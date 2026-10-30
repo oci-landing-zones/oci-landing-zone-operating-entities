@@ -3,7 +3,7 @@ import { emptyLzModel } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newSharedPlatform } from '../services/platforms';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 
 const hubs = [
   ['hub_a', 9],

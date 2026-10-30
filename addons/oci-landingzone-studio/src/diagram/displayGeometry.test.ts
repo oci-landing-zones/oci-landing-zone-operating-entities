@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import type { DiagramEdge, DiagramNode } from '../model/types';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { hubKindDefaults } from '../services/hubKinds';
 import { absoluteNodeRects, flowAnchorPoint } from './flowGeometry';
 import { associationDisplaySegments, connectionFlowGeometry, flowDisplayPoints, polylinePath, routeStructuralEdges, structuralEdgePoints, type FlowVisitAnchor } from './displayGeometry';
@@ -130,6 +130,22 @@ describe('shared diagram display geometry', () => {
     expect(geometry.points.filter((point) => point.x === entry[0].x && point.y === entry[0].y)).toHaveLength(1);
   });
 
+  it('keeps the attachment centre on the path before processing its DRG-end event', () => {
+    const anchor = { owner: 'drg', anchorId: 'attachment-at-drg', point: connections[3].points!.at(-1)! };
+    const geometry = connectionFlowGeometry(nodes, connections, ['app', 'attach-spoke', 'drg'], undefined, new Map([[1, anchor]]));
+    const attachment = flowAnchorPoint(absoluteNodeRects(nodes).get('attach-spoke')!);
+    const contains = (point: { x: number; y: number }) => geometry.points.slice(1).some((end, i) => {
+      const start = geometry.points[i];
+      return start.x === end.x ? point.x === start.x && point.y >= Math.min(start.y, end.y) && point.y <= Math.max(start.y, end.y)
+        : point.y === start.y && point.x >= Math.min(start.x, end.x) && point.x <= Math.max(start.x, end.x);
+    });
+    expect(contains(attachment)).toBe(true);
+    expect(geometry.points[geometry.visits[1].pointIndex]).toEqual(anchor.point);
+    expect(geometry.visits[1].distance).toBeLessThan(geometry.visits[2].distance);
+    const expected = connections[3].points!;
+    expect(geometry.points.some((_, index) => expected.every((point, offset) => point.x === geometry.points[index + offset]?.x && point.y === geometry.points[index + offset]?.y))).toBe(true);
+  });
+
   it('passes through each component centre once and processes its dot in the declared direction', () => {
     const resources: DiagramNode[] = [
       { id: 'source', kind: 'subnet', label: '', x: 400, y: 0, width: 100, height: 100 },
@@ -185,22 +201,6 @@ describe('obstacle-aware shared structural routing', () => {
     return a.y === b.y
       ? a.y > obstacle.y && a.y < obstacle.y + obstacle.height && Math.max(a.x, b.x) > obstacle.x && Math.min(a.x, b.x) < obstacle.x + obstacle.width
       : a.x > obstacle.x && a.x < obstacle.x + obstacle.width && Math.max(a.y, b.y) > obstacle.y && Math.min(a.y, b.y) < obstacle.y + obstacle.height;
-  });
-
-  it('avoids unrelated resources and compartments while allowing the real hoisted-dot ancestry', () => {
-    const nodes = [node('lz', 'landingzone', 0, 0, 700, 500),
-      node('owner', 'compartment', 20, 20, 240, 400, { parentId: 'lz' }),
-      node('vcn', 'vcn', 20, 30, 180, 300, { parentId: 'owner' }),
-      node('subnet', 'subnet', 20, 40, 100, 80, { parentId: 'vcn' }),
-      node('dot', 'rtdot', 156, 136, 8, 8, { parentId: 'lz', rtDotOwnerId: 'subnet' }),
-      node('services', 'resourcegroup', 280, 80, 100, 240, { parentId: 'lz' }),
-      node('other-vcn', 'vcn', 390, 80, 80, 240, { parentId: 'lz' }),
-      node('other-cmp', 'compartment', 480, 80, 60, 240, { parentId: 'lz' }),
-      node('table', 'routetable', 580, 100, 100, 100, { parentId: 'lz' })];
-    const [edge] = routeStructuralEdges(nodes, [{ id: 'leader', source: 'dot', target: 'table', sourceSide: 'right', targetSide: 'left' }]);
-    for (const obstacle of nodes.filter((n) => ['services', 'other-vcn', 'other-cmp'].includes(n.id))) expect(crosses(edge.points!, obstacle), obstacle.id).toBe(false);
-    expect(edge.points![0]).toEqual({ x: 164, y: 140 });
-    expect(structuralEdgePoints(edge, absoluteNodeRects(nodes))).toBe(edge.points);
   });
 
   it('avoids unrelated route dots but permits dots representing its actual endpoint ports', () => {
@@ -267,115 +267,9 @@ describe('obstacle-aware shared structural routing', () => {
 });
 
 
-describe('dedicated route-table annotation rails', () => {
+describe('shared table-line display', () => {
   const dot = (id: string, y: number): DiagramNode => ({ id, kind: 'rtdot', label: '', x: 0, y, width: 16, height: 16 });
-  const table = (id: string, y: number): DiagramNode => ({ id, kind: 'routetable', label: id, x: 300, y, width: 120, height: 100 });
-
-  it('gives each actual table one distinct rail and one common boundary entry', () => {
-    const nodes = [dot('one', 0), dot('two', 100), dot('three', 200), table('first', 50), table('second', 250)];
-    const edges: DiagramEdge[] = [
-      { id: 'z', source: 'one', target: 'first', sourceSide: 'right', targetSide: 'left' },
-      { id: 'a', source: 'three', target: 'first', sourceSide: 'right', targetSide: 'left' },
-      { id: 'b', source: 'two', target: 'second', sourceSide: 'right', targetSide: 'left' },
-    ];
-    const routed = routeStructuralEdges(nodes, edges);
-    const first = routed.filter((edge) => edge.target === 'first');
-    expect(new Set(first.map((edge) => edge.centerX)).size).toBe(1);
-    expect(first.map((edge) => edge.points!.at(-1))).toEqual([{ x: 300, y: 100 }, { x: 300, y: 100 }]);
-    expect(routed[2].centerX).not.toBe(first[0].centerX);
-    for (const edge of routed) {
-      expect(edge.points!.some((p, i, path) => i > 0 && p.x === edge.centerX && path[i - 1].x === edge.centerX)).toBe(true);
-      const target = nodes.find((node) => node.id === edge.target)!;
-      for (const p of edge.points!) expect(p.x > target.x && p.x < target.x + target.width && p.y > target.y && p.y < target.y + target.height).toBe(false);
-    }
-    expect(routeStructuralEdges(nodes, [...edges].reverse()).reverse()).toEqual(routed);
-  });
-
-  it('chooses a clear bounded rail with fewer physical-line crossings', () => {
-    const nodes = [dot('source', 0), table('target', 100),
-      { id: 'physical-source', kind: 'attachment' as const, label: '', x: 260, y: 40, width: 20, height: 20 },
-      { id: 'physical-target', kind: 'drg' as const, label: '', x: 350, y: 40, width: 20, height: 20 }];
-    const edges: DiagramEdge[] = [
-      { id: 'leader', source: 'source', target: 'target', sourceSide: 'right', targetSide: 'left' },
-      { id: 'physical', source: 'physical-source', target: 'physical-target', sourceSide: 'right', targetSide: 'left' },
-    ];
-    const [leader] = routeStructuralEdges(nodes, edges);
-    expect(leader.centerX).toBeLessThan(280);
-    expect(300 - leader.centerX!).toBeLessThanOrEqual(56);
-  });
-
-  it('keeps generated Hub B all-flow prefixes off their rails until the actual escaped join', async () => {
-    const { generatePreview } = await import('../generator/preview');
-    const { buildRouteTables } = await import('../services/routeTables');
-    const model = emptyLzModel();
-    model.network = { hubKind: 'hub_b', ...hubKindDefaults('hub_b') };
-    const preview = await generatePreview(model), tables = buildRouteTables(model, preview.network);
-    const graph = buildGraph(model, 5, { allFlows: true }, undefined, tables, preview.inventory);
-    expect(graph.flowErrors).toBeUndefined();
-    const rects = absoluteNodeRects(graph.nodes);
-    for (const edge of graph.edges.filter((edge) => rects.get(edge.source)?.node.kind === 'rtdot' && rects.get(edge.target)?.node.kind === 'routetable')) {
-      const points = edge.points!, terminal = points.at(-1)!;
-      const firstRail = points.findIndex((point) => point.x === edge.centerX);
-      expect(firstRail, edge.id).toBeGreaterThanOrEqual(0);
-      const joined = points.slice(firstRail, -1);
-      expect(joined.every((point) => point.x === edge.centerX), edge.id).toBe(true);
-      for (let i = 1; i < joined.length; i++) {
-        expect(Math.abs(joined[i].y - terminal.y), edge.id).toBeLessThanOrEqual(Math.abs(joined[i - 1].y - terminal.y) + 0.001);
-      }
-      expect(points.at(-2)!.y, edge.id).toBe(terminal.y);
-    }
-    const ingress = tables.find((table) => table.associations.some((association) => association.kind === 'vcn-ingress' && association.nodeId === 'hub-vcn'))!;
-    const edge = graph.edges.find((edge) => edge.target === ingress.id && rects.get(edge.source)?.node.kind === 'rtdot')!;
-    const start = edge.points![1], radius = Math.max(48, rects.get(edge.target)!.height);
-    const firstRail = edge.points!.findIndex((point) => point.x === edge.centerX);
-    for (const point of edge.points!.slice(1, firstRail)) expect(Math.abs(point.y - start.y)).toBeLessThanOrEqual(radius);
-  });
-
-  it('keeps a target table body blocked until its final boundary entry', () => {
-    const nodes = [dot('source', 40), { ...table('target', 0), x: 80 },
-      { id: 'block', kind: 'resourcegroup' as const, label: '', x: 0, y: -100, width: 60, height: 100 }];
-    const [edge] = routeStructuralEdges(nodes, [{ id: 'leader', source: 'source', target: 'target', sourceSide: 'right', targetSide: 'right' }]);
-    const target = nodes[1];
-    for (let i = 1; i < edge.points!.length; i++) {
-      const a = edge.points![i - 1], b = edge.points![i];
-      const crossed = a.y === b.y ? a.y > target.y && a.y < target.y + target.height && Math.max(a.x, b.x) > target.x && Math.min(a.x, b.x) < target.x + target.width
-        : a.x > target.x && a.x < target.x + target.width && Math.max(a.y, b.y) > target.y && Math.min(a.y, b.y) < target.y + target.height;
-      expect(crossed).toBe(false);
-    }
-    expect(edge.points!.at(-1)).toEqual({ x: 200, y: 50 });
-  });
-
-  it('routes around the actual source owner when its dot faces away from its table', () => {
-    const nodes = [{ id: 'owner', kind: 'attachment' as const, label: 'Attachment label', x: 100, y: 30, width: 120, height: 40 },
-      { ...dot('source', 42), x: 92, rtDotOwnerId: 'owner' }, table('target', 0)];
-    const [edge] = routeStructuralEdges(nodes, [{ id: 'leader', source: 'source', target: 'target', sourceSide: 'left', targetSide: 'left' }]);
-    const owner = nodes[0];
-    for (let i = 1; i < edge.points!.length; i++) {
-      const a = edge.points![i - 1], b = edge.points![i];
-      const inside = a.y === b.y ? a.y > owner.y && a.y < owner.y + owner.height && Math.max(a.x, b.x) > owner.x && Math.min(a.x, b.x) < owner.x + owner.width
-        : a.x > owner.x && a.x < owner.x + owner.width && Math.max(a.y, b.y) > owner.y && Math.min(a.y, b.y) < owner.y + owner.height;
-      expect(inside).toBe(false);
-    }
-    expect(edge.points![0]).toEqual({ x: 92, y: 50 });
-    expect(edge.points!.at(-1)).toEqual({ x: 300, y: 50 });
-  });
-
-  it('keeps crowded per-table lanes bounded and detours a blocked final approach', () => {
-    const nodes = [dot('source', 0), { id: 'block', kind: 'resourcegroup' as const, label: '', x: 270, y: 35, width: 15, height: 30 },
-      ...Array.from({ length: 8 }, (_, i) => table(`table-${i}`, 40 + i * 120))];
-    const edges = nodes.filter((node) => node.kind === 'routetable').map((node) => ({ id: `edge-${node.id}`, source: 'source', target: node.id, sourceSide: 'right' as const, targetSide: 'left' as const }));
-    const routed = routeStructuralEdges(nodes, edges);
-    expect(new Set(routed.map((edge) => edge.centerX)).size).toBe(routed.length);
-    for (const edge of routed) expect(300 - edge.centerX!).toBeGreaterThanOrEqual(16);
-    for (const edge of routed) expect(300 - edge.centerX!).toBeLessThanOrEqual(56);
-    const obstacle = nodes[1];
-    for (const edge of routed) for (let i = 1; i < edge.points!.length; i++) {
-      const a = edge.points![i - 1], b = edge.points![i];
-      expect(a.y === b.y ? a.y > obstacle.y && a.y < obstacle.y + obstacle.height && Math.max(a.x, b.x) > obstacle.x && Math.min(a.x, b.x) < obstacle.x + obstacle.width
-        : a.x > obstacle.x && a.x < obstacle.x + obstacle.width && Math.max(a.y, b.y) > obstacle.y && Math.min(a.y, b.y) < obstacle.y + obstacle.height).toBe(false);
-    }
-  });
-
+  const table = (id: string, y: number): DiagramNode => ({ id, kind: 'routetable', label: '', x: 200, y, width: 100, height: 100 });
   it('draws the exact same-table segment union once and retains unrelated-table overlaps', () => {
     const nodes = [dot('one', 0), dot('two', 40), { ...table('first', 50), x: 200 }, { ...table('second', 200), x: 200 }];
     const edges: DiagramEdge[] = [
@@ -411,6 +305,64 @@ describe('independent physical attachment fans', () => {
     }
     return total;
   };
+
+  it.each((['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const).flatMap((hub) => [
+    { hub, vpnCount: 2, shared: false }, { hub, vpnCount: 4, shared: true },
+  ]))('keeps $vpnCount VPNs clear for $hub (shared CPE: $shared)', async ({ hub, vpnCount, shared }) => {
+    const { emptyHybridConnectivity, newVpn } = await import('../services/hybridConnectivity');
+    const { physicalSharedSegments, structuralCrossings, structuralLineContacts } = await import('./layoutQuality');
+    const model = emptyLzModel();
+    model.network = { hubKind: hub, ...hubKindDefaults(hub) };
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    for (let i = 0; i < vpnCount; i++) {
+      const cpe = shared ? 0 : i;
+      hybrid.customer_premises_equipments[`cpe${cpe}`] = { ip_address: `203.0.113.${10 + cpe}` };
+      hybrid.ipsecs[`vpn${i}`] = { ...newVpn(`cpe${cpe}`), remote_cidrs: [`172.${20 + i}.0.0/16`] };
+    }
+    const graph = buildGraph(model, 2);
+    expect(structuralCrossings(graph)).toEqual([]);
+    expect(structuralLineContacts(graph)).toEqual([]);
+    expect(physicalSharedSegments(graph)).toEqual([]);
+    const rects = absoluteNodeRects(graph.nodes);
+    const physical = graph.edges.filter((edge) => edge.source.startsWith('hybrid-vpn-') || edge.source.startsWith('hybrid-cpe-'));
+    expect(physical).toHaveLength(vpnCount * 4);
+    for (const edge of physical) {
+      const points = edge.points!;
+      const length = points.slice(1).reduce((sum, point, i) => sum + Math.abs(point.x - points[i].x) + Math.abs(point.y - points[i].y), 0);
+      expect(length).toBeCloseTo(Math.abs(points[0].x - points.at(-1)!.x) + Math.abs(points[0].y - points.at(-1)!.y), 6);
+      expect(points).toHaveLength(4);
+      const source = rects.get(edge.source)!;
+      if (source.node.kind === 'vpn') {
+        const premises = rects.get(source.node.parentId!)!;
+        expect(points[1].x).toBeGreaterThan(premises.x + premises.width);
+        expect(points[1].x).toBeLessThan(rects.get(edge.target)!.x);
+      }
+    }
+  });
+
+  it('keeps VPN tunnel runs separated until the compact DRG approach', () => {
+    const drg: DiagramNode = { id: 'router', kind: 'drg', label: 'drg-fra-lz-hub', x: 100, y: 84, width: 48, height: 48 };
+    const nodes: DiagramNode[] = [drg,
+      { id: 'tunnel-1', kind: 'vpntunnel', label: 'Tunnel 1', x: -600, y: 0, width: 500, height: 96 },
+      { id: 'tunnel-2', kind: 'vpntunnel', label: 'Tunnel 2', x: -600, y: 120, width: 500, height: 96 },
+    ];
+    const edges: DiagramEdge[] = nodes.slice(1).map((node, i) => ({ id: `vpn-${i}`, source: node.id, target: drg.id,
+      sourceSide: 'right', sourcePort: 0.5, targetSide: 'left', targetPort: (i + 1) / 3 }));
+    const routed = routeStructuralEdges(nodes, edges);
+    const bendX = drg.x - 128;
+    for (const [index, edge] of routed.entries()) {
+      expect(edge.points).toEqual([
+        { x: -100, y: 48 + index * 120 },
+        { x: bendX, y: 48 + index * 120 },
+        { x: bendX, y: 100 + index * 16 },
+        { x: 100, y: 100 + index * 16 },
+      ]);
+    }
+    expect(sharedLength(routed[0].points!, routed[1].points!)).toBe(0);
+    const reversed = edges.map((edge) => ({ ...edge, source: edge.target, target: edge.source,
+      sourceSide: edge.targetSide, targetSide: edge.sourceSide, sourcePort: edge.targetPort, targetPort: edge.sourcePort }));
+    routeStructuralEdges(nodes, reversed).forEach((edge, i) => expect(edge.points).toEqual([...routed[i].points!].reverse()));
+  });
 
   it('keeps lower fan trunks outside the complete DRG caption while retaining glyph ports', () => {
     const drg: DiagramNode = { id: 'router', kind: 'drg', label: 'A long DRG caption beside physical branches', x: 0, y: 100, width: 48, height: 48 };

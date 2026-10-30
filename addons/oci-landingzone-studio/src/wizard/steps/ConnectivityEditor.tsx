@@ -4,7 +4,7 @@ import type { CrossConnectMapping, FastConnectConfig, VpnTunnel } from '../../mo
 import { ipsecPhaseOptions } from '../../model/hybridConnectivity';
 import { bandwidthShapeError, bgpMd5KeyError, emptyHybridConnectivity, newVpn, vpnIdentityError, vpnSharedSecretError } from '../../services/hybridConnectivity';
 import { FONT, s } from './networkEditorStyles';
-import { connectivityCatalog, cpeDeviceError, providerSelectionError, providerServicesForRegion, selectCpeDevice, selectProviderService } from '../../services/connectivityCatalog';
+import { providerSelectionError, providerServicesForRegion, selectProviderService } from '../../services/connectivityCatalog';
 import DeleteButton from '../../components/DeleteButton';
 import Switch from '../../components/Switch';
 import FieldHelp, { type FieldHelpContent } from './FieldHelp';
@@ -62,12 +62,12 @@ function ProviderServiceField({ circuit, realm, region, onChange }: { circuit: F
   const manual = !available.length || value === 'ocid' || Boolean(error);
   return <div role="group" aria-label="Provider service selection" style={{ gridColumn: '1 / -1' }}>
     {available.length > 0 && <Choice label="Provider service" help={help.provider} value={value} options={[
-      ['', 'Direct / physical connection'],
+      ['', 'Select provider service'],
       ...available.map((service): [string, string] => [service.ocid, service.label]),
       ['ocid', 'Other provider service (enter OCID)'],
     ]} onChange={(selection) => onChange(selectProviderService(circuit, selection, realm, region))} />}
     {manual && <div style={available.length ? { marginTop: 12 } : undefined}>
-      <Field label="Provider service OCID" help={help.provider} note={error || 'Leave empty for a direct physical connection.'} value={circuit.provider_service_id} invalid={Boolean(error)} onChange={(provider_service_id) => {
+      <Field label="Provider service OCID" help={help.provider} note={error || 'Enter the provider service OCID for this realm and region.'} value={circuit.provider_service_id} invalid={Boolean(error)} onChange={(provider_service_id) => {
         const next = selectProviderService(circuit, '', realm, region);
         if (provider_service_id) next.provider_service_id = provider_service_id;
         else delete next.provider_service_id;
@@ -191,31 +191,26 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
   return <div className="connectivity-editor" style={{ ...s.col, fontFamily: FONT, fontSize: 14, lineHeight: 1.5 }}>
     <section className="connectivity-setup" aria-label={kind === 'vpn' ? 'VPN setup guide' : 'FastConnect setup guide'}>
       <h2 style={{ ...s.title, marginBottom: 8 }}>{kind === 'vpn' ? 'Set up a VPN connection' : 'Set up a FastConnect circuit'}</h2>
-      <p>{kind === 'vpn' ? 'A VPN connects your office or data center to OCI over the internet. The customer router and OCI must use matching tunnel settings.' : 'FastConnect uses a dedicated provider service or physical connection. Agree the service with your provider or network team before entering its details here.'}</p>
+      <p>{kind === 'vpn' ? 'A VPN connects your office or data center to OCI over the internet. The customer router and OCI must use matching tunnel settings.' : 'FastConnect uses a dedicated provider service. Agree the service with your provider or network team before entering its details here.'}</p>
       <ol>
         {kind === 'vpn' ? <>
           <li><strong>Register your equipment.</strong> Add an OCI record for your router using its reachable public IP, or reuse an existing CPE object.</li>
           <li><strong>Add a VPN connection.</strong> Select the equipment and enter the remote networks that OCI needs to reach.</li>
           <li><strong>Configure both tunnels.</strong> Choose static or BGP routing and each tunnel's key source. Match IKE settings with your router administrator.</li>
         </> : <>
-          <li><strong>Confirm the connection details.</strong> Select a provider service when choices are available, or enter its OCID for your region. Direct connections need a provisioned physical cross-connect/group OCID.</li>
+          <li><strong>Confirm the connection details.</strong> Select a provider service when choices are available, or enter its OCID for your region.</li>
           <li><strong>Add a circuit.</strong> Connect your private network to the landing zone. Select bandwidth offered for your service.</li>
           <li><strong>Configure BGP.</strong> Use the settings agreed with your network team or provider. If the provider operates BGP, follow its instructions.</li>
         </>}
       </ol>
-      <p><strong>Then deploy and complete the connection.</strong> In Review, download the files for your Terraform deployment. Your network team must configure the router{kind === 'fastconnect' && ' and complete provider or physical activation'}. Allow the required traffic in firewall policies, network security groups and security lists, then test the path. Downloading files does not establish connectivity.</p>
+      <p><strong>Then deploy and complete the connection.</strong> In Review, download the files for your Terraform deployment. Your network team must configure the router{kind === 'fastconnect' && ' and complete provider activation'}. Allow the required traffic in firewall policies, network security groups and security lists, then test the path. Downloading files does not establish connectivity.</p>
       <a className="guide-link" href={kind === 'vpn' ? 'https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm' : 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm'} target="_blank" rel="noreferrer">{kind === 'vpn' ? 'Oracle VPN setup and prerequisites' : 'Oracle FastConnect connection options'}</a>
     </section>
     {kind === 'vpn' ? <>
     <section><h2 style={s.title}>Customer VPN equipment</h2>
-      <p style={{ ...s.help, marginBottom: 12 }}>Customer premises equipment (CPE) is your router or firewall. This creates its record in OCI; your network team configures the device itself. Already have a CPE object in OCI? Supply its OCID when adding the VPN below.</p>
-      {Object.entries(h.customer_premises_equipments).map(([name, cpe]) => <Card key={name} name={name} type="CPE" attention={Boolean(cpeDeviceError(cpe, model.foundation.realm))} onDelete={() => update((v) => { delete v.customer_premises_equipments[name]; })}>
+      <p style={{ ...s.help, marginBottom: 12 }}>Customer premises equipment (CPE) is your router or firewall. This creates its record in OCI using the Other device type; your network team configures the device itself. Already have a CPE object in OCI? Supply its OCID when adding the VPN below.</p>
+      {Object.entries(h.customer_premises_equipments).map(([name, cpe]) => <Card key={name} name={name} type="CPE" onDelete={() => update((v) => { delete v.customer_premises_equipments[name]; })}>
         <Field label="Public IPv4 address" help={help.cpeIp} note="Ask your router administrator for the reachable public IP. Behind NAT, use the translated public address." value={cpe.ip_address} onChange={(value) => update((v) => { v.customer_premises_equipments[name].ip_address = value; })} />
-        <Choice label="Device vendor" help={help.cpeVendor} value={cpe.cpe_device_shape_id !== undefined ? 'ocid' : cpe.cpe_device_shape_vendor_name ?? 'Other'} options={[...connectivityCatalog.cpe_vendors.map((vendor): [string, string] => [vendor.name, vendor.label]), ['ocid', 'Other device (enter shape ID / OCID)']]} note={`OCI resolves the vendor template in ${model.foundation.realm} / ${model.foundation.region} during deployment. Use a shape identifier for an exact model or an unlisted vendor.`} onChange={(selection) => update((v) => { v.customer_premises_equipments[name] = selectCpeDevice(cpe, selection); })} />
-        {(cpe.cpe_device_shape_id !== undefined || Boolean(cpeDeviceError(cpe, model.foundation.realm))) && <div style={{ gridColumn: '1 / -1' }}><Field label="Device shape ID / OCID" help={help.cpeShape} value={cpe.cpe_device_shape_id} invalid={Boolean(cpeDeviceError(cpe, model.foundation.realm))} note={cpeDeviceError(cpe, model.foundation.realm) || 'Use the identifier returned by OCI in the selected realm. Some device shape identifiers are UUIDs.'} onChange={(value) => update((v) => {
-          v.customer_premises_equipments[name].cpe_device_shape_id = value;
-          delete v.customer_premises_equipments[name].cpe_device_shape_vendor_name;
-        })} /></div>}
       </Card>)}
       <AddEntry label="CPE" names={Object.keys(h.customer_premises_equipments)} onAdd={(name) => update((v) => { v.customer_premises_equipments[name] = { ip_address: '' }; })} />
     </section>
@@ -249,7 +244,6 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
           if (value === '') delete next[key];
           v.fast_connect_virtual_circuits[name] = next;
         });
-        const partner = Boolean(circuit.provider_service_id);
         return <Card key={name} name={name} type="FastConnect" attention={Boolean(providerSelectionError(circuit, model.foundation.realm, model.foundation.region)) || Boolean(bandwidthShapeError(circuit.bandwidth_shape_name)) || Object.values(circuit.cross_connect_mappings ?? {}).some((mapping) => Boolean(bgpMd5KeyError(mapping)))} onDelete={() => update((v) => { delete v.fast_connect_virtual_circuits[name]; })}>
           <fieldset className="connectivity-settings"><legend style={{ ...s.subHead, fontSize: 13 }}>Circuit settings</legend><div className="connectivity-grid">
           <Field label="Remote IPv4 CIDRs" help={help.remote} note="Networks on your side that OCI should reach. Agree these ranges and BGP advertisements with your network team." value={circuit.remote_cidrs?.join(', ')} onChange={(value) => field('remote_cidrs', list(value))} />
@@ -268,19 +262,11 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
                 <h3 style={{ ...s.subHead, margin: 0, minWidth: 0, overflowWrap: 'anywhere' }}>BGP mapping: {key}</h3>
                 <DeleteButton label={`Remove BGP mapping ${key} from FastConnect ${name}`} onClick={() => update((v) => { delete v.fast_connect_virtual_circuits[name].cross_connect_mappings![key]; })} />
               </div>
-              <p style={{ ...s.help, marginBottom: 12 }}>{partner ? 'Use the peering details supplied for your partner service. A mapping describes this circuit; it does not order another provider connection.' : 'Map this circuit to a provisioned physical cross-connect/group. Use its real OCID and the VLAN agreed with your network team.'} The customer and Oracle addresses are different hosts in the same subnet; these are BGP interface IPs, not the remote networks.</p>
+              <p style={{ ...s.help, marginBottom: 12 }}>Use the peering details supplied for your partner service. A mapping describes this circuit; it does not order another provider connection. The customer and Oracle addresses are different hosts in the same subnet; these are BGP interface IPs, not the remote networks.</p>
               <div className="connectivity-grid">
               <Field label="Customer BGP IP/prefix" help={help.customerPeeringIp} value={mapping.customer_bgp_peering_ip} onChange={(value) => mapField('customer_bgp_peering_ip', value)} /><Field label="Oracle BGP IP/prefix" help={help.oraclePeeringIp} value={mapping.oracle_bgp_peering_ip} onChange={(value) => mapField('oracle_bgp_peering_ip', value)} />
               <Choice label="BGP authentication" help={help.bgpAuth} value={mapping.bgp_md5auth_mode ?? 'none'} options={[["none", 'Disabled'], ["inline", 'MD5 key for this session']]} note={mapping.bgp_md5auth_mode === 'inline' ? 'Use the key agreed with your BGP peer. Downloads include it; Studio clears it when you reopen the design.' : 'Enable only when your provider or router administrator requires a matching MD5 key.'} onChange={(value) => update((v) => { const m = v.fast_connect_virtual_circuits[name].cross_connect_mappings![key]; m.bgp_md5auth_mode = value as 'none' | 'inline'; delete m.bgp_md5auth_key; })} />
               {mapping.bgp_md5auth_mode === 'inline' && <Field label="BGP MD5 key (session only)" help={help.bgpKey} secret value={mapping.bgp_md5auth_key} invalid={Boolean(keyError)} note={keyError} onChange={(value) => mapField('bgp_md5auth_key', value)} />}
-              <details className="connectivity-disclosure" open={!partner || Boolean(mapping.cross_connect_or_cross_connect_group_id || mapping.vlan)} style={{ gridColumn: '1 / -1' }}>
-                <summary style={disclosure}>Cross-connect and VLAN<Chevron /></summary>
-                <p style={{ ...s.help, margin: '8px 0 12px' }}>Use a provisioned connection OCID for direct connections. Follow your provider's instructions for partner connections and VLANs.</p>
-                <div className="connectivity-grid">
-                  <div style={{ gridColumn: '1 / -1' }}><Field label="Cross-connect/group OCID" help={help.physicalId} value={mapping.cross_connect_or_cross_connect_group_id} onChange={(value) => mapField('cross_connect_or_cross_connect_group_id', value)} /></div>
-                  <Field label="VLAN" help={help.vlan} value={mapping.vlan} onChange={(value) => mapField('vlan', value)} />
-                </div>
-              </details>
             </div></div>;
           })}
           <div className="connectivity-mapping-add" style={{ gridColumn: '1 / -1' }}><AddEntry label="BGP mapping" owner={`FastConnect ${name}`} names={Object.keys(circuit.cross_connect_mappings ?? {})} onAdd={(key) => field('cross_connect_mappings', { ...circuit.cross_connect_mappings, [key]: {} })} /></div>
@@ -296,20 +282,6 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
       })}
       <AddEntry label="FastConnect circuit" names={Object.keys(h.fast_connect_virtual_circuits)} onAdd={(name) => update((v) => { v.fast_connect_virtual_circuits[name] = { type: 'PRIVATE', remote_cidrs: [], cross_connect_mappings: { primary: {} } }; })} />
     </section>
-    <details className="connectivity-disclosure" style={{ ...group, paddingTop: 0 }}><summary style={disclosure}>Physical FastConnect preparation<Chevron /></summary>
-      <p style={{ ...s.help, marginTop: 14 }}>Use this section only when you need to prepare physical ports with Oracle. Partner-managed services usually supply a provider service OCID instead. Create groups and ports first, complete cabling and activation, then enter their OCIDs in the circuit mappings. Terraform does not order carrier services or configure your router.</p>
-      {Object.entries(h.cross_connect_groups).map(([name, group]) => <Card key={name} name={name} type="Cross-connect group" onDelete={() => update((v) => { delete v.cross_connect_groups[name]; })}>
-        {Object.entries(group.cross_connects).map(([key, port]) => <div role="group" aria-label={`Port: ${key}`} key={key} style={{ gridColumn: '1 / -1' }}>
-          <div className="connectivity-item-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-            <h3 style={{ ...s.subHead, margin: 0, minWidth: 0, overflowWrap: 'anywhere' }}>Port: {key}</h3>
-            <DeleteButton label={`Remove port ${key} from cross-connect group ${name}`} onClick={() => update((v) => { delete v.cross_connect_groups[name].cross_connects[key]; })} />
-          </div><div className="connectivity-grid">
-          {(['location_name', 'port_speed_shape_name', 'customer_reference_name', 'near_cross_connect_or_cross_connect_group_id', 'far_cross_connect_or_cross_connect_group_id'] as const).map((field, i) => <div key={field} style={{ gridColumn: field.endsWith('_id') ? '1 / -1' : undefined }}><Field label={['Location name', 'Port speed shape', 'Customer reference (optional)', 'Near connection/group OCID (optional)', 'Far connection/group OCID (optional)'][i]} help={[help.location, help.portSpeed, help.reference, help.near, help.far][i]} value={port[field]} onChange={(value) => update((v) => { const p = v.cross_connect_groups[name].cross_connects[key]; if (value || field === 'location_name' || field === 'port_speed_shape_name') p[field] = value; else delete p[field]; })} /></div>)}
-        </div></div>)}
-        <div style={{ gridColumn: '1 / -1' }}><AddEntry label="port" owner={`cross-connect group ${name}`} names={Object.keys(group.cross_connects)} onAdd={(key) => update((v) => { v.cross_connect_groups[name].cross_connects[key] = { location_name: '', port_speed_shape_name: '' }; })} /></div>
-      </Card>)}
-      <AddEntry label="cross-connect group" names={Object.keys(h.cross_connect_groups)} onAdd={(name) => update((v) => { v.cross_connect_groups[name] = { cross_connects: {} }; })} />
-    </details>
     </>}
   </div>;
 }

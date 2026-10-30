@@ -14,6 +14,32 @@ const rule = (id: string, cidr: string, target: string, routeType: 'Static' | 'D
 });
 
 describe('flowTrace generated routing inventory', () => {
+  it('traces local inter-subnet delivery and highlights the implicit rule without sending it to the DRG', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const trace = traceFlow(model, { id: 'local', kind: 'east-west', color: C, srcEnv: 0, dstEnv: 0, dstSubnet: 1 }, tables);
+    expect(trace.ok).toBe(true);
+    expect(segments(trace)).toEqual(['cmp-env-0-vcn-sn-0->cmp-env-0-vcn-sn-1']);
+    const selected = tables.find((table) => table.id === trace.hops[0].tableId)!.rules[trace.hops[0].rowIndex!];
+    expect(selected.provenance).toBe('implicit-local');
+    expect(trace.hops[0].ruleId).toBe(selected.id);
+    expect(trace.hops.at(-1)?.label).toContain('(local)');
+  });
+
+  it('applies a local VCN-ingress route at its attachment and refuses to deliver it into another VCN', async () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    const tables = await generatedRouteTables(model);
+    const source = tables.find((table) => table.associations.some((binding) => binding.nodeId === 'cmp-env-0-vcn-sn-0'))!;
+    const local = source.rules.find((rule) => rule.provenance === 'implicit-local')!;
+    tables.push({ ...source, id: 'local-ingress', rules: [local], associations: [{ nodeId: 'cmp-env-0-vcn', kind: 'vcn-ingress' }] });
+    const [trace] = buildFlowTraces(model, ['preprod>prod:east-west:web'], 'flow', tables);
+    expect(trace.ok).toBe(true);
+    expect(trace.hops.find((hop) => hop.tableId === 'local-ingress')).toMatchObject({ node: 'attach-cmp-env-0', tableOwner: 'cmp-env-0-vcn', ruleId: local.id });
+    local.targetNodeId = 'cmp-env-1-vcn';
+    expect(buildFlowTraces(model, ['preprod>prod:east-west:web'], 'flow', tables)[0].ok).toBe(false);
+  });
+
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('resolves every supported traffic kind from actual %s tables', async (hubKind) => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
@@ -174,6 +200,13 @@ describe('flowTrace generated routing inventory', () => {
 });
 
 describe('effective rule selection', () => {
+  it('prefers a static route over an equal implicit local prefix, and local over a broader default', () => {
+    const local: RouteRule = { ...rule('local', '10.0.0.0/16', 'vcn'), nextHopKind: 'local', provenance: 'implicit-local', routeType: 'Implicit' };
+    const configured = rule('static', '10.0.0.0/16', 'firewall');
+    expect(matchRule([local, configured], '10.0.1.10/32')?.rule.id).toBe('static');
+    expect(matchRule([rule('default', '0.0.0.0/0', 'drg'), local], '10.0.1.10/32')?.rule.id).toBe('local');
+    expect(matchRule([local, rule('specific', '10.0.1.0/24', 'firewall')], '10.0.1.10/32')?.rule.id).toBe('specific');
+  });
   it('prefers longest prefix, then static, without treating import priority as forwarding preference', () => {
     const rules = [rule('default', '0.0.0.0/0', 'hub'), rule('dynamic', '10.0.0.0/16', 'dynamic', 'Dynamic'), rule('static', '10.0.0.0/16', 'static')];
     expect(matchRule(rules, '10.0.1.10/32')?.rule.id).toBe('static');

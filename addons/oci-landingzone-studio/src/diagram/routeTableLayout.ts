@@ -46,7 +46,7 @@ function wrap(value: string, width: number, fontSize: number, spacing = 0): stri
   return lines;
 }
 
-export function routeTableLayout(table: { label: string; columns?: 'vcn' | 'drg'; rowCount: number; note?: string; width: number }) {
+export function routeTableLayout(table: { label: string; columns?: 'vcn' | 'drg'; rowCount: number; rows?: { superseded?: boolean }[]; note?: string; width: number }) {
   const m = ROUTE_TABLE_METRICS, columns = COLUMNS[table.columns ?? 'vcn'];
   const innerWidth = table.width - 2 * m.border;
   const contentWidth = Math.max(1, innerWidth - 2 * m.paddingX);
@@ -60,6 +60,8 @@ export function routeTableLayout(table: { label: string; columns?: 'vcn' | 'drg'
   const noteHeight = noteLines.length ? noteLines.length * m.noteLine + 2 * m.notePadding : 0;
   const columnHeight = Math.max(...headerLines.map((lines) => lines.length)) * m.columnLine + 2 * m.columnPadding + m.border;
   const rowHeight = m.rowLine + 2 * m.rowPadding;
-  return { titleLines, noteLines, headerLines, columnWidths, titleHeight, noteHeight, columnHeight, rowHeight,
-    height: 2 * m.border + titleHeight + noteHeight + columnHeight + table.rowCount * rowHeight };
+  const rowNotes = Array.from({ length: table.rowCount }, (_, i) => table.rows?.[i]?.superseded ? '(fully superseded)' : '');
+  const rowHeights = rowNotes.map((note) => rowHeight + (note ? m.rowLine : 0));
+  return { titleLines, noteLines, headerLines, columnWidths, titleHeight, noteHeight, columnHeight, rowHeight, rowNotes, rowHeights,
+    height: 2 * m.border + titleHeight + noteHeight + columnHeight + rowHeights.reduce((sum, height) => sum + height, 0) };
 }

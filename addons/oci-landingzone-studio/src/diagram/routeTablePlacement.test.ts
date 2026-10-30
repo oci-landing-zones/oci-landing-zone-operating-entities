@@ -1,16 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
-import { buildRouteTables, type RouteRule, type RouteTable } from '../services/routeTables';
-import { buildGraph } from './buildGraph';
+import { emptyLzModel } from '../model/defaults';
+import type { RouteRule, RouteTable } from '../services/routeTables';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { absoluteNodeRects } from './flowGeometry';
 import { attachmentLabelLayout, ATTACHMENT_LABEL, DIAGRAM_LAYOUT, drgCaptionBounds, drgCaptionLayout } from './layoutPolicy';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
-import { hubKindDefaults } from '../services/hubKinds';
-import { generatePreview } from '../generator/preview';
-import { setAssetLoader } from '../generator/jsonnetVm';
 
-setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') }));
 
 const rule: RouteRule = {
   id: 'default', provenance: 'configured', destination: '0.0.0.0/0',
@@ -53,54 +48,6 @@ describe('owner-local route table callouts', () => {
     }
   });
 
-  it('keeps ingress and DRG tables in their fixed left zone despite a tall shared table', () => {
-    const { model, tables } = fixture();
-    const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables);
-    const rects = absoluteNodeRects(graph.nodes);
-    const ingress = rects.get('vcn-entry')!;
-    const small = rects.get('one-route')!, smallDot = rects.get('dot-one-route')!;
-    const large = rects.get('many-routes')!, network = rects.get('cmp-network')!;
-    expect(ingress.x + ingress.width).toBeLessThan(network.x);
-    expect(large.x + large.width).toBeLessThan(network.x);
-    expect(small.x + small.width).toBeLessThanOrEqual(smallDot.x);
-    expect(new Set([ingress.x, small.x, large.x]).size).toBe(1);
-    expect(graph.nodes.filter((node) => node.kind === 'routetable')).toHaveLength(tables.length);
-    for (const table of tables) expect(rects.get(table.id)!.node.rtRows).toHaveLength(table.rules.length);
-  });
-
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps generated %s table zones stable as attachment labels and fan counts change', async (hub) => {
-    for (const count of [2, 3]) {
-      const widths: number[] = [];
-      for (const region of ['fra', 'wmw']) {
-        const model = emptyLzModel();
-        model.network = { hubKind: hub, ...hubKindDefaults(hub) };
-        model.foundation.regionShortName = region;
-        if (count === 3) model.environments.push({ id: 'test', name: 'test', securityZone: false,
-          network: envNetworkDefaults(2, 'test', [model.network.hubVcnCidr, ...model.environments.map((env) => env.network.vcnCidr)]) });
-        model.remotePeeringConnections = [{ id: 'remote', name: 'remote', role: 'acceptor', peerRegionName: 'eu-amsterdam-1', remoteCidrs: ['10.200.0.0/21'] }];
-        const preview = await generatePreview(model);
-        const tables = buildRouteTables(model, preview.network);
-        const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables, preview.inventory);
-        const rects = absoluteNodeRects(graph.nodes), network = rects.get('cmp-network')!, environment = rects.get('cmp-env-0')!;
-        widths.push(rects.get('attach-hub')!.width);
-        expect(graph.nodes.filter((node) => node.kind === 'routetable')).toHaveLength(tables.length);
-        for (const table of tables) {
-          const card = rects.get(table.id)!;
-          const sharedRouting = !table.associations.length || table.associations.some((owner) => owner.kind === 'drg-attachment' || owner.kind === 'rpc-attachment');
-          const environmentRouting = !sharedRouting && table.associations.some((owner) => owner.nodeId.startsWith('cmp-env-'));
-          const sharedSubnet = !sharedRouting && !environmentRouting && table.associations.every((owner) => owner.kind === 'subnet');
-          if (environmentRouting) expect(card.x, `${hub}/${count}/${region} ${table.name}`).toBeGreaterThan(environment.x + environment.width);
-          else if (sharedSubnet) {
-            expect(card.x, table.name).toBeGreaterThan(network.x + network.width);
-            expect(card.x + card.width, table.name).toBeLessThan(environment.x);
-          } else expect(card.x + card.width, `${hub}/${count}/${region} ${table.name}`).toBeLessThan(network.x);
-          expect(card.node.rtRows).toHaveLength(table.rules.length);
-        }
-      }
-      expect(widths[1]).toBeGreaterThan(widths[0]);
-    }
-  }, 60_000);
-
   it('keeps canonical owner ports and produces the same layout regardless of input table order', () => {
     const { model, tables } = fixture();
     const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables);
@@ -118,9 +65,12 @@ describe('owner-local route table callouts', () => {
     for (const table of tables) for (const [index, association] of table.associations.entries()) {
       const owner = rects.get(association.nodeId)!, dot = rects.get(`dot-${table.id}${index ? `-${index}` : ''}`)!;
       const center = { x: dot.x + dot.width / 2, y: dot.y + dot.height / 2 };
-      expect(center).toEqual(association.kind === 'vcn-ingress'
-        ? { x: owner.x + owner.width / 2, y: owner.y + owner.height }
-        : { x: owner.x, y: owner.y + owner.height / 2 });
+      if (association.kind === 'drg-attachment') {
+        const physical = graph.edges.find((edge) => edge.source === association.nodeId && edge.target === 'drg')!;
+        expect(dot.node.rtDotOwnerId).toBe(association.nodeId);
+        expect(dot.node.rtDotPhysicalOwnerId).toBe('drg');
+        expect(center).toEqual(physical.points!.at(-1));
+      } else expect(center).toEqual({ x: owner.x + owner.width / 2, y: owner.y + owner.height });
     }
   });
 });

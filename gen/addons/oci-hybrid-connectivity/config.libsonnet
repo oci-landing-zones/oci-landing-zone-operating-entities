@@ -112,14 +112,8 @@ local mapping(raw, label) =
   normalize(raw)::
     local root = object(raw, 'hybrid_connectivity', ['customer_premises_equipments', 'ipsecs', 'fast_connect_virtual_circuits', 'cross_connect_groups']);
     local cpes = named_map(get(root, 'customer_premises_equipments', {}), 'hybrid_connectivity.customer_premises_equipments', function(raw, label)
-      local o = object(raw, label, ['ip_address', 'cpe_device_shape_id', 'cpe_device_shape_vendor_name']);
+      local o = object(raw, label, ['ip_address']);
       assert ip(v.required(o, 'ip_address', label + '.ip_address'), label) > 0;
-      assert get(o, 'cpe_device_shape_id') == null || get(o, 'cpe_device_shape_vendor_name') == null : label + ' must choose cpe_device_shape_id or cpe_device_shape_vendor_name, not both';
-      assert collections.all([
-        local value = text(o[k], label + '.' + k);
-        std.length(std.stripChars(value, ' \t\r\n')) > 0
-        for k in ['cpe_device_shape_id', 'cpe_device_shape_vendor_name'] if get(o, k) != null
-      ]) : label + ' device shape ID/vendor must be nonblank strings';
       o
     );
     local vpns = named_map(get(root, 'ipsecs', {}), 'hybrid_connectivity.ipsecs', function(raw, label)

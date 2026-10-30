@@ -2,8 +2,6 @@ export { default as ipsecPhaseOptions } from '../../../../gen/addons/oci-hybrid-
 
 export interface CpeConfig {
   ip_address: string;
-  cpe_device_shape_id?: string;
-  cpe_device_shape_vendor_name?: string;
 }
 
 export interface VpnTunnel {

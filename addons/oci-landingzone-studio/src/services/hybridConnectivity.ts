@@ -1,7 +1,7 @@
 import type { CrossConnectMapping, HybridConnectivity, VpnConfig, VpnTunnel } from '../model/hybridConnectivity';
 import type { LzModel } from '../model/types';
 import { parseCidr, overlaps } from './cidr';
-import { cpeDeviceError, providerSelectionError } from './connectivityCatalog';
+import { providerSelectionError } from './connectivityCatalog';
 
 export function emptyHybridConnectivity(): HybridConnectivity {
   return { customer_premises_equipments: {}, ipsecs: {}, fast_connect_virtual_circuits: {}, cross_connect_groups: {} };
@@ -15,6 +15,10 @@ export function newVpn(cpe: string): VpnConfig {
       tunnel_2: { routing: 'STATIC', ike_version: 'V2', secretMode: 'oci' },
     },
   };
+}
+
+export function vpnCpeNodeId(vpn: VpnConfig): string {
+  return vpn.cpe_key ? `hybrid-cpe-${vpn.cpe_key}` : `hybrid-cpe-existing:${vpn.cpe_id ?? ''}`;
 }
 
 const literal = (value: unknown) => typeof value === 'string' && value.length > 0 && !value.startsWith('ocid1.vaultsecret.');
@@ -58,6 +62,9 @@ export function hybridConfig(model: LzModel): HybridConnectivity | undefined {
   if (!model.hybridConnectivity) return undefined;
   const hybrid = structuredClone(model.hybridConnectivity);
   if (Object.values(hybrid).every((entries) => Object.keys(entries).length === 0)) return undefined;
+  for (const [name, cpe] of Object.entries(hybrid.customer_premises_equipments)) {
+    hybrid.customer_premises_equipments[name] = { ip_address: cpe.ip_address };
+  }
   for (const vpn of Object.values(hybrid.ipsecs)) {
     for (const tunnel of Object.values(vpn.tunnels_management)) {
       if (tunnel.secretMode === 'oci') delete tunnel.shared_secret;
@@ -118,10 +125,6 @@ export function validateHybridConnectivity(model: LzModel): string[] {
   const h = model.hybridConnectivity;
   if (!h) return [];
   const errors: string[] = [];
-  for (const [name, cpe] of Object.entries(h.customer_premises_equipments)) {
-    const error = cpeDeviceError(cpe, model.foundation.realm);
-    if (error) errors.push(`CPE ${name}: ${error}`);
-  }
   for (const [name, vpn] of Object.entries(h.ipsecs)) {
     const identityError = vpnIdentityError(vpn);
     if (identityError) errors.push(`VPN ${name}: ${identityError}`);

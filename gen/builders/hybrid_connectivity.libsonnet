@@ -12,6 +12,7 @@ function(params)
   local key(type, name) = n.key(type, ['HUB', segment(name)]);
   local drg_key = n.key('DRG', ['HUB']);
   local hub_attachment = n.key('DRGATT', ['HUB', 'VCN']);
+  local hc_table = key('DRGRT', 'HC');
   local remote_cidrs = contract.remote_cidrs(c);
   local types = (if std.length(std.objectFields(c.ipsecs)) > 0 then [{ name: 'VPN', type: 'IPSEC_TUNNEL', selector: 'ipsec_tunnel' }] else [])
               + (if std.length([v for v in std.objectValues(c.fast_connect_virtual_circuits) if v.provision_fc_virtual_circuit]) > 0 then [{ name: 'FASTCONNECT', type: 'VIRTUAL_CIRCUIT', selector: 'virtual_circuit' }] else []);
@@ -30,20 +31,21 @@ function(params)
     for t in [types[i]]
   };
   local local_entries = [{ vcn: params.hub_cidr, name: 'hub', drg_att_key: hub_attachment }] + locals;
-  local tables = {
-    [key('DRGRT', t.name)]: {
-      display_name: n.display('drgrt', ['hub', std.asciiLower(t.name)]), is_ecmp_enabled: false,
+  local tables = if std.length(types) == 0 then {} else {
+    [hc_table]: {
+      display_name: n.display('drgrt', ['hub', 'hc']), is_ecmp_enabled: false,
       route_rules: if direct then {} else {
-        [n.route_rule(['hybrid', std.asciiLower(t.name), e.name])]: {
+        [n.route_rule(['hybrid', 'hc', e.name])]: {
           destination: e.vcn, destination_type: 'CIDR_BLOCK', next_hop_drg_attachment_key: hub_attachment,
         } for e in local_entries
       },
     } + (if direct then { import_drg_route_distribution_key: key('DRGRD', 'HYBRID-LOCAL') } else {})
-    for t in types
   };
   local resources = {
     customer_premises_equipments: {
-      [key('CPE', name)]: c.customer_premises_equipments[name] + { display_name: n.display('cpe', ['hub', segment(name)]) }
+      [key('CPE', name)]: c.customer_premises_equipments[name] + {
+        display_name: n.display('cpe', ['hub', segment(name)]), cpe_device_shape_vendor_name: 'Other',
+      }
       for name in std.objectFields(c.customer_premises_equipments)
     },
     ipsecs: {
@@ -84,7 +86,7 @@ function(params)
       network_configuration+: { network_configuration_categories+: { '0-shared'+: {
         non_vcn_specific_gateways+: resources + {
           dynamic_routing_gateways+: { [drg_key]+: {
-            default_drg_route_tables: { [t.selector]: { drg_route_table_id: key('DRGRT', t.name) } for t in types },
+            default_drg_route_tables: { [t.selector]: { drg_route_table_id: hc_table } for t in types },
             drg_route_tables+: tables,
             drg_route_distributions+: {
               [n.key('DRGRD', ['HUB'])]+: { statements+: imports('HUB') },

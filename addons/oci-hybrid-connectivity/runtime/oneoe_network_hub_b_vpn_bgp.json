@@ -609,7 +609,8 @@
                     "customer_premises_equipments": {
                         "CPE-FRA-LZ-HUB-OFFICE-KEY": {
                             "display_name"                                : "cpe-fra-lz-hub-office",
-                            "ip_address"                                  : "203.0.113.10"
+                            "ip_address"                                  : "203.0.113.10",
+                            "cpe_device_shape_vendor_name"                : "Other"
                         }
                     },
 
@@ -619,7 +620,7 @@
 
                             "default_drg_route_tables": {
                                 "ipsec_tunnel": {
-                                    "drg_route_table_id"                  : "DRGRT-FRA-LZ-HUB-VPN-KEY"
+                                    "drg_route_table_id"                  : "DRGRT-FRA-LZ-HUB-HC-KEY"
                                 }
                             },
 
@@ -698,36 +699,36 @@
                             },
 
                             "drg_route_tables": {
-                                "DRGRT-FRA-LZ-HUB-KEY": {
-                                    "display_name"                        : "drgrt-fra-lz-hub",
-                                    "import_drg_route_distribution_key"   : "DRGRD-FRA-LZ-HUB-KEY",
-                                    "is_ecmp_enabled"                     : false,
-                                    "route_rules"                         : {}
-                                },
-
-                                "DRGRT-FRA-LZ-HUB-VPN-KEY": {
-                                    "display_name"                        : "drgrt-fra-lz-hub-vpn",
+                                "DRGRT-FRA-LZ-HUB-HC-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-hub-hc",
                                     "is_ecmp_enabled"                     : false,
 
                                     "route_rules": {
-                                        "rr-hybrid-vpn-hub": {
+                                        "rr-hybrid-hc-hub": {
                                             "destination"                 : "10.0.0.0/21",
                                             "destination_type"            : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                         },
 
-                                        "rr-hybrid-vpn-preprod": {
+                                        "rr-hybrid-hc-preprod": {
                                             "destination"                 : "10.0.128.0/21",
                                             "destination_type"            : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                         },
 
-                                        "rr-hybrid-vpn-prod": {
+                                        "rr-hybrid-hc-prod": {
                                             "destination"                 : "10.0.64.0/21",
                                             "destination_type"            : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                         }
                                     }
+                                },
+
+                                "DRGRT-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-hub",
+                                    "import_drg_route_distribution_key"   : "DRGRD-FRA-LZ-HUB-KEY",
+                                    "is_ecmp_enabled"                     : false,
+                                    "route_rules"                         : {}
                                 },
 
                                 "DRGRT-FRA-LZ-SPOKES-KEY": {

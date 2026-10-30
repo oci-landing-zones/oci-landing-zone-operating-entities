@@ -11,6 +11,18 @@ import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups
 import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('exports a full-width superseded note and the implicit route styling', () => {
+    const xml = toDrawioXml({ nodes: [{ id: 'rt', kind: 'routetable', label: 'VCN routes',
+      x: 0, y: 0, width: 310, height: 73,
+      rtRows: [{ destination: '10.0.0.0/16', targetType: 'Local', target: 'Local VCN', routeType: 'Implicit', superseded: true }],
+    }], edges: [] });
+    expect(xml).toContain('(fully superseded)');
+    expect(xml).toContain('colspan=&quot;4&quot;');
+    expect(xml).toContain('font-style:italic');
+    expect(xml).not.toContain('(partially covered)');
+    expect(valueAttributes(xml).every((value) => !value.includes('<'))).toBe(true);
+  });
+
   it('includes external root nodes in the export origin without clipping their negative model coordinates', () => {
     const diagram: DiagramModel = { nodes: [
       { id: 'region', kind: 'region', label: 'OCI Region', x: 0, y: 0, width: 1000, height: 1000 },
@@ -268,7 +280,10 @@ describe('toDrawioXml', () => {
     const xml = toDrawioXml(graph);
     const cell = xml.match(/id="RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0] ?? '';
     expect(cell).not.toContain('background:#fff3c4');
-    expect(cell.match(/&lt;tr/g)).toHaveLength(table.rtRows!.length + 1);
+    expect(cell.match(/&lt;tr/g)).toHaveLength(table.rtRows!.length + table.rtRows!.filter((row) => row.superseded).length + 1);
+    expect(cell).toContain('Implicit');
+    expect(cell).toContain('font-style:italic');
+    expect(cell).not.toContain('(partially covered)');
     expect(xml.match(/id="e-RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0]).toContain('endArrow=none;');
   });
 

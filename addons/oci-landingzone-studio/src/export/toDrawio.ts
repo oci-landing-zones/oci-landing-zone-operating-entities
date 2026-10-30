@@ -11,6 +11,7 @@ import { resourceGroupSvg } from '../diagram/resourceGroups';
 import { compartmentStyle } from '../diagram/compartmentStyle';
 import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from '../diagram/routeTableLayout';
+import { hybridTopologySvg } from '../diagram/hybridTopology';
 
 const svgUri = (svg: string) => `data:image/svg+xml,${encodeURIComponent(svg)}`;
 const SHIELD_URI = svgUri(SHIELD_SVG);
@@ -190,6 +191,12 @@ function nodeStyle(node: DiagramNode): string {
       return `ellipse;html=1;fillColor=${node.rtDotConfigured === false ? '#b0aca8' : RT_TONE_COLORS[node.rtDotTone ?? 'hub']};strokeColor=#ffffff;strokeWidth=1.5;`;
     case 'resourcegroup':
       return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(resourceGroupSvg(node.resourceKind!, node.resourceItems ?? [], node.width))};`;
+    case 'vpn':
+    case 'premises':
+    case 'vpntunnel':
+    case 'fastconnect':
+    case 'customerrouter':
+      return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(hybridTopologySvg(node))};`;
   }
 }
 
@@ -198,19 +205,20 @@ const RT_TONE_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spo
 /** HTML label for a route-table cell: coloured header + ONTV columns. */
 function routeTableValue(node: DiagramNode): string {
   const color = RT_TONE_COLORS[node.rtTone ?? 'hub'], m = ROUTE_TABLE_METRICS;
-  const layout = routeTableLayout({ label: node.label, columns: node.rtColumns, rowCount: node.rtRows?.length ?? 0, note: node.rtNote, width: node.width });
+  const layout = routeTableLayout({ label: node.label, columns: node.rtColumns, rowCount: node.rtRows?.length ?? 0, rows: node.rtRows, note: node.rtNote, width: node.width });
   const cellsOf = (r: NonNullable<DiagramNode['rtRows']>[number]) =>
     node.rtColumns === 'drg' ? [r.destination, r.targetType, r.target] : [r.destination, r.targetType, r.target, r.routeType];
   const columns = layout.columnWidths.map((width, i) => `<col style="width:${width + (i < layout.columnWidths.length - 1 ? m.gap : 0)}px;">`).join('');
   const lines = (values: string[]) => values.map(escapeHtml).join('<br>');
   const cellPadding = (i: number) => i < layout.columnWidths.length - 1 ? m.gap : 0;
   const th = layout.headerLines.map((values, i) => `<td style="height:${layout.columnHeight}px;box-sizing:border-box;vertical-align:top;color:${oracle.textMuted};padding:${m.columnPadding}px ${cellPadding(i)}px ${m.columnPadding}px 0;font-size:${m.columnSize}px;line-height:${m.columnLine}px;font-weight:700;letter-spacing:${m.letterSpacing}px;border-bottom:${m.border}px solid #eceae8;white-space:nowrap;">${lines(values)}</td>`).join('');
-  const rows = (node.rtRows ?? []).map((r) =>
-    `<tr style="height:${layout.rowHeight}px;">${cellsOf(r).map((c, j) => {
-      const cellColor = j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660';
+  const rows = (node.rtRows ?? []).map((r, i) => {
+    const style = r.routeType === 'Implicit' ? 'background:#f5f4f2;font-style:italic;' : '';
+    return `<tr style="height:${layout.rowHeight}px;${style}">${cellsOf(r).map((c, j) => {
+      const cellColor = r.superseded ? oracle.textMuted : j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660';
       return `<td title="${escapeHtml(c)}" style="height:${layout.rowHeight}px;box-sizing:border-box;padding:${m.rowPadding}px ${cellPadding(j)}px ${m.rowPadding}px 0;font-size:${m.rowSize}px;line-height:${m.rowLine}px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${cellColor};font-weight:${j === 2 ? 700 : 500};${j === 0 ? 'font-family:monospace;' : ''}">${escapeHtml(c)}</td>`;
-    }).join('')}</tr>`,
-  ).join('');
+    }).join('')}</tr>` + (layout.rowNotes[i] ? `<tr style="height:${m.rowLine}px;${style}"><td colspan="${layout.columnWidths.length}" style="height:${m.rowLine}px;padding:0;color:${oracle.textMuted};font-size:${m.rowSize}px;line-height:${m.rowLine}px;">${escapeHtml(layout.rowNotes[i])}</td></tr>` : '');
+  }).join('');
   const note = layout.noteHeight ? `<div style="height:${layout.noteHeight}px;box-sizing:border-box;font-size:${m.noteSize}px;line-height:${m.noteLine}px;color:#B23A48;font-weight:700;padding:${m.notePadding}px ${m.paddingX}px;background:#fdecea;white-space:nowrap;">${lines(layout.noteLines)}</div>` : '';
   return `<div style="font-family:${m.fontFamily};box-sizing:border-box;padding:${m.border}px;">` +
     `<div title="${escapeHtml(node.label)}" style="height:${layout.titleHeight}px;box-sizing:border-box;background:${color};color:#fff;font-size:${m.titleSize}px;line-height:${m.titleLine}px;font-weight:800;padding:${m.titlePadding}px ${m.paddingX}px;white-space:nowrap;">${lines(layout.titleLines)}</div>${note}` +
@@ -339,12 +347,12 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
       ];
     }
     const association = rects.get(edge.source)?.node.kind === 'rtdot' && rects.get(edge.target)?.node.kind === 'routetable';
-    const attachment = rects.get(edge.source)?.node.kind === 'attachment' || rects.get(edge.target)?.node.kind === 'attachment';
+    const attachment = ['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(edge.source)?.node.kind ?? '') || rects.get(edge.target)?.node.kind === 'attachment';
     const points = structuralEdgePoints(edge, rects);
     const terminals = attachment
       ? 'endArrow=oval;startArrow=oval;startFill=1;endFill=1;startSize=5;endSize=5;'
       : `endArrow=${association ? 'none' : 'block'};startArrow=none;`;
-    let base = `edgeStyle=none;orthogonal=1;rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.8 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
+    let base = `edgeStyle=none;orthogonal=${association ? 0 : 1};rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.8 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
     if (association) {
       (associations.get(edge.id) ?? [points]).forEach((segment, index) => {
         const id = index ? `${edge.id}-segment-${index}` : edge.id;

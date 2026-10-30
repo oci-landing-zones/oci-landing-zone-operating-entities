@@ -15,7 +15,7 @@ it('explains the setup order before customers add resources', () => {
   const vpn = render('vpn');
   expect(vpn).toContain('aria-label="VPN setup guide"');
   expect(vpn).toMatch(/Register your equipment\.[\s\S]*Add a VPN connection\.[\s\S]*Configure both tunnels\./);
-  expect(vpn).toContain('This creates its record in OCI; your network team configures the device itself.');
+  expect(vpn).toContain('This creates its record in OCI using the Other device type; your network team configures the device itself.');
   const fc = render('fastconnect');
   expect(fc).toContain('aria-label="FastConnect setup guide"');
   expect(fc).toMatch(/Confirm the connection details\.[\s\S]*Add a circuit\.[\s\S]*Configure BGP\./);
@@ -25,7 +25,7 @@ it('explains the setup order before customers add resources', () => {
   }
 });
 
-it('adapts visible guidance to tunnel routing, key source and circuit connection model', () => {
+it('adapts visible guidance to tunnel routing, key source and provider peering', () => {
   const model = emptyLzModel();
   const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
   const tunnel = (hybrid.ipsecs.office = newVpn('office')).tunnels_management.tunnel_1;
@@ -45,25 +45,31 @@ it('adapts visible guidance to tunnel routing, key source and circuit connection
   expect(render('fastconnect')).toContain('Use the peering details supplied for your partner service.');
   expect(render('fastconnect')).toContain('these are BGP interface IPs, not the remote networks.');
   circuit.provider_service_id = '';
-  const physical = render('fastconnect');
-  expect(physical).toContain('Map this circuit to a provisioned physical cross-connect/group.');
-  expect(physical).toContain('these are BGP interface IPs, not the remote networks.');
-  expect(physical).not.toContain('<option value="PUBLIC"');
-  expect(physical).not.toMatch(/<label[^>]*>Peering<\/label>/);
-  expect(physical).not.toContain('Owned public IPv4 prefixes');
-  expect(physical).not.toContain('Routing policy (comma-separated)');
+  const unselected = render('fastconnect');
+  expect(unselected).toContain('Use the peering details supplied for your partner service.');
+  expect(unselected).toContain('these are BGP interface IPs, not the remote networks.');
+  expect(unselected).not.toContain('Direct / physical connection');
+  expect(unselected).not.toContain('Leave empty for a direct physical connection.');
+  expect(unselected).not.toContain('<option value="PUBLIC"');
+  expect(unselected).not.toMatch(/<label[^>]*>Peering<\/label>/);
+  expect(unselected).not.toContain('Owned public IPv4 prefixes');
+  expect(unselected).not.toContain('Routing policy (comma-separated)');
 });
 
 it('uses provider OCID entry unless verified IDs exist for the selected location', () => {
   const model = emptyLzModel();
   const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
-  hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10', cpe_device_shape_vendor_name: 'Fortinet' };
+  hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+  Object.assign(hybrid.customer_premises_equipments.office, { cpe_device_shape_vendor_name: 'Fortinet', cpe_device_shape_id: 'old-shape' });
   const circuit: FastConnectConfig = hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE' };
   const render = (kind: 'vpn' | 'fastconnect') => renderToStaticMarkup(
     <WizardProvider initialModel={model}><ConnectivityEditor kind={kind} /></WizardProvider>,
   );
-  expect(render('vpn')).toContain('<option value="Fortinet" selected="">Fortinet</option>');
-  expect(render('vpn')).toContain('Other device (enter shape ID / OCID)');
+  expect(render('vpn')).not.toContain('Device vendor');
+  expect(render('vpn')).not.toContain('<option value="Fortinet"');
+  expect(render('vpn')).not.toContain('Device shape ID');
+  expect(render('vpn')).not.toContain('old-shape');
+  expect(render('vpn')).toContain('value="203.0.113.10"');
   model.foundation.realm = 'oc19';
   model.foundation.region = 'eu-frankfurt-2';
   const manual = render('fastconnect');
@@ -87,8 +93,6 @@ it('uses provider OCID entry unless verified IDs exist for the selected location
   expect(elsewhere).not.toContain(`<option value="${ocid}"`);
   expect(elsewhere).toContain(`value="${ocid}"`);
   expect(elsewhere).toContain('belongs to another location');
-  hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10', cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' };
-  expect(render('vpn')).toContain('value="51d06bb2-cbf6-44df-8e7b-3e8bf1750c47"');
 });
 
 it('keeps services separate and describes every editable field, including conditional fields', () => {
@@ -103,13 +107,16 @@ it('keeps services separate and describes every editable field, including condit
   };
   vpn.tunnels_management.tunnel_2 = { routing: 'STATIC', secretMode: 'vault' };
   hybrid.fast_connect_virtual_circuits.private = {
-    type: 'PRIVATE', cross_connect_mappings: { primary: { bgp_md5auth_mode: 'inline' } },
+    type: 'PRIVATE', cross_connect_mappings: { primary: {
+      bgp_md5auth_mode: 'inline', vlan: '100', cross_connect_or_cross_connect_group_id: 'ocid1.crossconnectgroup.oc1..existing',
+    } },
   };
   hybrid.cross_connect_groups.primary = { cross_connects: { port: { location_name: '', port_speed_shape_name: '' } } };
 
   const render = (kind: 'vpn' | 'fastconnect') => renderToStaticMarkup(
     <WizardProvider initialModel={model}><ConnectivityEditor kind={kind} /></WizardProvider>,
   );
+  const before = JSON.stringify(model);
   const vpnHtml = render('vpn');
   const fcHtml = render('fastconnect');
   expect(vpnHtml).toContain('Customer tunnel IP/prefix');
@@ -117,7 +124,13 @@ it('keeps services separate and describes every editable field, including condit
   expect(vpnHtml).not.toContain('FastConnect circuits');
   expect(fcHtml).toContain('Customer BGP IP/prefix');
   expect(fcHtml).toContain('BGP MD5 key (session only)');
-  expect(fcHtml).toContain('Physical FastConnect preparation');
+  expect(fcHtml).not.toContain('Cross-connect and VLAN');
+  expect(fcHtml).not.toContain('Cross-connect/group OCID');
+  expect(fcHtml).not.toContain('Physical FastConnect preparation');
+  expect(fcHtml).not.toContain('Add cross-connect group');
+  expect(fcHtml).not.toContain('ocid1.crossconnectgroup.oc1..existing');
+  expect(fcHtml).not.toMatch(/<label[^>]*>VLAN<\/label>/);
+  expect(JSON.stringify(model)).toBe(before);
   expect(fcHtml).not.toContain('Customer VPN equipment');
 
   for (const html of [vpnHtml, fcHtml]) {

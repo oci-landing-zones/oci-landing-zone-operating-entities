@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { absoluteNodeRects } from './flowGeometry';
 import { flowDisplayPoints, structuralEdgePoints } from './displayGeometry';
 import type { DiagramEdge } from '../model/types';
@@ -37,7 +37,12 @@ describe('canonical routing graph', () => {
         } else if (association.kind === 'vcn-ingress') {
           expect(centre).toEqual({ x: owner.x + owner.width / 2, y: owner.y + owner.height });
         } else if (association.kind === 'drg-attachment' || association.kind === 'rpc-attachment') {
-          expect(centre).toEqual({ x: owner.x, y: owner.y + owner.height / 2 });
+          const connection = graph.edges.find((edge) => edge.source === owner.id && edge.target === 'drg'
+            || edge.source === 'drg' && edge.target === owner.id)!;
+          expect(connection, association.nodeId).toBeDefined();
+          expect(dot.rtDotOwnerId).toBe(owner.id);
+          expect(dot.rtDotPhysicalOwnerId).toBe('drg');
+          expect(centre).toEqual(connection.source === 'drg' ? connection.points![0] : connection.points!.at(-1));
         }
       }
     }

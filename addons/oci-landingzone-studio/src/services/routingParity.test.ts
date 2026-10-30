@@ -63,7 +63,7 @@ describe('generated route preview parity', () => {
     const tables = buildRouteTables(model, preview.network);
     for (const table of tables.filter((table) => table.columns === 'vcn')) {
       const raw = resources.get(table.id)!.route_rules!;
-      expect(table.rules.map((rule) => [rule.id, rule.destination, rule.targetKey]), table.name)
+      expect(table.rules.filter((rule) => rule.provenance === 'configured').map((rule) => [rule.id, rule.destination, rule.targetKey]), table.name)
         .toEqual(Object.entries(raw).map(([id, rule]) => [id,
           rule.destination === 'all-services' ? 'OSN Services' : rule.destination,
           rule.network_entity_key ?? rule.network_entity_id]));
@@ -150,7 +150,7 @@ describe('generated route preview parity', () => {
         const node = envIndex === undefined ? `gw-${kind}` : `cmp-env-${envIndex}-${kind}`;
         return `${destination}:${kind}:${node}`;
       });
-      expect(table.rules.map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort(), table.name)
+      expect(table.rules.filter((rule) => rule.provenance === 'configured').map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort(), table.name)
         .toEqual(expected.sort());
     }
   }, 60_000);
@@ -168,7 +168,7 @@ describe('generated route preview parity', () => {
         ? `${rule.destination}:drg:drg`
         : `${rule.destination}:firewall:${resources.get(key)!.ipv4address}`;
     });
-    expect(preview.rules.map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort())
+    expect(preview.rules.filter((rule) => rule.provenance === 'configured').map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort())
       .toEqual(expected.sort());
   }, 60_000);
 

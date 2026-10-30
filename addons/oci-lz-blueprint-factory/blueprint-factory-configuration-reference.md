@@ -324,6 +324,8 @@ Use `hybrid_connectivity` at the top level alongside `hub` and `environments`. I
 
 This section documents the factory input, not the full downstream networking-module schema. Resource display names, compartments, DRG references, static VPN routes and attachment route-table assignments are generated. Do not add module-only fields such as `drg_id`, `gateway_key`, `static_routes`, `display_name` or `default_drg_route_tables` to these input objects.
 
+VPN tunnel and private FastConnect attachments share the generated `hc` (Hybrid Connectivity) DRG ingress table. Its local routes preserve the hub's inspection policy, providing the same ingress routing on either connection.
+
 ### 9.1 Resource maps and names
 
 | Field under `hybrid_connectivity` | Type | Purpose |
@@ -342,10 +344,8 @@ Each `customer_premises_equipments.<name>` accepts:
 | Field | Type | Required / default | Meaning and example |
 |---|---|---|---|
 | `ip_address` | IPv4 string | Required | Outside address used to reach the equipment, for example `203.0.113.10` (illustrative). |
-| `cpe_device_shape_id` | nonblank string | Optional; mutually exclusive with vendor selection | OCI device-shape identifier for the equipment model. The identifier can be a UUID; it need not be an OCID. |
-| `cpe_device_shape_vendor_name` | nonblank string | Optional; mutually exclusive with shape ID | Device vendor selector. The downstream module uses the first shape matching that vendor, so this does not select an exact equipment model. Use the explicit shape ID when the model is known. |
 
-A CPE object describes customer equipment; it does not configure the physical router. See [OCI VPN setup](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm).
+Blueprint Factory creates CPE records with the **Other** device type. A CPE object describes customer equipment; it does not configure the physical router. See [OCI VPN setup](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm).
 
 ### 9.3 VPN connections
 
@@ -416,7 +416,7 @@ Each `fast_connect_virtual_circuits.<name>` accepts:
 | `type` | string | Required | Must be `PRIVATE` for landing zone networks. Public circuits are unsupported. |
 | `remote_cidrs` | non-empty array of IPv4 CIDRs | Required | Expected private reachability, for example `['172.20.0.0/16']`. |
 | `provider_service_id` | string | For provider connections; a physical mapping is the alternative | OCI FastConnect provider service-offering OCID for the target realm and region. |
-| `provider_service_key_name` | string | Optional | Provider's service/activation key, separate from BGP authentication. |
+| `provider_service_key_name` | string | Optional | OCID or service key supplied by the partner. If it supplies neither, leave this empty and give the deployed virtual circuit OCID to the partner. The initiating side and setup order depend on the provider. |
 | `bandwidth_shape_name` | string | Optional in input; select the required shape for your service | A positive integer followed by one space and `Gbps`, for example `1 Gbps`, `20 Gbps` or `400 Gbps`. Leading zeros, fractions and other units are rejected. Available shapes depend on the provider and region; valid format does not confirm availability. |
 | `customer_asn` | number or decimal string | When your router peers with Oracle | Customer ASN, excluding 65534. |
 | `cross_connect_mappings` | object of named mappings | `{}` | Physical/BGP mapping settings described below. Requirements depend on the provider or direct connection. |
@@ -463,7 +463,7 @@ Create the physical group/ports first, complete cabling and activation, then add
 ### 9.7 Routing, keys and deployment
 
 - Remote networks must not overlap local hub, spoke, platform or remote-peering ranges. Identical VPN/private FastConnect prefixes can be reused for backup; partial overlaps are rejected.
-- Both VPN tunnel attachments and private circuit attachments receive custom ingress tables. Hubs A/B/C retain the existing firewall path; Hub E routes directly to local VCNs.
+- Both VPN tunnel attachments and private circuit attachments use the shared `hc` ingress table. Hubs A/B/C retain the existing firewall path; Hub E routes directly to local VCNs.
 - The factory assigns tables to managed attachments. It does not change DRG-wide defaults for future attachments outside this configuration. ECMP is disabled; actual BGP advertisements and OCI route selection decide the active path.
 - VPN `shared_secret` accepts a literal key or existing secret OCID. Literal VPN keys use letters, digits and spaces. BGP MD5 keys are literal values only. There is no separate secrets file or automatic copy into the LZ Vault.
 - In Studio, entered keys are session-only and masked in previews; exports contain the actual values. Saved designs require key re-entry, and secret-bearing outputs are not cached.

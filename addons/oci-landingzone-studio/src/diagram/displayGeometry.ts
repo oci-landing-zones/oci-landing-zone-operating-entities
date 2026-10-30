@@ -1,5 +1,5 @@
 import type { DiagramEdge, DiagramNode } from '../model/types';
-import { absoluteNodeRects, BEND_COST, clearRoutingSegment, createLocalFlowRouter, flowAnchorPoint, routeOrthogonalPoints, type FlowRect, type RoutingSegment } from './flowGeometry';
+import { absoluteNodeRects, clearRoutingSegment, createLocalFlowRouter, flowAnchorPoint, routeOrthogonalPoints, type FlowRect, type RoutingSegment } from './flowGeometry';
 import { type Point } from './flowOverlayGeometry';
 import { drgCaptionLayout } from './layoutPolicy';
 
@@ -135,18 +135,28 @@ function physicalFanRoutes(rects: Map<string, FlowRect>, edges: DiagramEdge[]): 
   for (const edge of edges) {
     const a = rects.get(edge.source), b = rects.get(edge.target);
     if (!a || !b) continue;
-    const reverse = a.node.kind === 'drg' && b.node.kind === 'attachment';
+    const reverse = a.node.kind === 'drg' && ['attachment', 'vpntunnel', 'fastconnect'].includes(b.node.kind)
+      || ['vpn', 'customerrouter'].includes(a.node.kind);
     const source = reverse ? b : a, target = reverse ? a : b;
-    if (source.node.kind !== 'attachment' || target.node.kind !== 'drg') continue;
+    const drgConnection = ['attachment', 'vpntunnel', 'fastconnect'].includes(source.node.kind) && target.node.kind === 'drg';
+    const customerConnection = source.node.kind === 'vpntunnel' && target.node.kind === 'vpn'
+      || source.node.kind === 'fastconnect' && target.node.kind === 'customerrouter';
+    const reservedChannel = source.node.kind === 'vcn' && target.node.kind === 'attachment' && edge.centerX != null;
+    if (!drgConnection && !customerConnection && !reservedChannel) continue;
     const s = borderPoint(source, target, reverse ? edge.targetSide : edge.sourceSide, reverse ? edge.targetPort : edge.sourcePort);
     const t = borderPoint(target, source, reverse ? edge.sourceSide : edge.targetSide, reverse ? edge.sourcePort : edge.targetPort);
     if (!((s.side === 'left' && t.side === 'right') || (s.side === 'right' && t.side === 'left'))) continue;
-    const key = `${target.id}:${t.side}`;
+    const key = reservedChannel ? `channel:${edge.centerX}:${t.side}:${t.x}` : `${target.id}:${t.side}`;
     groups.set(key, [...(groups.get(key) ?? []), { edge, source, target, s, t, side: t.side, reverse }]);
   }
   const result = new Map<string, DiagramEdge>();
   for (const fan of groups.values()) {
     if (fan.length < 2) continue;
+    // External connections leave the near-DRG space for short table-annotation branches.
+    const hybridDrg = fan[0].target.node.kind === 'drg' && fan.some(({ source }) => ['vpntunnel', 'fastconnect'].includes(source.node.kind));
+    const channels = fan[0].source.node.kind === 'vcn'
+      ? [...new Set(fan.map(({ edge }) => edge.centerX! + (edge.channel ?? 0)))].sort((a, b) => fan[0].side === 'right' ? a - b : b - a)
+      : undefined;
     const lanes: { low: number; high: number; index: number }[] = [];
     fan.sort((a, b) => {
       const aTop = a.s.y <= a.t.y, bTop = b.s.y <= b.t.y;
@@ -155,15 +165,22 @@ function physicalFanRoutes(rects: Map<string, FlowRect>, edges: DiagramEdge[]): 
     });
     for (const { edge, source, target, s, t, side, reverse } of fan) {
       const low = Math.min(s.y, t.y), high = Math.max(s.y, t.y);
-      let lane = 0;
-      while (lanes.some((used) => used.index === lane && low <= used.high + 8 && high >= used.low - 8)) lane++;
+      // Blocked inner rails must not let later branches cross an already nested outer rail.
+      let lane = Math.max(0, ...lanes.filter((used) => low <= used.high + 8 && high >= used.low - 8).map((used) => used.index + 1));
       const direction = side === 'right' ? 1 : -1;
-      const x = t.x + direction * (drgCaptionLayout(target.node.label, target.width).overhang + 12 + lane * 8);
-      if (direction * (s.x - x) < 12) continue;
-      const points = [s, { x, y: s.y }, { x, y: t.y }, t].map(({ x, y }) => ({ x, y }))
-        .filter((point, index, path) => index === 0 || point.x !== path[index - 1].x || point.y !== path[index - 1].y);
-      if (!points.slice(1).every((point, i) => clearRoutingSegment(rects, points[i], point,
-        [source.id, target.id], 0, [source.id, target.id]))) continue;
+      const premises = ['vpn', 'customerrouter'].includes(target.node.kind) ? rects.get(target.node.parentId ?? '') : undefined;
+      const offset = premises
+        ? (direction === 1 ? premises.x + premises.width - t.x : t.x - premises.x) + 12
+        : Math.max(drgCaptionLayout(target.node.label, target.width).overhang + 12, hybridDrg ? 128 : 0);
+      let points: Point[] | undefined;
+      for (; channels ? lane < channels.length : offset + lane * 8 <= direction * (s.x - t.x) - 12; lane++) {
+        const x = channels ? channels[lane] : t.x + direction * (offset + lane * 8);
+        const candidate = [s, { x, y: s.y }, { x, y: t.y }, t].map(({ x, y }) => ({ x, y }))
+          .filter((point, index, path) => index === 0 || point.x !== path[index - 1].x || point.y !== path[index - 1].y);
+        if (candidate.slice(1).every((point, i) => clearRoutingSegment(rects, candidate[i], point,
+          [source.id, target.id], 0, [source.id, target.id]))) { points = candidate; break; }
+      }
+      if (!points) continue;
       lanes.push({ low, high, index: lane });
       result.set(edge.id, { ...edge, points: reverse ? points.reverse() : points });
     }
@@ -189,10 +206,16 @@ function associationSegments(rects: Map<string, FlowRect>, edges: DiagramEdge[])
     const paths: Point[][] = [];
     const points = structuralEdgePoints(edge, rects);
     for (let i = 1; i < points.length; i++) {
-      const a = points[i - 1], b = points[i], horizontal = a.y === b.y;
-      const start = horizontal ? a.x : a.y, end = horizontal ? b.x : b.y;
+      const a = points[i - 1], b = points[i];
+      const length = Math.hypot(b.x - a.x, b.y - a.y);
+      if (length === 0) continue;
+      const sign = b.x > a.x || b.x === a.x && b.y > a.y ? 1 : -1;
+      const dx = (b.x - a.x) / length * sign, dy = (b.y - a.y) / length * sign;
+      const start = a.x * dx + a.y * dy, end = b.x * dx + b.y * dy;
       if (start === end) continue;
-      const key = horizontal ? `h:${a.y}` : `v:${a.x}`;
+      const key = `${dx.toFixed(9)}:${dy.toFixed(9)}:${(dx * a.y - dy * a.x).toFixed(6)}`;
+      const at = (value: number): Point => Math.abs(value - start) < 1e-7 ? { ...a } : Math.abs(value - end) < 1e-7 ? { ...b }
+        : { x: a.x + (b.x - a.x) * (value - start) / (end - start), y: a.y + (b.y - a.y) * (value - start) / (end - start) };
       const low = Math.min(start, end), high = Math.max(start, end);
       let pieces: [number, number][] = [[low, high]];
       for (const [from, to] of axes.get(key) ?? []) pieces = pieces.flatMap(([left, right]) =>
@@ -202,8 +225,7 @@ function associationSegments(rects: Map<string, FlowRect>, edges: DiagramEdge[])
       if (start > end) pieces.reverse();
       for (const [left, right] of pieces) {
         const from = start < end ? left : right, to = start < end ? right : left;
-        const p = horizontal ? { x: from, y: a.y } : { x: a.x, y: from };
-        const q = horizontal ? { x: to, y: a.y } : { x: a.x, y: to };
+        const p = at(from), q = at(to);
         const previous = paths.at(-1);
         if (previous?.at(-1)?.x === p.x && previous.at(-1)?.y === p.y) previous.push(q);
         else paths.push([p, q]);
@@ -222,156 +244,20 @@ function associationSegments(rects: Map<string, FlowRect>, edges: DiagramEdge[])
   return result;
 }
 
-function pathSimplicity(paths: Point[][]): number {
-  const vertices = new Map<string, Point>();
-  const segments = paths.flatMap((points) => points.slice(1).flatMap((b, i) => {
-    const a = points[i];
-    if (a.x === b.x && a.y === b.y) return [];
-    vertices.set(`${a.x}:${a.y}`, a); vertices.set(`${b.x}:${b.y}`, b);
-    return [{ a, b }];
-  }));
-  const length = segments.reduce((sum, { a, b }) => sum + Math.abs(b.x - a.x) + Math.abs(b.y - a.y), 0);
-  const corners = [...vertices.values()].filter((point) => {
-    let axes = 0;
-    for (const { a, b } of segments) {
-      if (a.y === b.y && point.y === a.y && point.x >= Math.min(a.x, b.x) && point.x <= Math.max(a.x, b.x)) axes |= 1;
-      if (a.x === b.x && point.x === a.x && point.y >= Math.min(a.y, b.y) && point.y <= Math.max(a.y, b.y)) axes |= 2;
-    }
-    return axes === 3;
-  }).length;
-  return length + BEND_COST * corners;
-}
-
-function associationRank(rects: Map<string, FlowRect>, edges: DiagramEdge[], others: Point[][]): [number, number] {
-  const paths = [...associationSegments(rects, edges).values()].flat();
-  return [connectionConflict(paths, others), pathSimplicity(paths)];
-}
-
-function associationStart(edge: DiagramEdge, target: FlowRect, rects: Map<string, FlowRect>) {
-  const source = rects.get(edge.source)!, s = borderPoint(source, target, edge.sourceSide, edge.sourcePort);
-  const owner = source.node.rtDotOwnerId ? rects.get(source.node.rtDotOwnerId) : undefined;
-  let start: Point = s;
-  const escaped = outward(s, s.side);
-  if (owner) {
-    if (s.side === 'left') escaped.x = Math.min(escaped.x, owner.x - 12);
-    if (s.side === 'right') escaped.x = Math.max(escaped.x, owner.x + owner.width + 12);
-    if (s.side === 'top') escaped.y = Math.min(escaped.y, owner.y - 12);
-    if (s.side === 'bottom') escaped.y = Math.max(escaped.y, owner.y + owner.height + 12);
-  }
-  if (clearRoutingSegment(rects, s, escaped, [source.id, target.id], 0)) start = escaped;
-  else for (const length of [8, 4, 1]) {
-    const candidate = outward(s, s.side, length);
-    if (clearRoutingSegment(rects, s, candidate, [source.id, target.id], 0)) { start = candidate; break; }
-  }
-  return { edge, source, s, start, ownerIds: owner ? [owner.id] : [] };
-}
-
-function routeAssociations(rects: Map<string, FlowRect>, leaders: DiagramEdge[], physical: DiagramEdge[]): DiagramEdge[] {
-  const groups = new Map<string, DiagramEdge[]>();
-  for (const edge of leaders) groups.set(edge.target, [...(groups.get(edge.target) ?? []), edge]);
-  const items = [...groups.entries()].map(([tableId, branches]) => {
-    const target = rects.get(tableId)!;
-    const side = borderPoint(target, rects.get(branches[0].source)!, branches[0].targetSide).side;
-    const terminal = borderPoint(target, rects.get(branches[0].source)!, side, 0.5);
-    const sources = branches.map((edge) => associationStart(edge, target, rects));
-    return { branches: sources, target, side, terminal, low: Math.min(terminal.y, ...sources.map(({ start }) => start.y)),
-      high: Math.max(terminal.y, ...sources.map(({ start }) => start.y)) };
-  }).sort((a, b) => a.low - b.low || a.target.id.localeCompare(b.target.id));
-  const occupied = physical.flatMap((edge) => edge.points!.slice(1).map((end, i) => ({ start: edge.points![i], end })));
-  const lanes: { x: number; low: number; high: number }[] = [];
-  const routed: DiagramEdge[] = [];
-  for (const { branches, target, side, terminal, low, high } of items) {
-    const direction = side === 'right' ? 1 : -1, border = side === 'right' ? target.x + target.width : target.x;
-    const excluded = [target.id, ...branches.map(({ source }) => source.id)];
-    const ownerBodies = branches.flatMap(({ ownerIds }) => ownerIds);
-    const candidates = Array.from({ length: 6 }, (_, lane) => border + direction * (16 + lane * 8));
-    const free = candidates.filter((x) => !lanes.some((used) => Math.abs(used.x - x) < 1 && low <= used.high + 8 && high >= used.low - 8));
-    // Crowded gutters compress the lane spacing instead of sending annotations across the drawing.
-    let rail = free[0] ?? border + direction * (16 + (lanes.length + 1) / (lanes.length + 2) * 40);
-    const otherPaths = [...physical.map((edge) => edge.points!), ...[...associationSegments(rects, routed).values()].flat()];
-    let bestScore = Infinity;
-    for (const x of free) {
-      if (!clearRoutingSegment(rects, { x, y: low }, { x, y: high }, excluded, 0, [target.id, ...ownerBodies]) ||
-        !clearRoutingSegment(rects, { x, y: terminal.y }, terminal, excluded, 0, [target.id, ...ownerBodies])) continue;
-      const score = connectionConflict([[{ x, y: low }, { x, y: high }]], otherPaths)
-        + connectionConflict([[{ x, y: terminal.y }, terminal]], otherPaths);
-      if (score < bestScore) { rail = x; bestScore = score; }
-    }
-    const group: DiagramEdge[] = [], alternatives: DiagramEdge[][] = [];
-    for (const { edge, source, s, start, ownerIds } of branches.sort((a, b) => a.edge.id.localeCompare(b.edge.id))) {
-      const join = { x: rail, y: start.y };
-      const distance = Math.min(12, Math.abs(start.x - rail) / 2);
-      const prejoin = { x: rail + (start.x <= rail ? -distance : distance), y: start.y };
-      const halfPlane = start.x <= rail ? { right: prejoin.x } : { left: prejoin.x };
-      const radius = Math.max(48, target.height);
-      const localBounds = { left: Math.min(start.x, prejoin.x) - 24, right: Math.max(start.x, prejoin.x) + 24,
-        top: start.y - radius, bottom: start.y + radius, ...halfPlane };
-      const exclusions = [source.id, target.id], bodies = [target.id, ...ownerIds];
-      let prefix = routeOrthogonalPoints(rects, start, prejoin, exclusions, rail, occupied, bodies, localBounds);
-      if (!prefix.slice(1).every((point, i) => clearRoutingSegment(rects, prefix[i], point, exclusions, 0, bodies))) {
-        prefix = routeOrthogonalPoints(rects, start, prejoin, exclusions, rail, occupied, bodies, halfPlane);
-      }
-      prefix.push(join);
-      const trunk = [{ x: rail, y: start.y }, { x: rail, y: terminal.y }, { x: terminal.x, y: terminal.y }];
-      const clearTrunk = trunk.slice(1).every((point, i) => clearRoutingSegment(rects, trunk[i], point, [source.id, target.id], 0, [target.id, ...ownerIds]));
-      const suffix = clearTrunk ? trunk : routeOrthogonalPoints(rects, join,
-        outward(terminal, side), [source.id, target.id], rail, occupied, [target.id, ...ownerIds]).concat([{ x: terminal.x, y: terminal.y }]);
-      const points: Point[] = [{ x: s.x, y: s.y }, ...prefix, ...suffix.slice(1)];
-      const result = { ...edge, centerX: rail, targetSide: side, targetPort: 0.5, points };
-      group.push(result);
-      const signature = (path: Point[]) => polylinePath(path.filter((point, i) => i === 0 || i === path.length - 1 ||
-        !(path[i - 1].x === point.x && point.x === path[i + 1].x || path[i - 1].y === point.y && point.y === path[i + 1].y)));
-      const seen = new Set([signature(points)]), choices: DiagramEdge[] = [];
-      for (const [index, vertex] of prefix.entries()) {
-        if ((vertex.y < low || vertex.y > high) && lanes.some((used) => Math.abs(used.x - rail) < 1 &&
-          Math.min(vertex.y, terminal.y) <= used.high + 8 && Math.max(vertex.y, terminal.y) >= used.low - 8)) continue;
-        const approach = { x: rail, y: vertex.y };
-        const previous = prefix[index - 1] ?? s;
-        if ((vertex.x - previous.x) * (approach.x - vertex.x) < -0.001) continue;
-        const candidate = [{ x: s.x, y: s.y }, ...prefix.slice(0, index + 1), approach,
-          { x: rail, y: terminal.y }, { x: terminal.x, y: terminal.y }]
-          .filter((point, i, path) => i === 0 || point.x !== path[i - 1].x || point.y !== path[i - 1].y);
-        const key = signature(candidate);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        const forward = outward(s, s.side, 1), first = candidate[1];
-        if (first && (first.x - s.x) * (forward.x - s.x) + (first.y - s.y) * (forward.y - s.y) < -0.001) continue;
-        if (candidate.some((point, i) => i > 1 && (point.x - candidate[i - 1].x) * (candidate[i - 1].x - candidate[i - 2].x)
-          + (point.y - candidate[i - 1].y) * (candidate[i - 1].y - candidate[i - 2].y) < -0.001)) continue;
-        const hasStub = start.x !== s.x || start.y !== s.y;
-        if (!candidate.slice(1).every((point, i) => i === 0 && hasStub && point.x === start.x && point.y === start.y
-          || clearRoutingSegment(rects, candidate[i], point, exclusions, 0, bodies))) continue;
-        choices.push({ ...result, points: candidate });
-      }
-      alternatives.push(choices);
-    }
-    let selected = group;
-    if (alternatives.some((choices) => choices.length)) {
-      let rank = associationRank(rects, selected, otherPaths);
-      alternatives.forEach((choices, index) => {
-        for (const choice of choices) {
-          const candidate = selected.map((edge, i) => i === index ? choice : edge);
-          const candidateRank = associationRank(rects, candidate, otherPaths);
-          if (candidateRank[0] < rank[0] || candidateRank[0] === rank[0] && candidateRank[1] < rank[1]) {
-            selected = candidate; rank = candidateRank;
-          }
-        }
-      });
-    }
-    // Reserve the chosen corridor joins, including detours beyond the original source heights.
-    const railHeights = selected.flatMap((edge) => edge.points!.filter((point) => point.x === rail).map((point) => point.y));
-    lanes.push({ x: rail, low: Math.min(low, ...railHeights), high: Math.max(high, ...railHeights) });
-    routed.push(...selected);
-    const groupPoints = routed.filter((edge) => edge.target === target.id);
-    occupied.push(...groupPoints.flatMap((edge) => edge.points!.slice(1).map((end, i) => ({ start: edge.points![i], end }))));
-  }
-  return routed;
+/** Resolve each table marker's source anchor after physical ports are positioned. */
+export function tableSourceAnchors(nodes: DiagramNode[], edges: DiagramEdge[]): DiagramEdge[] {
+  const rects = absoluteNodeRects(nodes);
+  return edges.map((edge) => {
+    if (edge.waypoints || !association(edge, rects)) return edge;
+    const source = rects.get(edge.source)!, target = rects.get(edge.target)!;
+    const { x, y, side } = borderPoint(source, target, edge.sourceSide, edge.sourcePort);
+    return { ...edge, sourceSide: side, centerX: undefined, points: [{ x, y }] };
+  });
 }
 
 /** Route shared fans together, preferring clear lanes over overlaps with earlier connections. */
 export function routeStructuralEdges(nodes: DiagramNode[], edges: DiagramEdge[]): DiagramEdge[] {
   const rects = absoluteNodeRects(nodes), byId = new Map<string, DiagramEdge>();
-  const leaders = edges.filter((edge) => !edge.waypoints && association(edge, rects));
   const ordered = edges.filter((edge) => !edge.waypoints && !association(edge, rects)).map((edge) => ({ ...edge, points: undefined }))
     .sort((a, b) => a.id.localeCompare(b.id));
   const fans = new Map<string, DiagramEdge[]>(), automaticTargets = new Set<string>();
@@ -400,6 +286,13 @@ export function routeStructuralEdges(nodes: DiagramNode[], edges: DiagramEdge[])
       automaticTargets.add(edge.id);
     });
   }
+  for (const edge of ordered) {
+    if (edge.centerX == null || rects.get(edge.source)?.node.kind !== 'vcn' || rects.get(edge.target)?.node.kind !== 'attachment') continue;
+    if (edge.sourcePort != null && edge.targetPort != null) continue;
+    const ports = routeStructural(edge, rects, []);
+    Object.assign(edge, { sourceSide: ports.sourceSide, sourcePort: ports.sourcePort,
+      targetSide: ports.targetSide, targetPort: ports.targetPort });
+  }
   const physicalFans = physicalFanRoutes(rects, ordered);
   const occupied: RoutingSegment[] = [];
   for (const edge of ordered) {
@@ -417,7 +310,6 @@ export function routeStructuralEdges(nodes: DiagramNode[], edges: DiagramEdge[])
     const candidate = routeStructural(edge, rects, occupied);
     if (connectionConflict([candidate.points!], others) < connectionConflict([edge.points!], others)) byId.set(edge.id, candidate);
   }
-  for (const edge of routeAssociations(rects, leaders, [...byId.values()])) byId.set(edge.id, edge);
   return edges.map((edge) => byId.get(edge.id) ?? edge);
 }
 
@@ -489,8 +381,8 @@ export function connectionFlowGeometry(nodes: DiagramNode[], connections: Diagra
     if (anchor?.owner === nodeVisits[index]) {
       return (anchor.phase ?? 'exit') === phase ? anchor.point : flowAnchorPoint(rects.get(nodeVisits[index])!);
     }
-    // Ingress processing happens after this connection, not at the attachment centre.
-    if (anchor) return legs[index].connection![0];
+    // VCN ingress follows the connection; DRG events still traverse the attachment centre first.
+    if (anchor && byId.get(anchor.owner)?.kind !== 'drg') return legs[index].connection![0];
     return flowAnchorPoint(rects.get(nodeVisits[index])!);
   };
   const record = (index: number) => {

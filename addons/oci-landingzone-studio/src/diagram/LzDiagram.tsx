@@ -54,6 +54,7 @@ import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
 import { ATTACHMENT_LABEL, DRG_CAPTION } from './layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
+import { hybridTopologySvg } from './hybridTopology';
 
 const COOPERATIVE_QUERY = '(max-width: 1100px)';
 const ZOOM_KEYS = ['Meta', 'Control'];
@@ -96,6 +97,11 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
     case 'routetable':
     case 'rtdot':
     case 'resourcegroup':
+    case 'vpn':
+    case 'premises':
+    case 'vpntunnel':
+    case 'fastconnect':
+    case 'customerrouter':
       return { background: 'transparent', border: 'none', borderRadius: 0 };
   }
 }
@@ -235,7 +241,7 @@ function ProjectNode({ data }: NodeProps) {
 }
 
 const RT_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spoke: '#2E6E3F' } as const;
-type RtRow = { id?: string; destination: string; targetType: string; target: string; routeType: string };
+type RtRow = NonNullable<DiagramNode['rtRows']>[number];
 const RT_CELLS = {
   vcn: (r: RtRow) => [r.destination, r.targetType, r.target, r.routeType],
   drg: (r: RtRow) => [r.destination, r.targetType, r.target],
@@ -246,7 +252,7 @@ function RouteTableNode({ id, data }: NodeProps) {
   const d = data as { label?: string; width?: number; rtRows?: RtRow[]; rtColumns?: keyof typeof RT_CELLS; rtNote?: string; rtTone?: keyof typeof RT_COLORS; rtHighlight?: number[]; rtLocked?: boolean };
   const color = RT_COLORS[d.rtTone ?? 'hub'], m = ROUTE_TABLE_METRICS;
   const cellsOf = RT_CELLS[d.rtColumns ?? 'vcn'];
-  const layout = routeTableLayout({ label: d.label ?? '', columns: d.rtColumns, rowCount: d.rtRows?.length ?? 0, note: d.rtNote, width: d.width ?? 310 });
+  const layout = routeTableLayout({ label: d.label ?? '', columns: d.rtColumns, rowCount: d.rtRows?.length ?? 0, rows: d.rtRows, note: d.rtNote, width: d.width ?? 310 });
   const gridTemplateColumns = layout.columnWidths.map((width) => `${width}px`).join(' ');
   const section: React.CSSProperties = { boxSizing: 'border-box', flexShrink: 0 };
   const activeRules = useContext(ActiveRulesContext);
@@ -266,10 +272,13 @@ function RouteTableNode({ id, data }: NodeProps) {
         {layout.headerLines.map((lines, i) => <span key={i} style={{ whiteSpace: 'pre' }}>{lines.join('\n')}</span>)}
       </div>
       {(d.rtRows ?? []).map((row, i) => (
-        <div key={i} style={{ ...section, height: layout.rowHeight, display: 'grid', gridTemplateColumns, gap: m.gap, fontSize: m.rowSize, lineHeight: `${m.rowLine}px`, padding: `${m.rowPadding}px ${m.paddingX}px`, background: row.id && hl.has(row.id) ? '#fff3c4' : 'transparent' }}>
-          {cellsOf(row).map((c, j) => (
-            <span key={j} title={c} style={{ color: cellColor(j), fontWeight: j === 2 ? 700 : 500, fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
-          ))}
+        <div key={row.id ?? i} style={{ ...section, height: layout.rowHeights[i], fontSize: m.rowSize, lineHeight: `${m.rowLine}px`, padding: `${m.rowPadding}px ${m.paddingX}px`, background: row.id && hl.has(row.id) ? '#fff3c4' : row.routeType === 'Implicit' ? '#f5f4f2' : 'transparent', fontStyle: row.routeType === 'Implicit' ? 'italic' : undefined }}>
+          <div style={{ display: 'grid', gridTemplateColumns, gap: m.gap }}>
+            {cellsOf(row).map((c, j) => (
+              <span key={j} title={c} style={{ color: row.superseded ? oracle.textMuted : cellColor(j), fontWeight: j === 2 ? 700 : 500, fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
+            ))}
+          </div>
+          {layout.rowNotes[i] && <div style={{ color: oracle.textMuted }}>{layout.rowNotes[i]}</div>}
         </div>
       ))}
     </div>
@@ -282,6 +291,21 @@ function ResourceGroupNode({ data }: NodeProps) {
   if (!d.resourceKind) return null;
   return <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
     dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />;
+}
+
+function ConnectivityNode({ data }: NodeProps) {
+  const node = data as unknown as DiagramNode;
+  let label = node.label;
+  if (node.premises) label += `: On-Premises, ${node.premises.cidrs.join(', ')}, ${node.premises.equipmentLabel} ${node.premises.equipmentAddress ?? node.premises.equipmentName}`;
+  if (node.vpnTunnel?.customerAddress) label += `, CPE interface ${node.vpnTunnel.customerAddress}`;
+  if (node.vpnTunnel?.oracleAddress) label += `, Oracle interface ${node.vpnTunnel.oracleAddress}`;
+  if (node.fastConnect) label += `, ${node.fastConnect.provider}, ${node.fastConnect.bandwidth ?? ''}, ${node.fastConnect.mappings.map((mapping) => `${mapping.name}: customer ${mapping.customerAddress ?? ''}, Oracle ${mapping.oracleAddress ?? ''}`).join('; ')}`;
+  return <div role="img" aria-label={label}
+    style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div dangerouslySetInnerHTML={{ __html: hybridTopologySvg(node) }} />
+    <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
+    <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+  </div>;
 }
 
 function RtDotNode({ data }: NodeProps) {
@@ -298,7 +322,7 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
 
 /** Nodes stay fixed; screen and export consume the same model-derived connector. */
 function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
@@ -310,7 +334,7 @@ const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker: string): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
-    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
     return {
     id: n.id,
     position: { x: n.x, y: n.y },
@@ -319,7 +343,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { label: n.label, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, resourceKind: n.resourceKind, resourceItems: n.resourceItems },
+    data: { label: n.label, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -352,7 +376,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     type: 'floating',
     label: e.label,
     data: { path: (associations.get(e.id) ?? [structuralEdgePoints(e, rects)]).map(polylinePath).join(' ') },
-    ...(rects.get(e.source)?.node.kind === 'attachment' || rects.get(e.target)?.node.kind === 'attachment'
+    ...(['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(e.source)?.node.kind ?? '') || rects.get(e.target)?.node.kind === 'attachment'
       ? { markerStart: attachmentMarker, markerEnd: attachmentMarker }
       : rects.get(e.target)?.node.kind !== 'routetable' ? { markerEnd: { type: MarkerType.ArrowClosed, color: '#6b6660', width: 15, height: 15 } } : {}),
     // Lift links above the opaque compartment fills. Dot→table connectors ride
@@ -595,7 +619,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       />
       {onOptionsChange && (
         <Panel position="top-right" className="diagram-layer-controls">
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100vw - 64px)' }}>
             {showFlowControl && <button
               type="button"
               style={{ ...layerBtn, ...(options?.showEndpoints ? layerBtnActive : null) }}

@@ -3,17 +3,9 @@ import { emptyLzModel } from '../model/defaults';
 import type { FastConnectConfig } from '../model/hybridConnectivity';
 import { buildConfig } from './lzConfig';
 import { emptyHybridConnectivity, validateHybridConnectivity } from './hybridConnectivity';
-import { connectivityCatalog, cpeDeviceError, providerSelectionError, providerServicesForRegion, selectCpeDevice, selectProviderService } from './connectivityCatalog';
+import { providerSelectionError, providerServicesForRegion, selectProviderService } from './connectivityCatalog';
 import { findRegion } from './regions';
 import { fastConnectProviderServices } from '../data/fastConnectProviderServices';
-
-it('keeps catalogue facts sourced and scopes any verified provider OCIDs', () => {
-  expect(connectivityCatalog.verified_on).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  for (const entry of connectivityCatalog.cpe_vendors) {
-    expect(entry.sources.length).toBeGreaterThan(0);
-    for (const url of entry.sources) expect(new URL(url).protocol).toBe('https:');
-  }
-});
 
 it('offers only verified provider OCIDs for the exact realm and region', () => {
   for (const region of ['eu-frankfurt-1', 'eu-amsterdam-1', 'uk-london-1', 'me-dubai-1']) {
@@ -54,15 +46,18 @@ it('keeps manual service IDs available and checks the selected realm and region'
   expect(providerSelectionError({ type: 'PRIVATE', provider_service_id: 'ocid1.virtualcircuit.oc1..example' }, 'oc1', 'eu-frankfurt-1')).toContain('rather than a circuit');
 });
 
-it('exports provider OCIDs while rejecting a mismatched location', () => {
+it('exports generic CPE settings and provider OCIDs while rejecting a mismatched location', () => {
   const model = emptyLzModel();
   const h = model.hybridConnectivity = emptyHybridConnectivity();
   const service = providerServicesForRegion('oc1', 'eu-frankfurt-1')[0];
   h.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', provider_service_id: service.ocid, remote_cidrs: ['172.20.0.0/16'] };
-  h.customer_premises_equipments.office = { ip_address: '203.0.113.10', cpe_device_shape_vendor_name: 'Fortinet' };
+  h.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+  Object.assign(h.customer_premises_equipments.office, { cpe_device_shape_vendor_name: 'Fortinet', cpe_device_shape_id: 'old-shape' });
+  const original = structuredClone(h.customer_premises_equipments.office);
   expect(validateHybridConnectivity(model)).toEqual([]);
   expect(buildConfig(model).hybrid_connectivity?.fast_connect_virtual_circuits.primary.provider_service_id).toBe(service.ocid);
-  expect(buildConfig(model).hybrid_connectivity?.customer_premises_equipments.office.cpe_device_shape_vendor_name).toBe('Fortinet');
+  expect(buildConfig(model).hybrid_connectivity?.customer_premises_equipments.office).toEqual({ ip_address: '203.0.113.10' });
+  expect(h.customer_premises_equipments.office).toEqual(original);
   model.foundation.realm = 'oc19';
   model.foundation.region = 'eu-madrid-2';
   expect(validateHybridConnectivity(model).join(' ')).toContain('another location');
@@ -71,25 +66,7 @@ it('exports provider OCIDs while rejecting a mismatched location', () => {
   expect(buildConfig(model).hybrid_connectivity?.fast_connect_virtual_circuits.primary.provider_service_id).toBe(manual.provider_service_id);
 });
 
-it('accepts UUID device identifiers and rejects blank, conflicting or wrong-realm selectors', () => {
-  const cpe = { ip_address: '203.0.113.10' };
-  expect(cpeDeviceError(cpe, 'oc19')).toBeUndefined();
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' }, 'oc19')).toBeUndefined();
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_id: '' }, 'oc1')).toContain('Enter a device shape identifier');
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_id: 'ocid1.cpedeviceshape.oc1..example' }, 'oc19')).toContain('verified for oc19');
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_id: 'ocid1.cpe.oc1..example' }, 'oc1')).toContain('rather than a CPE');
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_vendor_name: 'Unverified' }, 'oc1')).toContain('Enter its device shape identifier');
-  expect(cpeDeviceError({ ...cpe, cpe_device_shape_id: 'shape', cpe_device_shape_vendor_name: 'Fortinet' }, 'oc1')).toContain('rather than both');
-});
-
 it('selects verified service IDs and retains manual values without mutating the design', () => {
-  const cpe = { ip_address: '203.0.113.10', cpe_device_shape_id: 'specific-shape' };
-  const named = selectCpeDevice(cpe, 'Fortinet');
-  expect(named).toEqual({ ip_address: cpe.ip_address, cpe_device_shape_vendor_name: 'Fortinet' });
-  expect(cpe.cpe_device_shape_id).toBe('specific-shape');
-  expect(selectCpeDevice(named, 'ocid')).toEqual({ ip_address: cpe.ip_address, cpe_device_shape_id: '' });
-  expect(selectCpeDevice(named, 'Other')).toEqual({ ip_address: cpe.ip_address });
-  expect(selectCpeDevice(cpe, 'ocid').cpe_device_shape_id).toBe('specific-shape');
   const manual: FastConnectConfig = { type: 'PRIVATE', provider_service_id: 'ocid1.providerservice.oc1.eu-frankfurt-1.example', provider_service_key_name: 'activation-reference' };
   const service = providerServicesForRegion('oc1', 'eu-frankfurt-1')[0];
   const selected = selectProviderService(manual, service.ocid, 'oc1', 'eu-frankfurt-1');

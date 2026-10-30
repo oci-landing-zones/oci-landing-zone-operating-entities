@@ -77,6 +77,8 @@ Events, vaults, vulnerability scanning recipes, notifications, VCN flow log grou
 
 Route tables and their subnet, gateway, VCN-ingress and DRG-attachment associations come from the evaluated Blueprint Factory network configuration. DRG import distributions provide expected route advertisements; remote prefixes come from the supplied peer CIDRs. These are configuration previews, not live learned routes. Designs without Projects VCNs can use **Show routing tables** without selecting a packet flow.
 
+VCN tables also show OCI's automatic local routes as shaded, italic **Implicit** rows. Routes use longest-prefix matching; a configured static route wins over an implicit local route with the same prefix. **(fully superseded)** means preferred routes cover the entire destination in the preview. A route with only partial coverage remains active for the remaining addresses. Traffic within the same subnet is forwarded directly and does not use these route lookups. See [VCN routing and precedence](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingroutetables.htm).
+
 Packets follow the same connection geometry as the structural diagram, including repeated attachment visits. Each numbered hop uses one processing anchor on that path for its marker, packet pause and effective-rule highlight. Routing anchors come from the table's resource association; component entry and exit remain on the path. Manual stepping holds the same anchor, and reduced-motion mode uses static steps. Draw.io downloads retain the same table inventory, processing anchors and connection geometry as a static diagram, without an animation phase.
 
 Hub E shows direct DRG routing without firewall inspection, local spoke NAT gateways for internet egress, and local service gateways for OCI Services. Its DRG preview derives dynamic routes from configured subnets, matching the default [VCN attachment route advertisement](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-create-attachment.htm). When an OKE extension suppresses the hub load balancer in the generator, Studio omits that load balancer and its ingress flow choices. Flow traces describe routing paths; they do not verify deployed backends or security policy reachability.
@@ -94,7 +96,7 @@ Studio currently provides a guided interface for the following repository-suppor
 | Environments | Environment networks, optional OCI Security Zones, and projects |
 | Platforms | Environment OKE (`oke_simple`), Custom, EXACC, and EXACS platforms; shared Custom, EXACC, and EXACS platforms. Choose a type from each panel's dropdown. |
 | Exadata fields | Shared, hybrid, and dedicated EXACC/EXACS selections map to UC1, UC2, and UC3; EXACC stays networkless, while EXACS creates networks where AVMC/VMCs are placed. |
-| Hybrid connectivity | BGP/static VPNs with two tunnels, private FastConnect circuits, physical preparation, custom attachment routing, and inline VPN/BGP keys |
+| Hybrid connectivity | BGP/static VPNs with two tunnels, private provider FastConnect circuits, custom attachment routing, and inline VPN/BGP keys |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 | Deployment scope | Complete or regional DR using the standard wizard |
 | Remote peering | Multiple RPC acceptor/requester connections; same tenancy for regional DR, same or cross tenancy for complete deployments |
@@ -131,7 +133,7 @@ Studio runs entirely in the browser. It does not request OCI credentials, deploy
 
 Use a browser profile controlled by the intended operator. Connectivity keys entered in masked inputs remain in memory for the current session; saved designs retain the authentication mode and require key re-entry after reload. Secret-bearing generated outputs are not cached in browser storage. Explicit downloads contain the keys in `config.jsonnet` and generated network files. Keep those files, Terraform state and raw outputs private. Studio does not automatically copy keys into the landing zone Vault.
 
-Configure [OCI Hybrid Connectivity](../oci-hybrid-connectivity/README.md) in the separate optional VPN and FastConnect sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. Use the documented Terraform CLI handoff: the pinned Orchestrator v2.2.0 RMS facade's OCI provider constraint conflicts with Networking v0.9.0. Ready physical connection OCIDs and existing VPN secrets must be available before the connectivity apply.
+Configure [OCI Hybrid Connectivity](../oci-hybrid-connectivity/README.md) in the separate optional VPN and FastConnect sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. Use the documented Terraform CLI handoff: the pinned Orchestrator v2.2.0 RMS facade's OCI provider constraint conflicts with Networking v0.9.0. Provider service OCIDs and existing VPN secrets must be available before the connectivity apply.
 
 Studio displays a UPL license notice at the bottom of the dashboard. Your organization's architecture, security, compliance, and deployment approvals still apply.
 

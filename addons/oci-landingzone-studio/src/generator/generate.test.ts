@@ -140,7 +140,7 @@ describe('hybrid VPN identity contract', () => {
   });
 });
 
-describe('hybrid CPE device selector', () => {
+describe('hybrid generic CPE contract', () => {
   async function normalizeDevice(selector: Record<string, unknown>) {
     const { files } = buildVirtualFs();
     files['cpe-check.jsonnet'] = `(import 'addons/oci-hybrid-connectivity/config.libsonnet').normalize({
@@ -149,26 +149,17 @@ describe('hybrid CPE device selector', () => {
     return evaluate('cpe-check.jsonnet', files);
   }
 
-  it('accepts a UUID device shape identifier without requiring an OCID', async () => {
-    const selector = { cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' };
-    await expect(normalizeDevice(selector)).resolves.toEqual({ ip_address: '203.0.113.10', ...selector });
+  it('accepts only the public IP for newly registered equipment', async () => {
+    await expect(normalizeDevice({})).resolves.toEqual({ ip_address: '203.0.113.10' });
   });
 
-  it('accepts a vendor name without restricting it to a built-in catalog', async () => {
-    const selector = { cpe_device_shape_vendor_name: 'Example Network Vendor' };
-    await expect(normalizeDevice(selector)).resolves.toEqual({ ip_address: '203.0.113.10', ...selector });
-  });
-
-  it('rejects a shape identifier combined with vendor selection', async () => {
-    await expect(normalizeDevice({ cpe_device_shape_id: 'shape-id', cpe_device_shape_vendor_name: 'Example' }))
-      .rejects.toThrow('must choose cpe_device_shape_id or cpe_device_shape_vendor_name, not both');
-  });
-
-  it('rejects blank and non-string device selectors', async () => {
-    for (const field of ['cpe_device_shape_id', 'cpe_device_shape_vendor_name']) {
-      await expect(normalizeDevice({ [field]: '   ' })).rejects.toThrow('device shape ID/vendor must be nonblank strings');
-      for (const value of ['', 42]) await expect(normalizeDevice({ [field]: value })).rejects.toThrow(`${field} must be a non-empty string`);
-    }
+  it.each([
+    { cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' },
+    { cpe_device_shape_vendor_name: 'Fortinet' },
+    { cpe_device_shape_vendor_name: 'Other' },
+    { cpe_device_shape_id: 'shape-id', cpe_device_shape_vendor_name: 'Fortinet' },
+  ])('rejects configurable device selectors: %j', async (selector) => {
+    await expect(normalizeDevice(selector)).rejects.toThrow('unsupported');
   });
 });
 
@@ -277,7 +268,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['iam.json']).toBeDefined();
     expect(out.config).toContain('environments: {}');
   }, 60_000);
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s assigns custom VPN and private circuit ingress tables', async (hubKind) => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s assigns VPN and private circuits to one HC ingress table', async (hubKind) => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
@@ -289,19 +280,22 @@ describe('generator (go-jsonnet wasm)', () => {
     const out = await generateOutputs(model);
     const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
     const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
-    for (const [selector, name] of [['ipsec_tunnel', 'VPN'], ['virtual_circuit', 'FASTCONNECT']]) {
-      const key = `DRGRT-FRA-LZ-HUB-${name}-KEY`;
+    const key = 'DRGRT-FRA-LZ-HUB-HC-KEY';
+    for (const selector of ['ipsec_tunnel', 'virtual_circuit']) {
       expect(drg.default_drg_route_tables[selector]).toEqual({ drg_route_table_id: key });
-      const table = drg.drg_route_tables[key];
-      expect(table.is_ecmp_enabled).toBe(false);
-      if (hubKind === 'hub_e') {
-        expect(table.import_drg_route_distribution_key).toBe('DRGRD-FRA-LZ-HUB-HYBRID-LOCAL-KEY');
-        expect(table.route_rules).toEqual({});
-      } else {
-        const rules = Object.values<Record<string, unknown>>(table.route_rules);
-        expect(rules.length).toBeGreaterThan(1);
-        expect(rules.every((rule) => rule.destination !== '0.0.0.0/0' && rule.next_hop_drg_attachment_key === 'DRGATT-FRA-LZ-HUB-VCN-KEY')).toBe(true);
-      }
+    }
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
+    const table = drg.drg_route_tables[key];
+    expect(table.display_name).toBe('drgrt-fra-lz-hub-hc');
+    expect(table.is_ecmp_enabled).toBe(false);
+    if (hubKind === 'hub_e') {
+      expect(table.import_drg_route_distribution_key).toBe('DRGRD-FRA-LZ-HUB-HYBRID-LOCAL-KEY');
+      expect(table.route_rules).toEqual({});
+    } else {
+      const rules = Object.values<Record<string, unknown>>(table.route_rules);
+      expect(rules.length).toBeGreaterThan(1);
+      expect(rules.every((rule) => rule.destination !== '0.0.0.0/0' && rule.next_hop_drg_attachment_key === 'DRGATT-FRA-LZ-HUB-VCN-KEY')).toBe(true);
     }
     expect(Object.keys(gateways.ipsecs)).toHaveLength(1);
     expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(1);
