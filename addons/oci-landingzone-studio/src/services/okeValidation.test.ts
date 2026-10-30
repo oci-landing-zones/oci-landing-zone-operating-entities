@@ -39,3 +39,17 @@ describe('validateOkePlatform', () => {
     expect(validateOkeModel(model)).toEqual([]);
   });
 });
+
+it('validates explicit peer CIDRs and rejects overlap with an OKE environment VCN', () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  model.platforms = [platform];
+  for (const cidr of ['invalid', '0.0.0.0/0', '10.50.1.0/16']) {
+    platform.okeParams!.peerVcnCidrs = [cidr];
+    expect(validateOkeModel(model).some((error) => error.includes('Peer CIDRs'))).toBe(true);
+  }
+  platform.okeParams!.peerVcnCidrs = [platform.vcnCidr];
+  expect(validateOkeModel(model).some((error) => error.includes('must not overlap the OKE VCN'))).toBe(true);
+  platform.okeParams!.peerVcnCidrs = ['10.50.0.0/16'];
+  expect(validateOkeModel(model)).toEqual([]);
+});

@@ -453,3 +453,176 @@ it.each(['medium', 'large'] as const)('generates OKE %s after resizing alongside
   }
   expect(Object.keys(out.files).some((file) => file.includes('oke'))).toBe(true);
 }, 60_000);
+
+it('generates a cluster without worker pools when node pool creation is disabled', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.createNodePools = false;
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.config).toContain('create_node_pools: false');
+  expect(out.config).not.toContain('worker_image:');
+  expect(out.files['oke.json']).toBeDefined();
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  expect(Object.values(deployments).every((value) => !Object.hasOwn(value as object, 'workers_configuration'))).toBe(true);
+  expect(out.files['oke_workers.json']).toBeUndefined();
+  expect(out.files['network.json']).toBeDefined();
+}, 60_000);
+
+it.each([1, 2] as const)('generates native OKE 0.3.0 deployments for CIS%d with explicit worker defaults', async (cisLevel) => {
+  const model = emptyLzModel();
+  model.foundation.cisLevel = cisLevel;
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.createNodePools = true;
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.files['oke_clusters.json']).toBeUndefined();
+  expect(out.files['oke_workers.json']).toBeUndefined();
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  expect(Object.keys(deployments)).toHaveLength(model.environments.length);
+  for (const key of Object.keys(deployments)) {
+    const deployment = deployments[key];
+    const cluster = deployment.cluster_configuration;
+    const workers = deployment.workers_configuration;
+    expect(cluster.cluster_type).toBe('enhanced');
+    expect(cluster.cni_type).toBe('native');
+    expect(cluster.options.kubernetes_network_config.pods_cidr).toBeUndefined();
+    expect(cluster.networking.service_lb_subnet_ids).toHaveLength(1);
+    expect(workers.default_shape).toBe('VM.Standard.E5.Flex');
+    expect(workers.default_os_version).toBe('9');
+    expect(workers.default_ocpus).toBe(1);
+    expect(workers.default_memory).toBe(8);
+    expect(workers.default_pod_subnet_id).toBeDefined();
+    expect(workers.default_disable_default_cloud_init).toBeUndefined();
+    expect(workers.default_cloud_init[0].content).not.toContain('oke_init_script');
+    expect(!!cluster.encryption).toBe(cisLevel === 2);
+    expect(!!workers.default_volume_kms_key_id).toBe(cisLevel === 2);
+    expect(Object.keys(workers.worker_pools)).toHaveLength(1);
+  }
+}, 60_000);
+
+it('generates OKE 0.3.0 Flannel with Oracle Linux 8 and no native pod subnet', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, cniType: 'overlay', podsCidr: '10.244.0.0/16', workerImage: '8\\.[0-9]+' };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  for (const key of Object.keys(deployments)) {
+    const { cluster_configuration: cluster, workers_configuration: workers } = deployments[key];
+    expect(cluster.cni_type).toBe('flannel');
+    expect(cluster.options.kubernetes_network_config.pods_cidr).toBe('10.244.0.0/16');
+    expect(workers.default_os_version).toBe('8');
+    expect(workers.default_pod_subnet_id).toBeUndefined();
+    expect(workers.default_pod_nsg_ids).toBeUndefined();
+  }
+}, 60_000);
+
+it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('independently controls worker and native pod internet routes and NSGs in %s', async (hubKind) => {
+  for (const [workerInternetAccess, podInternetAccess] of [[true, true], [false, true], [true, false], [false, false]]) {
+    const model = emptyLzModel();
+    model.environments = model.environments.slice(0, 1);
+    model.network = { ...model.network, hubKind, ...hubKindDefaults(hubKind) };
+    const platform = newPlatform('oke_simple', []);
+    platform.okeParams = { ...platform.okeParams!, workerInternetAccess, podInternetAccess };
+    model.platforms = [platform];
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    for (const [role, enabled] of [['workers', workerInternetAccess], ['pods', podInternetAccess]] as const) {
+      const table = objects.find((entry) => entry.display_name === `rt-fra-lz-prod-oke-${role}`)!;
+      const routes = Object.values(table.route_rules as Record<string, Record<string, unknown>>);
+      expect(routes.some((route) => route.destination === '0.0.0.0/0')).toBe(enabled);
+      expect(routes.some((route) => route.destination_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
+      if (!enabled) expect(routes.filter((route) => route.destination_type === 'CIDR_BLOCK')).toEqual([]);
+      const nsg = objects.find((entry) => entry.display_name === `nsg-fra-lz-prod-oke-${role}`)!;
+      const egress = Object.values(nsg.egress_rules as Record<string, Record<string, unknown>>);
+      expect(egress.some((rule) => rule.dst === '0.0.0.0/0' && rule.protocol === 'ALL')).toBe(enabled);
+      expect(egress.some((rule) => rule.dst_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
+    }
+  }
+}, 60_000);
+
+it('attaches the additional peering NSG independently to workers and native pods', async () => {
+  for (const [workerSpokeAccess, podSpokeAccess] of [[false, false], [true, false], [false, true], [true, true]]) {
+    const model = emptyLzModel();
+    model.environments = model.environments.slice(0, 1);
+    const platform = newPlatform('oke_simple', []);
+    platform.okeParams = { ...platform.okeParams!, createNodePools: true, workerInternetAccess: false, podInternetAccess: false, workerSpokeAccess, podSpokeAccess, peerVcnCidrs: ['10.0.64.0/21', '10.50.0.0/16'] };
+    model.platforms = [platform];
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    const peering = objects.find((entry) => entry.display_name === 'nsg-fra-lz-prod-oke-peering');
+    expect(!!peering).toBe(workerSpokeAccess || podSpokeAccess);
+    const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+    const workers = deployments[Object.keys(deployments)[0]].workers_configuration;
+    expect(workers.default_nsg_ids.some((key: string) => key.includes('PEERING'))).toBe(workerSpokeAccess);
+    expect(workers.default_pod_nsg_ids.some((key: string) => key.includes('PEERING'))).toBe(podSpokeAccess);
+    expect(workers.default_nsg_ids).toContain('NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY');
+    expect(workers.default_pod_nsg_ids).toContain('NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY');
+    if (peering) {
+      const ingress = Object.values(peering.ingress_rules as Record<string, Record<string, unknown>>);
+      const egress = Object.values(peering.egress_rules as Record<string, Record<string, unknown>>);
+      expect(ingress.map((rule) => rule.src)).toEqual(['10.0.64.0/21', '10.50.0.0/16']);
+      expect(egress.map((rule) => rule.dst)).toEqual(ingress.map((rule) => rule.src));
+      expect(egress.every((rule) => rule.dst !== '0.0.0.0/0' && rule.dst !== platform.vcnCidr && rule.protocol === 'ALL' && rule.stateless === true)).toBe(true);
+    }
+  }
+}, 60_000);
+
+it('ignores pod peering for Flannel and omits unused peering NSGs', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, cniType: 'overlay', podsCidr: '10.244.0.0/16', podSpokeAccess: true };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.config).not.toContain('pod_spoke_access');
+  expect(out.files['network.json']).not.toContain('peering');
+}, 60_000);
+
+it('does not create or attach a peering NSG when no peer CIDRs are selected', async () => {
+  const model = emptyLzModel();
+  model.environments = model.environments.slice(0, 1).map((env) => ({ ...env, projectNetworkEnabled: false }));
+  model.projects = [];
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, workerSpokeAccess: true, podSpokeAccess: true, peerVcnCidrs: [] };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.files['network.json']).not.toContain('peering');
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  const workers = deployments[Object.keys(deployments)[0]].workers_configuration;
+  expect(workers.default_nsg_ids).toHaveLength(1);
+  expect(workers.default_pod_nsg_ids).toHaveLength(1);
+}, 60_000);
+
+it.each(['0.0.0.0/0', '10.50.1.0/16', '10.0.80.0/20'])('rejects unsafe or malformed explicit peer CIDR %s', async (cidr) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerSpokeAccess: true, peerVcnCidrs: [cidr] };
+  model.platforms = [platform];
+  await expect(generateOutputs(model)).rejects.toThrow(/[Pp]eer|canonical/);
+}, 60_000);
+
+it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('limits worker and pod DRG routes to their configured peers and public LB in %s', async (hubKind) => {
+  const model = emptyLzModel();
+  model.network = { hubKind, ...hubKindDefaults(hubKind) };
+  model.environments = model.environments.slice(0, 1);
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerInternetAccess: false, podInternetAccess: false,
+    workerSpokeAccess: true, podSpokeAccess: false, peerVcnCidrs: ['10.90.0.0/24', '10.91.0.0/24'] };
+  model.platforms = [platform];
+  for (const publicLoadBalancer of [false, true]) {
+    platform.okeParams.publicLoadBalancer = publicLoadBalancer;
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    const lbCidr = model.network.subnets.find((sn) => sn.name === 'lb')!.cidr;
+    const getRules = (role: string) => Object.values(objects.find((entry) => entry.display_name === `rt-fra-lz-prod-oke-${role}`)!.route_rules as Record<string, Record<string, unknown>>);
+    for (const role of ['workers', 'pods']) {
+      const rules = getRules(role);
+      const expected = [...(role === 'workers' ? platform.okeParams.peerVcnCidrs! : []), ...(publicLoadBalancer ? [lbCidr] : [])];
+      expect(rules.filter((r) => r.destination_type === 'CIDR_BLOCK').map((r) => r.destination).sort()).toEqual(expected.sort());
+      expect(rules.filter((r) => r.destination_type === 'SERVICE_CIDR_BLOCK')).toHaveLength(1);
+    }
+    // Administrative return routing is owned by the control-plane table.
+    expect(getRules('cp').some((r) => r.destination === '0.0.0.0/0' || r.destination === model.network.hubVcnCidr)).toBe(true);
+  }
+}, 60_000);

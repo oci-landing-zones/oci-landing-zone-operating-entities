@@ -3,7 +3,8 @@
  *   1. Optional shared platforms — repeatable, removable Custom or Exadata entries.
  *   2. Environment platforms — VCN-bearing compartments dropped into one/all/a
  *      subset of the environments. Pick a supported type (OKE, Custom, or
- *      Exadata), name it, choose placement. OKE defaults to the generator-owned
+ *      Exadata), name it, choose placement for Custom or Exadata. OKE creates
+ *      one independent card per environment and defaults to the generator-owned
  *      small profile and exposes its cluster settings; Custom starts empty. Each
  *      platform shows a generated per-environment table (its VCN per env) with a
  *      per-env override.
@@ -12,6 +13,7 @@
  * the diagram and JSON derive from it.
  */
 
+import { createOkeEntries } from '../../services/okePlacements';
 import { useState, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import { oracle } from '../../theme';
@@ -20,7 +22,7 @@ import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
 import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, OKE_PROFILE_PREFIX, okeProfileCidrError, setOkeEnvironmentCidr, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformInEnv, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
@@ -183,14 +185,21 @@ function PerEnvTable({ platform, environments, onPlatform }: {
               <tr key={inst.id}>
                 <td style={local.genTd}>{inst.name}</td>
                 <td style={local.genTd}>
-                  {inst.vcnCidr}
+                  {profileOwned ? <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}><ValidatedInput
+                    id={`platform-${platform.id}-${inst.id}-vcn`}
+                    aria-label={`${platform.key} ${inst.name} VCN CIDR`}
+                    style={s.rowInput}
+                    value={inst.vcnCidr.split('/')[0]}
+                    error={okeProfileCidrError(inst.vcnCidr, platform.okeParams!.clusterSize!)}
+                    onChange={(event) => onPlatform(setOkeEnvironmentCidr(platform, environments, inst.id, `${event.target.value.split('/')[0].trim()}/${OKE_PROFILE_PREFIX[platform.okeParams!.clusterSize!]}`))}
+                  /><span aria-label="Profile prefix">/{OKE_PROFILE_PREFIX[platform.okeParams!.clusterSize!]}</span></div> : inst.vcnCidr}
                   <FieldError id={`platform-${platform.id}-${inst.id}-conflict`} error={conflicts[`platform:${platform.id}:${inst.id}`]} />
                   {inst.overridden && !profileOwned && <span style={local.overrideTag}>override</span>}
                 </td>
                 <td style={local.genTd}>{inst.subnets.length === 0 ? 'auto' : `${inst.subnets.length} subnet${inst.subnets.length === 1 ? '' : 's'}`}</td>
                 <td style={{ ...local.genTd, textAlign: 'right' }}>
                   {profileOwned ? (
-                    <span style={local.fieldHint}>Automatic</span>
+                    <span style={local.fieldHint}>Automatic subnets</span>
                   ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>
@@ -228,7 +237,7 @@ function PerEnvTable({ platform, environments, onPlatform }: {
 }
 
 /** One platform card: header (name + type + placement + delete) and an expandable body. */
-function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDelete }: {
+export function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDelete }: {
   platform: PlatformConfig;
   environments: { id: string; name: string }[];
   open: boolean;
@@ -242,7 +251,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   const keyError = configKeyError(platform.key, peers.map((other) => other.key), 3);
   const baseConflicts = platformEnvInstances(platform, environments).filter((instance) => instance.vcnCidr === platform.vcnCidr).flatMap((instance) => conflicts[`platform:${platform.id}:${instance.id}`] ?? []);
   const isOke = platform.type === 'oke_simple';
-  const oke = platform.okeParams ?? okeDefaultParams();
+  const oke = platform.okeParams ?? okeDefaultParams(model.network);
 
   return (
     <div style={local.card}>
@@ -253,7 +262,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <span style={local.typeBadge}>{meta.label}</span>
         </span>
         <span style={{ fontSize: 12.5, color: oracle.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
-          {platform.environments === 'all' ? 'all envs' : `${platform.environments.length} env${platform.environments.length === 1 ? '' : 's'}`} · {platform.vcnCidr}
+          {isOke ? environments.find((env) => platformInEnv(platform, env.id))?.name ?? 'Environment unavailable' : platform.environments === 'all' ? 'all envs' : `${platform.environments.length} env${platform.environments.length === 1 ? '' : 's'}`} · {platform.vcnCidr}
         </span>
       </button>
 
@@ -262,7 +271,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
             <div>
               <label style={s.label}>Placement</label>
-              <PlacementChips id={platform.id} value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />
+              {isOke ? <button type="button" aria-label="OKE environment" aria-pressed="true" aria-disabled="true" style={{ ...local.chip, ...local.chipActive, cursor: 'default' }}>{environments.find((env) => platformInEnv(platform, env.id))?.name ?? 'Environment unavailable'}</button> : <PlacementChips id={platform.id} value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />}
             </div>
             <DeleteButton label={`Delete platform ${platform.key}`} onClick={onDelete} />
           </div>
@@ -270,7 +279,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <div style={{ marginBottom: 16 }}>
             <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
             <ValidatedInput id={`${platform.id}-key`} error={keyError} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
-            <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
+            <div style={local.fieldHint}>Up to 3 characters. Used in generated resource names to keep OCI Network Firewall address-list names within their 28-character limit.</div>
           </div>
 
           {isOke && <OkeSettingsFields platform={platform} onPlatform={onPlatform} />}
@@ -280,7 +289,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             {isOke && oke.clusterSize ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
                 <div style={s.subHead}>{oke.clusterSize} network profile · {platform.vcnCidr}</div>
-                <div style={local.fieldHint}>This profile reserves the following subnets. Select Manual subnets only when you need a different address plan.</div>
+                <div style={local.fieldHint}>Edit this cluster’s VCN CIDR below. The profile fixes its prefix and calculates subnets automatically. Select Manual subnets to customize individual subnets.</div>
                 <div style={local.subnetGrid} role="list" aria-label="Network profile subnet allocation">
                   {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => (
                     <div key={sn.name} style={local.subnetCell} role="listitem">
@@ -302,10 +311,10 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             )}
           </div>
 
-          <div style={{ marginTop: 18 }}>
-            <label style={s.label}>Per-environment settings</label>
+          {(!isOke || oke.clusterSize) && <div style={{ marginTop: 18 }}>
+            <label style={s.label}>{isOke ? 'Environment network' : 'Per-environment settings'}</label>
             <PerEnvTable platform={platform} environments={environments} onPlatform={onPlatform} />
-          </div>
+          </div>}
         </div>
       )}
     </div>
@@ -329,7 +338,7 @@ export default function PlatformTemplatesStep() {
     && (!sharedExadata.includes(type) || model.exadata[type].database === 'per_environment'
       || (type === 'exacc' && model.exadata.exacc.database === undefined && model.exadata.exacc.environments.length > 0)));
   const sharedTypeAdded = isExadataType(newSharedType) && model.exadata[newSharedType].enabled;
-  const environmentTypeAdded = isExadataType(newType) && model.exadata[newType].enabled;
+  const environmentTypeAdded = (isExadataType(newType) && model.exadata[newType].enabled) || (newType === 'oke_simple' && environments.length === 0);
 
   function addExadata(type: ExadataType, shared: boolean) {
     setField('exadata', addExadataPlatform(model, type, shared));
@@ -391,7 +400,14 @@ export default function PlatformTemplatesStep() {
       addExadata(newType, false);
       return;
     }
-    const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model));
+    if (newType === 'oke_simple') {
+      const entries = createOkeEntries(model, configuredVcnCidrs(model), newName);
+      setPlatforms([...model.platforms, ...entries]);
+      setOpenId(entries[0]?.id ?? null);
+      setNewName('');
+      return;
+    }
+    const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model), model.network);
     const platform = { ...created, key: newName.trim() || created.key };
     setPlatforms([...model.platforms, platform]);
     setOpenId(platform.id);
@@ -458,7 +474,7 @@ export default function PlatformTemplatesStep() {
           <div className="studio-info-heading"><h2 style={s.title}>Environment platforms</h2>
             <InfoButton title="Environment platforms"><p>Place a workload platform in all environments or select individual environments. Each selected environment gets its own platform resources.</p><p>The placement table shows the resulting networks. Use an environment override when that instance needs a different address range; Reset restores its derived settings.</p></InfoButton>
           </div>
-          <p style={local.note}>Add a workload platform to one or more environments. Each selected environment receives its own platform resources.</p>
+          <p style={local.note}>Adding OKE creates one independent cluster entry per active environment. Custom platforms can span multiple environments.</p>
 
           {model.platforms.length === 0 && environmentExadata.length === 0 && (
             <p style={{ ...s.help, marginBottom: 16 }}>No environment platforms configured.</p>
@@ -503,7 +519,7 @@ export default function PlatformTemplatesStep() {
                   onKeyDown={(e) => { if (e.key === 'Enter') addPlatform(); }}
                 />
               </div>}
-              <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>Add platform</button>
+              <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>{newType === 'oke_simple' ? 'Add OKE clusters' : 'Add platform'}</button>
             </div>
           </div>
         </div>

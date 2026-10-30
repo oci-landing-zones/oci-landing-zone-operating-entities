@@ -1,3 +1,4 @@
+import { flowGroup } from '../diagram/flowOverlayGeometry';
 /* eslint-disable react-refresh/only-export-components */
 /**
  * FlowSidebar — docked, collapsible right-side flow picker (diagram-only, step 3+).
@@ -36,13 +37,18 @@ export interface FlowChoice {
   id: string;
   label: string;
   sub: string;
+  endpoint?: string;
 }
 
 /** Concrete choices for one source environment, including every east-west destination. */
-export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true): FlowChoice[] {
+export function flowChoices(environments: { name: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[], sourceIndex: number, ingressAvailable = true): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
-  return [
+  const choices = [
+    ...(source.publicLb ? [
+      { id: flowId(source.name, 'lb'), label: 'Hub public LB → Spoke', sub: 'example LB backend' },
+      { id: flowId(source.name, 'lb-return'), label: 'Spoke → Hub public LB (response)', sub: 'LB response' },
+    ] : []),
     { id: flowId(source.name, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
     ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' }] : []),
     ...environments
@@ -52,8 +58,28 @@ export function flowChoices(environments: { name: string }[], sourceIndex: numbe
         label: `Spoke → ${destination.name}`,
         sub: 'east-west',
       })),
+    ...environments.filter((destination) => destination.apiServer).map((destination) => ({
+      id: `${source.name}>${destination.name}:api`, label: `Spoke → ${destination.name} API Server`, sub: 'TCP 6443',
+    })),
     { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
-  ];
+  ].filter((choice) => {
+    const [scope, kind] = choice.id.split(':');
+    return !source.rolesFor || source.rolesFor(kind, scope.split('>')[1]).length > 0;
+  });
+  if (!source.oke) return source.apiOnly ? choices.map((choice) => ({ ...choice, label: choice.label.replace('Spoke', 'Hub') })) : choices;
+  return choices.flatMap((choice) => {
+    const [scope, kind] = choice.id.split(':');
+    return (source.rolesFor?.(kind, scope.split('>')[1]) ?? []).flatMap((role) => {
+      const label = choice.label.replace('Spoke', role === 'pods' ? 'Pods' : 'Workers');
+      const sub = kind === 'lb' ? (role === 'workers' ? 'TCP health checks / NodePort' : 'TCP backend')
+        : kind === 'lb-return' ? (role === 'workers' ? 'Health check / NodePort response' : 'TCP LB response') : choice.sub;
+      const peers = kind === 'east-west' ? source.peersFor?.(role, scope.split('>')[1]) ?? [] : [];
+      return peers.length ? peers.map((peer) => ({
+        ...choice, id: `${choice.id}:${role}:${peer.role}`, endpoint: role,
+        label: `${label} / ${peer.role} (${peer.cidr})`,
+      })) : [{ ...choice, id: `${choice.id}:${role}`, endpoint: role, label, sub }];
+    });
+  });
 }
 
 /** The endpoint roles currently traced for one flow, in subnet order. */
@@ -235,13 +261,13 @@ function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: 
   );
 }
 
-const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services'];
+const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services', 'api', 'lb', 'lb-return'];
 
 export default function FlowSidebar({
   environments, active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
   allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true,
 }: {
-  environments: { name: string; roles: string[] }[];
+  environments: { name: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; roles: string[]; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[];
   ingressAvailable?: boolean;
   active: string[];
   traces: FlowTrace[];
@@ -265,7 +291,7 @@ export default function FlowSidebar({
   const [openEnvs, setOpenEnvs] = React.useState<Record<string, boolean>>({});
   const set = new Set(active);
   // Count flows, not endpoint picks: `prod:egress:web` and `prod:egress:db` are one flow.
-  const selectedCount = new Set(active.map((id) => id.split(':').slice(0, 2).join(':'))).size;
+  const selectedCount = new Set(active.map(flowGroup)).size;
   const capped = selectedCount >= MAX_FLOWS;
   // A flow clicked on the diagram scrolls into view here.
   React.useEffect(() => {
@@ -340,7 +366,7 @@ export default function FlowSidebar({
         {allFlows ? (
           <>
             <div style={styles.legend} aria-label="Traffic types">
-              {KIND_ORDER.map((kind) => (
+              {KIND_ORDER.filter((kind) => (kind !== 'api' || environments.some((env) => env.apiServer)) && (!kind.startsWith('lb') || environments.some((env) => env.publicLb))).map((kind) => (
                 <span key={kind} style={styles.legendItem}>
                   <span style={{ ...styles.legendLine, background: FLOW_KIND_COLORS[kind] }} />
                   {FLOW_KIND_LABELS[kind]}
@@ -362,7 +388,7 @@ export default function FlowSidebar({
                   </div>
                   {open && choices.map((choice) => {
                     const isSelected = choice.id === selected;
-                    const trace = traces.find((t) => t.id.split('#')[0].split(':').slice(0, 2).join(':') === choice.id);
+                    const trace = traces.find((t) => flowGroup(t.id) === choice.id);
                     const color = trace?.color ?? oracle.ink;
                     return (
                       <div key={choice.id} id={`lz-flow-${choice.id}`}
@@ -400,7 +426,7 @@ export default function FlowSidebar({
         {selectedCount >= MAX_FLOWS && <p style={styles.capNote} role="status">Up to {MAX_FLOWS} flows can be traced at once, so each keeps a colour you can tell apart. Clear one to add another.</p>}
         <p style={styles.guidance}>{selectedCount ? 'Choose endpoints below. Select a path to focus on its flow.' : 'Select a traffic flow to trace its route.'}</p>
         {environments.length === 0 ? (
-          <div style={styles.empty}>No environments yet — add one in the form to pick flows.</div>
+          <div style={styles.empty}>No Projects or OKE networks available to trace.</div>
         ) : (
           environments.map((env, envIndex) => {
             const choices = flowChoices(environments, envIndex, ingressAvailable);
@@ -419,9 +445,11 @@ export default function FlowSidebar({
                 </div>
                 {open && choices.map((choice) => {
                   const allId = choice.id;
-                  const roleIds = env.roles.map((r) => `${allId}:${r}`);
+                  const [scope, kind] = allId.split(':');
+                  const roles = choice.endpoint ? [] : env.rolesFor?.(kind, scope.split('>')[1]) ?? env.roles;
+                  const roleIds = roles.map((r) => `${allId}:${r}`);
                   const allOn = set.has(allId);
-                  const traced = selectedRoles(set, allId, env.roles);
+                  const traced = selectedRoles(set, allId, roles);
                   const isActive = allOn || traced.length > 0;
                   const focusRole = traced.includes(focus[allId]) ? focus[allId] : traced[0];
                   const trace = isActive ? (focusRole ? traceFor(allId, env.roles, focusRole) : traces.find((t) => t.id.startsWith(`${allId}#`))) : undefined;
@@ -436,7 +464,7 @@ export default function FlowSidebar({
                           checked={isActive}
                           disabled={!isActive && capped}
                           aria-label={`Trace ${choice.label} for ${env.name}`}
-                          onChange={() => onChange(toggleFlow(active, allId, env.roles))}
+                          onChange={() => onChange(toggleFlow(active, allId, roles))}
                         />
                         {isActive && <span style={{ ...styles.swatch, background: color }} />}
                         <span>
@@ -445,10 +473,10 @@ export default function FlowSidebar({
                         </span>
                         {selected === allId && <span style={styles.selectedTag}>Selected</span>}
                       </label>
-                      {isActive && env.roles.length > 0 && (
+                      {isActive && roles.length > 0 && (
                         <div style={styles.chipsRow} role="group" aria-label={`Endpoints traced for ${choice.label}`}>
                           <span style={styles.chipLabel}>Endpoints</span>
-                          {env.roles.map((r) => {
+                          {roles.map((r) => {
                             const rid = `${allId}:${r}`;
                             const on = allOn || set.has(rid);
                             return (
@@ -464,10 +492,10 @@ export default function FlowSidebar({
                               </button>
                             );
                           })}
-                          {env.roles.length > 1 && (
+                          {roles.length > 1 && (
                             <button type="button" aria-pressed={allOn} title={allOn ? 'Trace only the first endpoint' : 'Trace every endpoint'}
                               // Turning "all" off drops back to the default single endpoint (untick, then re-tick).
-                              onClick={() => (allOn ? onChange(toggleFlow(toggleFlow(active, allId, env.roles), allId, env.roles)) : toggleAll(allId, roleIds))}
+                              onClick={() => (allOn ? onChange(toggleFlow(toggleFlow(active, allId, roles), allId, roles)) : toggleAll(allId, roleIds))}
                               style={{ ...styles.chip, ...(allOn ? picked(color) : styles.chipOff) }}>
                               all
                             </button>

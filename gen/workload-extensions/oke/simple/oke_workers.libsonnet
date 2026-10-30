@@ -1,3 +1,4 @@
+local peering = import './oke_peering.libsonnet';
 // OKE worker node pool output builder.
 
 function(ctx)
@@ -27,10 +28,10 @@ function(ctx)
           cluster: ctx.cluster_name,
         },
         networking: (if ctx.is_overlay_network then {} else {
-          pods_nsg_ids: [ctx.nsg_pods_key],
+          pods_nsg_ids: [ctx.nsg_pods_key] + peering.pod_ids(ctx),
           pods_subnet_id: ctx.sn_pods_key,
         }) + {
-          workers_nsg_ids: [ctx.nsg_workers_key],
+          workers_nsg_ids: [ctx.nsg_workers_key] + peering.worker_ids(ctx),
           workers_subnet_id: ctx.sn_workers_key,
         },
         node_config_details: {

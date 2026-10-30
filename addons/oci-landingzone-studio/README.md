@@ -69,7 +69,15 @@ Other environment names share the `10.1.192.0/18` pool. Each new Projects, Custo
 
 The first OKE platform starts at `10.0.80.0/20` for the `small` profile. Changing an OKE network profile checks every selected environment against configured VCNs and allocates free, aligned blocks within the same private address range when needed. Each allocation is saved per environment. If no block is available, its CIDR remains empty for correction instead of overlapping another network. Review the resulting address plan, including networks outside Studio; reservations alone do not guarantee a deployable combination.
 
-The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
+OKE platforms include a **Create sample node pool** switch, disabled by default. Turn it off for a cluster-only deployment. Worker image and boot-volume fields are hidden, and generated configuration omits worker pools. The cluster and its network/security prerequisites are retained.
+
+Adding OKE creates one independent cluster card for each active environment. Placement is a read-only environment label; network and cluster settings are edited per card. Saved shared OKE entries are expanded into separate cards while preserving each environment’s effective configuration. Custom platforms retain shared placement controls.
+
+Worker and VCN Native pod internet access can be toggled separately; both default to enabled. Disabling access removes the corresponding subnet default route and broad internet NSG egress rule while retaining OCI service access, its opted-in peer CIDRs, and the hub public LB subnet when that feature is enabled. Unselected hub and spoke prefixes are omitted from worker and pod routes. Hub A/B/C use the DRG egress path; Hub E uses its local NAT gateway. Flannel pods share the worker internet setting. These controls prepare network policy for the subnet, including when worker pools are not created.
+
+Worker and VCN Native pod **spoke connectivity** switches default to off. Enabling either attaches an additional peering NSG granting both ingress and egress for the configured peer VCN CIDRs. Enter the permitted networks in **Peer VCN CIDR blocks**; this list starts empty and is not populated from other Landing Zone VCNs. External entries require separately configured DRG routes and peering. The NSG is created in each OKE VCN only when the list is nonempty and a component is opted in; existing worker/pod NSGs remain attached. Target-spoke rules and hub firewall policies still apply. This permits peering with internet access disabled. Because NSG permissions are additive, enabled internet egress with a DRG default can still permit outbound spoke traffic even with spoke connectivity off; that setting is not an isolation guarantee. Hub E’s local NAT default does not provide spoke routing; selected peers require explicit DRG prefixes.
+
+The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment. OKE placements add worker and VCN Native pod endpoints to the existing flow picker, only in their selected environments. OKE uses separate Workers and Pods cases, including independent animation and step controls. Peering cases identify each matching destination subnet and CIDR from the explicit peer list, rather than assuming a destination subnet. Their internet and spoke connectivity controls filter available paths; saved selections obey the same controls. OCI Services paths remain available. Kubernetes API Server flows show TCP 6443 access from matching administrative source CIDRs, including hub subnets, and retain the generated same-cluster worker and native pod access. API access targets the private control-plane subnet. Enabling public load balancers adds an example OKE public LB in the hub LB subnet, backend flows to workers and VCN Native pods, and separate response flows. These paths remain available with internet and peering disabled, reflecting the existing dedicated LB rules. The example does not represent a provisioned load balancer.
 
 The [diagram design rules](DIAGRAM-DESIGN.md) define composition, readable sizing, colors, resource ownership and routing consistency. Studio's test suite checks those rules across representative configurations and visible layers.
 
@@ -106,6 +114,11 @@ Studio intentionally does not replace the Landing Zone framework contract. A res
 
 ## 4. Review and deployment
 
+This development branch prepares Orchestrator 2.4.0. Studio selects CIS OKE 0.3.0 and emits one `oke.json` containing `oke_configuration`, with a stable deployment key per environment/platform cluster and its optional workers. The Deploy to OCI link targets `release-2.4.0` for release testing; it is a mutable branch, not a published production release. Pin a reviewed commit for repeatable testing.
+
+Existing legacy clusters must remain on their tested module version. Regenerating an older Studio OKE design changes its output contract; this is not an in-place resource/state migration. Existing published Blueprint Factory profiles retain legacy output unless they explicitly select `module_version: '0.3.0'`.
+
+
 The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration and the complete set of generated JSON artifacts for that snapshot. Review it in your normal architecture, network, security, and change-management processes.
 
 Before deployment:
@@ -118,7 +131,7 @@ Before deployment:
 
 Use Terraform locally or from customer-controlled CI/CD where possible. If you use OCI Resource Manager, stage the artifacts in a private Object Storage bucket or approved private source repository controlled by your organization.
 
-Studio's **Deploy to OCI** link opens the Create Stack page with the latest released Orchestrator and the private Object Storage configuration source prefilled. Set the working directory to `rms-facade`, provide the bucket and current phase's file values, and review the plan before applying.
+Studio's **Deploy to OCI** link opens the Create Stack page with the Orchestrator release-testing branch and the private Object Storage configuration source prefilled. Set the working directory to `rms-facade`, provide the bucket and current phase's file values, and review the plan before applying.
 
 For deployment details, use the [Terraform deployment guide](../../commons/content/terraform.md) or [OCI Resource Manager deployment guide](../../commons/content/orm.md).
 

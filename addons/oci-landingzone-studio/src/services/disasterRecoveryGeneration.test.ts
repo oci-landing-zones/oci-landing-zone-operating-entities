@@ -82,7 +82,7 @@ describe('DR file generation', () => {
     model.platforms = [platform];
     const id = `platform:${platform.id}:${model.environments[0].id}`;
     draft.platformIds = [id];
-    draft.platformOkeParams = { [id]: { ...platform.okeParams!, clusterSize: undefined, servicesCidr: '172.30.0.0/16', workerBootVolumeSize: 80 } };
+    draft.platformOkeParams = { [id]: { ...platform.okeParams!, createNodePools: true, clusterSize: undefined, servicesCidr: '172.30.0.0/16', workerBootVolumeSize: 80 } };
     const { home, dr } = buildDrFileConfigs(model, draft);
     const entry = dr.environments.prod.platforms[platform.key];
     expect(entry.network?.vcn).toBe('10.0.216.0/21');

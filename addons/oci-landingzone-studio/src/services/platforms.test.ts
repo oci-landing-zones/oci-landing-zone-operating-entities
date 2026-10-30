@@ -2,7 +2,7 @@ import { overlaps, parseCidr } from "./cidr";
 
 import { describe, expect, it } from 'vitest';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultSubnets, okeNetworkProfilePatch,
+  PLATFORM_TYPES, okeProfileCidrError, setOkeEnvironmentCidr, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultParams, okeDefaultSubnets, okeNetworkProfilePatch,
   okeProfileSubnets, placementsOverlap, platformEnvInstances, platformSubnetsForEnv, platformVcnForEnv,
 } from './platforms';
 import { validateOkePlatform } from './okeValidation';
@@ -23,8 +23,9 @@ describe('newPlatform', () => {
     const p = newPlatform('oke_simple', []);
     expect(p).toMatchObject({ id: 'oke', key: 'oke', type: 'oke_simple', environments: 'all', vcnCidr: '10.0.80.0/20' });
     expect(p.subnets).toEqual([]);
+    expect(p.okeParams?.createNodePools).toBe(false);
     expect(p.okeParams?.clusterSize).toBe('small');
-    expect(p.okeParams?.kubernetesVersion).toBe('v1.35.2');
+    expect(p.okeParams?.kubernetesVersion).toBe('v1.36.4');
     expect(p.okeParams?.workerImage).toBe('9\\.[0-9]+');
   });
 
@@ -190,4 +191,32 @@ describe('OKE profile resizing avoids configured networks', () => {
     expect(updated.vcnCidr).toBe('');
     expect(platformEnvInstances(updated, ENVS)[0].vcnCidr).toBe('');
   });
+});
+
+
+describe('editing profile-owned OKE VCNs', () => {
+  it('changes only the selected environment, retaining the profile and recalculating its subnets', () => {
+    const original = newPlatform('oke_simple', []);
+    const before = platformEnvInstances(original, ENVS);
+    const updated = { ...original, ...setOkeEnvironmentCidr(original, ENVS, 'prod', '10.140.0.0/20') };
+    const after = platformEnvInstances(updated, ENVS);
+    expect(updated.okeParams?.clusterSize).toBe('small');
+    expect(after[0].subnets).toEqual(okeProfileSubnets('10.140.0.0/20', 'small', 'native', false));
+    expect(after.slice(1).map((instance) => [instance.vcnCidr, instance.subnets])).toEqual(before.slice(1).map((instance) => [instance.vcnCidr, instance.subnets]));
+    expect(original.vcnCidr).toBe('10.0.80.0/20');
+  });
+  it('requires the selected prefix and a canonical network address', () => {
+    expect(okeProfileCidrError('10.140.0.0/16', 'large')).toBeNull();
+    expect(okeProfileCidrError('10.140.1.0/16', 'large')).toContain('10.140.0.0/16');
+    expect(okeProfileCidrError('10.140.0.0/20', 'large')).toContain('/16');
+    expect(okeProfileCidrError('', 'large')).toContain('/16');
+  });
+});
+
+
+it('defaults API Server access to only the current hub management subnet', () => {
+  expect(okeDefaultParams().apiAllowedCidrs).toEqual(['10.0.3.0/24']);
+  const network = { subnets: [{ name: 'lb', cidr: '172.20.1.0/24' }, { name: 'mgmt', cidr: '172.20.3.0/24' }] };
+  expect(newPlatform('oke_simple', [], ENVS, [], network).okeParams!.apiAllowedCidrs).toEqual(['172.20.3.0/24']);
+  expect(okeDefaultParams({ subnets: [] }).apiAllowedCidrs).toEqual([]);
 });

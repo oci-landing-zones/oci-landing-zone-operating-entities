@@ -18,7 +18,7 @@ beforeEach(() => {
   vi.mocked(getLZ).mockReturnValue({ id: 'test', name: 'Preserved design', createdAt: '', updatedAt: '', model });
   vi.mocked(useDiagramPreview).mockImplementation((current) => ({
     snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] } } },
-    pending: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
+    pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
   }));
 });
 

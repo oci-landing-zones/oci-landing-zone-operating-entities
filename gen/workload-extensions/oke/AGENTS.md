@@ -24,6 +24,19 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 
 ## Current Repo Contract
 
+- `config_params.worker_spoke_access` and `pod_spoke_access` default to `false`. They attach a VCN-local peering NSG in addition to the component's required NSGs. The peering NSG grants stateless ALL-protocol ingress/egress for the explicit `config_params.peer_vcn_cidrs` list (default empty), rejecting overlap with its own VCN and `0.0.0.0/0`. This list does not create DRG routes or RPCs and is never auto-populated from Landing Zone VCNs. Do not create or reference it when there are no peers or no selected components. Native pods can opt in independently; Flannel uses worker attachment. Internet's broad egress remains additive, so an off peering switch does not guarantee outbound isolation when internet access is enabled.
+
+
+- `config_params.worker_internet_access` and `pod_internet_access` are booleans defaulting to `true`. Disabling either removes its subnet default route and broad ALL-protocol internet egress NSG rule, retaining explicit internal DRG routes and OCI service-gateway access. Pod settings apply only to native CNI; Flannel pods share worker egress. Hub A/B/C use DRG internet routing; Hub E retains local NAT routing.
+
+
+- `config_params.module_version` selects the output contract: omitted or `0.2.9` retains the published legacy files; `0.3.0` emits `oke.json` with the orchestrator `oke_configuration` deployment map. Studio exports explicitly select `0.3.0` for Orchestrator 2.4.0 release testing.
+- The 0.3.0 path uses enhanced clusters, private endpoints, CNI `native` or `flannel`, `service_lb_subnet_ids`, and inherited cluster compartment/CIS settings for workers. Native outputs omit `pods_cidr`.
+- For 0.3.0 managed pools, image selection maps the OL8/OL9 family to `default_os_version`. Upstream bootstrap stays enabled; additional cloud-config runs growfs and CIS2 FSS package setup. No explicit `oke_init_script` bootstrap is added. The orchestrator supplies `tenancy_id` from its root tenancy input.
+
+
+- `config_params.create_node_pools` defaults to `true`. Setting it to `false` omits the worker-pool contribution while retaining the cluster and its networking/security prerequisites. Studio hides worker image and boot-volume settings in this mode.
+
 - `oke_simple` supports two network shapes through `config_params.cni_type`: `native` and `overlay`.
 - `cni_type` defaults to `native`.
 - `config_params.cni` is the downstream OKE cluster CNI request. It defaults from `cni_type`: `vcn_native` for native and `flannel` for overlay.
@@ -117,5 +130,5 @@ If those assumptions are missing, present the CIDRs as an example or starting po
 - For native OKE questions, do not infer overlay semantics from `pods_cidr` passthrough examples.
 - For overlay OKE questions, do not add or require pod OCI subnets unless the contract changes.
 - When multiple OKE platforms are generated, each OKE VCN route table must reference only gateways in that same VCN for NAT and service gateway routes.
-- OKE subnet route tables omit explicit hub and peer DRG prefixes only when the same output emits a default route to that DRG. Hub E local-NAT outputs and outputs without that DRG default retain the explicit prefixes, including remote-peering destinations. The FSS route table remains service-gateway-only.
+- Worker and pod subnet route tables include explicit peer CIDRs only when that component opts into peering. Public-LB-enabled clusters retain the exact Hub LB subnet route for backend responses independently of peering or internet access. Omit those explicit prefixes only when that component has an internet default through the same DRG; local-NAT defaults still require explicit DRG prefixes. Control-plane and internal-LB tables retain topology-derived routes. The FSS route table remains service-gateway-only.
 - When changing the OKE contract, update the generator, fixtures, tests, published JSON, and OKE docs in the same change.

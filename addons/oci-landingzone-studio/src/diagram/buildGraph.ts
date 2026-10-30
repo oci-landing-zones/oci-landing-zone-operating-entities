@@ -1,3 +1,4 @@
+import { flowGroup } from './flowOverlayGeometry';
 import type { DiagramEdge, DiagramModel, DiagramNode, DiagramOptions, LzModel } from '../model/types';
 import { getHubKind, hasHubLoadBalancer } from '../services/hubKinds';
 import { envNetworkDefaults } from '../model/defaults';
@@ -344,8 +345,8 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // Every drawn flow shows its source and destination VMs.
   for (const t of flowTraces) {
     for (const segment of t.segments) {
-      if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.from)) flowEndpointIds.add(segment.from);
-      if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.to)) flowEndpointIds.add(segment.to);
+      if (/^(?:cmp-env-\d+-(?:vcn|plat-\d+)|hub-vcn)-sn-\d+$/.test(segment.from)) flowEndpointIds.add(segment.from);
+      if (/^(?:cmp-env-\d+-(?:vcn|plat-\d+)|hub-vcn)-sn-\d+$/.test(segment.to)) flowEndpointIds.add(segment.to);
     }
   }
   const showRouteTables = showSpokes && supportsFlowTracing && (!!opts.showFlows || !!opts.allFlows || flowActive);
@@ -383,13 +384,15 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const regionTok = f.regionShortName.trim().toLowerCase() || '<region>';
 
   // ---- hub network (left column), driven by the step 2 fields
-  const hubSubnets = model.network.subnets.map((sn) => {
+  const hubSubnets = model.network.subnets.map((sn, j) => {
     const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
-    if (spec.icon === 'lb' && !hasHubLoadBalancer(model)) {
+    if (spec.icon === 'lb' && model.platforms.some((p) => p.type === 'oke_simple' && p.okeParams?.publicLoadBalancer && model.environments.some((env) => platformInEnv(p, env.id)))) {
+      spec.caption = 'Example OKE public LB';
+    } else if (spec.icon === 'lb' && !hasHubLoadBalancer(model)) {
       delete spec.icon;
       delete spec.caption;
     }
-    return showAllEndpoints ? withEndpoint(spec) : spec;
+    return showAllEndpoints || flowEndpointIds.has(`hub-vcn-sn-${j}`) ? withEndpoint(spec) : spec;
   });
   const hubVcnLabel = `${generatorNames.hubVcn(regionTok)}\n${model.network.hubVcnCidr}`;
   const hubVcnH = vcnHeight(hubSubnets);
@@ -437,14 +440,19 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const platformInstances = showPlatforms
       ? platforms
           .filter((p) => platformInEnv(p, e.id))
-          .map((p) => {
+          .map((p, slot) => {
             const vcnCidr = platformVcnForEnv(p, e.id, i);
             const key = p.key.trim() || p.id;
             const subnetSpecs: SubnetSpec[] = platformSubnetsForEnv(p, e.id, i)
-              .map((sn) => ({
-                name: generatorNames.environmentPlatformSubnet(regionTok, name, key, sn.name, p.type),
-                cidr: sn.cidr,
-              }));
+              .map((sn, j) => {
+                const spec: SubnetSpec = {
+                  name: generatorNames.environmentPlatformSubnet(regionTok, name, key, sn.name, p.type),
+                  cidr: sn.cidr,
+                };
+                const nodeId = `cmp-env-${i}-plat-${slot}-sn-${j}`;
+                if (p.type !== 'oke_simple' || !((['workers', 'pods'].includes(sn.name) && showAllEndpoints) || (['workers', 'pods', 'control-plane'].includes(sn.name) && flowEndpointIds.has(nodeId)))) return spec;
+                return { ...spec, endpoint: { name: sn.name === 'control-plane' ? `${name}-${key}-API Server` : `${name}-${key}-${sn.name}`, ip: hostIpInSubnet(sn.cidr, 10) } };
+              });
             const vcnName = generatorNames.environmentPlatformVcn(regionTok, name, key);
             return {
               id: p.id, name: key, type: p.type, vcnName,
@@ -968,7 +976,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   for (const t of flowTraces) {
     const segs = t.segments;
     if (!segs.length || segs.some((segment) => !nodeIds.has(segment.from) || !nodeIds.has(segment.to))) continue;
-    const base = t.id.split('#')[0].split(':').slice(0, 2).join(':');
+    const base = flowGroup(t.id);
     const waypoints = [segs[0].from, ...segs.map((s) => s.to)];
     // Keep endpoints and shared legs on their real resources. Artificially
     // shifting complete traces made packets float beside the subnet/DRG icons;

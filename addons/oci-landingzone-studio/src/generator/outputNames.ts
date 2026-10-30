@@ -20,7 +20,9 @@ export function isCurrentOutputSet(output: { config: string; files: Record<strin
   return output !== null
     && output.config === config
     && Object.hasOwn(output.files, 'network.json')
-    && !Object.hasOwn(output.files, 'network_pre.json');
+    && !Object.hasOwn(output.files, 'network_pre.json')
+    && !Object.hasOwn(output.files, 'oke_clusters.json')
+    && !Object.hasOwn(output.files, 'oke_workers.json');
 }
 
 export interface DeploymentStage {

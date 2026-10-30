@@ -82,6 +82,13 @@ export type PlatformType = 'oke_simple' | 'custom';
 
 /** OKE settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
+  /** Defaults to true for previously saved designs. */
+  createNodePools?: boolean;
+  workerInternetAccess?: boolean;
+  podInternetAccess?: boolean;
+  workerSpokeAccess?: boolean;
+  podSpokeAccess?: boolean;
+  peerVcnCidrs?: string[];
   kubernetesVersion: string;   // e.g. v1.35.2
   servicesCidr: string;        // e.g. 10.96.0.0/16
   apiAllowedCidrs: string[];   // e.g. ['10.0.1.0/24']
@@ -114,9 +121,11 @@ export interface PlatformConfig {
   /** Key in environments.<env>.platforms. */
   key: string;
   type: PlatformType;
+  /** OKE card owns a fixed network in one environment; older placements are expanded on load. */
+  environmentScoped?: boolean;
   /** 'all' applies it to every environment; otherwise the listed environment IDs. */
   environments: 'all' | string[];
-  /** Base VCN CIDR (env-0); other envs derive from it. */
+  /** Fixed CIDR for scoped OKE cards; base CIDR for shared placements. */
   vcnCidr: string;
   /** Default (locked) + custom subnets, relative to the base VCN. */
   subnets: Subnet[];
