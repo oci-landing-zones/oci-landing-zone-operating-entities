@@ -23,6 +23,8 @@ Explain that the LZ Vault does not automatically store inline keys. Studio retai
 
 ## Routing and verification
 
+The shared table display name is `drgrt-<region>-lz-hc` (for example, `drgrt-fra-lz-hc`). Its internal resource key remains stable.
+
 Assign both automatic VPN tunnel attachments and private circuit attachments to the same `hc` (Hybrid Connectivity) ingress table through the existing `default_drg_route_tables` selectors. Do not create those attachments again or claim to update DRG-wide future-attachment defaults. Hubs A/B/C keep firewall inspection; Hub E routes directly. The shared ingress table reaches local networks and does not intentionally provide external transit. Routes do not add firewall allow rules.
 
 Use synthetic secrets in tests and examples. Test all hubs, overlap rejection, both tunnel assignments, rejection of public circuits and their fields, backup prefixes and networked platforms. Run `python3 -m unittest discover -s tests -p 'test_*.py'` and Studio tests/lint/typecheck/build. Studio tests must prove secret stripping on save, cache suppression, masked previews, export passthrough and required re-entry after reload.

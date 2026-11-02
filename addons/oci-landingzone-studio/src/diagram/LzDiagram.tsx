@@ -52,7 +52,7 @@ import { absoluteNodeRects, diagramBounds } from './flowGeometry';
 import { resourceGroupSvg } from './resourceGroups';
 import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
-import { ATTACHMENT_LABEL, DRG_CAPTION } from './layoutPolicy';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from './layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
 import { hybridTopologySvg } from './hybridTopology';
 
@@ -193,8 +193,8 @@ function VcnNode({ data }: NodeProps) {
       {d.label}
       <span
         title="Oracle Services Network"
-        style={{ position: 'absolute', right: -13, bottom: -13, width: 26, height: 26, lineHeight: 0 }}
-        dangerouslySetInnerHTML={{ __html: OSN_SVG }}
+        style={{ position: 'absolute', right: -OSN_ICON_SIZE / 2, bottom: -OSN_ICON_SIZE / 2, width: OSN_ICON_SIZE, height: OSN_ICON_SIZE, lineHeight: 0 }}
+        dangerouslySetInnerHTML={{ __html: OSN_SVG.replace('width="44" height="44"', 'width="100%" height="100%"') }}
       />
       <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
@@ -220,10 +220,10 @@ function DrgNode({ data }: NodeProps) {
 
 /** Attachment labels reserve terminal clearance on both sides. */
 function AttachmentNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; attachmentVertical?: boolean };
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: `0 ${ATTACHMENT_LABEL.sidePadding}px`, fontFamily: ATTACHMENT_LABEL.fontFamily, fontSize: ATTACHMENT_LABEL.fontSize, fontWeight: ATTACHMENT_LABEL.fontWeight, lineHeight: 1.2, color: '#1f3a63', whiteSpace: 'pre' }}>
-      <span>{d.label}</span>
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: d.attachmentVertical ? `${ATTACHMENT_LABEL.sidePadding}px 0` : `0 ${ATTACHMENT_LABEL.sidePadding}px`, fontFamily: ATTACHMENT_LABEL.fontFamily, fontSize: ATTACHMENT_LABEL.fontSize, fontWeight: ATTACHMENT_LABEL.fontWeight, lineHeight: 1.2, color: '#1f3a63', whiteSpace: 'pre' }}>
+      <span style={d.attachmentVertical ? { writingMode: 'vertical-rl', textOrientation: 'mixed' } : undefined}>{d.label}</span>
       <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
     </div>
@@ -313,8 +313,9 @@ function RtDotNode({ data }: NodeProps) {
   const color = d.rtDotConfigured ? RT_COLORS[d.rtDotTone ?? 'hub'] : '#b0aca8';
   return (
     <div
+      className={d.rtLocked ? undefined : 'route-table-dot-clickable'}
       title={d.rtLocked ? 'Route table shown in flow mode' : d.rtDotOpen ? 'Hide route table' : 'Show route table'}
-      style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', background: color, cursor: d.rtLocked ? 'default' : 'pointer', boxSizing: 'border-box', border: '1.5px solid #fff', boxShadow: d.rtDotOpen ? `0 0 0 3px ${color}66` : '0 0 1px rgba(0,0,0,0.4)' }}
+      style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', background: color, color, cursor: d.rtLocked ? 'default' : 'pointer', boxSizing: 'border-box', border: '1.5px solid #fff', boxShadow: d.rtDotOpen ? `0 0 0 3px ${color}66` : '0 0 1px rgba(0,0,0,0.4)' }}
     >
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="target" position={Position.Right} style={hiddenHandle} isConnectable={false} />
@@ -343,7 +344,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { label: n.label, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
+    data: { label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -377,12 +378,13 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     label: e.label,
     data: { path: (associations.get(e.id) ?? [structuralEdgePoints(e, rects)]).map(polylinePath).join(' ') },
     ...(['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(e.source)?.node.kind ?? '') || rects.get(e.target)?.node.kind === 'attachment'
-      ? { markerStart: attachmentMarker, markerEnd: attachmentMarker }
+      ? { markerStart: rects.get(e.source)?.node.kind === 'attachment' ? undefined : attachmentMarker,
+          markerEnd: rects.get(e.target)?.node.kind === 'attachment' ? undefined : attachmentMarker }
       : rects.get(e.target)?.node.kind !== 'routetable' ? { markerEnd: { type: MarkerType.ArrowClosed, color: '#6b6660', width: 15, height: 15 } } : {}),
     // Lift links above the opaque compartment fills. Dot→table connectors ride
     // just under the table (above the dots) so the whole line stays visible.
     zIndex: rects.get(e.target)?.node.kind === 'routetable' ? 1900 : 1000,
-    style: rects.get(e.target)?.node.kind === 'routetable' ? { stroke: '#6b6660', strokeWidth: 1.8, strokeDasharray: '5 4' } : { stroke: '#6b6660', strokeWidth: 1.4 },
+    style: rects.get(e.target)?.node.kind === 'routetable' ? { stroke: '#6b6660', strokeWidth: 1.2, strokeDasharray: '5 4' } : { stroke: '#6b6660', strokeWidth: 1.4 },
     labelStyle: { fill: oracle.ink, fontSize: 11, fontWeight: 600 },
     labelBgStyle: { fill: oracle.surface },
   }));

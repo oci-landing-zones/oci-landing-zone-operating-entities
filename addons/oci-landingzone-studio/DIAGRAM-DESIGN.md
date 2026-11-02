@@ -10,7 +10,7 @@ The diagram presents the generated landing zone as a readable architecture drawi
 - Network views retain the hub, attachment and environment topology. Route-table lanes and connector channels reserve their own space. A height limit must never hide real networks, routes or generated resources.
 - Containers fit their actual child extents with consistent title space, padding and gaps. Repeated sibling cards do not overlap, and growth must not leave obsolete outer bounds or unnecessary empty tails.
 - Attachment pills fit the complete generated label using the shared font, weight and terminal padding in both canvas and export. The stack uses its longest actual label; cluster sizing includes the DRG caption and physical fan lanes. A fixed width or an ellipsis is not a substitute for reserved readable text bounds.
-- DRG captions are measured visible content below the glyph. Their bounds stay inside the compartment and remain obstacles to connector lines, including lines whose terminal belongs to that DRG. Glyph connection ports stay on the glyph boundary. The glyph grows with the attachment count to keep port dots separate.
+- DRG captions are measured visible content below the glyph. Their bounds stay inside the compartment and remain obstacles to connector lines, including lines whose terminal belongs to that DRG. DRG connection ports sit on the visible circular ring, rather than the rectangular node boundary. The DRG glyph stays 48 pixels square and is centered beneath the hub VCN.
 
 ## Resource blocks and hierarchy
 
@@ -23,12 +23,12 @@ The diagram presents the generated landing zone as a readable architecture drawi
 
 ## Routing and updates
 
-- Physical links use orthogonal geometry computed after final layout. DRG attachment links retain endpoint dots at both ends. Opposing endpoint extensions share the available gap. Clear terminal approaches must not reverse into those extensions.
+- Physical links use orthogonal geometry computed after final layout. DRG attachment links meet attachment rectangles without endpoint dots; dots remain at the VCN and DRG endpoints. Opposing endpoint extensions share the available gap. Clear terminal approaches must not reverse into those extensions.
 - VPN drawings place each configured CPE in an on-premises boundary outside the OCI region, including equipment not yet assigned to a VPN. VPNs reference the actual CPE key or existing CPE OCID; multiple VPNs sharing equipment use one router glyph. Two distinct tunnel nodes per VPN show the configured inside addresses and connect that CPE to separate DRG ports. VPN and FastConnect share one generated `hc` ingress table below the connectivity rows. All DRG route-table markers sit at the corresponding attachment's endpoint on the DRG glyph. Configuration flow previews follow Tunnel 1 through the same connection geometry; they do not infer deployed tunnel state.
 - FastConnect uses the same compact external layout: customer router, one virtual circuit and one DRG attachment per circuit. Provider, bandwidth and configured BGP mappings appear on the circuit; multiple mappings do not create additional circuits or DRG attachments. Physical preparation alone has no routed connection.
 - Structural routing prioritizes avoiding unrelated resource and compartment interiors, including generated service blocks. Its actual endpoints, associated port dots, owning resources and ancestor containers are the only ownership exceptions; touching a box boundary is allowed. Table-card interiors remain obstacles even when the card is the connection's target. Ports may move to an unobstructed border position when no fixed port was specified. Constrained layouts may retain unavoidable intersections; routing must render the best available path instead of failing the diagram.
-- All generated table cards remain visible in routing mode. Each card uses one of three predefined columns, chosen automatically from its owner geometry and line contacts. Canonical owner dots stay on their actual resources.
-- Route-table leaders may cross resource bodies. Each leader connects its owner dot directly to a common card entry without an outward stub. The entry projects the owners' average position onto the selected card edge, with corner clearance, so extra route rows do not pull a nearby join toward the card midpoint. Every card stays in one of the predefined left, center and right columns, including hybrid connectivity tables. Automatic table placement uses two bounded passes to choose columns and vertical order. Joint moves can insert one card into another's slot, relocate the displaced card to a different column and push neighbouring cards down; the complete arrangement must remain valid before its score is compared. No table names or service-specific ordering rules affect placement.
+- All generated table cards remain visible in routing mode. Each card uses a predefined column or compartment boundary lane, chosen automatically from its owner geometry and line contacts. Canonical owner dots stay on their actual resources.
+- Route-table leaders may cross resource bodies. Each leader connects its owner dot directly to the nearest top corner of the card without an outward stub; ties choose the left corner. All route-table owner dots use the same 8-pixel diameter, including VCN, subnet, gateway and DRG dots. Cards may use the left, center and right columns or straddle any compartment boundary, while keeping titles, resource bodies and physical connections clear. Automatic table placement uses two bounded passes to choose columns and vertical order. Joint moves can insert one card into another's slot, relocate the displaced card to a different column and push neighbouring cards down; the complete arrangement must remain valid before its score is compared. No table names or service-specific ordering rules affect placement.
 - Placement first avoids false shared runs. The final pass also prioritizes reducing vertical separation beyond two card widths. Within those preferences, a combined score balances resource intersections, line contacts, obscured content and distance from the owner ports. Squaring the worst leader's contact count discourages concentrating crossings on one connection to improve several others. Gaps beyond half a card width incur a growing proximity penalty, averaged per table; total line length breaks equal scores. Vertical candidates follow content boundaries, physical channels and a small set of samples spanning the available height. Cards stay clear of visible resource blocks, headings, captions, other cards and existing physical connections; crowded columns grow vertically instead of creating another column. Resource positions and physical/packet paths stay unchanged. Measurements include lines returning through their own owner bodies. Table-leader intersections are measured separately from physical-path clearance; the search does not guarantee a global optimum.
 - Structural paths are routed together to reduce perpendicular crossings and shared collinear runs. Corner and T contacts count too; actual shared endpoint junctions do not. Separate attachment-to-DRG links must keep distinct physical segments even when they share the same DRG. A common terminal point is allowed; a shared trunk would imply a connection that does not exist. Perpendicular crossings remain a best-effort preference rather than an absolute zero-crossing rule.
 - Contact measurements exclude intentional same-table annotation junctions and the initial outward port escape where an annotation meets its own physical connection. Later crossings still count even when links share an owner. Clear text and distinct physical connections take priority if preserving them requires an additional point crossing.
@@ -43,3 +43,43 @@ The diagram presents the generated landing zone as a readable architecture drawi
 The matrix covers Foundation and network stages, zero and multiple environments, all supported hubs, complete and DR scope, disabled Projects VCNs, platforms, long generated names, table layers and active flows. It checks geometry, ownership, readable widths, shared alignment, compact bounds, composition, palette and routing anchors. Independent measurements bound ordinary hub line contacts and verify clear resource interiors in feasible fixtures, without rejecting unavoidable crossings globally. Mutation cases prove that deliberately clipped attachment labels, shared physical trunks, broken widths, overlaps, inventories, missing connector paths and anchors are rejected. Shared text estimates are backed by browser checks of actual rendered label bounds and terminal clearance at readable zoom levels.
 
 Browser inspection remains necessary for typography and the full composition at desktop and phone sizes. Geometry tests complement that inspection; containment alone does not establish that a diagram is readable.
+
+- The hub VCN attachment uses a vertical label above the DRG, with top/bottom connection ports. Other VCN attachment labels remain horizontal.
+
+- Hub attachment links align vertically from the hub VCN to the DRG. Other VCN attachments use distinct DRG ports; dense attachment stacks keep their labels separated without enlarging the DRG.
+
+- The vertical hub attachment rectangle is centered on its connection, with 12-pixel line segments above and below in the standard layout.
+
+- Hub and shared VCNs are centered horizontally in the network compartment. The DRG and vertical hub attachment share that centerline; compartment width reserves space for the attachment stack on the right.
+
+- Spoke and environment platform VCNs use equal horizontal margins in their network compartments. Route cards can overlap compartment bodies and borders while leaving their titles readable.
+
+- Every route card also considers lanes 66 pixels from owner ports and resource edges. Placement proximity penalizes both cramped gaps below 66 pixels and excessive distance beyond 132 pixels, while preserving resource and connection clearance.
+
+- Ingress cards stay on the left of their owner ports. Left-lane cards prefer a shared right edge 66 pixels before the leftmost owner port, with fallback positions when resources or connections obstruct alignment.
+
+- The hub-bound DRG route card sits below the hub ingress card in the same left column when clear. The spoke-bound DRG route card stays to the right of the DRG; the spoke card does not participate in the shared left-card alignment.
+
+- The hub ingress card starts beside the hub VCN bottom port, with the hub DRG card stacked 16 pixels beneath it where space permits.
+
+- Dotted table leaders must not enter VCN interiors from outside or re-enter their VCN from a border dot. Subnet and gateway annotations may exit their owning VCN. VCN clearance takes precedence over shared column alignment.
+
+- The hub DRG route card sits 12 pixels outside the network compartment’s left edge, with its top 12 pixels below the DRG glyph where clear, independent of shared left-column spacing.
+
+- Spoke and OKE subnet route cards share a column 40 pixels right of their VCN, centered vertically around their owner rows. Cards shift vertically when needed to keep the column clear. The same rule applies to every environment.
+
+- The spoke-bound DRG route card prefers a position 36 pixels below the attachment stack and beside the DRG, keeping its dotted leaders off attachment labels. Dense solid attachment fans retain a clear 12-pixel terminal approach.
+
+- Subnet boxes have equal horizontal margins inside hub, spoke and platform VCNs.
+
+- Oracle Services Network icons are 36 pixels square with an opaque white mesh interior and white node circles, with the SVG scaled to its wrapper and the icon center anchored to the bottom-right VCN corner in both canvas and Draw.io.
+
+- The hub-to-DRG gap expands to fit visible nearby routing cards and the upper part of a dense attachment stack. The DRG, spoke attachments and following compartments move down together before physical and packet paths are calculated. The hub attachment label stays centered on the longer connection; VCN and DRG sizes stay unchanged. Compact layouts retain the short gap.
+
+- Hub-link expansion considers only hub ingress cards and clearance above the attachment stack; large DRG and subnet cards do not enlarge it. Hub subnet route cards prefer one column 66 pixels right of the VCN and move downward to clear other cards.
+
+- Clickable route-table dots show a slow expanding halo without moving their connection anchors. Locked dots do not pulse; reduced-motion users see a static halo.
+
+- Endpoint and Flow views share a canonical layout planned with all tables and endpoint space. Opening a table only changes visibility; it does not move route cards, owner dots, physical connections or packet paths. Hidden endpoint decorations retain their reserved space in detail views.
+
+- Right-hand wrapper padding follows the final canonical table/resource and connection extents, instead of retaining an unused reserved routing lane. Spoke/OKE cards follow owner-subnet vertical order, with 12-pixel spacing, so pods precedes workers without crossing their leader lines.

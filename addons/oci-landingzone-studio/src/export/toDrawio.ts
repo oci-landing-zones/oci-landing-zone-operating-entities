@@ -9,7 +9,7 @@ import { flowGroup, labelAnchor, marksAlong, type Point } from '../diagram/flowO
 import { createFlowPlayback, flowHopMarkers } from '../diagram/flowPlayback';
 import { resourceGroupSvg } from '../diagram/resourceGroups';
 import { compartmentStyle } from '../diagram/compartmentStyle';
-import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from '../diagram/routeTableLayout';
 import { hybridTopologySvg } from '../diagram/hybridTopology';
 
@@ -43,7 +43,7 @@ function osnCell(node: DiagramNode): string {
   const style = `shape=image;imageAspect=0;aspect=fixed;noLabel=1;image=${OSN_URI};`;
   return (
     `        <mxCell id="${node.id}-osn" value="" style="${style}" vertex="1" parent="${node.id}">\n` +
-    `          <mxGeometry x="${node.width - 13}" y="${node.height - 13}" width="26" height="26" as="geometry" />\n` +
+    `          <mxGeometry x="${node.width - OSN_ICON_SIZE / 2}" y="${node.height - OSN_ICON_SIZE / 2}" width="${OSN_ICON_SIZE}" height="${OSN_ICON_SIZE}" as="geometry" />\n` +
     `        </mxCell>`
   );
 }
@@ -182,7 +182,7 @@ function nodeStyle(node: DiagramNode): string {
       return `shape=image;imageAspect=0;aspect=fixed;image=${DRG_URI};` +
         `verticalLabelPosition=bottom;verticalAlign=top;spacingTop=${DRG_CAPTION.gap};fontSize=${DRG_CAPTION.fontSize};fontFamily=${DRG_CAPTION.fontFamily};fontStyle=1;fontColor=${oracle.ink};html=1;`;
     case 'attachment':
-      return `rounded=1;whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
+      return `rounded=1;${node.attachmentVertical ? 'horizontal=0;' : ''}whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
     case 'project':
       return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=${node.container ? 'top' : 'middle'};fillColor=#ECEAE8;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=12;`;
     case 'routetable':
@@ -350,9 +350,9 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     const attachment = ['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(edge.source)?.node.kind ?? '') || rects.get(edge.target)?.node.kind === 'attachment';
     const points = structuralEdgePoints(edge, rects);
     const terminals = attachment
-      ? 'endArrow=oval;startArrow=oval;startFill=1;endFill=1;startSize=5;endSize=5;'
+      ? `endArrow=${rects.get(edge.target)?.node.kind === 'attachment' ? 'none' : 'oval'};startArrow=${rects.get(edge.source)?.node.kind === 'attachment' ? 'none' : 'oval'};startFill=1;endFill=1;startSize=5;endSize=5;`
       : `endArrow=${association ? 'none' : 'block'};startArrow=none;`;
-    let base = `edgeStyle=none;orthogonal=${association ? 0 : 1};rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.8 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
+    let base = `edgeStyle=none;orthogonal=${association ? 0 : 1};rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.2 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
     if (association) {
       (associations.get(edge.id) ?? [points]).forEach((segment, index) => {
         const id = index ? `${edge.id}-segment-${index}` : edge.id;

@@ -119,3 +119,5 @@ If those assumptions are missing, present the CIDRs as an example or starting po
 - When multiple OKE platforms are generated, each OKE VCN route table must reference only gateways in that same VCN for NAT and service gateway routes.
 - OKE subnet route tables omit explicit hub and peer DRG prefixes only when the same output emits a default route to that DRG. Hub E local-NAT outputs and outputs without that DRG default retain the explicit prefixes, including remote-peering destinations. The FSS route table remains service-gateway-only.
 - When changing the OKE contract, update the generator, fixtures, tests, published JSON, and OKE docs in the same change.
+
+- Adding OKE must retain the baseline hub L7 load balancer. This IaC-owned example LB is separate from optional Kubernetes-managed public load balancers; enabling or disabling the latter must not suppress the baseline hub LB.

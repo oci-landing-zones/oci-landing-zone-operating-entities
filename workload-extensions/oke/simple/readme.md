@@ -291,3 +291,5 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
 See [LICENSE](/LICENSE.txt) for more details.
+
+Adding OKE retains the baseline hub load balancer. This IaC-managed load balancer is separate from public load balancers created and managed by Kubernetes Services. Review its example backend targets before deployment.

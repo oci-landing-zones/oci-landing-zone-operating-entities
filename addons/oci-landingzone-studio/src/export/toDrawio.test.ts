@@ -8,7 +8,7 @@ import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } f
 import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups';
-import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
   it('exports a full-width superseded note and the implicit route styling', () => {
@@ -131,6 +131,11 @@ describe('toDrawioXml', () => {
     // one OSN glyph per VCN (1 hub + 2 env)
     const osnCells = xml.match(/id="[^"]*-osn"/g) ?? [];
     expect(osnCells).toHaveLength(3);
+    const graph = buildGraph(emptyLzModel(), 3);
+    for (const vcn of graph.nodes.filter((node) => node.kind === 'vcn')) {
+      const cell = xml.match(new RegExp(`id="${vcn.id}-osn"[\\s\\S]*?</mxCell>`))?.[0] ?? '';
+      expect(cell).toContain(`x="${vcn.width - OSN_ICON_SIZE / 2}" y="${vcn.height - OSN_ICON_SIZE / 2}" width="${OSN_ICON_SIZE}" height="${OSN_ICON_SIZE}"`);
+    }
     // every attachment pill clusters with the DRG inside cmp-network
     expect(xml).toMatch(/id="attach-hub"[^>]*parent="cmp-network"/);
     expect(xml).toMatch(/id="attach-cmp-env-0"[^>]*parent="cmp-network"/);
@@ -143,12 +148,11 @@ describe('toDrawioXml', () => {
     // VCN → attach → DRG connections have endpoint dots and square corners.
     expect(xml).toContain('source="hub-vcn" target="attach-hub"');
     expect(xml).toContain('source="attach-hub" target="drg"');
-    expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.25;');
-    expect(xml.match(/id="e-attach-cmp-env-0-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.5;');
-    expect(xml.match(/id="e-attach-cmp-env-1-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.75;');
-    for (const edge of buildGraph(emptyLzModel(), 3).edges) {
+    for (const edge of graph.edges) {
       const cell = xml.match(new RegExp(`id="${edge.id}"[^>]+`))?.[0] ?? '';
-      expect(cell).toContain('endArrow=oval;startArrow=oval;');
+      const source = graph.nodes.find((node) => node.id === edge.source)!;
+      const target = graph.nodes.find((node) => node.id === edge.target)!;
+      expect(cell).toContain(`endArrow=${target.kind === 'attachment' ? 'none' : 'oval'};startArrow=${source.kind === 'attachment' ? 'none' : 'oval'};`);
       expect(cell).toContain('startFill=1;endFill=1;');
     }
     expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('rounded=0;');

@@ -85,6 +85,7 @@ const OSN_BROWN = '#BB501C';
  * circles, not filled dots. Sits in the lower-right corner of every VCN.
  */
 export const OSN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
+  <polygon points="22,9 34.4,18 29.6,32.5 14.4,32.5 9.6,18" fill="#ffffff"/>
   <g fill="none" stroke="${OSN_BROWN}" stroke-width="2.1">
     <line x1="22" y1="9" x2="34.4" y2="18"/><line x1="34.4" y1="18" x2="29.6" y2="32.5"/>
     <line x1="29.6" y1="32.5" x2="14.4" y2="32.5"/><line x1="14.4" y1="32.5" x2="9.6" y2="18"/>

@@ -42,20 +42,21 @@ export interface FlowChoice {
 export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = []): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
+  const sourceLabel = source.name;
   return [
-    { id: flowId(source.name, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
-    ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' }] : []),
+    { id: flowId(source.name, 'egress'), label: `${sourceLabel} → Internet`, sub: 'egress' },
+    ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: `Internet → ${sourceLabel}`, sub: 'ingress' }] : []),
     ...environments
       .filter((_, index) => index !== sourceIndex)
       .map((destination) => ({
         id: `${source.name}>${destination.name}:east-west`,
-        label: `Spoke → ${destination.name}`,
+        label: `${sourceLabel} → ${destination.name}`,
         sub: 'east-west',
       })),
-    { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
+    { id: flowId(source.name, 'services'), label: `${sourceLabel} → OCI Services`, sub: 'Service Gateway' },
     ...externalConnections.flatMap((connection) => [
-      { id: flowId(source.name, `hybrid-out@${connection.id}`), label: `Spoke → ${connection.name}`, sub: connection.type },
-      { id: flowId(source.name, `hybrid-in@${connection.id}`), label: `${connection.name} → Spoke`, sub: connection.type },
+      { id: flowId(source.name, `hybrid-out@${connection.id}`), label: `${sourceLabel} → ${connection.name}`, sub: connection.type },
+      { id: flowId(source.name, `hybrid-in@${connection.id}`), label: `${connection.name} → ${sourceLabel}`, sub: connection.type },
     ]),
   ];
 }

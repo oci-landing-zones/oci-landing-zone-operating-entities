@@ -33,7 +33,7 @@ function(params)
   local local_entries = [{ vcn: params.hub_cidr, name: 'hub', drg_att_key: hub_attachment }] + locals;
   local tables = if std.length(types) == 0 then {} else {
     [hc_table]: {
-      display_name: n.display('drgrt', ['hub', 'hc']), is_ecmp_enabled: false,
+      display_name: n.display('drgrt', ['hc']), is_ecmp_enabled: false,
       route_rules: if direct then {} else {
         [n.route_rule(['hybrid', 'hc', e.name])]: {
           destination: e.vcn, destination_type: 'CIDR_BLOCK', next_hop_drg_attachment_key: hub_attachment,

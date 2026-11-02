@@ -832,3 +832,25 @@ fieldset[aria-invalid="true"] {
 .rpc-connection-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; }
 .rpc-connection-header h3 { margin: 0; font-size: 15px; line-height: 1.4; }
 .rpc-connection-header button { width: 44px !important; height: 44px !important; flex-shrink: 0; }
+
+/* A gentle halo advertises clickable table markers without moving their anchors. */
+.route-table-dot-clickable::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: route-table-dot-pulse 2.4s ease-out infinite;
+}
+@keyframes route-table-dot-pulse {
+  0% { transform: scale(1); opacity: 0.65; }
+  75%, 100% { transform: scale(2.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-table-dot-clickable::after {
+    animation: none;
+    transform: scale(1.2);
+    opacity: 0.4;
+  }
+}

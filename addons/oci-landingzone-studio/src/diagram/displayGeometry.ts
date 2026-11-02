@@ -15,6 +15,16 @@ type Side = NonNullable<DiagramEdge['sourceSide']>;
 
 function borderPoint(rect: FlowRect, other: FlowRect, side?: Side, port = 0.5): Point & { side: Side } {
   const { x, y, width: w, height: h } = rect;
+  if (rect.node.kind === 'drg' && side) {
+    // The visible SVG ring has radius 18 in a 40-unit viewBox.
+    const fraction = Math.max(0.05, Math.min(0.95, port));
+    const offset = fraction - 0.5;
+    const reach = Math.sqrt(Math.max(0, 0.45 ** 2 - offset ** 2));
+    if (side === 'left' || side === 'right') {
+      return { x: x + w * (0.5 + (side === 'right' ? reach : -reach)), y: y + h * fraction, side };
+    }
+    return { x: x + w * fraction, y: y + h * (0.5 + (side === 'bottom' ? reach : -reach)), side };
+  }
   if (side === 'left') return { x, y: y + h * port, side };
   if (side === 'right') return { x: x + w, y: y + h * port, side };
   if (side === 'top') return { x: x + w * port, y, side };
@@ -146,6 +156,8 @@ function physicalFanRoutes(rects: Map<string, FlowRect>, edges: DiagramEdge[]): 
     const s = borderPoint(source, target, reverse ? edge.targetSide : edge.sourceSide, reverse ? edge.targetPort : edge.sourcePort);
     const t = borderPoint(target, source, reverse ? edge.sourceSide : edge.targetSide, reverse ? edge.sourcePort : edge.targetPort);
     if (!((s.side === 'left' && t.side === 'right') || (s.side === 'right' && t.side === 'left'))) continue;
+    // Aligned attachment ports already have a direct horizontal connection.
+    if (drgConnection && s.y === t.y) continue;
     const key = reservedChannel ? `channel:${edge.centerX}:${t.side}:${t.x}` : `${target.id}:${t.side}`;
     groups.set(key, [...(groups.get(key) ?? []), { edge, source, target, s, t, side: t.side, reverse }]);
   }
@@ -178,7 +190,15 @@ function physicalFanRoutes(rects: Map<string, FlowRect>, edges: DiagramEdge[]): 
         const candidate = [s, { x, y: s.y }, { x, y: t.y }, t].map(({ x, y }) => ({ x, y }))
           .filter((point, index, path) => index === 0 || point.x !== path[index - 1].x || point.y !== path[index - 1].y);
         if (candidate.slice(1).every((point, i) => clearRoutingSegment(rects, candidate[i], point,
-          [source.id, target.id], 0, [source.id, target.id]))) { points = candidate; break; }
+          [source.id, target.id], 0, target.node.kind === 'drg' ? [source.id] : [source.id, target.id]))) { points = candidate; break; }
+      }
+      if (!points && source.node.kind === 'attachment' && target.node.kind === 'drg') {
+        // A crowded fan can exhaust its nested lanes. Keep a clear terminal
+        // approach instead of letting the general router fold back beside the pill.
+        const x = s.x + (t.x < s.x ? -12 : 12);
+        const candidate = [s, { x, y: s.y }, { x, y: t.y }, t].map(({ x, y }) => ({ x, y }));
+        if (candidate.slice(1).every((point, i) => clearRoutingSegment(rects, candidate[i], point,
+          [source.id, target.id], 0, target.node.kind === 'drg' ? [source.id] : [source.id, target.id]))) points = candidate;
       }
       if (!points) continue;
       lanes.push({ low, high, index: lane });

@@ -287,7 +287,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
     const table = drg.drg_route_tables[key];
-    expect(table.display_name).toBe('drgrt-fra-lz-hub-hc');
+    expect(table.display_name).toBe('drgrt-fra-lz-hc');
     expect(table.is_ecmp_enabled).toBe(false);
     if (hubKind === 'hub_e') {
       expect(table.import_drg_route_distribution_key).toBe('DRGRD-FRA-LZ-HUB-HYBRID-LOCAL-KEY');
@@ -537,10 +537,11 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
   }, 60_000);
 
-  it('carries an OKE platform through to the generated network config', async () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps the %s hub load balancer alongside OKE', async (hubKind) => {
     const base = emptyLzModel();
     const model: LzModel = {
       ...base,
+      network: { hubKind, ...hubKindDefaults(hubKind) },
       environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
       platforms: [newPlatform('oke_simple', [])],
     };
@@ -548,6 +549,8 @@ describe('generator (go-jsonnet wasm)', () => {
     const body = out.files['network.json'];
     // The platform's per-environment VCN lands in the prod category.
     expect(body).toContain('10.0.80.0/20');
+    const shared = JSON.parse(body).network_configuration.network_configuration_categories['0-shared'];
+    expect(Object.keys(shared.non_vcn_specific_gateways.l7_load_balancers)).toHaveLength(1);
     // And OKE contributes its own extension artifacts alongside the core files.
     expect(Object.keys(out.files).some((f) => f.includes('oke'))).toBe(true);
   }, 60_000);

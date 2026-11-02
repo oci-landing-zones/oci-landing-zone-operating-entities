@@ -28,7 +28,7 @@ it('includes a line returning through its own resource body in line measurements
   expect(structuralCrossings({ nodes, edges }, { includeOwnerBodies: true })).toEqual([{ edgeId: 'leader', nodeId: 'owner' }]);
 });
 
-it('keeps the common table entry near its owners when route rows make the card taller', () => {
+it('keeps the common table entry at the top-left corner when route rows make the card taller', () => {
   const nodes: DiagramNode[] = [
     { id: 'dot-high', kind: 'rtdot', label: '', x: 40, y: 80, width: 8, height: 8 },
     { id: 'dot-low', kind: 'rtdot', label: '', x: 40, y: 140, width: 8, height: 8 },
@@ -37,10 +37,165 @@ it('keeps the common table entry near its owners when route rows make the card t
   const edges: DiagramEdge[] = ['high', 'low'].map((id, i) => ({ id, source: `dot-${id}`, target: 'table',
     points: [{ x: 48, y: 84 + i * 60 }, { x: 300, y: 190 }] }));
   const direct = tableAssociations(nodes, edges);
-  expect(direct.map((edge) => edge.points!.at(-1))).toEqual([{ x: 300, y: 114 }, { x: 300, y: 114 }]);
-  expect(direct.every((edge) => edge.targetPort === (114 - 40) / 300)).toBe(true);
+  expect(direct.map((edge) => edge.points!.at(-1))).toEqual([{ x: 300, y: 40 }, { x: 300, y: 40 }]);
+  expect(direct.every((edge) => edge.targetSide === 'left' && edge.targetPort === 0)).toBe(true);
   const taller = tableAssociations(nodes.map((node) => node.id === 'table' ? { ...node, height: 400 } : node), edges);
   expect(taller.map((edge) => edge.points)).toEqual(direct.map((edge) => edge.points));
+});
+
+it('connects each owner to its nearest top corner, choosing left on a tie', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'table', kind: 'routetable', label: '', x: 300, y: 40, width: 100, height: 300 },
+    ...[100, 350, 500].map((x, i) => ({ id: `dot-${i}`, kind: 'rtdot' as const, label: '', x, y: 100, width: 8, height: 8 })),
+  ];
+  const edges: DiagramEdge[] = [100, 350, 500].map((x, i) => ({ id: `edge-${i}`, source: `dot-${i}`, target: 'table',
+    points: [{ x, y: 104 }, { x: 300, y: 40 }] }));
+  const routed = tableAssociations(nodes, edges);
+  expect(routed.map((edge) => edge.points!.at(-1))).toEqual([{ x: 300, y: 40 }, { x: 300, y: 40 }, { x: 400, y: 40 }]);
+  expect(routed.map((edge) => edge.targetSide)).toEqual(['left', 'left', 'right']);
+  expect(routed.every((edge) => edge.targetPort === 0)).toBe(true);
+});
+
+it.each(['hub', 'gateway', 'drg', 'spoke'] as const)('allows %s route cards across any compartment border below its title', (rtTone) => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1000, height: 500 },
+    { id: 'network', kind: 'compartment', tone: 'gray', label: 'Platform', parentId: 'landingzone', x: 100, y: 100, width: 400, height: 300 },
+    { id: 'table', kind: 'routetable', rtTone, label: 'Routes', parentId: 'landingzone', x: 450, y: 200, width: 100, height: 60 },
+  ];
+  const placed = optimizeTablePlacement(nodes, [], [0, 700, 800], false);
+  expect(placed.find((node) => node.id === 'table')).toEqual(nodes[2]);
+});
+
+it('pulls a distant card toward a clear lane beside its owner', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 600 },
+    { id: 'dot', kind: 'rtdot', label: '', x: 500, y: 250, width: 8, height: 8 },
+    { id: 'table', kind: 'routetable', label: 'Routes', parentId: 'landingzone', x: 900, y: 250, width: 100, height: 60 },
+  ];
+  const edges: DiagramEdge[] = [{ id: 'leader', source: 'dot', target: 'table', points: [{ x: 508, y: 254 }, { x: 900, y: 250 }] }];
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1050]);
+  const card = placed.find((node) => node.id === 'table')!;
+  expect(Math.min(Math.abs(card.x - 508), Math.abs(card.x + card.width - 508))).toBe(66);
+});
+
+it('keeps left cards on the left and aligns their right edges when clear', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 800 },
+    ...[500, 600].flatMap((x, i): DiagramNode[] => [
+      { id: `dot-${i}`, kind: 'rtdot', label: '', x, y: 200 + i * 250, width: 8, height: 8 },
+      { id: `table-${i}`, kind: 'routetable', rtKeepLeft: true, label: 'Routes', parentId: 'landingzone', x: 900, y: 200 + i * 250, width: 100, height: 60 },
+    ]),
+  ];
+  const edges: DiagramEdge[] = [500, 600].map((x, i) => ({ id: `leader-${i}`, source: `dot-${i}`, target: `table-${i}`, points: [{ x, y: 204 + i * 250 }, { x: 900, y: 200 + i * 250 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1050]);
+  const cards = placed.filter((node) => node.kind === 'routetable');
+  expect(cards.map((card) => card.x + card.width)).toEqual([434, 434]);
+});
+
+it.each(['initial', 'right'] as const)('respects a DRG card column preference of %s', (rtColumnPreference) => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 600 },
+    { id: 'dot', kind: 'rtdot', label: '', x: 500, y: 250, width: 8, height: 8 },
+    { id: 'table', kind: 'routetable', rtColumnPreference, label: 'Routes', parentId: 'landingzone', x: 100, y: 250, width: 100, height: 60 },
+  ];
+  const edges: DiagramEdge[] = [{ id: 'leader', source: 'dot', target: 'table', points: [{ x: 508, y: 254 }, { x: 100, y: 250 }] }];
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1050]);
+  const card = placed.find((node) => node.id === 'table')!;
+  if (rtColumnPreference === 'initial') expect(card.x).toBe(100);
+  else expect(card.x).toBeGreaterThan(508);
+});
+
+it('stacks the hub ingress and DRG cards beside the hub bottom', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 800 },
+    { id: 'ingress-dot', kind: 'rtdot', label: '', x: 600, y: 300, width: 8, height: 8 },
+    { id: 'drg-dot', kind: 'rtdot', label: '', x: 600, y: 500, width: 8, height: 8 },
+    { id: 'ingress', kind: 'routetable', rtKeepLeft: true, rtLayoutRole: 'hub-ingress', label: 'Ingress', parentId: 'landingzone', x: 100, y: 100, width: 100, height: 60 },
+    { id: 'drg-table', kind: 'routetable', rtKeepLeft: true, rtLayoutRole: 'hub-drg', label: 'DRG', parentId: 'landingzone', x: 100, y: 550, width: 100, height: 120 },
+  ];
+  const edges: DiagramEdge[] = ['ingress', 'drg'].map((name, i) => ({ id: `e-${name}`, source: `${name}-dot`, target: i ? 'drg-table' : 'ingress', points: [{ x: 600, y: 304 + i * 200 }, { x: 100, y: 100 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1050]);
+  const ingress = placed.find((node) => node.id === 'ingress')!, drg = placed.find((node) => node.id === 'drg-table')!;
+  expect(ingress.y).toBe(304);
+  expect(drg.x).toBe(ingress.x);
+  expect(drg.y).toBe(ingress.y + ingress.height + 16);
+});
+
+it('moves an ingress card below its VCN rather than drawing across the VCN', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 900 },
+    { id: 'vcn', kind: 'vcn', label: 'VCN', parentId: 'landingzone', x: 500, y: 100, width: 300, height: 300 },
+    { id: 'dot', kind: 'rtdot', rtDotOwnerId: 'vcn', label: '', x: 646, y: 400, width: 8, height: 8 },
+    { id: 'table', kind: 'routetable', rtKeepLeft: true, label: 'Ingress', parentId: 'landingzone', x: 200, y: 150, width: 200, height: 80 },
+  ];
+  const edges: DiagramEdge[] = [{ id: 'leader', source: 'dot', target: 'table', points: [{ x: 650, y: 404 }, { x: 400, y: 150 }] }];
+  const placed = optimizeTablePlacement(nodes, edges, [200, 850, 950]);
+  expect(placed.find((node) => node.id === 'table')!.y).toBeGreaterThanOrEqual(400);
+});
+
+it('leaves only 12 pixels between the hub DRG card and the network compartment', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1200, height: 800 },
+    { id: 'cmp-network', kind: 'compartment', tone: 'yellow', label: 'Network', parentId: 'landingzone', x: 400, y: 100, width: 600, height: 600 },
+    { id: 'drg', kind: 'drg', label: '', x: 676, y: 300, width: 48, height: 48 },
+    { id: 'dot', kind: 'rtdot', label: '', x: 700, y: 350, width: 8, height: 8 },
+    { id: 'table', kind: 'routetable', rtLayoutRole: 'hub-drg', label: 'DRG', parentId: 'landingzone', x: 100, y: 350, width: 200, height: 100 },
+  ];
+  const edges: DiagramEdge[] = [{ id: 'leader', source: 'dot', target: 'table', points: [{ x: 700, y: 354 }, { x: 300, y: 350 }] }];
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1050]);
+  const card = placed.find((node) => node.id === 'table')!;
+  expect(400 - card.x - card.width).toBe(12);
+  expect(card.y).toBe(360);
+});
+
+it('places both spoke cards beside their VCNs and near their owner rows', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1600, height: 1500 },
+    ...[0, 1].flatMap((i): DiagramNode[] => [
+      { id: `env-${i}`, kind: 'compartment', label: 'Environment', parentId: 'landingzone', x: 400, y: 100 + i * 600, width: 600, height: 500 },
+      { id: `network-${i}`, kind: 'compartment', label: 'Network', parentId: `env-${i}`, x: 20, y: 60, width: 350, height: 400 },
+      { id: `vcn-${i}`, kind: 'vcn', label: 'VCN', parentId: `network-${i}`, x: 20, y: 60, width: 300, height: 300 },
+      { id: `subnet-${i}`, kind: 'subnet', label: 'Subnet', parentId: `vcn-${i}`, x: 20, y: 100, width: 260, height: 40 },
+      { id: `dot-${i}`, kind: 'rtdot', rtDotOwnerId: `subnet-${i}`, label: '', x: 716, y: 340 + i * 600, width: 8, height: 8 },
+      { id: `table-${i}`, kind: 'routetable', rtLayoutRole: 'spoke', label: 'Routes', parentId: 'landingzone', x: 1200, y: 300 + i * 600, width: 200, height: 80 },
+    ]),
+  ];
+  const edges: DiagramEdge[] = [0, 1].map((i) => ({ id: `leader-${i}`, source: `dot-${i}`, target: `table-${i}`, points: [{ x: 720, y: 344 + i * 600 }, { x: 1200, y: 300 + i * 600 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 1200, 1350]);
+  for (const i of [0, 1]) {
+    const card = placed.find((node) => node.id === `table-${i}`)!;
+    expect(card.x).toBe(780);
+    expect(card.y).toBe(304 + i * 600);
+  }
+});
+
+it('places the spokes DRG card below attachment labels', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1400, height: 1000 },
+    { id: 'drg', kind: 'drg', label: '', x: 400, y: 300, width: 48, height: 48 },
+    { id: 'attachment', kind: 'attachment', label: 'Spoke attachment', x: 500, y: 400, width: 250, height: 26 },
+    { id: 'dot', kind: 'rtdot', label: '', x: 444, y: 320, width: 8, height: 8 },
+    { id: 'table', kind: 'routetable', rtLayoutRole: 'spoke-drg', rtColumnPreference: 'right', label: 'Spokes', parentId: 'landingzone', x: 900, y: 300, width: 250, height: 80 },
+  ];
+  const edges: DiagramEdge[] = [{ id: 'leader', source: 'dot', target: 'table', points: [{ x: 448, y: 324 }, { x: 900, y: 300 }] }];
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1100]);
+  const card = placed.find((node) => node.id === 'table')!;
+  expect(card.y).toBeGreaterThanOrEqual(462);
+  expect(card.x).toBe(472);
+});
+
+it('aligns hub subnet cards in one right-hand column', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1500, height: 1000 },
+    { id: 'hub-vcn', kind: 'vcn', label: 'Hub', x: 400, y: 100, width: 300, height: 400 },
+    ...[0, 1].flatMap((i): DiagramNode[] => [
+      { id: `dot-${i}`, kind: 'rtdot', label: '', x: 680, y: 180 + i * 150, width: 8, height: 8 },
+      { id: `card-${i}`, kind: 'routetable', rtLayoutRole: 'hub-subnet', label: 'Subnet routes', parentId: 'landingzone', x: 900 + i * 100, y: 180 + i * 150, width: 250, height: 80 },
+    ]),
+  ];
+  const edges: DiagramEdge[] = [0, 1].map((i) => ({ id: `leader-${i}`, source: `dot-${i}`, target: `card-${i}`, points: [{ x: 684, y: 184 + i * 150 }, { x: 900, y: 180 + i * 150 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 900, 1200]);
+  expect(placed.filter((node) => node.kind === 'routetable').map((node) => node.x)).toEqual([766, 766]);
 });
 
 it('permits a direct resource crossing and removes it by moving only the table', () => {

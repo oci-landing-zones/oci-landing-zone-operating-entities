@@ -288,6 +288,9 @@ export interface DiagramNode {
   /** Route-table box payload (kind === 'routetable'). */
   rtRows?: { id?: string; destination: string; targetType: string; target: string; routeType: string; superseded?: boolean }[];
   rtColumns?: 'vcn' | 'drg';
+  rtKeepLeft?: boolean;
+  rtColumnPreference?: 'right' | 'initial';
+  rtLayoutRole?: 'hub-ingress' | 'hub-drg' | 'spoke' | 'spoke-drg' | 'hub-subnet';
   rtNote?: string;
   rtTone?: 'hub' | 'gateway' | 'drg' | 'spoke';
   /** Rows (by index) to highlight when a flow traverses this table. */
@@ -297,6 +300,7 @@ export interface DiagramNode {
   rtDotOwnerId?: string;
   /** Visible attachment endpoint when the table binding belongs to a separate resource. */
   rtDotPhysicalOwnerId?: string;
+  attachmentVertical?: boolean;
   rtDotOpen?: boolean;
   rtDotConfigured?: boolean;
   rtDotTone?: 'hub' | 'gateway' | 'drg' | 'spoke';

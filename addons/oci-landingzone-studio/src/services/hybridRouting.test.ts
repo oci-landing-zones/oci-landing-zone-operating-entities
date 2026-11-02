@@ -27,7 +27,7 @@ describe('hybrid routing views', () => {
       };
     expect(drg.default_drg_route_tables.ipsec_tunnel.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
     expect(drg.default_drg_route_tables.virtual_circuit.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
-    expect(drg.drg_route_tables['DRGRT-FRA-LZ-HUB-HC-KEY'].display_name).toBe('drgrt-fra-lz-hub-hc');
+    expect(drg.drg_route_tables['DRGRT-FRA-LZ-HUB-HC-KEY'].display_name).toBe('drgrt-fra-lz-hc');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
     const tables = buildRouteTables(model, network);

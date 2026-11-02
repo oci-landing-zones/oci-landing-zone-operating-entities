@@ -700,7 +700,7 @@
 
                             "drg_route_tables": {
                                 "DRGRT-FRA-LZ-HUB-HC-KEY": {
-                                    "display_name"                        : "drgrt-fra-lz-hub-hc",
+                                    "display_name"                        : "drgrt-fra-lz-hc",
                                     "is_ecmp_enabled"                     : false,
 
                                     "route_rules": {

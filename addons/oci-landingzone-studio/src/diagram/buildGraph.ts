@@ -69,9 +69,8 @@ const GW_H = 74;
 // icon centre sit exactly on the VCN's left boundary line.
 const GW_X = -GW_W / 2;
 const VCN_X = GW_W / 2 + 8;
-const SUB_X = GW_W / 2 + 8;
-
-const VCN_W = SUB_X + SUB_W + VCN_PAD;
+const VCN_W = GW_W / 2 + 8 + SUB_W + VCN_PAD;
+const SUB_X = (VCN_W - SUB_W) / 2;
 const HUB_NET_W = VCN_X + VCN_W + PAD;
 const NET_COMP_W = HUB_NET_W;
 // Projects: a compartment to the right of each env network compartment,
@@ -95,11 +94,10 @@ const rowOffset = (heights: number[], index: number) =>
 // ---- DRG + VCN attachments. The DRG and ALL attachment pills cluster together
 // inside cmp-network, below the hub VCN: the DRG on the left, the pills stacked
 // to its right (one per VCN). Each VCN links to its pill, each pill to the DRG.
-const DRG_SIZE = 48;       // minimum glyph size; dense attachment fans reserve more port space
+const DRG_SIZE = 48;       // fixed glyph size independent of attachment count
 const DRG_LABEL_H = 18;    // the "DRG" caption hangs below the icon — reserve room for it
 const ATTACH_H = 26;
 const ATTACH_GAP_V = 10;   // vertical gap between stacked attachment pills
-const HUB_ATTACH_GAP = 18; // gap below the hub VCN before the DRG/attachment cluster
 const ROUTE_GUTTER = 132;  // column gap (step 2+) — the channel the spoke links run up
 const HYBRID_EQUIPMENT_GAP = 64;
 
@@ -375,6 +373,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   const tableLane = (table: RouteTable): TableLane => {
     if (table.associations.length && table.associations.every((association) => /^hybrid-vpn-.+:tunnel-[12]$/.test(association.nodeId) || association.nodeId.startsWith('hybrid-fc-'))) return 'external';
     if (!table.associations.length || table.associations.some((association) => association.kind === 'drg-attachment' || association.kind === 'rpc-attachment')) return 'left';
+    if (table.associations.some((association) => association.kind === 'vcn-ingress')) return 'left';
     if (table.associations.some((association) => association.nodeId.startsWith('cmp-env-'))) return 'right';
     return table.associations.every((association) => association.kind === 'subnet') ? 'middle' : 'left';
   };
@@ -526,13 +525,28 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     ...gutterItems,
   ];
   const numAttach = attachList.length;
-  const drgSize = Math.max(DRG_SIZE, (Math.max(numAttach, vpns.length * 2 + circuits.length) + 1) * 12);
+  const hubAttachmentHeight = attachmentLabelLayout(attachList[0].label).width;
+  const compactHubGap = hubAttachmentHeight + 24;
+  const upperAttachmentReach = numAttach > 3
+    ? Math.max(0, (numAttach / 2 - 1) * (ATTACH_H + ATTACH_GAP_V) + ATTACH_H / 2 - DRG_SIZE / 2)
+    : 0;
+  const nearbyRoutingHeight = Math.max(0, ...openTables.filter((table) => table.associations.some((association) =>
+    association.kind === 'vcn-ingress' && association.nodeId === 'hub-vcn'))
+    .map((table) => routeTableLayout({ label: table.name, columns: table.columns, rowCount: table.rules.length,
+      rows: table.rules, note: table.note, width: RT_W }).height));
+  // Only cards beside the hub exit need space before the DRG. DRG cards
+  // below the cluster and subnet cards beside the VCN do not stretch this link.
+  const hubAttachGap = Math.max(compactHubGap,
+    nearbyRoutingHeight ? nearbyRoutingHeight + 24 : 0,
+    openTables.length ? upperAttachmentReach + 48 : 0);
+  const drgSize = DRG_SIZE;
   const attachmentWidth = Math.max(...attachList.map((attachment) => attachmentLabelLayout(attachment.label).width));
   const drgFootprint = drgCaptionLayout(generatorNames.hubDrg(regionTok), drgSize).width;
   const attachmentGap = 2 * COMP_GAP + 8 * (numAttach - 1);
-  const groupW = drgFootprint + attachmentGap + attachmentWidth;
+  const groupW = 2 * (drgFootprint / 2 + attachmentGap + attachmentWidth);
   const leftColumnW = Math.max(showHub ? Math.max(HUB_NET_W, groupW + 2 * PAD) : COMP_W, ...(sharedOwners ?? []).map((owner) => ownerWidths.get(owner.key) ?? 0));
   const netCompW = leftColumnW;
+  const centeredVcnX = (netCompW - VCN_W) / 2;
   const securityCompW = leftColumnW;
   const stackH = numAttach * ATTACH_H + (numAttach - 1) * ATTACH_GAP_V;
   // The DRG icon is centred in the cluster; padding both sides by its caption
@@ -543,7 +557,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     ? sharedInstances.reduce((height, instance) => height + instance.vcnH, 0) + sharedInstances.length * PLAT_VCN_GAP
     : 0;
   const netCompH = showHub
-    ? TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP + clusterH + PAD + hybridHeight
+    ? TITLE + PAD + hubVcnH + sharedNetworkH + hubAttachGap + clusterH + PAD + hybridHeight
     : COMP_H;
   const sharedRows = [
     ...sharedInstances.map((instance) => ({ key: instance.platform.key, height: nestedHeight(exadata.sharedChildren[instance.platform.key]?.length ?? 0) })),
@@ -610,7 +624,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
   nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: f.stackScope !== 'regional', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
-    const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets);
+    const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets, centeredVcnX);
     // Gateways straddle the left boundary: IGW by the first subnet,
     // NAT by the internal firewall subnet, SGW by the last subnet.
     const centerOf = (i: number) => placed[i].y + placed[i].height / 2;
@@ -636,7 +650,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     let sharedY = TITLE + PAD + hubVcnH + PLAT_VCN_GAP;
     sharedInstances.forEach((instance) => {
       const label = `${generatorNames.sharedPlatformVcn(regionTok, instance.platform.key)}\n${instance.platform.vcnCidr}`;
-      const placed = pushVcn(nodes, instance.vcnId, 'cmp-network', label, instance.subnets, VCN_X, sharedY);
+      const placed = pushVcn(nodes, instance.vcnId, 'cmp-network', label, instance.subnets, centeredVcnX, sharedY);
       const firstAnchor = placed[0] ? placed[0].y + placed[0].height / 2 : VCN_TITLE + PAD;
       const last = placed[placed.length - 1];
       const lastAnchor = last ? last.y + last.height / 2 : firstAnchor;
@@ -654,12 +668,13 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
       }
       sharedY += instance.vcnH + PLAT_VCN_GAP;
     });
-    const clusterTop = TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP;
-    const groupLeft = (netCompW - groupW) / 2;
-    const drgX = groupLeft + (drgFootprint - drgSize) / 2;
-    const stackX = groupLeft + drgFootprint + attachmentGap;
-    const stackTop = clusterTop + (clusterH - stackH) / 2;
-    nodes.push({ id: 'drg', kind: 'drg', label: generatorNames.hubDrg(regionTok), parentId: 'cmp-network', x: drgX, y: clusterTop + (clusterH - drgSize) / 2, width: drgSize, height: drgSize });
+    const clusterTop = TITLE + PAD + hubVcnH + sharedNetworkH + hubAttachGap;
+    const drgX = (netCompW - drgSize) / 2;
+    const stackX = drgX + drgSize / 2 + drgFootprint / 2 + attachmentGap;
+    const drgY = clusterTop;
+    const hubVcnBottom = TITLE + PAD + hubVcnH;
+    const hubAttachmentY = (hubVcnBottom + drgY - hubAttachmentHeight) / 2;
+    nodes.push({ id: 'drg', kind: 'drg', label: generatorNames.hubDrg(regionTok), parentId: 'cmp-network', x: drgX, y: drgY, width: drgSize, height: drgSize });
 
     // Gutter-routed attachments: one per spoke VCN (step 3) and one per platform
     // VCN (step 4). Grouped by environment (a spoke then its platforms) so the
@@ -677,18 +692,27 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     const gutterMid = (gutterItems.length - 1) / 2;
     const gutterStep = Math.min(18, (gutter * 0.55) / Math.max(1, gutterItems.length));
     attachList.forEach((a, i) => {
-      nodes.push({ id: a.id, kind: 'attachment', label: a.label, parentId: 'cmp-network', x: stackX, y: stackTop + i * (ATTACH_H + ATTACH_GAP_V), width: attachmentWidth, height: ATTACH_H });
+      const vertical = i === 0;
+      const port = numAttach <= 2 ? 0.5 : 0.15 + 0.7 * (i - 1) / (numAttach - 2);
+      const stackSpacing = Math.max(ATTACH_H + ATTACH_GAP_V, drgSize * 0.7);
+      const attachmentY = numAttach <= 3 ? drgY + drgSize * port - ATTACH_H / 2
+        : drgY + drgSize / 2 + (i - numAttach / 2) * stackSpacing - ATTACH_H / 2;
+      nodes.push({ id: a.id, kind: 'attachment', label: a.label, parentId: 'cmp-network', attachmentVertical: vertical,
+        x: vertical ? drgX + (drgSize - ATTACH_H) / 2 : stackX,
+        y: vertical ? hubAttachmentY : attachmentY,
+        width: vertical ? ATTACH_H : attachmentWidth, height: vertical ? hubAttachmentHeight : ATTACH_H });
       // Hub VCN sits directly above its pill (vertical link); spoke + platform VCNs
       // sit to the right (horizontal link through the gutter). Every pill meets the
       // DRG on its left side.
       const hub = i === 0;
       const channel = hub ? undefined : (i - 1 - gutterMid) * gutterStep;
-      edges.push({ id: `e-${a.vcn}-${a.id}`, source: a.vcn, target: a.id, sourceSide: hub ? 'bottom' : 'left', targetSide: hub ? 'top' : 'right', channel, centerX: hub ? undefined : gutterCenterX });
+      edges.push({ id: `e-${a.vcn}-${a.id}`, source: a.vcn, target: a.id, sourceSide: hub ? 'bottom' : 'left', targetSide: hub ? 'top' : 'right',
+        ...(hub ? { sourcePort: (drgX + drgSize / 2 - nodes.find((node) => node.id === a.vcn)!.x) / nodes.find((node) => node.id === a.vcn)!.width, targetPort: 0.5 } : {}), channel, centerX: hub ? undefined : gutterCenterX });
       // Each DRG attachment is a separate OCI connection. Give every line its
       // own port on the DRG border so the graph never collapses them into one.
       edges.push({
         id: `e-${a.id}-drg`, source: a.id, target: 'drg',
-        sourceSide: 'left', targetSide: 'right', targetPort: (i + 1) / (attachList.length + 1),
+        sourceSide: hub ? 'bottom' : 'left', targetSide: hub ? 'top' : 'right', sourcePort: 0.5, targetPort: hub ? 0.5 : port,
       });
     });
 
@@ -750,11 +774,11 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     envY = compTop + env.compH + COMP_GAP;
     if (!showSpokes) return;
     nodes.push({ id: `${env.id}-network`, kind: 'compartment', tone: 'yellow', container: true, label: env.netLabel, parentId: env.id, x: PAD, y: TITLE + PAD, width: NET_COMP_W, height: env.netH });
-    const placed = env.hasProjectNetwork ? pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets) : [];
+    const placed = env.hasProjectNetwork ? pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets, (NET_COMP_W - VCN_W) / 2) : [];
     let platformY = TITLE + PAD + env.vcnH + (env.hasProjectNetwork ? PLAT_VCN_GAP : 0);
     env.platformInstances.forEach((pl, k) => {
       const platformVcnId = `${env.id}-plat-${k}`;
-      const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, VCN_X, platformY);
+      const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, (NET_COMP_W - VCN_W) / 2, platformY);
       const platformFirstAnchor = platformPlaced[0]
         ? platformPlaced[0].y + platformPlaced[0].height / 2
         : VCN_TITLE + PAD;
@@ -992,7 +1016,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   if (showDots && allRouteTables.length > 0) {
     const rects = absoluteNodeRects(nodes);
     const lz = rects.get('landingzone')!;
-    const DOT = 16;
+    const DOT = 8;
     const ports = new Map<string, { dotId: string; x: number; y: number; side: 'left' | 'right' | 'top' | 'bottom' }[]>();
     for (const table of allRouteTables) {
       const lane = dotLane(table);
@@ -1017,7 +1041,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
         }
         x -= lz.x; y -= lz.y;
         const dotId = index === 0 ? `dot-${table.id}` : `dot-${table.id}-${index}`;
-        const dotSize = connection ? 8 : DOT;
+        const dotSize = DOT;
         tablePorts.push({ dotId, x, y, side });
         nodes.push({
           id: dotId, kind: 'rtdot', label: '', parentId: external ? undefined : 'landingzone',
@@ -1070,11 +1094,15 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
         .sort((a, b) => Math.abs(a - desired) - Math.abs(b - desired) || a - b)[0];
       occupied[lane].push({ y, height });
       if (drgTable) drgBottom[lane] = y + height + RT_STACK_GAP;
+      const hubDrgTable = table.kind === 'drg' && table.associations.some((association) => association.nodeId === 'attach-hub');
+      const spokeDrgTable = table.kind === 'drg' && table.associations.some((association) => association.kind === 'drg-attachment' && association.nodeId.startsWith('attach-cmp-env-'));
       nodes.push({
         id: table.id, kind: 'routetable', label: table.name, parentId: lane === 'external' ? undefined : 'landingzone',
         rtRows: table.rules.map((rule) => ({ id: rule.id, destination: rule.destination, targetType: rule.targetType, target: rule.target, routeType: rule.routeType, superseded: rule.superseded })),
         rtHighlight: [...new Set(rtHighlight.get(table.id) ?? [])].sort((a, b) => a - b),
-        rtColumns: table.columns, rtNote: note || undefined, rtTone: table.kind,
+        rtColumns: table.columns, rtKeepLeft: lane === 'left' && !hubDrgTable && !spokeDrgTable,
+        rtColumnPreference: spokeDrgTable ? 'right' : undefined,
+        rtLayoutRole: spokeDrgTable ? 'spoke-drg' : hubDrgTable ? 'hub-drg' : table.associations.some((association) => association.kind === 'vcn-ingress' && association.nodeId === 'hub-vcn') ? 'hub-ingress' : table.associations.length > 0 && table.associations.every((association) => association.kind === 'subnet' && association.nodeId.startsWith('hub-vcn-sn-')) ? 'hub-subnet' : table.kind === 'spoke' && table.associations.some((association) => association.kind === 'subnet') ? 'spoke' : undefined, rtNote: note || undefined, rtTone: table.kind,
         x: columns[lane], y, width: RT_W, height,
       });
       tablePorts.forEach((port, index) => {
@@ -1204,8 +1232,45 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
 }
 
 export function buildGraph(...args: Parameters<typeof buildGraphLayout>): DiagramModel {
-  const graph = buildGraphLayout(...args);
+  const [model, step = Infinity, options = {}, projection, tables = [], inventory] = args;
+  const flowLayer = !!options.showFlows || !!options.allFlows || !!options.activeFlows?.length;
+  const detailLayer = flowLayer || !!options.showDots || !!options.showEndpoints;
+  // Plan every detail layer against the same complete resource inventory.
+  // Endpoint/table toggles affect visibility, never callout or connection geometry.
+  const graph = buildGraphLayout(model, step, detailLayer
+    ? { ...options, showFlows: true, showDots: true, showEndpoints: true }
+    : options, projection, tables, inventory);
   if (!graph.tableColumns) return graph;
-  const nodes = optimizeTablePlacement(graph.nodes, graph.edges, graph.tableColumns);
-  return { ...graph, nodes, edges: tableAssociations(nodes, graph.edges) };
+  let plannedNodes = optimizeTablePlacement(graph.nodes, graph.edges, graph.tableColumns);
+  const plannedEdges = tableAssociations(plannedNodes, graph.edges);
+  // Replace the old reserved right-hand table lane with the actual final extent.
+  // Fit the full canonical inventory so opening/hiding tables cannot resize it.
+  const wrapperIds = new Set(['landingzone', 'tenancy', 'region']);
+  const finalRects = absoluteNodeRects(plannedNodes);
+  const landingZone = finalRects.get('landingzone');
+  if (landingZone) {
+    const right = Math.max(landingZone.x + PAD,
+      ...[...finalRects.values()].filter((rect) => !wrapperIds.has(rect.id)).map((rect) => rect.x + rect.width),
+      ...plannedEdges.flatMap((edge) => (edge.points ?? []).map((point) => point.x)));
+    const widths = new Map<string, number>([['landingzone', right - landingZone.x + PAD]]);
+    for (const id of ['tenancy', 'region']) {
+      const childId = id === 'tenancy' ? 'landingzone' : 'tenancy';
+      const child = finalRects.get(childId), parent = finalRects.get(id);
+      if (child && parent) widths.set(id, child.x - parent.x + widths.get(childId)! + PAD);
+    }
+    plannedNodes = plannedNodes.map((node) => widths.has(node.id) ? { ...node, width: widths.get(node.id)! } : node);
+  }
+  if (!detailLayer) return { ...graph, nodes: plannedNodes, edges: plannedEdges };
+  const visibleTables = new Set(flowLayer ? tables.map((table) => table.id) : options.openTables ?? []);
+  const showDots = !!options.showDots || flowLayer;
+  const endpointIds = new Set(plannedEdges.filter((edge) => edge.waypoints)
+    .flatMap((edge) => edge.waypoints ?? []));
+  const nodes = plannedNodes.filter((node) => node.kind === 'routetable' ? visibleTables.has(node.id)
+    : node.kind !== 'rtdot' || showDots).map((node) => ({ ...node,
+      ...(node.kind === 'rtdot' ? { rtDotOpen: visibleTables.has(node.rtDotTableId!) } : {}),
+      ...(!options.showEndpoints && !endpointIds.has(node.id) ? { endpointName: undefined, endpointIp: undefined } : {}),
+    }));
+  const visibleIds = new Set(nodes.map((node) => node.id));
+  const edges = plannedEdges.filter((edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target));
+  return { ...graph, nodes, edges };
 }

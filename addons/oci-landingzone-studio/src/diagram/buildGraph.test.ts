@@ -287,13 +287,14 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.filter((node) => node.icon === 'firewall')).toEqual([]);
   });
 
-  it('does not invent a hub load balancer when OKE suppresses it in the generator', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps the %s hub load balancer when OKE is added', (hubKind) => {
     const model = emptyLzModel();
-    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
     model.platforms = [newPlatform('oke_simple', [], model.environments)];
     const graph = buildGraph(model, 4);
-    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.icon).toBeUndefined();
-    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.publicSubnet).toBe(true);
+    const lbSubnet = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-lb\n'));
+    expect(lbSubnet?.icon).toBe('lb');
+    expect(lbSubnet?.publicSubnet).toBe(true);
   });
 
   it('places multiple shared compartments under platform and VCNs under network with attachments', () => {

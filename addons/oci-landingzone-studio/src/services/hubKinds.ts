@@ -84,10 +84,9 @@ export function getHubKind(id: HubKind): HubKindDef | undefined {
   return HUB_KINDS.find((k) => k.id === id);
 }
 
-/** The generator omits the hub L7 load balancer when an OKE extension is placed. */
+/** Hub load-balancer availability depends on its subnet, independently of platforms. */
 export function hasHubLoadBalancer(model: LzModel): boolean {
-  return !model.platforms.some((platform) => platform.type === 'oke_simple'
-    && model.environments.some((env) => platform.environments === 'all' || platform.environments.includes(env.id)));
+  return model.network.subnets.some((subnet) => subnet.name === 'lb');
 }
 
 /** Default VCN CIDR + config-keyed subnets for a hub kind. */

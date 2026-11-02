@@ -7,6 +7,8 @@ export const DIAGRAM_LAYOUT = {
   maxResourceColumns: 3,
 } as const;
 
+export const OSN_ICON_SIZE = 36;
+
 export const ATTACHMENT_LABEL = {
   fontFamily: 'Arial, Helvetica, sans-serif',
   fontSize: 11.5,
