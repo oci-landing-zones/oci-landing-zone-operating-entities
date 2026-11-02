@@ -256,7 +256,11 @@ export interface DiagramNode {
   /** Compartment that holds nested children — label renders top-left. */
   container?: boolean;
   /** Icon glyph: gateways use it as the node body, subnets show it centred. */
-  icon?: 'igw' | 'natgw' | 'sgw' | 'firewall' | 'lb';
+  icon?: 'igw' | 'natgw' | 'sgw' | 'firewall' | 'lb' | 'nlb';
+  /** Illustrative Hub C backend bridge, positioned in the VCN subnet gap. */
+  firewallBackendBridgeY?: number;
+  firewallBackendUpperArm?: number;
+  firewallBackendLowerArm?: number;
   /** Caption under a subnet icon (e.g. nfw-<region>-hub-dmz). */
   caption?: string;
   /** Caption colour. */

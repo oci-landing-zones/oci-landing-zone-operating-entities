@@ -6,7 +6,7 @@ import { setAssetLoader } from '../generator/jsonnetVm';
 import { buildRouteTables } from '../services/routeTables';
 import { toDrawioXml } from '../export/toDrawio';
 import * as graphBuilder from '../diagram/buildGraph';
-import { createDiagramGraph } from './diagramGraph';
+import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from './diagramGraph';
 import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { complexHybridModel } from '../diagram/complexHybrid.testSupport';
 
@@ -82,6 +82,16 @@ describe('diagram geometry and chosen export layers', () => {
       ...flows.edges.flatMap((edge) => (edge.points ?? []).map((point) => point.x)));
     const lz = flowRects.get('landingzone')!;
     expect(lz.x + lz.width - contentRight).toBeCloseTo(16);
+    for (const card of flows.nodes.filter((node) => node.rtLayoutRole === 'spoke')) {
+      const dot = flows.nodes.find((node) => node.rtDotTableId === card.id)!;
+      let owner = flowRects.get(dot.rtDotOwnerId!)!;
+      while (owner.node.kind !== 'vcn') owner = flowRects.get(owner.node.parentId!)!;
+      const network = flowRects.get(owner.node.parentId!)!;
+      const environment = flowRects.get(network.node.parentId!)!;
+      const cardRect = flowRects.get(card.id)!;
+      expect(cardRect.y, card.label).toBeGreaterThanOrEqual(environment.y + 56);
+      expect(cardRect.y + cardRect.height, card.label).toBeLessThanOrEqual(environment.y + environment.height - 16);
+    }
     const podsCards = flows.nodes.filter((node) => node.kind === 'routetable' && node.label.endsWith('-pods'));
     expect(podsCards.length).toBeGreaterThan(0);
     for (const pods of podsCards) {
@@ -95,6 +105,25 @@ describe('diagram geometry and chosen export layers', () => {
     expect({ x: a.x, y: a.y, width: a.width, height: a.height }).toEqual({ x: b.x, y: b.y, width: b.width, height: b.height });
     expect(endpoints.edges.filter((edge) => edge.target === id).map((edge) => edge.points))
       .toEqual(flows.edges.filter((edge) => edge.target === id).map((edge) => edge.points));
+  }, 30_000);
+
+  it('exports the full static routing design after arbitrary live flow and endpoint selections', async () => {
+    const { model, preview } = await generated();
+    const getDiagram = createDiagramGraph(model, preview);
+    getDiagram(5, { showDots: true, showEndpoints: true, openTables: [preview.tables[0].id] });
+    const live = getDiagram(5, { showFlows: true, allFlows: true, activeFlows: ['prod:egress:web'], focusFlow: 'prod:egress' });
+    expect(live.edges.some((edge) => edge.waypoints)).toBe(true);
+    const exported = getDiagram(5, REVIEW_DIAGRAM_OPTIONS);
+    expect(exported.nodes.filter((node) => node.kind === 'routetable').map((node) => node.id).sort())
+      .toEqual(preview.tables.map((table) => table.id).sort());
+    expect(exported.edges.some((edge) => edge.waypoints)).toBe(false);
+    expect(exported.nodes.some((node) => node.endpointName || node.rtHighlight?.length)).toBe(false);
+    expect(exported.display?.focusFlow).toBeUndefined();
+    const xml = toDrawioXml(exported);
+    for (const table of preview.tables) expect(xml).toContain(`id="${table.id}"`);
+    expect(xml).not.toContain('flowAnimation=1');
+    expect(xml).not.toContain('id="flow-');
+    expect(xml).not.toContain('-ep-icon');
   }, 30_000);
 
   it('builds edited export layers only when requested and uses their current generated snapshot', async () => {

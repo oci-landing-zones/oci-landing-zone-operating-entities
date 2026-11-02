@@ -33,7 +33,7 @@ The diagram presents the generated landing zone as a readable architecture drawi
 - Structural paths are routed together to reduce perpendicular crossings and shared collinear runs. Corner and T contacts count too; actual shared endpoint junctions do not. Separate attachment-to-DRG links must keep distinct physical segments even when they share the same DRG. A common terminal point is allowed; a shared trunk would imply a connection that does not exist. Perpendicular crossings remain a best-effort preference rather than an absolute zero-crossing rule.
 - Contact measurements exclude intentional same-table annotation junctions and the initial outward port escape where an annotation meets its own physical connection. Later crossings still count even when links share an owner. Clear text and distinct physical connections take priority if preserving them requires an additional point crossing.
 - Packet paths reuse the same physical attachment geometry. Each numbered marker, packet pause and effective-rule highlight resolves to its shared processing anchor.
-- Selecting a flow changes presentation without recalculating route geometry. Review exports the selected Diagram view layers for the current generated snapshot, even when the form shows a clean overview.
+- Selecting a flow changes presentation without recalculating route geometry. Review exports the complete static design and routing tables for the current generated snapshot, independently of selected Diagram view layers.
 - Initial display publishes one complete generated snapshot already fitted to its viewport. Pending changes keep the previous complete snapshot and its matching model together; pending content cannot be edited or exported as current.
 
 ## Automatic checks
@@ -83,3 +83,27 @@ Browser inspection remains necessary for typography and the full composition at 
 - Endpoint and Flow views share a canonical layout planned with all tables and endpoint space. Opening a table only changes visibility; it does not move route cards, owner dots, physical connections or packet paths. Hidden endpoint decorations retain their reserved space in detail views.
 
 - Right-hand wrapper padding follows the final canonical table/resource and connection extents, instead of retaining an unused reserved routing lane. Spoke/OKE cards follow owner-subnet vertical order, with 12-pixel spacing, so pods precedes workers without crossing their leader lines.
+
+- Environment-owned subnet route cards stay strictly inside their owning environment’s vertical span. Ordered stacks compact upward as needed; overflow uses additional columns on the right, with outer wrappers fitted afterward, rather than spilling into a different environment.
+
+- Route-card stacks are grouped by owning VCN, not by environment alone. Multi-card OKE stacks center vertically beside their own VCN independently of the projects route card; environment bounds and overflow columns still apply.
+
+- During flow playback, the matched route row smoothly scales to 112% with a green fill, outline and shadow, then returns over 360 ms when the packet leaves that lookup. The active card rises above neighboring cards without changing layout or connector anchors. Manual steps hold the same highlight; reduced motion keeps the highlight without scaling.
+
+- Packet travel uses a consistent 240 diagram units per second for longer paths, retaining a 1750-ms minimum for short paths. There is no maximum-duration cap that accelerates Internet flows; rule and hop dwell times remain synchronized.
+
+- The active rule also shows a green magnified callout with larger bold text for every cell, without ellipsis. The callout smoothly appears and disappears over the matched row and does not alter layout, playback speed or connector geometry.
+
+- Local subnet flow legs approach the VCN attachment port in the physical connection’s departure direction. This prevents a false U-turn at the VCN border while retaining canonical resource visits, hop anchors and route-rule timing.
+
+- When an outbound subnet leg meets the attachment departure segment before the VCN port, the packet joins directly at that intersection. The redundant excursion to the border is omitted; actual routing-rule processing anchors and subsequent connection geometry remain intact.
+
+- Review Draw.io exports always use the complete static design with all route tables and association dots/lines, regardless of live wizard layer selections. Example VM endpoints, flow paths and active rule highlighting are excluded. Export requires a ready generated preview.
+
+- Route-table cards have a soft lower-right drop shadow in Studio and native shadows in Draw.io exports, without changing card geometry or attachment anchors.
+
+- Hub C untrust/trust subnets show NLB distribution icons with captions “Untrust NLB” and “Trust NLB”. Two translucent illustrative firewall backends bridge a reserved 72-pixel gap between those subnets. The same symbols appear in Draw.io and do not add deployable resources.
+
+- Translucent Hub C backend connectors terminate at unlabeled interface dots within untrust and trust. Firewall 1/2 labels sit above their symbols at the same opacity.
+
+- Hub C backend illustrations follow the two-interface design: unlabeled interface dots sit inside untrust and trust, with orthogonal connections to the two firewall symbols between the subnets. Firewall labels sit above their symbols. All illustrative elements retain the same translucency.

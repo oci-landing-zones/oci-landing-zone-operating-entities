@@ -2,13 +2,14 @@ import type { DiagramModel, DiagramNode } from '../model/types';
 import { oracle } from '../theme';
 import { SHIELD_SVG } from '../diagram/shieldSvg';
 import { ROUTE_TABLE_SVG } from '../diagram/routeTableSvg';
-import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from '../diagram/icons';
+import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, NLB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from '../diagram/icons';
 import { absoluteNodeRects, diagramBounds } from '../diagram/flowGeometry';
 import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } from '../diagram/displayGeometry';
 import { flowGroup, labelAnchor, marksAlong, type Point } from '../diagram/flowOverlayGeometry';
 import { createFlowPlayback, flowHopMarkers } from '../diagram/flowPlayback';
 import { resourceGroupSvg } from '../diagram/resourceGroups';
 import { compartmentStyle } from '../diagram/compartmentStyle';
+import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from '../diagram/firewallBackends';
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from '../diagram/routeTableLayout';
 import { hybridTopologySvg } from '../diagram/hybridTopology';
@@ -25,6 +26,7 @@ const ICON_URIS: Record<string, string> = {
   sgw: svgUri(SGW_SVG),
   firewall: svgUri(FIREWALL_SVG),
   lb: svgUri(LB_SVG),
+  nlb: svgUri(NLB_SVG),
 };
 const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
 
@@ -186,7 +188,7 @@ function nodeStyle(node: DiagramNode): string {
     case 'project':
       return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=${node.container ? 'top' : 'middle'};fillColor=#ECEAE8;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=12;`;
     case 'routetable':
-      return `rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
+      return `rounded=0;shadow=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
     case 'rtdot':
       return `ellipse;html=1;fillColor=${node.rtDotConfigured === false ? '#b0aca8' : RT_TONE_COLORS[node.rtDotTone ?? 'hub']};strokeColor=#ffffff;strokeWidth=1.5;`;
     case 'resourcegroup':
@@ -290,6 +292,8 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
   const osnCells = diagram.nodes
     .filter((n) => n.kind === 'vcn')
     .map(osnCell);
+  const backendCells = diagram.nodes.filter((node) => node.kind === 'vcn' && node.firewallBackendBridgeY != null)
+    .map((node) => vertexCell(`${node.id}-firewall-backends`, '', `shape=image;imageAspect=0;noLabel=1;image=${svgUri(firewallBackendBridgeSvg(node.width, node.firewallBackendUpperArm, node.firewallBackendLowerArm))};`, 0, node.firewallBackendBridgeY! - (node.firewallBackendUpperArm ?? 0), node.width, FIREWALL_BACKEND_GAP + (node.firewallBackendUpperArm ?? 0) + (node.firewallBackendLowerArm ?? 0), node.id));
   const iconCells = diagram.nodes
     .filter((n) => n.kind === 'subnet' && n.icon)
     .flatMap(subnetIconCells);
@@ -298,7 +302,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     .flatMap(subnetEndpointCells);
   const gatewayChildCells = diagram.nodes.filter((node) => node.kind === 'gateway').flatMap(gatewayCells);
   const publicBadgeCells = diagram.nodes.filter((node) => node.kind === 'subnet' && node.publicSubnet).map((node) =>
-    vertexCell(`${node.id}-public`, 'PUBLIC', `rounded=1;arcSize=50;html=1;fillColor=${oracle.cidrBlue};strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=8.5;`, node.width - 48, 4, 44, 15, node.id));
+    vertexCell(`${node.id}-public`, 'Public', `rounded=1;arcSize=50;html=1;fillColor=${CAPTION_COLORS.green};strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=8.5;`, node.width - 48, 4, 44, 15, node.id));
   const rects = absoluteNodeRects(diagram.nodes);
   const associations = associationDisplaySegments(diagram.nodes, diagram.edges);
   const allFlows = diagram.display?.allFlows ?? false;
@@ -390,7 +394,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     `      <root>\n` +
     `        <mxCell id="0" />\n` +
     `        <mxCell id="1" parent="0" />\n` +
-    [...nodeCells, ...shieldCells, ...routeTableCells, ...osnCells, ...iconCells, ...endpointCells, ...gatewayChildCells, ...publicBadgeCells, ...structuralCells, ...flowCases, ...edgeCells, ...flowAnnotations].join('\n') + '\n' +
+    [...nodeCells, ...shieldCells, ...routeTableCells, ...osnCells, ...backendCells, ...iconCells, ...endpointCells, ...gatewayChildCells, ...publicBadgeCells, ...structuralCells, ...flowCases, ...edgeCells, ...flowAnnotations].join('\n') + '\n' +
     `      </root>\n` +
     `    </mxGraphModel>\n` +
     `  </diagram>\n` +

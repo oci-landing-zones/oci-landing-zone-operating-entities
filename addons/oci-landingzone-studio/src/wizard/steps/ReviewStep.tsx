@@ -21,7 +21,6 @@ import { getOutputs, saveOutputs } from '../../services/lzStore';
 // inside `run()`. Only its names — a dependency-free module — are imported here.
 import { CONFIG_FILENAME, deploymentStages, isCurrentOutputSet } from '../../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../../export/zip';
-import { buildGraph } from '../../diagram/buildGraph';
 import { toDrawioXml } from '../../export/toDrawio';
 import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
@@ -200,7 +199,8 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     const filename = bundleFilename(designName).replace(/-lz-outputs\.zip$/, '.drawio');
     setError(null);
     try {
-      downloadTextFile(filename, toDrawioXml(getDiagram?.() ?? buildGraph(model, 5)), 'application/xml');
+      if (!getDiagram) throw new Error('Wait for the current diagram preview before exporting.');
+      downloadTextFile(filename, toDrawioXml(getDiagram()), 'application/xml');
     } catch (error) {
       setError(error instanceof Error ? error.message : String(error));
     }
@@ -259,7 +259,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             >
               {busy ? 'Preparing download…' : 'Download files'}
             </button>
-            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady}>
+            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady || !getDiagram}>
               Export diagram (.drawio)
             </button>
           </div>

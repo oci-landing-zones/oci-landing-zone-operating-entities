@@ -19,7 +19,7 @@ import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformsStep from '../wizard/steps/PlatformsStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
-import { createDiagramGraph } from '../wizard/diagramGraph';
+import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from '../wizard/diagramGraph';
 import { allFlowIds, buildFlowTraces, specFromId } from '../services/flowTrace';
 import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
@@ -204,7 +204,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const diagramStatus = diagramResult.error ? 'error' : routing.status;
   function exportDiagram() {
     if (diagramStatus !== 'ready' || !getDiagram || snapshot?.model !== model) throw new Error('Wait for the current diagram preview before exporting.');
-    return getDiagram(WIZARD_STEPS.length, chosenOpts);
+    return getDiagram(WIZARD_STEPS.length, REVIEW_DIAGRAM_OPTIONS);
   }
   // Flow traces drive the step-by-step hop list in the sidebar (the diagram reads
   // the same traces via buildGraph). Only meaningful in diagram-only mode.

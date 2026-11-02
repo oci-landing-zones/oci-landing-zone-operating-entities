@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { toDrawioXml } from './toDrawio';
 import { buildGraph } from '../diagram/buildGraph';
+import { hubKindDefaults } from '../services/hubKinds';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { DiagramModel, LzModel } from '../model/types';
@@ -11,12 +12,28 @@ import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('exports Hub C NLB icons and the translucent firewall backend bridge', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_c', ...hubKindDefaults('hub_c') };
+    const xml = toDrawioXml(buildGraph(model, 3));
+    expect(xml).toContain('Untrust NLB');
+    expect(xml).toContain('Trust NLB');
+    expect(xml).not.toContain('NLB + firewall backends');
+    expect(xml).toContain('id="hub-vcn-firewall-backends"');
+    expect(decodeURIComponent(xml)).toContain('<g opacity="0.45">');
+    expect(decodeURIComponent(xml)).toContain('Firewall 1</text>');
+    expect(decodeURIComponent(xml)).toContain('Firewall 2</text>');
+    expect(decodeURIComponent(xml)).not.toContain('>vNIC1</text>');
+    expect(decodeURIComponent(xml)).not.toContain('>vNIC2</text>');
+  });
+
   it('exports a full-width superseded note and the implicit route styling', () => {
     const xml = toDrawioXml({ nodes: [{ id: 'rt', kind: 'routetable', label: 'VCN routes',
       x: 0, y: 0, width: 310, height: 73,
       rtRows: [{ destination: '10.0.0.0/16', targetType: 'Local', target: 'Local VCN', routeType: 'Implicit', superseded: true }],
     }], edges: [] });
     expect(xml).toContain('(fully superseded)');
+    expect(xml.match(/id="rt"[^>]+/)?.[0]).toContain('shadow=1;');
     expect(xml).toContain('colspan=&quot;4&quot;');
     expect(xml).toContain('font-style:italic');
     expect(xml).not.toContain('(partially covered)');

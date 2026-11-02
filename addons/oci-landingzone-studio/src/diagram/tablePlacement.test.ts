@@ -198,6 +198,56 @@ it('aligns hub subnet cards in one right-hand column', () => {
   expect(placed.filter((node) => node.kind === 'routetable').map((node) => node.x)).toEqual([766, 766]);
 });
 
+it('compacts environment cards upward and adds right columns instead of spilling into the next environment', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1500, height: 1000 },
+    { id: 'prod', kind: 'compartment', label: 'Prod', parentId: 'landingzone', x: 400, y: 100, width: 400, height: 300 },
+    { id: 'preprod', kind: 'compartment', label: 'Preprod', parentId: 'landingzone', x: 400, y: 420, width: 400, height: 400 },
+    { id: 'network', kind: 'compartment', label: 'Network', parentId: 'prod', x: 10, y: 40, width: 320, height: 240 },
+    { id: 'vcn', kind: 'vcn', label: 'VCN', parentId: 'network', x: 10, y: 40, width: 300, height: 180 },
+    ...[0, 1, 2].flatMap((i): DiagramNode[] => [
+      { id: `subnet-${i}`, kind: 'subnet', label: 'Subnet', parentId: 'vcn', x: 20, y: 60 + i * 30, width: 260, height: 20 },
+      { id: `dot-${i}`, kind: 'rtdot', rtDotOwnerId: `subnet-${i}`, label: '', x: 696, y: 250 + i * 30, width: 8, height: 8 },
+      { id: `card-${i}`, kind: 'routetable', rtLayoutRole: 'spoke', label: 'Routes', parentId: 'landingzone', x: 1000, y: 500 + i * 120, width: 200, height: 100 },
+    ]),
+  ];
+  const edges: DiagramEdge[] = [0, 1, 2].map((i) => ({ id: `leader-${i}`, source: `dot-${i}`, target: `card-${i}`, points: [{ x: 700, y: 254 + i * 30 }, { x: 1000, y: 500 + i * 120 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 1000, 1250]);
+  const cards = placed.filter((node) => node.kind === 'routetable');
+  for (const card of cards) {
+    expect(card.y).toBeGreaterThanOrEqual(156);
+    expect(card.y + card.height).toBeLessThanOrEqual(384);
+  }
+  expect(new Set(cards.map((card) => card.x)).size).toBeGreaterThan(1);
+  expect(cards[0].x).toBe(cards[1].x);
+  expect(cards[0].y + cards[0].height + 12).toBeLessThanOrEqual(cards[1].y);
+});
+
+it('centers the OKE stack beside its own VCN independently of the projects route card', () => {
+  const nodes: DiagramNode[] = [
+    { id: 'landingzone', kind: 'landingzone', label: 'LZ', x: 0, y: 0, width: 1500, height: 1300 },
+    { id: 'prod', kind: 'compartment', label: 'Prod', parentId: 'landingzone', x: 400, y: 100, width: 400, height: 1100 },
+    { id: 'network', kind: 'compartment', label: 'Network', parentId: 'prod', x: 10, y: 40, width: 320, height: 1000 },
+    { id: 'projects-vcn', kind: 'vcn', label: 'Projects', parentId: 'network', x: 10, y: 40, width: 300, height: 300 },
+    { id: 'oke-vcn', kind: 'vcn', label: 'OKE', parentId: 'network', x: 10, y: 540, width: 300, height: 400 },
+    ...[0, 1, 2].flatMap((i): DiagramNode[] => [
+      { id: `subnet-${i}`, kind: 'subnet', label: 'Subnet', parentId: i ? 'oke-vcn' : 'projects-vcn', x: 20, y: 100 + i * 40, width: 260, height: 30 },
+      { id: `dot-${i}`, kind: 'rtdot', rtDotOwnerId: `subnet-${i}`, label: '', x: 696, y: i ? 800 + i * 60 : 300, width: 8, height: 8 },
+      { id: `card-${i}`, kind: 'routetable', rtLayoutRole: 'spoke', label: 'Routes', parentId: 'landingzone', x: 1000, y: 300 + i * 120, width: 200, height: 100 },
+    ]),
+  ];
+  const edges: DiagramEdge[] = [0, 1, 2].map((i) => ({ id: `leader-${i}`, source: `dot-${i}`, target: `card-${i}`, points: [{ x: 700, y: i ? 804 + i * 60 : 304 }, { x: 1000, y: 300 + i * 120 }] }));
+  const placed = optimizeTablePlacement(nodes, edges, [100, 1000, 1250]);
+  const project = placed.find((node) => node.id === 'card-0')!;
+  const pods = placed.find((node) => node.id === 'card-1')!;
+  const workers = placed.find((node) => node.id === 'card-2')!;
+  // OKE VCN absolute top is 680 and its center is 880.
+  expect((pods.y + workers.y + workers.height) / 2).toBe(880);
+  expect(pods.y - project.y - project.height).toBeGreaterThan(100);
+  expect(pods.x).toBe(workers.x);
+  expect(pods.y + pods.height + 12).toBe(workers.y);
+});
+
 it('permits a direct resource crossing and removes it by moving only the table', () => {
   const nodes: DiagramNode[] = [
     { id: 'owner', kind: 'gateway', label: '', x: 0, y: 0, width: 40, height: 40 },

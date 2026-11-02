@@ -70,13 +70,23 @@ describe('flow playback timeline', () => {
     expect(flowHopMarkers(edge)).toEqual([]);
   });
 
-  it.each([[100, 1750], [1000, 1000 / 240 * 1000], [10000, 6000]])(
+  it.each([[100, 1750], [1000, 1000 / 240 * 1000], [10000, 10000 / 240 * 1000]])(
     'moves along a %i-unit path in %i ms, excluding hop pauses', (distance, duration) => {
       const playback = createFlowPlayback({ id: 'travel', source: 'a', target: 'b', points: [{ x: 0, y: 0 }, { x: distance, y: 0 }] });
       expect(playback.travelMsPerUnit * distance).toBeCloseTo(duration);
       expect(sampleFlowPlayback(playback, duration / 2).distance).toBeCloseTo(distance / 2);
     },
   );
+
+  it('keeps Internet ingress, egress and OCI Services at the same speed on long paths', () => {
+    const playbacks = [
+      ['flow-prod:egress#0', 10000], ['flow-prod:ingress#0', 8000], ['flow-prod:services#0', 2000],
+    ].map(([id, distance]) => createFlowPlayback({ id: String(id), source: 'a', target: 'b', points: [{ x: 0, y: 0 }, { x: Number(distance), y: 0 }] }));
+    for (const playback of playbacks) {
+      expect(playback.travelMsPerUnit).toBeCloseTo(1000 / 240);
+      expect(sampleFlowPlayback(playback, 1000).distance).toBeCloseTo(240);
+    }
+  });
 
   it('holds every numbered routing hop for 960 ms and each other numbered stop for 360 ms', () => {
     const playback = createFlowPlayback(hairpin);

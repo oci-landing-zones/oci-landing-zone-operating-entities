@@ -32,6 +32,29 @@ describe('shared diagram display geometry', () => {
     }
   });
 
+  it('joins db and infra egress to the VCN attachment without reversing at the border', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 5, { showFlows: true, showEndpoints: true,
+      activeFlows: ['prod:egress:db', 'prod:egress:infra', 'preprod:egress:db', 'preprod:egress:infra'] }, undefined, await generatedRouteTables(model));
+    expect(graph.flowErrors).toBeUndefined();
+    const flows = graph.edges.filter((edge) => edge.waypoints);
+    expect(flows).toHaveLength(4);
+    for (const flow of flows) {
+      const envIndex = flow.id.includes('preprod') ? 1 : 0;
+      const physical = graph.edges.find((edge) => edge.id === `e-cmp-env-${envIndex}-vcn-attach-cmp-env-${envIndex}`)!.points!;
+      const [port] = physical;
+      const path = flow.points!;
+      const index = path.findIndex((point) => point.x === port.x && point.y === port.y);
+      expect(index, flow.id).toBe(-1);
+      const directJoin = path.findIndex((point, i) => i > 0 && i + 1 < path.length
+        && point.y === port.y && point.x < port.x
+        && path[i - 1].x === point.x && path[i - 1].y > point.y
+        && path[i + 1].y === point.y && path[i + 1].x < point.x);
+      expect(directJoin, flow.id).toBeGreaterThan(0);
+      expect(createFlowPlayback(flow).valid).toBe(true);
+    }
+  }, 30_000);
+
   it('keeps every flow on its canonical connection points for live and downloadable views', () => {
     const edges: DiagramEdge[] = ['prod:egress', 'preprod:egress', 'prod:ingress'].map((group) => ({
       id: `flow-${group}#0`, source: 'a', target: 'b', waypoints: ['a', 'b'], points: [{ x: 0, y: 0 }, { x: 100, y: 0 }],

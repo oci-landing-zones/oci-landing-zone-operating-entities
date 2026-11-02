@@ -55,7 +55,9 @@ export function optimizeTablePlacement(nodes: DiagramNode[], edges: DiagramEdge[
     const ports = edges.filter((edge) => !edge.waypoints && edge.target === id)
       .flatMap((edge) => edge.points?.slice(0, 1) ?? []);
     const centerY = ports.length ? ports.reduce((sum, port) => sum + port.y, 0) / ports.length : owner.y + owner.height / 2;
-    return { x: owner.x + owner.width + 40, y: centerY - table.height / 2 };
+    const network = rects.get(owner.node.parentId ?? '');
+    const environment = rects.get(network?.node.parentId ?? '');
+    return { x: owner.x + owner.width + 40, y: centerY - table.height / 2, environment, vcn: owner };
 
   };
   const ownerGap = 66;
@@ -141,10 +143,13 @@ export function optimizeTablePlacement(nodes: DiagramNode[], edges: DiagramEdge[
         return startsInside && owner?.node.kind !== 'vcn' || !tableLineEntersBox(source, entry, vcn);
       });
     });
-  const canPlace = (candidate: Box, ignore = new Set([candidate.id])) => {
+  const canPlace = (candidate: Box, ignore = new Set([candidate.id]), extendRight = false) => {
     const table = rects.get(candidate.id)!.node, bounds = boundsFor(table);
-    return leaderClearsVcns(candidate) && columnsFor(candidate.id).includes(candidate.x) && candidate.x >= bounds.x && candidate.y >= bounds.y
-      && candidate.x + candidate.width <= bounds.right && candidate.y + candidate.height <= bounds.bottom
+    const environment = spokePosition(candidate.id)?.environment;
+    const insideEnvironment = !environment || candidate.y >= environment.y + 56
+      && candidate.y + candidate.height <= environment.y + environment.height - 16;
+    return insideEnvironment && leaderClearsVcns(candidate) && columnsFor(candidate.id).includes(candidate.x) && candidate.x >= bounds.x && candidate.y >= bounds.y
+      && (extendRight || candidate.x + candidate.width <= bounds.right) && candidate.y + candidate.height <= bounds.bottom
       && ![...boxes, ...[...positions.values()].filter((box) => !ignore.has(box.id))].some((box) => overlaps(candidate, box))
       && !physical.some(({ a, b }) => tableLineEntersBox(a, b, candidate));
   };
@@ -280,22 +285,55 @@ export function optimizeTablePlacement(nodes: DiagramNode[], edges: DiagramEdge[
   const spokeCards = tables.filter((table) => table.rtLayoutRole === 'spoke')
     .sort((a, b) => (spokePosition(a.id)?.y ?? 0) - (spokePosition(b.id)?.y ?? 0) || a.id.localeCompare(b.id));
   const pendingSpokeCards = new Set(spokeCards.map((table) => table.id));
-  const spokeColumnBottom = new Map<number, number>();
+  const groups = new Map<string, DiagramNode[]>();
   for (const table of spokeCards) {
     const desired = spokePosition(table.id);
-    if (!desired) { pendingSpokeCards.delete(table.id); continue; }
-    const current = positions.get(table.id)!;
-    const minimumY = spokeColumnBottom.get(desired.x) ?? -Infinity;
-    // Project and OKE cards share the VCN-side column, near their owner rows.
-    // Keep that alignment by moving vertically when a title or card obstructs it.
-    const offsets = [0, ...Array.from({ length: 50 }, (_, i) => [(i + 1) * 12, -(i + 1) * 12]).flat()];
-    for (const offset of offsets) {
-      const candidate = { ...current, x: desired.x, y: Math.max(minimumY, desired.y + offset) };
-      if (canPlace(candidate, pendingSpokeCards)) { positions.set(table.id, candidate); break; }
+    if (!desired?.environment) { pendingSpokeCards.delete(table.id); continue; }
+    const key = `${desired.environment.id}:${desired.vcn.id}:${desired.x}`;
+    groups.set(key, [...(groups.get(key) ?? []), table]);
+  }
+  for (const cards of groups.values()) {
+    const first = spokePosition(cards[0].id)!;
+    const environment = first.environment!;
+    const top = environment.y + 56, bottom = environment.y + environment.height - 16;
+    let remaining = [...cards], x = first.x;
+    while (remaining.length) {
+      let packed = false;
+      for (let count = remaining.length; count > 0 && !packed; count--) {
+        const batch = remaining.slice(0, count);
+        const height = batch.reduce((sum, table) => sum + table.height + 12, -12);
+        if (height > bottom - top) continue;
+        const ownerAlignedY = batch.length > 1
+          ? first.vcn.y + (first.vcn.height - height) / 2
+          : spokePosition(batch[0].id)!.y;
+        const preferred = Math.max(top, Math.min(bottom - height, ownerAlignedY));
+        const starts = [...new Set([preferred, top, bottom - height,
+          ...Array.from({ length: Math.ceil((bottom - top - height) / 12) + 1 }, (_, i) => top + i * 12)])]
+          .filter((y) => y >= top && y + height <= bottom)
+          .sort((a, b) => Math.abs(a - preferred) - Math.abs(b - preferred) || a - b);
+        for (const table of batch) {
+          const lanes = columnsFor(table.id);
+          if (!lanes.includes(x)) lanes.push(x);
+        }
+        for (const start of starts) {
+          let y = start;
+          const candidates = batch.map((table) => {
+            const candidate = { ...positions.get(table.id)!, x, y };
+            y += table.height + 12;
+            return candidate;
+          });
+          if (!candidates.every((candidate) => canPlace(candidate, pendingSpokeCards, true))) continue;
+          for (const candidate of candidates) { positions.set(candidate.id, candidate); pendingSpokeCards.delete(candidate.id); }
+          remaining = remaining.slice(count);
+          packed = true;
+          break;
+        }
+      }
+      // A new right-hand column stays beside this environment, never in the next.
+      x = Math.max(x + Math.max(...cards.map((table) => table.width)) + 24,
+        packed ? -Infinity : global.right + 24);
+      if (!packed && remaining[0].height > bottom - top) break;
     }
-    pendingSpokeCards.delete(table.id);
-    const placed = positions.get(table.id)!;
-    spokeColumnBottom.set(placed.x, Math.max(spokeColumnBottom.get(placed.x) ?? -Infinity, placed.y + placed.height + 12));
   }
   for (const table of tables.filter((table) => table.rtLayoutRole === 'spoke-drg')) {
     const drg = rects.get('drg');

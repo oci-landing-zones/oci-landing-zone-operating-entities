@@ -34,9 +34,9 @@ import { SHIELD_SVG } from './shieldSvg';
 import FlowOverlay, { type FlowFocus } from './FlowOverlay';
 import type { ActiveRouteRule } from './flowPlayback';
 import { ROUTE_TABLE_SVG } from './routeTableSvg';
-import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from './icons';
+import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, NLB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from './icons';
 
-const ICONS: Record<string, string> = { igw: IGW_SVG, natgw: NATGW_SVG, sgw: SGW_SVG, firewall: FIREWALL_SVG, lb: LB_SVG };
+const ICONS: Record<string, string> = { igw: IGW_SVG, natgw: NATGW_SVG, sgw: SGW_SVG, firewall: FIREWALL_SVG, lb: LB_SVG, nlb: NLB_SVG };
 
 /** Invisible connection point — floating edges compute their own endpoints. */
 const hiddenHandle: React.CSSProperties = { opacity: 0, width: 1, height: 1, minWidth: 0, minHeight: 0, border: 'none', background: 'transparent', pointerEvents: 'none' };
@@ -52,6 +52,7 @@ import { absoluteNodeRects, diagramBounds } from './flowGeometry';
 import { resourceGroupSvg } from './resourceGroups';
 import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
+import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBackends';
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from './layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
 import { hybridTopologySvg } from './hybridTopology';
@@ -136,8 +137,8 @@ function SubnetNode({ data }: NodeProps) {
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
       {/* Public (IGW-routed) subnet badge — the LB / DMZ front-ends face the internet. */}
       {d.publicSubnet && (
-        <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: oracle.cidrBlue, borderRadius: 8, lineHeight: 1.5 }}>
-          PUBLIC
+        <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: CAPTION_COLORS.green, borderRadius: 8, lineHeight: 1.5 }}>
+          Public
         </span>
       )}
       <span style={{ color: d.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName, fontWeight: 700 }}>{name}</span>
@@ -187,7 +188,7 @@ function GatewayNode({ data }: NodeProps) {
  * the bottom-right corner. Hidden handles let the routing edges attach.
  */
 function VcnNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; width?: number; firewallBackendBridgeY?: number; firewallBackendUpperArm?: number; firewallBackendLowerArm?: number };
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', padding: '7px 10px', boxSizing: 'border-box', fontSize: 13, fontWeight: 700, color: oracle.vcnBorder, whiteSpace: 'pre-line', lineHeight: 1.3 }}>
       {d.label}
@@ -260,7 +261,7 @@ function RouteTableNode({ id, data }: NodeProps) {
   const toggleRt = useContext(RtContext);
   const cellColor = (j: number) => (j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660');
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#fff', border: `${m.border}px solid ${color}`, boxSizing: 'border-box', fontFamily: m.fontFamily, overflow: 'hidden' }}>
+    <div className={`route-table-card${hl.size ? ' route-table-card--active' : ''}`} style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#fff', border: `${m.border}px solid ${color}`, boxSizing: 'border-box', fontFamily: m.fontFamily, overflow: 'visible' }}>
       <Handle type="target" position={Position.Right} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <div style={{ ...section, height: layout.titleHeight, background: color, color: '#fff', fontWeight: 800, fontSize: m.titleSize, lineHeight: `${m.titleLine}px`, padding: `${m.titlePadding}px ${m.paddingX}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
@@ -272,13 +273,16 @@ function RouteTableNode({ id, data }: NodeProps) {
         {layout.headerLines.map((lines, i) => <span key={i} style={{ whiteSpace: 'pre' }}>{lines.join('\n')}</span>)}
       </div>
       {(d.rtRows ?? []).map((row, i) => (
-        <div key={row.id ?? i} style={{ ...section, height: layout.rowHeights[i], fontSize: m.rowSize, lineHeight: `${m.rowLine}px`, padding: `${m.rowPadding}px ${m.paddingX}px`, background: row.id && hl.has(row.id) ? '#fff3c4' : row.routeType === 'Implicit' ? '#f5f4f2' : 'transparent', fontStyle: row.routeType === 'Implicit' ? 'italic' : undefined }}>
+        <div key={row.id ?? i} className={`route-table-rule${row.id && hl.has(row.id) ? ' route-table-rule--active' : ''}`} style={{ ...section, height: layout.rowHeights[i], fontSize: m.rowSize, lineHeight: `${m.rowLine}px`, padding: `${m.rowPadding}px ${m.paddingX}px`, background: row.id && hl.has(row.id) ? '#e8f4db' : row.routeType === 'Implicit' ? '#f5f4f2' : '#fff', fontStyle: row.routeType === 'Implicit' ? 'italic' : undefined }}>
           <div style={{ display: 'grid', gridTemplateColumns, gap: m.gap }}>
             {cellsOf(row).map((c, j) => (
               <span key={j} title={c} style={{ color: row.superseded ? oracle.textMuted : cellColor(j), fontWeight: j === 2 ? 700 : 500, fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
             ))}
           </div>
           {layout.rowNotes[i] && <div style={{ color: oracle.textMuted }}>{layout.rowNotes[i]}</div>}
+          <div className="route-table-rule-magnifier" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${cellsOf(row).length}, max-content)` }}>
+            {cellsOf(row).map((cell, j) => <span key={j} style={{ fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined }}>{cell}</span>)}
+          </div>
         </div>
       ))}
     </div>
@@ -344,7 +348,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
+    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -461,6 +465,8 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   const [activeRules, setActiveRules] = useState<ActiveRouteRule[]>([]);
   const attachmentMarker = React.useId();
   const { nodes, edges } = useMemo(() => toReactFlow(diagram, rtLocked, attachmentMarker), [diagram, rtLocked, attachmentMarker]);
+  const backendBridges = useMemo(() => [...absoluteNodeRects(diagram.nodes).values()]
+    .filter((rect) => rect.node.kind === 'vcn' && rect.node.firewallBackendBridgeY != null), [diagram.nodes]);
   const { setViewport, getViewport, viewportInitialized } = useReactFlow();
   const [framed, setFramed] = useState(false);
   const container = useRef<HTMLDivElement>(null);
@@ -605,6 +611,12 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       proOptions={{ hideAttribution: true }}
     >
       <Background />
+      {backendBridges.length > 0 && <ViewportPortal>
+        {backendBridges.map((rect) => <div key={`${rect.id}-firewall-backends`} aria-label="Illustrative NLB firewall backends"
+          style={{ position: 'absolute', left: rect.x, top: rect.y + rect.node.firewallBackendBridgeY! - (rect.node.firewallBackendUpperArm ?? 0), width: rect.width,
+            height: FIREWALL_BACKEND_GAP + (rect.node.firewallBackendUpperArm ?? 0) + (rect.node.firewallBackendLowerArm ?? 0), pointerEvents: 'none', zIndex: 1200, lineHeight: 0 }}
+          dangerouslySetInnerHTML={{ __html: firewallBackendBridgeSvg(rect.width, rect.node.firewallBackendUpperArm, rect.node.firewallBackendLowerArm) }} />)}
+      </ViewportPortal>}
       {flowEdges.length > 0 && (
         <ViewportPortal>
           <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={modelBounds.width} height={modelBounds.height} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}

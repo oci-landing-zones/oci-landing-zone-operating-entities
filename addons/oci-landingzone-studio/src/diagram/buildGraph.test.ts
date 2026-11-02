@@ -118,6 +118,23 @@ describe('generator-aligned graph', () => {
     expect(graph.edges.some((edge) => edge.source === 'hybrid-cpe-unused' || edge.target === 'hybrid-cpe-unused')).toBe(false);
   });
 
+  it('shows Hub C NLBs with illustrative firewall backends between untrust and trust', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_c', ...hubKindDefaults('hub_c') };
+    const graph = buildGraph(model, 3);
+    const untrust = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-untrust\n'))!;
+    const trust = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-trust\n'))!;
+    const vcn = graph.nodes.find((node) => node.id === 'hub-vcn')!;
+    expect(untrust).toMatchObject({ icon: 'nlb', caption: 'Untrust NLB', publicSubnet: true });
+    expect(trust).toMatchObject({ icon: 'nlb', caption: 'Trust NLB' });
+    expect(vcn.firewallBackendBridgeY).toBe(untrust.y + untrust.height);
+    expect(vcn.firewallBackendBridgeY! - vcn.firewallBackendUpperArm!).toBe(untrust.y + untrust.height - 22);
+    expect(vcn.firewallBackendBridgeY! + 72 + vcn.firewallBackendLowerArm!).toBe(trust.y + trust.height - 12);
+    expect(trust.y - untrust.y - untrust.height).toBe(72);
+    expect(graph.nodes.some((node) => node.icon === 'firewall')).toBe(false);
+    expect(buildGraph(emptyLzModel(), 3).nodes.find((node) => node.id === 'hub-vcn')?.firewallBackendBridgeY).toBeUndefined();
+  });
+
   it('uses the normalized custom region key for VCN names and firewall captions', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = ' FR2 ';

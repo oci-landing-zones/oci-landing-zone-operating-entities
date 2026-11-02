@@ -323,6 +323,34 @@ export function routeStructuralEdges(nodes: DiagramNode[], edges: DiagramEdge[])
   return edges.map((edge) => byId.get(edge.id) ?? edge);
 }
 
+/** Join an outbound local leg where it first meets the connection's straight
+ * departure segment; the VCN border itself is not a packet-processing hop. */
+function joinOutboundPath(local: Point[], connection: Point[], rects: Map<string, FlowRect>, excluded: string[]): Point[] {
+  if (connection.length < 2) return [...local, ...connection];
+  const first = connection[0];
+  const horizontal = connection[1].y === first.y;
+  let end = 1;
+  while (end + 1 < connection.length && (horizontal ? connection[end + 1].y === first.y : connection[end + 1].x === first.x)) end++;
+  const last = connection[end];
+  const low = Math.min(horizontal ? first.x : first.y, horizontal ? last.x : last.y);
+  const high = Math.max(horizontal ? first.x : first.y, horizontal ? last.x : last.y);
+  for (let i = 1; i < local.length; i++) {
+    const a = local[i - 1], b = local[i];
+    let crossing: Point | undefined;
+    if (horizontal && a.x === b.x && (first.y - a.y) * (b.y - a.y) >= 0) crossing = { x: a.x, y: first.y };
+    if (!horizontal && a.y === b.y && (first.x - a.x) * (b.x - a.x) >= 0) crossing = { x: first.x, y: a.y };
+    if (horizontal && a.y === first.y && b.y === first.y && Math.max(a.x, b.x) >= low && Math.min(a.x, b.x) <= high) crossing = { x: Math.max(low, Math.min(high, a.x)), y: first.y };
+    if (!horizontal && a.x === first.x && b.x === first.x && Math.max(a.y, b.y) >= low && Math.min(a.y, b.y) <= high) crossing = { x: first.x, y: Math.max(low, Math.min(high, a.y)) };
+    if (crossing) {
+      const coordinate = horizontal ? crossing.x : crossing.y;
+      if (coordinate >= low && coordinate <= high && clearRoutingSegment(rects, a, crossing, excluded, 0)) {
+        return [...local.slice(0, i), crossing, ...connection.slice(end)];
+      }
+    }
+  }
+  return [...local, ...connection];
+}
+
 export interface FlowVisitAnchor {
   point: Point;
   owner: string;
@@ -415,9 +443,13 @@ export function connectionFlowGeometry(nodes: DiagramNode[], connections: Diagra
       const { connection, outbound, inbound, entryOwner } = legs[index - 1];
       if (connection?.length) {
         const first = connection[0], last = connection.at(-1)!;
-        if (outbound) append(routeLocal(start, first, [from, id], preferredX, { startOwner: portOwner(index - 1, 'exit') }));
-        else join(start, first);
-        append(connection);
+        if (outbound) {
+          const next = connection.find((point) => point.x !== first.x || point.y !== first.y) ?? first;
+          const endDirection = { x: Math.sign(next.x - first.x), y: Math.sign(next.y - first.y) };
+          const local = routeLocal(start, first, [from, id], preferredX, { startOwner: portOwner(index - 1, 'exit'), endDirection });
+          append(joinOutboundPath(local, connection, rects, [from, id]));
+        }
+        else { join(start, first); append(connection); }
         const previousEvent = hopAnchors?.get(index - 1);
         if (previousEvent && previousEvent.owner !== from && previousEvent.owner === entryOwner) {
           append(routeLocal(last, previousEvent.point, [from, id, previousEvent.owner], preferredX));

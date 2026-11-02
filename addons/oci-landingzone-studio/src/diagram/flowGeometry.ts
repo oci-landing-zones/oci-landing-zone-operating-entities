@@ -332,7 +332,7 @@ export function clearRoutingSegment(rects: Map<string, FlowRect>, start: FlowPoi
 
 /** Route a local resource leg to a canonical connection port without moving that port. */
 export function routeBetweenPoints(nodes: DiagramNode[], start: FlowPoint, end: FlowPoint, excludedIds: string[], preferredX?: number,
-  ports?: { startOwner?: string; endOwner?: string }): FlowPoint[] {
+  ports?: { startOwner?: string; endOwner?: string; endDirection?: FlowPoint }): FlowPoint[] {
   const rects = absoluteNodeRects(nodes);
   const excluded = routingExclusions(rects, excludedIds);
   const outside = (point: FlowPoint, ownerId?: string): FlowPoint => {
@@ -346,18 +346,22 @@ export function routeBetweenPoints(nodes: DiagramNode[], start: FlowPoint, end: 
       ? { x: dx < 0 ? owner.x - CLEARANCE : owner.x + owner.width + CLEARANCE, y: point.y }
       : { x: point.x, y: dy < 0 ? owner.y - CLEARANCE : owner.y + owner.height + CLEARANCE };
   };
-  const from = outside(start, ports?.startOwner), to = outside(end, ports?.endOwner);
+  const from = outside(start, ports?.startOwner);
+  const outsideEnd = outside(end, ports?.endOwner);
+  const direction = ports?.endDirection;
+  const to = direction ? { x: outsideEnd.x - direction.x * 12, y: outsideEnd.y - direction.y * 12 } : outsideEnd;
   const obstacles = routingObstacles(rects, excluded);
-  return compact([start, ...routePair(from, to, obstacles, preferredX), end]);
+  return compact([start, ...routePair(from, to, obstacles, preferredX, [], false, undefined, undefined,
+    direction ? { start: { x: 0, y: 0 }, end: direction } : undefined), outsideEnd, end]);
 }
 
 /** Reuse local joins only while this graph's node geometry is fixed. */
 export function createLocalFlowRouter(nodes: DiagramNode[]) {
   const paths = new Map<string, FlowPoint[]>();
   return (start: FlowPoint, end: FlowPoint, excludedIds: string[], preferredX?: number,
-    ports?: { startOwner?: string; endOwner?: string }): FlowPoint[] => {
+    ports?: { startOwner?: string; endOwner?: string; endDirection?: FlowPoint }): FlowPoint[] => {
     const coordinates = [start.x, start.y, end.x, end.y, preferredX].map((value) => Object.is(value, -0) ? '-0' : String(value));
-    const key = JSON.stringify([coordinates, excludedIds, ports?.startOwner, ports?.endOwner]);
+    const key = JSON.stringify([coordinates, excludedIds, ports?.startOwner, ports?.endOwner, ports?.endDirection]);
     const cached = paths.get(key);
     if (cached) return cached.map((point) => ({ ...point }));
     const path = routeBetweenPoints(nodes, start, end, excludedIds, preferredX, ports);

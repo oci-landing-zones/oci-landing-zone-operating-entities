@@ -18,6 +18,7 @@ import { routeTableLayout } from './routeTableLayout';
 import { attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionLayout, minimumOwnerWidths } from './layoutPolicy';
 import { premisesLayout, fastConnectHeight, FASTCONNECT_LINE_Y, HYBRID_LINK_WIDTH, HYBRID_REGION_GAP, VPN_PAIR_PITCH, VPN_TUNNEL_HEIGHT } from './hybridTopology';
 import { providerServicesForRegion } from '../services/connectivityCatalog';
+import { FIREWALL_BACKEND_GAP } from './firewallBackends';
 import { optimizeTablePlacement, tableAssociations } from './tablePlacement';
 
 /**
@@ -111,6 +112,7 @@ const RT_RIGHT_W = RT_W + RT_GAP + PAD; // reserved right margin (spoke tables)
 interface SubnetSpec {
   name: string;
   cidr: string;
+  backendGapAfter?: number;
   icon?: DiagramNode['icon'];
   caption?: string;
   captionTone?: 'green' | 'orange';
@@ -142,7 +144,7 @@ function withEndpoint(sn: SubnetSpec, scope = ''): SubnetSpec {
 const vcnHeight = (subnets: SubnetSpec[]) =>
   VCN_TITLE +
   subnets.reduce((h, sn) => h + subnetHeight(sn), 0) +
-  (subnets.length > 1 ? (subnets.length - 1) * SUB_GAP : 0) +
+  subnets.slice(0, -1).reduce((sum, sn) => sum + (sn.backendGapAfter ?? SUB_GAP), 0) +
   VCN_PAD;
 const wrapHeight = (childHeight: number) => TITLE + PAD + childHeight + PAD;
 
@@ -263,7 +265,13 @@ function pushVcn(
       x: SUB_X, y: sy, width: SUB_W, height,
     });
     placed.push({ y: sy, height });
-    sy += height + SUB_GAP;
+    if (sn.backendGapAfter && subnets[i + 1]?.name.endsWith('-trust')) {
+      const vcn = nodes.find((node) => node.id === id)!;
+      vcn.firewallBackendBridgeY = sy + height;
+      vcn.firewallBackendUpperArm = 22;
+      vcn.firewallBackendLowerArm = Math.max(0, subnetHeight(subnets[i + 1]) - 12);
+    }
+    sy += height + (sn.backendGapAfter ?? SUB_GAP);
   });
   return placed;
 }
@@ -287,10 +295,10 @@ function decorateHubSubnet(name: string, cidr: string, regionTok: string): Subne
     return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-lz-hub`, captionTone: 'orange', ipNote: hostIpInSubnet(cidr, 10) };
   }
   if (name.endsWith('-untrust')) {
-    return { name, cidr, icon: 'firewall', caption: 'Untrust NLB + firewall backends', captionTone: 'green', isPublic: true };
+    return { name, cidr, icon: 'nlb', caption: 'Untrust NLB', captionTone: 'green', isPublic: true, backendGapAfter: FIREWALL_BACKEND_GAP };
   }
   if (name.endsWith('-trust')) {
-    return { name, cidr, icon: 'firewall', caption: 'Trust NLB + firewall backends', captionTone: 'orange' };
+    return { name, cidr, icon: 'nlb', caption: 'Trust NLB', captionTone: 'orange' };
   }
   return { name, cidr };
 }
