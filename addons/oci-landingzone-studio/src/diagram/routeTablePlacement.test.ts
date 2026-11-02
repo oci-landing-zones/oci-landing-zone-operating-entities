@@ -187,13 +187,14 @@ describe('content-sized attachment stacks', () => {
     }
   });
 
-  it('connects attachment endpoints to the visible DRG ring', () => {
+  it('connects attachment endpoints to the DRG square frame', () => {
     const graph = buildGraph(emptyLzModel(), 5);
     const drg = absoluteNodeRects(graph.nodes).get('drg')!;
     for (const edge of graph.edges.filter((edge) => edge.target === 'drg')) {
       const endpoint = edge.points!.at(-1)!;
-      const radius = Math.hypot((endpoint.x - drg.x) / drg.width - 0.5, (endpoint.y - drg.y) / drg.height - 0.5);
-      expect(radius, edge.id).toBeCloseTo(0.45, 8);
+      if (edge.targetSide === 'top') expect(endpoint.y, edge.id).toBe(drg.y);
+      else if (edge.targetSide === 'left') expect(endpoint.x, edge.id).toBe(drg.x);
+      else expect(endpoint.x, edge.id).toBe(drg.x + drg.width);
     }
   });
 

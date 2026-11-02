@@ -15,16 +15,6 @@ type Side = NonNullable<DiagramEdge['sourceSide']>;
 
 function borderPoint(rect: FlowRect, other: FlowRect, side?: Side, port = 0.5): Point & { side: Side } {
   const { x, y, width: w, height: h } = rect;
-  if (rect.node.kind === 'drg' && side) {
-    // The visible SVG ring has radius 18 in a 40-unit viewBox.
-    const fraction = Math.max(0.05, Math.min(0.95, port));
-    const offset = fraction - 0.5;
-    const reach = Math.sqrt(Math.max(0, 0.45 ** 2 - offset ** 2));
-    if (side === 'left' || side === 'right') {
-      return { x: x + w * (0.5 + (side === 'right' ? reach : -reach)), y: y + h * fraction, side };
-    }
-    return { x: x + w * fraction, y: y + h * (0.5 + (side === 'bottom' ? reach : -reach)), side };
-  }
   if (side === 'left') return { x, y: y + h * port, side };
   if (side === 'right') return { x: x + w, y: y + h * port, side };
   if (side === 'top') return { x: x + w * port, y, side };

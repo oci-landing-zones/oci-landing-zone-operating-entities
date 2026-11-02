@@ -203,7 +203,7 @@ function VcnNode({ data }: NodeProps) {
 }
 
 /**
- * DRG node: the teal glyph fills the (icon-sized) box so links meet its centre;
+ * DRG node: the rounded square frame fills the box so links meet its edges;
  * the "DRG" name is an overlay below that doesn't enlarge the connection box.
  */
 function DrgNode({ data }: NodeProps) {

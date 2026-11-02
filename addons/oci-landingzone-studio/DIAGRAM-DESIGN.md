@@ -10,7 +10,7 @@ The diagram presents the generated landing zone as a readable architecture drawi
 - Network views retain the hub, attachment and environment topology. Route-table lanes and connector channels reserve their own space. A height limit must never hide real networks, routes or generated resources.
 - Containers fit their actual child extents with consistent title space, padding and gaps. Repeated sibling cards do not overlap, and growth must not leave obsolete outer bounds or unnecessary empty tails.
 - Attachment pills fit the complete generated label using the shared font, weight and terminal padding in both canvas and export. The stack uses its longest actual label; cluster sizing includes the DRG caption and physical fan lanes. A fixed width or an ellipsis is not a substitute for reserved readable text bounds.
-- DRG captions are measured visible content below the glyph. Their bounds stay inside the compartment and remain obstacles to connector lines, including lines whose terminal belongs to that DRG. DRG connection ports sit on the visible circular ring, rather than the rectangular node boundary. The DRG glyph stays 48 pixels square and is centered beneath the hub VCN.
+- DRG captions are measured visible content below the glyph. Their bounds stay inside the compartment and remain obstacles to connector lines, including lines whose terminal belongs to that DRG. DRG connection ports sit on a white rounded square frame containing the smaller circular DRG glyph. The dotted frame provides straight-sided attachment anchors. The DRG glyph stays 48 pixels square and is centered beneath the hub VCN.
 
 ## Resource blocks and hierarchy
 

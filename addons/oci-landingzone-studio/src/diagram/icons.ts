@@ -105,9 +105,12 @@ const DRG_TEAL = '#2D5967';
 
 /**
  * Dynamic Routing Gateway (DRG): teal ring with a vertical double-arrow pointing
- * outward and two horizontal arrows pointing inward — the OCI DRG glyph.
+ * outward and two horizontal arrows pointing inward, inside a rounded square
+ * frame whose edges provide attachment ports.
  */
 export const DRG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <rect x="0" y="0" width="40" height="40" rx="6" fill="#ffffff" stroke="${DRG_TEAL}" stroke-width="1.2" stroke-dasharray="0.6 0.8"/>
+  <g transform="translate(20 20) scale(0.66) translate(-20 -20)">
   <circle cx="20" cy="20" r="18" fill="#ffffff" stroke="${DRG_TEAL}" stroke-width="2.8"/>
   <g stroke="${DRG_TEAL}" stroke-width="2.6" fill="${DRG_TEAL}">
     <line x1="20" y1="11.5" x2="20" y2="28.5"/>
@@ -117,6 +120,7 @@ export const DRG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 
     <polygon points="17.4,20 12,16.6 12,23.4" stroke="none"/>
     <line x1="33" y1="20" x2="27" y2="20"/>
     <polygon points="22.6,20 28,16.6 28,23.4" stroke="none"/>
+  </g>
   </g>
 </svg>`;
 
