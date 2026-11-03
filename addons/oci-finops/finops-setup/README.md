@@ -22,13 +22,12 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 |---|---|
 | [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
 | [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
-| [finops_governance.json](deployment/finops_governance.json) | Create the active `tagns-lz-cost-governance` namespace and its six defined tags at tenancy root, following One-OE naming. |
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
 | [finops_service_access.json](deployment/finops_service_access.json) | After provisioning, enable the ADB report-reading principal and tag-metadata access. Replace the compartment OCID placeholder before using this file. |
 
-Include `finops_governance.json` in the FinOps stack inputs. It defines the active namespace `tagns-lz-cost-governance` (`TAGNS-LZ-COST-GOVERNANCE-KEY`) and the tags `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`, with corresponding `TAG-LZ-...-KEY` identifiers. Each tag restricts assignments to its `valid_values` list, including the literal string `none`. The example values must be adapted to the customer's catalog. No tag defaults or automatic assignment to resources are configured; OCI cost-tracking flags are disabled. If the namespace already exists, reconcile its Terraform ownership before applying. For a combined stack, merge this namespace into the existing `tags_configuration.namespaces` map rather than supplying duplicate top-level configuration blocks.
+The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace and its six tags: `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`. Provision them through the One-OE [governance configuration](../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json) before deploying the FinOps addon. The addon reuses these tags; their definitions, allowed values, and tag defaults remain managed by One-OE.
 
-**FOCUS installer compatibility:** The tag catalog installer in `finops-focus-platform` must support the six tag names above, including `tag-lz-platform`. Versions that require `tag-lz-application` must be updated before installing the tag catalog; commit `ffe4956` alone does not establish compatibility with this renamed tag. The installer checks existing OCI tags and does not create them. Apply this governance configuration before running a compatible tag catalog installer.
+**FOCUS installer compatibility:** The tag catalog installer in `finops-focus-platform` must support the six tag names above, including `tag-lz-platform`. Versions that require `tag-lz-application` must be updated before installing the tag catalog; commit `ffe4956` alone does not establish compatibility with this renamed tag. The installer checks existing OCI tags and does not create them. Apply the One-OE governance configuration before running a compatible tag catalog installer.
 
 The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the Bastion in `cmp-finops`, targeting the FinOps VCN's infra subnet in `cmp-lz-network`. Both FinOps groups have session access only in `cmp-finops`.
 
@@ -47,7 +46,7 @@ Terraform creates the `nott-lz-finops` topic and its configured subscriptions. C
    ]
    ```
 
-2. Add `finops_observability.json` to the stack inputs while preserving existing IAM, network, and governance inputs. A separate stack must receive `CMP-FINOPS-KEY` through compartment dependencies. Apply the ADB dynamic group's `ONS_TOPIC_PUBLISH` grant from `finops_service_access.json` in `cmp-finops`; creating the topic alone does not authorize publishing.
+2. Add `finops_observability.json` to the stack inputs while preserving existing FinOps IAM and network inputs. A separate stack must receive `CMP-FINOPS-KEY` through compartment dependencies. Apply the ADB dynamic group's `ONS_TOPIC_PUBLISH` grant from `finops_service_access.json` in `cmp-finops`; creating the topic alone does not authorize publishing.
 3. Validate the configuration, review the Terraform plan for the expected topic and email subscriptions, then apply it. OCI sends a confirmation email to each configured recipient.
 4. Open the OCI confirmation email and confirm each subscription. Verify that its state is `ACTIVE` before continuing; Terraform creation alone does not confirm an email subscription. An empty `subscriptions` list creates only the topic and does not provide email delivery.
 5. Supply the deployed topic OCID when the FOCUS shared core installer requests it. To change recipients later, update the deployment configuration, review and apply a new Terraform plan, and confirm each new subscription.
@@ -156,6 +155,8 @@ In `DRGRD-FRA-LZ-HUB-KEY`, add an import statement for the new attachment. Use a
 For a single stack, move the FinOps attachment into the existing DRG's `drg_attachments` map, remove its `inject_into_existing_drgs` block, and use `drg_attachment_key: DRGATT-FRA-LZ-FINOPS-KEY` in this import statement. Preserve all existing routes and imports. Do not import FinOps directly into the spoke route table: that would bypass the hub inspection path. Add the required firewall policy rules for permitted FinOps traffic and verify both directions. The local service-gateway and same-VCN paths intentionally do not traverse the hub firewall.
 
 ### Validation and migration
+
+If an existing FinOps stack manages the cost-governance namespace or its tags, transfer their Terraform ownership to the One-OE stack before removing their definitions from the deployed FinOps inputs. Review both stacks' plans to ensure the existing namespace and tags are retained.
 
 Run the static IAM boundary regression checks from the repository root:
 
