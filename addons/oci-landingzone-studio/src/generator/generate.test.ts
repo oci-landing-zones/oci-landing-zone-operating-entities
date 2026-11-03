@@ -537,7 +537,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
   }, 60_000);
 
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps the %s hub load balancer alongside OKE', async (hubKind) => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('omits the %s example hub load balancer alongside OKE', async (hubKind) => {
     const base = emptyLzModel();
     const model: LzModel = {
       ...base,
@@ -550,7 +550,7 @@ describe('generator (go-jsonnet wasm)', () => {
     // The platform's per-environment VCN lands in the prod category.
     expect(body).toContain('10.0.80.0/20');
     const shared = JSON.parse(body).network_configuration.network_configuration_categories['0-shared'];
-    expect(Object.keys(shared.non_vcn_specific_gateways.l7_load_balancers)).toHaveLength(1);
+    expect(shared.non_vcn_specific_gateways.l7_load_balancers).toBeUndefined();
     // And OKE contributes its own extension artifacts alongside the core files.
     expect(Object.keys(out.files).some((f) => f.includes('oke'))).toBe(true);
   }, 60_000);

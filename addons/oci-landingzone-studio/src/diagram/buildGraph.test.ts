@@ -304,13 +304,13 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.filter((node) => node.icon === 'firewall')).toEqual([]);
   });
 
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps the %s hub load balancer when OKE is added', (hubKind) => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('omits the %s example hub load balancer when OKE is added', (hubKind) => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     model.platforms = [newPlatform('oke_simple', [], model.environments)];
     const graph = buildGraph(model, 4);
     const lbSubnet = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-lb\n'));
-    expect(lbSubnet?.icon).toBe('lb');
+    expect(lbSubnet?.icon).toBeUndefined();
     expect(lbSubnet?.publicSubnet).toBe(true);
   });
 

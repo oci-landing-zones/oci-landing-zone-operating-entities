@@ -176,15 +176,16 @@ describe('flowTrace generated routing inventory', () => {
     expect(roles[0].color).not.toBe(roles[1].color);
   });
 
-  it('drops disabled networks and removed roles while retaining ingress with OKE', async () => {
+  it('drops disabled networks, removed roles and example LB ingress with OKE', async () => {
     const model = emptyLzModel();
     model.environments[1].projectNetworkEnabled = false;
     expect(buildFlowTraces(model, ['prod>preprod:east-west:web', 'preprod:egress:web'], 'flow', await generatedRouteTables(model))).toEqual([]);
     expect(specFromId(model, 'prod:east-west', C)).toBeNull();
     expect(specFromId(model, 'prod:egress:removed', C)).toBeNull();
-    model.platforms = [newPlatform('oke_simple', [], model.environments)];
     expect(specFromId(model, 'prod:ingress:web', C)).toMatchObject({ kind: 'ingress', srcEnv: 0 });
-    expect(allFlowIds(model).some((id) => id.includes(':ingress'))).toBe(true);
+    model.platforms = [newPlatform('oke_simple', [], model.environments)];
+    expect(specFromId(model, 'prod:ingress:web', C)).toBeNull();
+    expect(allFlowIds(model).some((id) => id.includes(':ingress'))).toBe(false);
     model.environments[0].network.subnets = [];
     expect(allFlowIds(model)).toEqual([]);
   });

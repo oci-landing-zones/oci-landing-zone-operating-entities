@@ -10,7 +10,7 @@
     "preprod-platform-oke",
     "prod-platform-oke"
   ],
-  "hub_l7_load_balancers_present": true,
+  "hub_l7_load_balancers_present": false,
   "hub_lb_nsg_present": true,
   "hub_lb_subnet_present": true,
   "node_pool_compartment_ids": {

@@ -84,9 +84,11 @@ export function getHubKind(id: HubKind): HubKindDef | undefined {
   return HUB_KINDS.find((k) => k.id === id);
 }
 
-/** Hub load-balancer availability depends on its subnet, independently of platforms. */
+/** OKE supplies its own optional load balancers instead of the example hub LB. */
 export function hasHubLoadBalancer(model: LzModel): boolean {
-  return model.network.subnets.some((subnet) => subnet.name === 'lb');
+  return model.network.subnets.some((subnet) => subnet.name === 'lb')
+    && !model.platforms.some((platform) => platform.type === 'oke_simple'
+      && model.environments.some((env) => platform.environments === 'all' || platform.environments.includes(env.id)));
 }
 
 /** Default VCN CIDR + config-keyed subnets for a hub kind. */
