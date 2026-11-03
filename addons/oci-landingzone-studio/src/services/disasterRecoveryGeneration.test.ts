@@ -48,6 +48,11 @@ describe('DR file generation', () => {
     expect(files['DR/security_cis2.json']).not.toContain('cloud_guard_configuration');
     expect(files['DR/observability_cis2.json']).toContain('dr@example.com');
     expect(files['README.txt']).toContain('Home');
+    expect(files['Home/README.txt']).toContain('Home Region deployment');
+    expect(files['Home/README.txt']).toContain('save_output = true');
+    expect(files['DR/README.txt']).toContain('DR deployment');
+    expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
+    expect(files['DR/README.txt']).toContain('oci_dependency_objects');
   }, 30000);
 
   it('includes selected EXACS networks, edited subnets and matched RPC peer keys', async () => {

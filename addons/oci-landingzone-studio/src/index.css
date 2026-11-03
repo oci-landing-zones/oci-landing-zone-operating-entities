@@ -451,6 +451,19 @@ a:focus:not(:focus-visible) {
   font-weight: 800;
 }
 
+.deployment-guide code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 600;
+  color: #174d75;
+}
+
+.deployment-guide .required-setting-name,
+.deployment-guide .required-setting-value {
+  font-weight: inherit;
+}
+
 .guide-link {
   display: inline;
   padding: 1px 3px;

@@ -467,11 +467,11 @@ Create the physical group/ports first, complete cabling and activation, then add
 - The factory assigns tables to managed attachments. It does not change DRG-wide defaults for future attachments outside this configuration. ECMP is disabled; actual BGP advertisements and OCI route selection decide the active path.
 - VPN `shared_secret` accepts a literal key or existing secret OCID. Literal VPN keys use letters, digits and spaces. BGP MD5 keys are literal values only. There is no separate secrets file or automatic copy into the LZ Vault.
 - In Studio, entered keys are session-only and masked in previews; exports contain the actual values. Saved designs require key re-entry, and secret-bearing outputs are not cached.
-- Use the documented Terraform CLI deployment path with Orchestrator v2.2.0 / Networking v0.9.0. The pinned RMS facade has incompatible provider constraints. Existing secret references and physical connections must be ready before their connectivity apply.
+- Use the same pinned Orchestrator v2.2.0 `rms-facade` workflow as the rest of the landing zone, with Networking v0.9.0. Resource Manager with a private configuration source is the default; Terraform CLI with the facade's local file source remains an alternative. Follow the [Studio deployment workflow](../oci-landingzone-studio/README.md#4-review-and-deployment) for phase selection. Existing secret references and physical connections must be ready before their connectivity apply.
 
 **Manual post-deployment configuration required:** configure peer equipment and advertisements, complete carrier work, and permit approved traffic in firewall policy, NSGs and security lists. The customer owns those resources' lifecycle, drift management and compliance review.
 
-Follow the [customer guide](../oci-hybrid-connectivity/README.md) for Studio steps, generation, staged deployment, verification and the impact of unavailable prerequisites. Start from the [complete examples](../oci-hybrid-connectivity/examples/) for static VPN, BGP VPN, FastConnect with VPN backup, existing physical connections or physical preparation.
+Configure connections in [Landing Zone Studio](../oci-landingzone-studio/README.md) or add the fields above to your private Blueprint Factory source configuration. Review the generated file set and complete the peer and provider work before testing connectivity.
 
 ## References
 

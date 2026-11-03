@@ -109,7 +109,7 @@ Studio intentionally does not replace the Landing Zone framework contract. A res
 
 ## 4. Review and deployment
 
-The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration and the complete set of generated JSON artifacts for that snapshot. Review it in your normal architecture, network, security, and change-management processes.
+The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration, generated JSON artifacts and a `README.txt` with the matching deployment file lists. Review it in your normal architecture, network, security, and change-management processes. The design source `config.jsonnet`, README and diagram exports are not Terraform deployment inputs.
 
 Before deployment:
 
@@ -119,9 +119,18 @@ Before deployment:
 - Resolve every generated placeholder and follow the security and observability pre/final workflow.
 - Store source configuration and generated artifacts in a private, organization-controlled location.
 
-Use Terraform locally or from customer-controlled CI/CD where possible. If you use OCI Resource Manager, stage the artifacts in a private Object Storage bucket or approved private source repository controlled by your organization.
+Use OCI Resource Manager with the generated files in a private Object Storage bucket controlled by your organization. Terraform CLI and customer-controlled CI/CD remain alternatives over the same deployment phases.
 
-Studio's **Deploy to OCI** link opens the Create Stack page with the latest released Orchestrator and the private Object Storage configuration source prefilled. Set the working directory to `rms-facade`, provide the bucket and current phase's file values, and review the plan before applying.
+Review and the ZIP README follow the same execution order:
+
+1. **Prepare the files.** Unzip, review placeholders and upload the generated JSON files to your private bucket. Complete any Home or RPC acceptor prerequisites first.
+2. **Create and apply phase 1.** Studio's **Deploy to OCI** link opens Create Stack with Orchestrator **v2.2.0** and `configuration_source = "ocibucket"` prefilled. Select `rms-facade` as the working directory and enter `oci_configuration_bucket`. Set `oci_configuration_objects` to the listed phase 1 files: network and selected CIS security/observability `_pre` files, plus IAM and governance for Home. Set any applicable runtime dependency/output variables before creating the stack. Create without applying, then plan, review and apply.
+3. **Update and apply phase 2.** After phase 1 succeeds, edit the same stack's variables. Replace `oci_configuration_objects` with the listed phase 2 files, which replace `_pre` controls with final controls and add generated workload files. For Hub C, prepare the third-party firewalls first and upload the edited `network_backends.json`; use it instead of `network.json` for phase 2 and subsequent updates. Save the variables, then plan, review and apply in the same stack/state.
+4. **Complete external setup, when applicable.** Finish the selected router/provider or platform work described in the guide. Instructions appear only for options in that design.
+
+For DR, complete Home first with matching compartments and IAM, and set `save_output = true` on Home. Copy **both** `compartments_output.json` and `network_output.json` from its successful deployment to the private DR bucket and list both in `oci_dependency_objects` on the separate DR stack. Keep these runtime dependencies separate from configuration inputs; they are not included in the Studio ZIP. For CIS2, select the DR region in Home to prepare its Object Storage key grant.
+
+The CLI alternative uses the same pinned `rms-facade`: set `configuration_source = "file"` and supply absolute paths in `local_config_file_paths`, with runtime dependencies in `local_dependency_file_paths` when required. Supply the tenancy and region, initialize, save and review a plan, then apply that plan. Retain the same state when moving to phase 2. Review and the ZIP README include this sequence for customer-controlled CI/CD as well.
 
 For deployment details, use the [Terraform deployment guide](../../commons/content/terraform.md) or [OCI Resource Manager deployment guide](../../commons/content/orm.md).
 
@@ -133,7 +142,7 @@ Studio runs entirely in the browser. It does not request OCI credentials, deploy
 
 Use a browser profile controlled by the intended operator. Connectivity keys entered in masked inputs remain in memory for the current session; saved designs retain the authentication mode and require key re-entry after reload. Secret-bearing generated outputs are not cached in browser storage. Explicit downloads contain the keys in `config.jsonnet` and generated network files. Keep those files, Terraform state and raw outputs private. Studio does not automatically copy keys into the landing zone Vault.
 
-Configure [OCI Hybrid Connectivity](../oci-hybrid-connectivity/README.md) in the separate optional VPN and FastConnect sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. Use the documented Terraform CLI handoff: the pinned Orchestrator v2.2.0 RMS facade's OCI provider constraint conflicts with Networking v0.9.0. Provider service OCIDs and existing VPN secrets must be available before the connectivity apply.
+Configure [VPN and FastConnect](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#9-vpn-and-fastconnect) in the separate optional sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. These connections use the same deployment workflow above. Provider service OCIDs and existing VPN secrets must be available before the connectivity apply; router configuration and carrier activation remain external work.
 
 Studio displays a UPL license notice at the bottom of the dashboard. Your organization's architecture, security, compliance, and deployment approvals still apply.
 
