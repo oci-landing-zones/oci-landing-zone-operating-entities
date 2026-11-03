@@ -154,6 +154,7 @@ Update this diagram when any of these change:
   - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
+  - `gen/addons/oci-hybrid-connectivity/profiles.libsonnet`
   - `gen/addons/oci-x-rpc/profiles.libsonnet`
   - `gen/addons/oci-lz-dr/one-oe/profiles.libsonnet`
 - Published entrypoints must stay thin:
@@ -417,6 +418,8 @@ Config mode validates required fields during normalization. `config.environments
 - **Published ExaCS multi-stack exception**: its publication adapter still emits separate spoke-network pre/final files because the extension stack creates the VCN and the base stack creates its DRG attachment. See the [ExaCS multi-stack guide](../workload-extensions/exacs/multi-stack/readme.md).
 
 ## 11. Platform Topology Rules
+
+Hybrid connectivity is a top-level add-on, not a platform or workload extension. Its contract lives in `gen/addons/oci-hybrid-connectivity/AGENTS.md`. The composition combines its route entries/overlays with RPC before hub, spoke and platform integration. Both automatic VPN tunnel attachments and private FastConnect attachments receive custom ingress tables via Networking v0.9.0 selectors. Inline values pass through to network outputs; do not log them or introduce a separate secret-file workflow.
 
 - `topology.libsonnet` is the single source of truth for environment labels, DNS short codes, platform placement, and security-target eligibility.
 - `topology.libsonnet` owns both raw environment metadata and semantic ordering helpers such as preferred environment precedence.

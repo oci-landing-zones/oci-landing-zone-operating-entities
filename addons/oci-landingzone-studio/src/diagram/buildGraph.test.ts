@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
@@ -7,6 +7,7 @@ import type { Environment, LzModel } from '../model/types';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { buildFlowTraces } from '../services/flowTrace';
 import { absoluteNodeRects, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
+import { emptyHybridConnectivity, newVpn, vpnCpeNodeId } from '../services/hybridConnectivity';
 
 function env(name: string, securityZone: boolean, index: number): Environment {
   return { id: `environment-${index + 1}`, name, securityZone, network: envNetworkDefaults(index) };
@@ -35,6 +36,105 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('places VPN outside the OCI region for %s with only DRG port clearance inside the network compartment', (kind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: kind, ...hubKindDefaults(kind) };
+    const baseline = buildGraph(model, 2);
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    for (const [index, name] of ['office', 'backup'].entries()) {
+      hybrid.customer_premises_equipments[`router-${name}`] = { ip_address: `203.0.113.${10 + index}` };
+      hybrid.ipsecs[name] = { ...newVpn(`router-${name}`), remote_cidrs: ['172.20.0.0/16'] };
+    }
+    for (const step of [2, 5]) {
+      const graph = buildGraph(model, step);
+      const rects = absoluteNodeRects(graph.nodes);
+      const region = rects.get('region')!;
+      const vpns = ['office', 'backup'].map((name) => rects.get(`hybrid-cpe-router-${name}:premises`)!);
+      for (const [index, vpn] of vpns.entries()) {
+        expect(vpn.node.parentId).toBeUndefined();
+        expect(vpn.node.kind).toBe('premises');
+        expect(vpn.x + vpn.width).toBeLessThan(region.x);
+        const tunnels = graph.edges.filter((edge) => edge.source.startsWith(`hybrid-vpn-${['office', 'backup'][index]}:tunnel-`) && edge.target === 'drg');
+        expect(tunnels).toHaveLength(2);
+        expect(new Set(tunnels.map((edge) => edge.targetPort)).size).toBe(2);
+        expect(tunnels.every((edge) => edge.points!.length >= 2)).toBe(true);
+      }
+      expect(vpns[0].y + vpns[0].height).toBeLessThan(vpns[1].y);
+    }
+    const before = buildGraph(model, 2);
+    expect(before.nodes.find((node) => node.id === 'hub-vcn')!.height)
+      .toBe(baseline.nodes.find((node) => node.id === 'hub-vcn')!.height);
+    expect(before.nodes.find((node) => node.id === 'cmp-network')!.height - baseline.nodes.find((node) => node.id === 'cmp-network')!.height)
+      .toBe(before.nodes.find((node) => node.id === 'drg')!.height - baseline.nodes.find((node) => node.id === 'drg')!.height);
+    hybrid.ipsecs.office.remote_cidrs = Array.from({ length: 12 }, (_, index) => `172.${20 + index}.0.0/16`);
+    const widened = buildGraph(model, 2);
+    expect(widened.nodes).toHaveLength(before.nodes.length);
+    expect(widened.nodes.find((node) => node.id === 'hybrid-cpe-router-office:premises')!.height)
+      .toBeGreaterThan(before.nodes.find((node) => node.id === 'hybrid-cpe-router-office:premises')!.height);
+    expect(buildGraph(model, 1).nodes.some((node) => node.id.startsWith('hybrid-vpn-'))).toBe(false);
+    hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'] };
+    expect(buildGraph(model, 2).nodes.find((node) => node.id === 'hybrid-fc-primary')?.parentId).toBeUndefined();
+  });
+
+  it('draws every CPE once and connects each VPN pair to its selected physical equipment', () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments = {
+      east: { ip_address: '203.0.113.10' }, west: { ip_address: '203.0.113.20' }, spare: { ip_address: '203.0.113.30' },
+    };
+    hybrid.ipsecs.office = { ...newVpn('east'), remote_cidrs: ['172.20.0.0/16'] };
+    hybrid.ipsecs.backup = { ...newVpn('east'), remote_cidrs: ['172.21.0.0/16'] };
+    hybrid.ipsecs.branch = { ...newVpn('west'), remote_cidrs: ['172.22.0.0/16'] };
+    for (const [name, id] of [['existing_a', 'ocid1.cpe.oc1..existingone'], ['existing_b', 'ocid1.cpe.oc1..existingone'], ['existing_c', 'ocid1.cpe.oc1..existingtwo']]) {
+      hybrid.ipsecs[name] = { ...newVpn(''), cpe_key: undefined, cpe_id: id, remote_cidrs: ['172.23.0.0/16'] };
+    }
+    const graph = buildGraph(model, 2);
+    expect(graph.nodes.filter((node) => node.kind === 'vpn')).toHaveLength(5);
+    expect(graph.nodes.filter((node) => node.kind === 'vpntunnel')).toHaveLength(12);
+    expect(new Set(graph.nodes.map((node) => node.id)).size).toBe(graph.nodes.length);
+    for (const [name, config] of Object.entries(hybrid.ipsecs)) {
+      const cpe = vpnCpeNodeId(config);
+      for (const tunnel of [1, 2]) expect(graph.edges).toContainEqual(expect.objectContaining({ source: cpe, target: `hybrid-vpn-${name}:tunnel-${tunnel}` }));
+    }
+    expect(graph.edges.some((edge) => edge.source === 'hybrid-cpe-spare' || edge.target === 'hybrid-cpe-spare')).toBe(false);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-east:premises')?.premises?.cidrs).toEqual(['172.20.0.0/16', '172.21.0.0/16']);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-west:premises')?.premises?.equipmentAddress).toBe('203.0.113.20');
+    const rects = absoluteNodeRects(graph.nodes);
+    const east = rects.get('hybrid-cpe-east:premises')!;
+    for (const name of ['office', 'backup']) for (const tunnel of [1, 2]) {
+      const row = rects.get(`hybrid-vpn-${name}:tunnel-${tunnel}`)!;
+      expect(row.y).toBeGreaterThanOrEqual(east.y + 30);
+      expect(row.y + row.height).toBeLessThanOrEqual(east.y + east.height);
+    }
+  });
+
+  it('shows configured CPEs without inventing a VPN or DRG connection', () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.unused = { ip_address: '203.0.113.30' };
+    const graph = buildGraph(model, 2);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-unused')?.kind).toBe('vpn');
+    expect(graph.nodes.some((node) => node.kind === 'vpntunnel')).toBe(false);
+    expect(graph.edges.some((edge) => edge.source === 'hybrid-cpe-unused' || edge.target === 'hybrid-cpe-unused')).toBe(false);
+  });
+
+  it('shows Hub C NLBs with illustrative firewall backends between untrust and trust', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_c', ...hubKindDefaults('hub_c') };
+    const graph = buildGraph(model, 3);
+    const untrust = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-untrust\n'))!;
+    const trust = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-trust\n'))!;
+    const vcn = graph.nodes.find((node) => node.id === 'hub-vcn')!;
+    expect(untrust).toMatchObject({ icon: 'nlb', caption: 'Untrust NLB', publicSubnet: true });
+    expect(trust).toMatchObject({ icon: 'nlb', caption: 'Trust NLB' });
+    expect(vcn.firewallBackendBridgeY).toBe(untrust.y + untrust.height);
+    expect(vcn.firewallBackendBridgeY! - vcn.firewallBackendUpperArm!).toBe(untrust.y + untrust.height - 22);
+    expect(vcn.firewallBackendBridgeY! + 72 + vcn.firewallBackendLowerArm!).toBe(trust.y + trust.height - 12);
+    expect(trust.y - untrust.y - untrust.height).toBe(72);
+    expect(graph.nodes.some((node) => node.icon === 'firewall')).toBe(false);
+    expect(buildGraph(emptyLzModel(), 3).nodes.find((node) => node.id === 'hub-vcn')?.firewallBackendBridgeY).toBeUndefined();
+  });
+
   it('uses the normalized custom region key for VCN names and firewall captions', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = ' FR2 ';
@@ -204,13 +304,14 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.filter((node) => node.icon === 'firewall')).toEqual([]);
   });
 
-  it('does not invent a hub load balancer when OKE suppresses it in the generator', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('omits the %s example hub load balancer when OKE is added', (hubKind) => {
     const model = emptyLzModel();
-    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
     model.platforms = [newPlatform('oke_simple', [], model.environments)];
     const graph = buildGraph(model, 4);
-    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.icon).toBeUndefined();
-    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.publicSubnet).toBe(true);
+    const lbSubnet = graph.nodes.find((node) => node.kind === 'subnet' && node.label.includes('-hub-lb\n'));
+    expect(lbSubnet?.icon).toBeUndefined();
+    expect(lbSubnet?.publicSubnet).toBe(true);
   });
 
   it('places multiple shared compartments under platform and VCNs under network with attachments', () => {
@@ -255,23 +356,6 @@ describe('generator-aligned graph', () => {
     }
   });
 
-  it('nests every gateway inside its VCN', () => {
-    const base = emptyLzModel();
-    const graph = buildGraph({
-      ...base,
-      network: { hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
-      platforms: [newPlatform('custom', [])],
-      sharedPlatforms: [newSharedPlatform('custom', [])],
-    }, 4);
-    const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
-    const gateways = graph.nodes.filter((node) => node.kind === 'gateway');
-    expect(gateways.length).toBeGreaterThan(0);
-    for (const gateway of gateways) {
-      expect(nodes.get(gateway.parentId ?? '')?.kind, gateway.id).toBe('vcn');
-      expect(gateway.x + gateway.width / 2, `${gateway.id} icon centre`).toBe(0);
-    }
-  });
-
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps %s gateways on compact VCN boundaries with readable service labels', (kind) => {
     const model = emptyLzModel();
     model.network = { hubKind: kind, ...hubKindDefaults(kind) };
@@ -280,17 +364,19 @@ describe('generator-aligned graph', () => {
     const before = structuredClone(model);
     const graph = buildGraph(model, 4, { showEndpoints: true });
     const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+    expect(graph.nodes.some((node) => node.kind === 'gateway')).toBe(true);
     for (const gateway of graph.nodes.filter((node) => node.kind === 'gateway')) {
       const vcn = nodes.get(gateway.parentId!)!;
+      expect(vcn.kind, gateway.id).toBe('vcn');
       const network = nodes.get(vcn.parentId!)!;
       expect(gateway.x + gateway.width / 2, gateway.id).toBe(0);
-      expect(vcn.x).toBe(46);
-      expect(vcn.x + gateway.x, `${gateway.id} compartment inset`).toBeGreaterThanOrEqual(8);
+      expect(vcn.x).toBe((network.width - vcn.width) / 2);
+      expect(vcn.x + gateway.x + gateway.width / 2 - 17, `${gateway.id} icon inset`).toBeGreaterThanOrEqual(8);
       expect(vcn.x + vcn.width).toBeLessThanOrEqual(network.width);
       expect(gateway.label).toBe({ igw: 'Internet\nGateway', natgw: 'NAT\nGateway', sgw: 'Service\nGateway' }[gateway.icon as 'igw' | 'natgw' | 'sgw']);
       const subnets = graph.nodes.filter((node) => node.parentId === vcn.id && node.kind === 'subnet');
       subnets.forEach((subnet) => {
-        expect(subnet.x).toBeGreaterThanOrEqual(gateway.x + gateway.width + 8);
+        expect(subnet.x).toBe((vcn.width - subnet.width) / 2);
         expect(subnet.width).toBe(300);
         expect(vcn.width - subnet.x - subnet.width - 10).toBeGreaterThanOrEqual(6);
         expect(subnet.label.split('\n')).toHaveLength(2);
@@ -343,18 +429,6 @@ describe('generator-aligned graph', () => {
     expect(flow.points?.at(-1)).toEqual(flowAnchor(graph, 'gw-natgw'));
   });
 
-  it('keeps all shared route-table attachment points visible during a flow', async () => {
-    const model = emptyLzModel();
-    const tables = await generatedRouteTables(model);
-    const spokeTable = tables.find((table) => table.associations.some((association) => association.nodeId === 'attach-cmp-env-0' && association.kind === 'drg-attachment'))!;
-    const graph = buildGraph(model, 3, {
-      activeFlows: ['prod:egress:web'],
-      openTables: [spokeTable.id],
-    }, undefined, tables);
-    expect(graph.nodes.find((node) => node.id === spokeTable.id)).toBeDefined();
-    expect(graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === spokeTable.id)).toHaveLength(spokeTable.associations.length);
-  });
-
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)(
     'shows every %s route table, full rules, and all governed attachments in flow mode',
     async (kind) => {
@@ -368,7 +442,7 @@ describe('generator-aligned graph', () => {
       expect(tables.map((table) => table.id).sort()).toEqual(expected.map((table) => table.id).sort());
       for (const table of expected) {
         const node = tables.find((entry) => entry.id === table.id)!;
-        expect(node.rtRows, table.id).toEqual(table.rules.map(({ id, destination, targetType, target, routeType }) => ({ id, destination, targetType, target, routeType })));
+        expect(node.rtRows, table.id).toEqual(table.rules.map(({ id, destination, targetType, target, routeType, superseded }) => ({ id, destination, targetType, target, routeType, superseded })));
         expect(node.rtHighlight, table.id).toEqual(trace.highlights.find((entry) => entry.tableId === table.id)?.rows ?? []);
         const dots = graph.nodes.filter((entry) => entry.kind === 'rtdot' && entry.rtDotTableId === table.id);
         expect(dots, table.id).toHaveLength(table.associations.length);
@@ -479,6 +553,6 @@ describe('generator-aligned graph', () => {
 
     const drgEdges = graph.edges.filter((edge) => edge.target === 'drg' && edge.source.startsWith('attach-'));
     expect(drgEdges).toHaveLength(6);
-    expect(new Set(drgEdges.map((edge) => edge.targetPort)).size).toBe(drgEdges.length);
+    expect(new Set(drgEdges.map((edge) => `${edge.targetSide}:${edge.targetPort}`)).size).toBe(drgEdges.length);
   });
 });

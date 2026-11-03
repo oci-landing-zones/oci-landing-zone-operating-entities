@@ -1,12 +1,16 @@
 import type { LzModel } from '../model/types';
 import type { RouteRule, RouteTable } from './routeTables';
+import { routePriority } from './routeTables';
 import { hasHubLoadBalancer } from './hubKinds';
 import { contains, hostIpInSubnet, parseCidr } from './cidr';
 
-export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services';
+import { hybridRoutes, vpnCpeNodeId } from './hybridConnectivity';
+
+export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services' | 'hybrid-in' | 'hybrid-out';
 
 /** A resolved flow to trace. Subnet indices default to 0 (web). */
 export interface FlowSpec {
+  hybridId?: string;
   id: string;
   kind: FlowKind;
   color: string;
@@ -61,6 +65,8 @@ export const FLOW_KIND_COLORS: Record<FlowKind, string> = {
   services: '#1baf7a',
   'east-west': '#4a3aa7',
   ingress: '#d03f86',
+  'hybrid-in': '#d03f86',
+  'hybrid-out': '#2a78d6',
 };
 
 export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
@@ -68,6 +74,8 @@ export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
   ingress: 'Internet → Spoke',
   'east-west': 'Spoke → spoke',
   services: 'Spoke → OCI Services',
+  'hybrid-in': 'External network → Spoke',
+  'hybrid-out': 'Spoke → External network',
 };
 
 /**
@@ -86,6 +94,7 @@ export function allFlowIds(model: LzModel): string[] {
       ...(hasHubLoadBalancer(model) ? [pick(`${env.name}:ingress`)] : []),
       ...envs.filter((other) => other.name !== env.name).map((other) => pick(`${env.name}>${other.name}:east-west`)),
       pick(`${env.name}:services`),
+      ...hybridRoutes(model).flatMap((connection) => [pick(`${env.name}:hybrid-in@${connection.id}`), pick(`${env.name}:hybrid-out@${connection.id}`)]),
     ];
   });
 }
@@ -95,6 +104,9 @@ const host32 = (cidr: string) => `${hostIpInSubnet(cidr, 10)}/32`;
 
 /** Resource identity comes from the model; routing policy comes only from generated tables. */
 function buildTopo(model: LzModel, tables: RouteTable[]) {
+  const connections = hybridRoutes(model);
+  const externalEndpoints = new Map(connections.map((connection) => [connection.id, connection.type === 'VPN'
+    ? vpnCpeNodeId(model.hybridConnectivity!.ipsecs[connection.name]) : connection.id + ':router']));
   const tablesFor = (node: string, kind: RouteTable['associations'][number]['kind']) =>
     tables.filter((table) => table.associations.some((binding) => binding.nodeId === node && binding.kind === kind));
   const tableFor = (node: string, kind: RouteTable['associations'][number]['kind']) => {
@@ -118,6 +130,16 @@ function buildTopo(model: LzModel, tables: RouteTable[]) {
     subnets: env.network.subnets.map((sn, j) => ({ cidr: sn.cidr, node: `cmp-env-${i}-vcn-sn-${j}`, role: sn.name.split('-').pop() || `sn${j}` })),
   }));
   const human = (node: string) => {
+    const hybrid = connections.find((connection) => connection.id === node);
+    if (hybrid) return `${hybrid.type} ${hybrid.name}`;
+    const vpn = connections.find((connection) => connection.type === 'VPN'
+      && (node === connection.id + ':tunnel-1' || node === connection.id + ':tunnel-2'));
+    if (vpn) return `VPN ${vpn.name} Tunnel ${node.endsWith('-1') ? '1' : '2'}`;
+    const cpe = Object.keys(model.hybridConnectivity?.customer_premises_equipments ?? {}).find((name) => node === `hybrid-cpe-${name}`);
+    if (cpe) return `CPE ${cpe}`;
+    if (node.startsWith('hybrid-cpe-existing:')) return 'Existing CPE';
+    const router = connections.find((connection) => connection.type === 'FastConnect' && node === connection.id + ':router');
+    if (router) return `FastConnect ${router.name} customer router`;
     if (node === 'drg') return 'DRG';
     const gateway = node.match(/(?:^|-)(igw|natgw|sgw)(?:-\d+)?$/)?.[1];
     if (gateway === 'igw') return 'Internet gateway';
@@ -131,18 +153,18 @@ function buildTopo(model: LzModel, tables: RouteTable[]) {
     const hub = node.match(/^hub-vcn-sn-(\d+)$/);
     return hub ? model.network.subnets[+hub[1]]?.name ?? node : node;
   };
-  return { tableFor, hasConflictingBinding: (node: string, kind: RouteTable['associations'][number]['kind']) => tablesFor(node, kind).length > 1, fwNodes, trust, untrust, lb, envs, human };
+  return { tableFor, hasConflictingBinding: (node: string, kind: RouteTable['associations'][number]['kind']) => tablesFor(node, kind).length > 1, fwNodes, trust, untrust, lb, envs, human, externalEndpoints };
 }
 type Topo = ReturnType<typeof buildTopo>;
 
-/** OCI longest-prefix match; static routes win an equal-prefix dynamic route. */
+/** OCI longest-prefix match, then static over implicit local or imported routes. */
 export function matchRule(rules: RouteRule[], dest: string): { rule: RouteRule; i: number } | null {
   const candidates = rules.flatMap((rule, i) => {
     if (dest === 'OSN') return rule.destination === 'OSN Services' ? [{ rule, i, prefix: 0 }] : [];
     const prefix = rule.matchCidr && contains(rule.matchCidr, dest) ? parseCidr(rule.matchCidr)?.prefix : undefined;
     return prefix == null ? [] : [{ rule, i, prefix }];
   }).sort((a, b) => b.prefix - a.prefix
-    || Number(a.rule.routeType === 'Dynamic') - Number(b.rule.routeType === 'Dynamic'));
+    || routePriority(a.rule) - routePriority(b.rule));
   const best = candidates[0];
   if (!best) return null;
   const tied = candidates.filter((candidate) => candidate.prefix === best.prefix && candidate.rule.routeType === best.rule.routeType);
@@ -177,11 +199,17 @@ function ruleHop(topo: Topo, acc: Acc, node: string, table: RouteTable, match: {
   hop(acc, node, `${topo.human(node)}: ${match.rule.destination} → ${match.rule.target}${inspected ? ' (inspect)' : ''}`, table, match, inspected, owner);
 }
 
+function deliverLocal(topo: Topo, acc: Acc, rule: RouteRule, destination: string | null) {
+  if (!destination || !rule.targetNodeId || !destination.startsWith(rule.targetNodeId + '-sn-')) { acc.ok = false; return; }
+  pushVisual(acc, destination);
+  hop(acc, destination, `→ ${topo.human(destination)} (local)`);
+}
+
 /** Route bindings distinguish VCN→DRG and DRG→VCN; they are never interchangeable. */
-function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: number | 'hub' }, dstNode: string | null) {
+function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: number | 'hub'; kind?: RouteTable['associations'][number]['kind'] }, dstNode: string | null) {
   let node = start.node;
   let zone = start.zone;
-  let kind: RouteTable['associations'][number]['kind'] = 'subnet';
+  let kind: RouteTable['associations'][number]['kind'] = start.kind ?? 'subnet';
   for (let guard = 0; guard < 24; guard++) {
     const table = topo.tableFor(node, kind);
     const match = table ? matchRule(table.rules, start.dest) : null;
@@ -189,6 +217,7 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
     ruleHop(topo, acc, node, table, match);
     const rule = match.rule;
     switch (rule.nextHopKind) {
+      case 'local': deliverLocal(topo, acc, rule, dstNode); return;
       case 'drg': {
         node = zone === 'hub' ? 'attach-hub' : `attach-cmp-env-${zone}`;
         pushVisual(acc, node);
@@ -211,6 +240,7 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
           const entry = matchRule(ingress.rules, start.dest);
           if (!entry) { acc.ok = false; return; }
           ruleHop(topo, acc, node, ingress, entry, vcn);
+          if (entry.rule.nextHopKind === 'local') { deliverLocal(topo, acc, entry.rule, dstNode); return; }
           const target = entry.rule.targetNodeId ?? topo.fwNodes.find((fw) => fwIp(fw.cidr) === entry.rule.flowTarget)?.node;
           if (entry.rule.nextHopKind !== 'firewall' && entry.rule.nextHopKind !== 'nlb' || !target) { acc.ok = false; return; }
           node = target;
@@ -256,6 +286,16 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
         hop(acc, gateway, `${topo.human(gateway)} → ${rule.nextHopKind === 'sgw' ? 'OCI Services' : 'Internet'}`);
         return;
       }
+      case 'external': {
+        const target = rule.targetNodeId ?? rule.flowTarget;
+        if (!target) { acc.ok = false; return; }
+        if (target.startsWith('hybrid-vpn-')) pushVisual(acc, target + ':tunnel-1');
+        else pushVisual(acc, target);
+        const endpoint = topo.externalEndpoints.get(target) ?? target;
+        pushVisual(acc, endpoint);
+        hop(acc, endpoint, `→ ${topo.human(endpoint)} (expected path; deployed routes are unavailable)`);
+        return;
+      }
       default: acc.ok = false; return;
     }
   }
@@ -272,6 +312,23 @@ export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] =
   const srcTag = `${source?.name ?? ''} ${srcSub?.role ?? 'vm'}`.trim();
   const backend = dstSub ?? srcSub;
   const dstTag = `${destination?.name ?? source?.name ?? ''} ${backend?.role ?? ''}`.trim();
+  if (spec.kind === 'hybrid-in' || spec.kind === 'hybrid-out') {
+    const connection = hybridRoutes(model).find((entry) => entry.id === spec.hybridId);
+    const local = spec.kind === 'hybrid-in' ? backend : srcSub;
+    const label = spec.kind === 'hybrid-in' ? `${connection?.name} → ${dstTag}` : `${srcTag} → ${connection?.name}`;
+    if (!connection || !local || !connection.cidrs[0] || !parseCidr(connection.cidrs[0])) return finish(spec, { ...acc, ok: false }, label);
+    if (spec.kind === 'hybrid-in') {
+      pushVisual(acc, topo.externalEndpoints.get(connection.id)!);
+      const ingress = connection.type === 'VPN' ? connection.id + ':tunnel-1' : connection.id;
+      pushVisual(acc, ingress);
+      pushVisual(acc, 'drg');
+      walk(topo, acc, { node: ingress, kind: 'drg-attachment', dest: host32(local.cidr), zone: 'hub' }, local.node);
+    } else {
+      pushVisual(acc, local.node);
+      walk(topo, acc, { node: local.node, dest: host32(connection.cidrs[0]), zone: spec.srcEnv }, null);
+    }
+    return finish(spec, acc, label);
+  }
   const label = spec.kind === 'egress' ? `${srcTag} → INET` : spec.kind === 'services' ? `${srcTag} → OSN`
     : spec.kind === 'ingress' ? `INET → ${dstTag}` : `${srcTag} → ${dstTag}`;
   if (spec.kind === 'ingress') {
@@ -313,8 +370,9 @@ function finish(spec: FlowSpec, acc: Acc, label: string): FlowTrace {
  * to the first other environment.
  */
 export function specFromId(model: LzModel, id: string, color: string): FlowSpec | null {
-  const [scope, kind, role] = id.split(':');
-  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services'].includes(kind)) return null;
+  const [scope, kindPart, role] = id.split(':');
+  const [kind, hybridId] = (kindPart ?? '').split('@');
+  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out'].includes(kind)) return null;
   if (kind === 'ingress' && !hasHubLoadBalancer(model)) return null;
   const available = (index: number) => index >= 0 && model.environments[index].projectNetworkEnabled !== false
     && model.environments[index].network.subnets.length > 0;
@@ -331,6 +389,10 @@ export function specFromId(model: LzModel, id: string, color: string): FlowSpec 
   }
   const srcEnv = envIdx(scope);
   if (srcEnv < 0 || !hasRole(srcEnv)) return null;
+  if (kind === 'hybrid-in' || kind === 'hybrid-out') {
+    if (!hybridRoutes(model).some((connection) => connection.id === hybridId)) return null;
+    return { id, kind, color, srcEnv, dstEnv: srcEnv, hybridId };
+  }
   // Ingress backend defaults to the same env's web subnet.
   return { id, kind: kind as FlowKind, color, srcEnv, dstEnv: kind === 'ingress' ? srcEnv : undefined };
 }
@@ -351,7 +413,7 @@ export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'f
     const parts = id.split(':');
     // Past the cap there is no distinguishable colour left; older saved selections are not drawn.
     const color = colorBy === 'kind'
-      ? FLOW_KIND_COLORS[parts[1] as FlowKind]
+      ? FLOW_KIND_COLORS[parts[1].split('@')[0] as FlowKind]
       : FLOW_COLORS[groups.indexOf(`${parts[0]}:${parts[1]}`)];
     if (!color) return;
     const role = parts.length >= 3 ? parts[2] : undefined;
@@ -376,7 +438,7 @@ export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'f
         // East-west pairs matching roles, falling back to the first destination
         // subnet when the two environments have different endpoint sets.
         srcSubnet: base.kind === 'ingress' ? base.srcSubnet : k,
-        dstSubnet,
+        dstSubnet: base.kind === 'hybrid-in' ? k : dstSubnet,
       };
       const trace = traceFlow(model, spec, tables);
       if (trace.hops.length > 0) out.push(trace);

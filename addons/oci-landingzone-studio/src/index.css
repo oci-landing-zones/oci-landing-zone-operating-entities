@@ -451,6 +451,19 @@ a:focus:not(:focus-visible) {
   font-weight: 800;
 }
 
+.deployment-guide code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 600;
+  color: #174d75;
+}
+
+.deployment-guide .required-setting-name,
+.deployment-guide .required-setting-value {
+  font-weight: inherit;
+}
+
 .guide-link {
   display: inline;
   padding: 1px 3px;
@@ -832,3 +845,87 @@ fieldset[aria-invalid="true"] {
 .rpc-connection-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; }
 .rpc-connection-header h3 { margin: 0; font-size: 15px; line-height: 1.4; }
 .rpc-connection-header button { width: 44px !important; height: 44px !important; flex-shrink: 0; }
+
+/* A gentle halo advertises clickable table markers without moving their anchors. */
+.route-table-dot-clickable::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: route-table-dot-pulse 2.4s ease-out infinite;
+}
+@keyframes route-table-dot-pulse {
+  0% { transform: scale(1); opacity: 0.65; }
+  75%, 100% { transform: scale(2.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-table-dot-clickable::after {
+    animation: none;
+    transform: scale(1.2);
+    opacity: 0.4;
+  }
+}
+
+/* Route lookup emphasis follows the packet clock and reverses smoothly on exit. */
+.route-table-rule {
+  position: relative;
+  transform: scale(1);
+  transform-origin: center;
+  box-shadow: 0 0 0 0 rgba(67, 133, 57, 0);
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 360ms ease, background-color 360ms ease;
+}
+.route-table-rule--active {
+  z-index: 2;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 1px #69a84f;
+  border-radius: 3px;
+}
+.react-flow__node-routetable:has(.route-table-card--active) {
+  z-index: 2500 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-table-rule { transition: none; }
+  .route-table-rule--active { transform: none; }
+}
+
+/* Magnify the actual matched rule text, not only the row's background box. */
+.route-table-rule-magnifier {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  gap: 18px;
+  align-items: center;
+  width: max-content;
+  padding: 6px 10px;
+  border: 3px solid #75ae66;
+  border-radius: 6px;
+  background: #f2faec;
+  color: #263d25;
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: 800;
+  font-style: normal;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  box-shadow: 0 3px 12px rgba(49, 97, 38, 0.3);
+  transition: opacity 200ms ease, transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.route-table-rule--active .route-table-rule-magnifier {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-table-rule-magnifier {
+    transition: none;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Soft lower-right elevation for every route-table card. */
+.route-table-card { box-shadow: 5px 6px 8px rgba(32, 31, 28, 0.42); }

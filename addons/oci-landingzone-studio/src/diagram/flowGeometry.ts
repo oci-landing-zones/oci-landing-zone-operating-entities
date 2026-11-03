@@ -1,5 +1,6 @@
 import type { DiagramNode } from '../model/types';
 import { drgCaptionBounds } from './layoutPolicy';
+import { FASTCONNECT_LINE_Y } from './hybridTopology';
 
 export interface FlowPoint { x: number; y: number }
 
@@ -15,6 +16,18 @@ export interface FlowRect {
 const CLEARANCE = 10;
 export const BEND_COST = 24;
 const EPS = 0.001;
+
+export function diagramBounds(nodes: DiagramNode[]) {
+  const roots = nodes.filter((node) => !node.parentId);
+  if (!roots.length) return { x: 0, y: 0, width: 0, height: 0 };
+  const x = Math.min(...roots.map((node) => node.x));
+  const y = Math.min(...roots.map((node) => node.y));
+  return {
+    x, y,
+    width: Math.max(...roots.map((node) => node.x + node.width)) - x,
+    height: Math.max(...roots.map((node) => node.y + node.height)) - y,
+  };
+}
 
 /** Absolute rectangles derived from the same parent-relative model used by both renderers. */
 export function absoluteNodeRects(nodes: DiagramNode[]): Map<string, FlowRect> {
@@ -55,6 +68,7 @@ export function absoluteNodeRects(nodes: DiagramNode[]): Map<string, FlowRect> {
  */
 export function flowAnchorPoint(rect: FlowRect): FlowPoint {
   const { node } = rect;
+  if (node.kind === 'fastconnect') return { x: rect.x + rect.width / 2, y: rect.y + FASTCONNECT_LINE_Y };
   if (node.kind === 'gateway') return { x: rect.x + rect.width / 2, y: rect.y + Math.min(18, rect.height / 2) };
   if (node.kind === 'subnet' && node.endpointName) return { x: rect.x + rect.width / 2, y: rect.y + Math.min(70, rect.height / 2 + 15) };
   if (node.kind === 'subnet' && node.icon) return { x: rect.x + rect.width / 2, y: rect.y + Math.min(61, rect.height / 2) };
@@ -62,6 +76,7 @@ export function flowAnchorPoint(rect: FlowRect): FlowPoint {
 }
 
 const obstacleKind = (node: DiagramNode) =>
+  node.kind === 'premises' || node.kind === 'vpn' || node.kind === 'vpntunnel' || node.kind === 'fastconnect' || node.kind === 'customerrouter' ||
   node.kind === 'subnet' || node.kind === 'gateway' || node.kind === 'attachment' ||
   node.kind === 'drg' || node.kind === 'routetable' || node.kind === 'project' ||
   node.kind === 'resourcegroup' || node.kind === 'vcn' || node.kind === 'compartment' || node.kind === 'rtdot';
@@ -135,14 +150,16 @@ export function routingExclusions(rects: Map<string, FlowRect>, ids: string[]): 
     while (id && !excluded.has(id)) {
       excluded.add(id);
       const node = rects.get(id)?.node;
-      if (node?.rtDotOwnerId) add(node.rtDotOwnerId);
+      const owner = node?.rtDotPhysicalOwnerId ?? node?.rtDotOwnerId;
+      if (owner) add(owner);
       id = node?.parentId;
     }
   };
   ids.forEach(add);
-  const endpointOwners = new Set(ids.flatMap((id) => [id, rects.get(id)?.node.rtDotOwnerId].filter((value): value is string => Boolean(value))));
+  const endpointOwners = new Set(ids.flatMap((id) => [id, rects.get(id)?.node.rtDotPhysicalOwnerId ?? rects.get(id)?.node.rtDotOwnerId].filter((value): value is string => Boolean(value))));
   for (const rect of rects.values()) {
-    if (rect.node.rtDotOwnerId && endpointOwners.has(rect.node.rtDotOwnerId)) excluded.add(rect.id);
+    const owner = rect.node.rtDotPhysicalOwnerId ?? rect.node.rtDotOwnerId;
+    if (owner && endpointOwners.has(owner)) excluded.add(rect.id);
   }
   return excluded;
 }
@@ -315,7 +332,7 @@ export function clearRoutingSegment(rects: Map<string, FlowRect>, start: FlowPoi
 
 /** Route a local resource leg to a canonical connection port without moving that port. */
 export function routeBetweenPoints(nodes: DiagramNode[], start: FlowPoint, end: FlowPoint, excludedIds: string[], preferredX?: number,
-  ports?: { startOwner?: string; endOwner?: string }): FlowPoint[] {
+  ports?: { startOwner?: string; endOwner?: string; endDirection?: FlowPoint }): FlowPoint[] {
   const rects = absoluteNodeRects(nodes);
   const excluded = routingExclusions(rects, excludedIds);
   const outside = (point: FlowPoint, ownerId?: string): FlowPoint => {
@@ -329,18 +346,22 @@ export function routeBetweenPoints(nodes: DiagramNode[], start: FlowPoint, end: 
       ? { x: dx < 0 ? owner.x - CLEARANCE : owner.x + owner.width + CLEARANCE, y: point.y }
       : { x: point.x, y: dy < 0 ? owner.y - CLEARANCE : owner.y + owner.height + CLEARANCE };
   };
-  const from = outside(start, ports?.startOwner), to = outside(end, ports?.endOwner);
+  const from = outside(start, ports?.startOwner);
+  const outsideEnd = outside(end, ports?.endOwner);
+  const direction = ports?.endDirection;
+  const to = direction ? { x: outsideEnd.x - direction.x * 12, y: outsideEnd.y - direction.y * 12 } : outsideEnd;
   const obstacles = routingObstacles(rects, excluded);
-  return compact([start, ...routePair(from, to, obstacles, preferredX), end]);
+  return compact([start, ...routePair(from, to, obstacles, preferredX, [], false, undefined, undefined,
+    direction ? { start: { x: 0, y: 0 }, end: direction } : undefined), outsideEnd, end]);
 }
 
 /** Reuse local joins only while this graph's node geometry is fixed. */
 export function createLocalFlowRouter(nodes: DiagramNode[]) {
   const paths = new Map<string, FlowPoint[]>();
   return (start: FlowPoint, end: FlowPoint, excludedIds: string[], preferredX?: number,
-    ports?: { startOwner?: string; endOwner?: string }): FlowPoint[] => {
+    ports?: { startOwner?: string; endOwner?: string; endDirection?: FlowPoint }): FlowPoint[] => {
     const coordinates = [start.x, start.y, end.x, end.y, preferredX].map((value) => Object.is(value, -0) ? '-0' : String(value));
-    const key = JSON.stringify([coordinates, excludedIds, ports?.startOwner, ports?.endOwner]);
+    const key = JSON.stringify([coordinates, excludedIds, ports?.startOwner, ports?.endOwner, ports?.endDirection]);
     const cached = paths.get(key);
     if (cached) return cached.map((point) => ({ ...point }));
     const path = routeBetweenPoints(nodes, start, end, excludedIds, preferredX, ports);

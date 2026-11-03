@@ -5,6 +5,7 @@ import { defaultDrPlatformCidrs, drRegionOptions, type DrDesignDraft } from './d
 import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './cidr';
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
+import { deploymentReadme } from './deployment';
 
 type EnvironmentConfig = Omit<EnvConfigEntry, 'project_network'> & { project_network?: EnvConfigEntry['project_network'] };
 interface RpcConfig { remote_cidrs: string[]; peer_region_name: string; peer_id?: string }
@@ -166,8 +167,10 @@ export async function generateDrFileBundle(model: LzModel, draft: DrDesignDraft,
   const drConfig = serialize(dr);
   const drFiles = await generateFromConfigCode(drConfig);
   return {
-    ...Object.fromEntries(Object.entries({ 'config.jsonnet': homeConfig, ...homeFiles }).map(([name, body]) => [`Home/${name}`, body])),
-    ...Object.fromEntries(Object.entries({ 'config.jsonnet': drConfig, ...drFiles }).map(([name, body]) => [`DR/${name}`, body])),
-    'README.txt': `Stack 1 · Home (${home.region})\nDeploy/update Home first, using its complete generated file set.\nSave compartments_output.json${draft.rpcEnabled ? ' and network_output.json (including the RPC acceptor)' : ''} from that execution. These runtime outputs are not configuration files and are not included in this ZIP.\n\nStack 2 · DR (${dr.region})\nUse a separate regional stack/state. Copy the Home dependency outputs to the DR dependency bucket and configure the Orchestrator to read them before deploying DR.\n${draft.rpcEnabled ? 'The DR RPC requester references the Home acceptor key in that network dependency. Both canonical network.json files include RPC resources and routes.\n' : ''}\nDeploy the selected CIS security and observability _pre prerequisites before their final counterparts and dependent workloads. Review the generated file sets before deployment. Use a customer-controlled private source with Orchestrator v2.2.0, rms-facade.\n`,
+    ...Object.fromEntries(Object.entries({ 'config.jsonnet': homeConfig, ...homeFiles,
+      'README.txt': deploymentReadme(home, Object.keys(homeFiles)) }).map(([name, body]) => [`Home/${name}`, body])),
+    ...Object.fromEntries(Object.entries({ 'config.jsonnet': drConfig, ...drFiles,
+      'README.txt': deploymentReadme(dr, Object.keys(drFiles)) }).map(([name, body]) => [`DR/${name}`, body])),
+    'README.txt': 'Deploy Home first using Home/README.txt. Then deploy DR in a separate stack/state using DR/README.txt. Always pass compartments_output.json and network_output.json from the successful Home deployment to DR. These runtime dependencies are not included in this ZIP.\n',
   };
 }

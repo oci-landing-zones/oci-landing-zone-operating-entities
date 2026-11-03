@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { routeTableLayout, ROUTE_TABLE_METRICS as m } from './routeTableLayout';
 
 describe('route-table content extents', () => {
+  it('reserves a full-width line only for fully superseded routes', () => {
+    const layout = routeTableLayout({ label: 'rt-hub', width: 310, rowCount: 3, rows: [{ superseded: true }, { superseded: false }, {}] });
+    expect(layout.rowNotes).toEqual(['(fully superseded)', '', '']);
+    expect(layout.rowHeights).toEqual([26, 15, 15]);
+    const plain = routeTableLayout({ label: 'rt-hub', width: 310, rowCount: 3 });
+    expect(layout.height - plain.height).toBe(m.rowLine);
+  });
   it('ends at the final row without an unused footer, including an empty table', () => {
     for (const columns of ['vcn', 'drg'] as const) {
       const empty = routeTableLayout({ label: 'Generated table', columns, width: 310, rowCount: 0 });
