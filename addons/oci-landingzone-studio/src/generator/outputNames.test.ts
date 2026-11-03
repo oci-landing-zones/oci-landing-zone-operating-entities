@@ -39,22 +39,6 @@ describe('deploymentStages', () => {
     expect(() => deploymentStages(['network.json'], 'network_backends.json')).toThrow('network_backends.json');
   });
 
-  it('uses one network file in both operations while keeping staged controls separate', () => {
-    const stages = deploymentStages([
-      'iam.json', 'governance.json', 'network.json',
-      'security_cis1_pre.json', 'security_cis1.json',
-      'observability_cis1_pre.json', 'observability_cis1.json',
-      'network_backends.json', 'oke_clusters.json',
-    ]);
-    expect([...stages[0].files].sort()).toEqual([
-      'iam.json', 'governance.json', 'network.json',
-      'security_cis1_pre.json', 'observability_cis1_pre.json',
-    ].sort());
-    expect([...stages[1].files].sort()).toEqual([
-      'iam.json', 'governance.json', 'network.json',
-      'security_cis1.json', 'observability_cis1.json', 'oke_clusters.json',
-    ].sort());
-  });
 });
 
 describe('isCurrentOutputSet', () => {

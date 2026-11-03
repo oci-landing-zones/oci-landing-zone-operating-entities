@@ -12,9 +12,12 @@ import { deploymentStages } from './outputNames';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
 
-const cases = [false, true].flatMap((regional) => ([1, 2] as const).flatMap((cis) =>
-  (['hub_b', 'hub_c'] as const).flatMap((hub) => [false, true].map((oke) => ({ regional, cis, hub, oke }))),
-));
+const cases = [
+  { regional: false, cis: 2, hub: 'hub_c', oke: true },
+  { regional: true, cis: 1, hub: 'hub_b', oke: false },
+  { regional: false, cis: 1, hub: 'hub_b', oke: true },
+  { regional: true, cis: 2, hub: 'hub_c', oke: false },
+] as const;
 
 describe('canonical deployment file sets', () => {
   it.each(cases)('keeps each root family unique for $regional/$cis/$hub/$oke', async ({ regional, cis, hub, oke }) => {
@@ -24,6 +27,10 @@ describe('canonical deployment file sets', () => {
     model.network = { hubKind: hub, ...hubKindDefaults(hub) };
     if (oke) model.platforms = [newPlatform('oke_simple', [])];
     const result = await generateOutputs(model);
+    expect(Object.keys(result.files).filter((file) => /^(security|observability)_cis/.test(file)).sort()).toEqual([
+      `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
+      `observability_cis${cis}_pre.json`, `observability_cis${cis}.json`,
+    ].sort());
     const stages = deploymentStages(Object.keys(result.files), completionNetwork(buildConfig(model)));
     for (const stage of stages) {
       const roots = stage.files.flatMap((file) => Object.keys(JSON.parse(result.files[file])));

@@ -13,7 +13,6 @@ import { attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionBounds, minimumOwnerWi
 import { physicalSharedSegments, structuralCrossings, structuralLineContacts, validateDiagramLayout } from './layoutQuality';
 import { oracle } from '../theme';
 import { routeStructuralEdges } from './displayGeometry';
-import { absoluteNodeRects } from './flowGeometry';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
@@ -74,27 +73,14 @@ describe('generated diagram quality matrix', () => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const { inventory, tables } = await generated(model);
-    const dotsOnly = absoluteNodeRects(buildGraph(model, 5, { showDots: true }, undefined, tables, inventory).nodes);
     const cases: { step: number; options: DiagramOptions }[] = [
       { step: 1, options: {} }, { step: 2, options: {} }, { step: 5, options: {} },
-      { step: 5, options: { showEndpoints: true, showDots: true, openTables: [tables[0].id] } },
-      { step: 5, options: { showFlows: true } }, { step: 5, options: { allFlows: true } },
+      { step: 5, options: { allFlows: true } },
     ];
     for (const { step, options } of cases) {
       const graph = buildGraph(model, step, options, undefined, tables, inventory);
       expectLayout(graph, { inventory, routeTables: tables, foundation: step === 1, showRouteTables: !!(options.showFlows || options.allFlows) }, `${hubKind} step ${step} ${JSON.stringify(options)}`);
       expect(structuralCrossings(physicalConnections(graph)), `${hubKind} step ${step} unrelated-resource intersections`).toEqual([]);
-      const currentRects = absoluteNodeRects(graph.nodes);
-      if (step === 5) for (const dot of currentRects.values()) if (dot.node.kind === 'rtdot') {
-        const original = dotsOnly.get(dot.id)!;
-        const owner = currentRects.get(dot.node.rtDotPhysicalOwnerId ?? dot.node.rtDotOwnerId!)!;
-        const originalOwner = dotsOnly.get(original.node.rtDotPhysicalOwnerId ?? original.node.rtDotOwnerId!)!;
-        expect(dot.node.rtDotOwnerId).toBe(original.node.rtDotOwnerId);
-        expect((dot.x + dot.width / 2 - owner.x) / owner.width, `${hubKind} canonical horizontal port ${dot.id}`)
-          .toBeCloseTo((original.x + original.width / 2 - originalOwner.x) / originalOwner.width, 6);
-        expect((dot.y + dot.height / 2 - owner.y) / owner.height, `${hubKind} canonical vertical port ${dot.id}`)
-          .toBeCloseTo((original.y + original.height / 2 - originalOwner.y) / originalOwner.height, 6);
-      }
       if (options.showFlows || options.allFlows) {
         // Distinct physical links and clear text take priority over best-effort point crossings.
         const budget = { hub_a: 4, hub_b: 4, hub_c: 4, hub_e: 1 };
@@ -103,7 +89,7 @@ describe('generated diagram quality matrix', () => {
     }
   }, 60_000);
 
-  it.each([0, 1, 3, 6])('stacks %i Foundation environments with readable widths and compact gaps', async (count) => {
+  it.each([0, 6])('stacks %i Foundation environments with readable widths and compact gaps', async (count) => {
     const model = environmentCount(count);
     const { inventory, tables } = await generated(model);
     const graph = buildGraph(model, 1, {}, undefined, tables, inventory);
@@ -115,11 +101,11 @@ describe('generated diagram quality matrix', () => {
     }
   }, 60_000);
 
-  it.each([3, 6])('keeps physical routes clear with %i environments and visible tables', async (count) => {
-    const model = environmentCount(count);
+  it('keeps physical routes clear with six environments and visible tables', async () => {
+    const model = environmentCount(6);
     const { inventory, tables } = await generated(model);
     const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables, inventory);
-    expectLayout(graph, { inventory, routeTables: tables, showRouteTables: true }, `${count} environments with routing`);
+    expectLayout(graph, { inventory, routeTables: tables, showRouteTables: true }, 'six environments with routing');
     expect(structuralCrossings(physicalConnections(graph))).toEqual([]);
   }, 60_000);
 

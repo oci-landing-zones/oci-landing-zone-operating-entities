@@ -208,7 +208,8 @@ describe('generator (go-jsonnet wasm)', () => {
     await expect(output).rejects.toThrow('Use 3 characters or fewer for the region short name.');
   });
 
-  it.each(['fr2', 'FR2'])('uses custom region short name %s in generated resource names', async (regionShortName) => {
+  it('normalizes a custom region short name in generated resource names', async () => {
+    const regionShortName = 'FR2';
     const model = emptyLzModel();
     model.foundation.regionShortName = regionShortName;
     const out = await generateOutputs(model);
@@ -485,20 +486,6 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(destinations.filter((topic) => topic === `NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`)).toHaveLength(4);
   }, 60_000);
 
-  it('emits the selected CIS level 1 artifact family', async () => {
-    const base = emptyLzModel();
-    const out = await generateOutputs({
-      ...base,
-      foundation: { ...base.foundation, cisLevel: 1 },
-    });
-
-    expect(out.config).toContain('cis_level: 1');
-    expect(out.secondary).toContain('security_cis1.json');
-    expect(out.secondary).toContain('observability_cis1.json');
-    expect(out.secondary).not.toContain('security_cis2.json');
-    expect(out.secondary).not.toContain('observability_cis2.json');
-  }, 60_000);
-
   it('generates Hub E as a final-only no-firewall bundle', async () => {
     const base = emptyLzModel();
     const model: LzModel = {
@@ -525,16 +512,10 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.config).toContain(`kind: '${hubKind}'`);
     expect(out.files['network.json']).toBeDefined();
     expectHubGeneratorContract(out.files, hubKind);
-  }, 60_000);
-
-  it('includes Hub C external-firewall backend placeholders in the complete output set', async () => {
-    const base = emptyLzModel();
-    const out = await generateOutputs({
-      ...base,
-      network: { ...base.network, hubKind: 'hub_c', ...hubKindDefaults('hub_c') },
-    });
-    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
-    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
+    if (hubKind === 'hub_c') {
+      expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
+      expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
+    }
   }, 60_000);
 
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('omits the %s example hub load balancer alongside OKE', async (hubKind) => {

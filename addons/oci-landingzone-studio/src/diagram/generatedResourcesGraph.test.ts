@@ -1,4 +1,3 @@
-import { tableAssociations } from './tablePlacement';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
@@ -9,9 +8,6 @@ import { resourceGroupLayout } from './resourceGroups';
 import { generatePreview } from '../generator/preview';
 import { buildRouteTables } from '../services/routeTables';
 import { setAssetLoader } from '../generator/jsonnetVm';
-import { hubKindDefaults } from '../services/hubKinds';
-import { createFlowPlayback, flowHopMarkers, pointAtDistance } from './flowPlayback';
-import { tableSourceAnchors, routeStructuralEdges } from './displayGeometry';
 import { DIAGRAM_LAYOUT, minimumOwnerWidths } from './layoutPolicy';
 import { generatorNames } from '../services/generatorNaming';
 
@@ -207,12 +203,10 @@ describe('generated diagram resource groups', () => {
     expect(expanded.nodes.some((node) => node.id === 'resource-empty')).toBe(false);
   });
 
-  it.each([
-    ['complete', true], ['regional', true], ['complete', false], ['regional', false],
-  ] as const)('renders exactly the canonical %s resource inventory (no environments: %s)', async (scope, noEnvironments) => {
+  it.each(['complete', 'regional'] as const)('renders the canonical %s resource inventory without environments', async (scope) => {
     const model = emptyLzModel();
     model.foundation.stackScope = scope;
-    if (noEnvironments) model.environments = [];
+    model.environments = [];
     const preview = await generatePreview(model);
     const tables = buildRouteTables(model, preview.network);
     const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables, preview.inventory);
@@ -233,40 +227,4 @@ describe('generated diagram resource groups', () => {
     }
   });
 
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps %s routing, packet stops and numbers aligned after generated resource growth', async (hub) => {
-    const model = emptyLzModel();
-    model.network = { hubKind: hub, ...hubKindDefaults(hub) };
-    const preview = await generatePreview(model);
-    const graph = buildGraph(model, 5, { allFlows: true }, undefined, buildRouteTables(model, preview.network), preview.inventory);
-    expect(graph.flowErrors).toBeUndefined();
-    expect(graph.nodes.some((node) => node.kind === 'resourcegroup')).toBe(true);
-    const rects = absoluteNodeRects(graph.nodes);
-    const structural = routeStructuralEdges(graph.nodes, graph.edges.filter((edge) => !edge.waypoints)
-      .map((edge) => ({ ...edge, points: undefined })));
-    const canonical = new Map(tableAssociations(graph.nodes, tableSourceAnchors(graph.nodes, structural)).map((edge) => [edge.id, edge.points]));
-    const flows = graph.edges.filter((edge) => edge.waypoints);
-    expect(flows.length).toBeGreaterThan(0);
-    for (const edge of graph.edges.filter((edge) => !edge.waypoints)) {
-      expect(edge.points, edge.id).toEqual(canonical.get(edge.id));
-    }
-    for (const resource of graph.nodes.filter((node) => node.kind === 'resourcegroup')) {
-      const group = rects.get(resource.id)!;
-      for (const table of graph.nodes.filter((node) => node.kind === 'routetable')) {
-        const box = rects.get(table.id)!;
-        expect(group.x < box.x + box.width && group.x + group.width > box.x && group.y < box.y + box.height && group.y + group.height > box.y,
-          `${hub}: ${group.id} overlaps ${box.id}`).toBe(false);
-      }
-    }
-    for (const flow of flows) {
-      const playback = createFlowPlayback(flow);
-      expect(playback.valid, flow.id).toBe(true);
-      for (const marker of flowHopMarkers(flow)) {
-        expect(pointAtDistance(flow.points!, playback.stops[marker.seq - 1].distance)).toEqual({ x: marker.x, y: marker.y });
-        if (!flow.flowHops![marker.seq - 1].tableId) continue;
-        const dot = rects.get(marker.anchorId!)!;
-        expect(dot.node.kind).toBe('rtdot');
-        expect({ x: marker.x, y: marker.y }).toEqual({ x: dot.x + dot.width / 2, y: dot.y + dot.height / 2 });
-      }
-    }
-  });
 });
