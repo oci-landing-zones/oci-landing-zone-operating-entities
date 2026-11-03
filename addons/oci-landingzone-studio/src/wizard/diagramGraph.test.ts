@@ -9,6 +9,7 @@ import * as graphBuilder from '../diagram/buildGraph';
 import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from './diagramGraph';
 import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { complexHybridModel } from '../diagram/complexHybrid.testSupport';
+import type { DiagramModel } from '../model/types';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
@@ -18,11 +19,26 @@ async function generated(model = emptyLzModel()) {
 }
 
 describe('diagram geometry and chosen export layers', () => {
-  it('changes focus and highlights without rebuilding any geometry or dropping active flows', async () => {
-    const { model, preview } = await generated();
-    const build = vi.spyOn(graphBuilder, 'buildGraph');
+  it('changes focus and highlights without rebuilding any geometry or dropping active flows', () => {
+    const diagram: DiagramModel = {
+      nodes: [
+        { id: 'source', kind: 'subnet', label: 'Source', x: 0, y: 0, width: 100, height: 40 },
+        { id: 'target', kind: 'gateway', label: 'Target', x: 200, y: 0, width: 40, height: 40 },
+        { id: 'routes', kind: 'routetable', label: 'Routes', x: 0, y: 100, width: 200, height: 80,
+          rtRows: ['services', 'egress'].map((id) => ({ id, destination: '0.0.0.0/0', targetType: 'Gateway', target: 'target', routeType: 'Static' })),
+          rtHighlight: [0, 1] },
+      ],
+      edges: [['prod:services', 'services'], ['preprod:egress', 'egress']].map(([flow, rule]) => ({
+        id: `flow-${flow}#0`, source: 'source', target: 'target', waypoints: ['source', 'target'],
+        points: [{ x: 50, y: 20 }, { x: 220, y: 20 }],
+        flowHops: [{ node: 'source', seq: 1, visitIndex: 0, tableId: 'routes', ruleId: rule }],
+      })),
+      display: { allFlows: true },
+    };
+    const before = structuredClone(diagram);
+    const build = vi.spyOn(graphBuilder, 'buildGraph').mockReturnValue(diagram);
     try {
-      const getDiagram = createDiagramGraph(model, preview);
+      const getDiagram = createDiagramGraph(emptyLzModel(), { tables: [], inventory: { compartments: [], groups: [] } });
       const all = getDiagram(5, { allFlows: true });
       const focused = getDiagram(5, { allFlows: true, focusFlow: 'prod:services' });
       const other = getDiagram(5, { allFlows: true, focusFlow: 'preprod:egress' });
@@ -30,9 +46,10 @@ describe('diagram geometry and chosen export layers', () => {
       expect(focused.edges).toBe(all.edges);
       expect(other.edges).toBe(all.edges);
       expect(focused.display).toEqual({ allFlows: true, focusFlow: 'prod:services' });
-      expect(focused.nodes.filter((node) => node.kind === 'routetable' && node.rtHighlight?.length).map((node) => node.id))
-        .not.toEqual(other.nodes.filter((node) => node.kind === 'routetable' && node.rtHighlight?.length).map((node) => node.id));
+      expect(focused.nodes.find((node) => node.id === 'routes')?.rtHighlight).toEqual([0]);
+      expect(other.nodes.find((node) => node.id === 'routes')?.rtHighlight).toEqual([1]);
       expect(getDiagram(5, { allFlows: true })).toBe(all);
+      expect(diagram).toEqual(before);
     } finally { build.mockRestore(); }
   });
 
