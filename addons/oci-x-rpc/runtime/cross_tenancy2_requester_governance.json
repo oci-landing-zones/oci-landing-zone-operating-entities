@@ -19,7 +19,6 @@
                             "tobedefined",
                             "IT",
                             "Finance",
-                            "Digital",
                             "Retail"
                         ]
                     },
@@ -45,8 +44,7 @@
                             "shared",
                             "staging",
                             "test",
-                            "tobedefined",
-                            "uat"
+                            "tobedefined"
                         ]
                     },
 

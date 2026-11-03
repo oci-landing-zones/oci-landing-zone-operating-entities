@@ -37,7 +37,7 @@ function(config, n)
             description: 'Deployment environment associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: std.set(['tobedefined', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'] + std.objectFields(config.environments)),
+            valid_values: std.set(['tobedefined', 'shared', 'prod', 'preprod', 'dev', 'staging', 'test'] + std.objectFields(config.environments)),
           },
           [n.key_global('TAG', ['OWNER'])]: {
             name: n.display_global('tag', ['owner']),
@@ -51,7 +51,7 @@ function(config, n)
             description: 'Business unit responsible for the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['tobedefined', 'IT', 'Finance', 'Digital', 'Retail'],
+            valid_values: ['tobedefined', 'IT', 'Finance', 'Retail'],
           },
           [n.key_global('TAG', ['PROJECT'])]: {
             name: n.display_global('tag', ['project']),
