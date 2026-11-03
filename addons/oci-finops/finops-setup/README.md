@@ -104,6 +104,8 @@ Configure each Database Tools connection's resource principal and credential-sec
 | ADB subnet | `10.0.24.16/28` | Autonomous Database private endpoint. |
 | Infra subnet | `10.0.24.32/28` | Optional Bastion and Database Tools private connectivity. |
 
+DNS labels follow the One-OE regional naming pattern: `vcnfralzfinops` for the VCN, and `snfrafinopsoac`, `snfrafinopsdb`, and `snfrafinopsinf` for the OAC, ADB, and infra subnets. The infra suffix is shortened to `inf` to stay within OCI's 15-character limit. The VCN domain is `vcnfralzfinops.oraclevcn.com`. Changing these labels on an existing deployment requires replacing the VCN and affected network resources; review the Terraform plan before applying.
+
 The infra subnet is included in the JSON and is created when that configuration is applied. To omit it, remove `SN-FRA-LZ-FINOPS-INFRA-KEY`, `SL-FRA-LZ-FINOPS-INFRA-KEY`, and the `infra_*` rules in both NSGs. There is no per-subnet enable switch in this module. The high-level architecture drawing does not include infra.
 
 Attach `NSG-FRA-LZ-FINOPS-ADB-KEY` to ADB, and `NSG-FRA-LZ-FINOPS-OAC-KEY` to the applicable OAC endpoint and PAC. Rules allow OAC to ADB on TCP 1522, infra and Hub A management (`10.0.3.0/24`) to ADB on TCP 1522/443, and those administration sources to private OAC on TCP 443. Infra's security list supplies the corresponding outbound rules because a Bastion endpoint cannot be assumed to use a workload NSG. Service subnets have only path-MTU ingress in their security list; endpoint NSGs supply application access. No unrestricted egress rule overrides those controls.

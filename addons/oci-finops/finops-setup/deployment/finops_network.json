@@ -11,13 +11,13 @@
                     "VCN-FRA-LZ-FINOPS-KEY": {
                         "display_name"                         : "vcn-fra-lz-finops",
                         "cidr_blocks"                          : ["10.0.24.0/26"],
-                        "dns_label"                            : "finops",
+                        "dns_label"                            : "vcnfralzfinops",
 
                         "subnets": {
                             "SN-FRA-LZ-FINOPS-OAC-KEY": {
                                 "display_name"                 : "sn-fra-lz-finops-oac",
                                 "cidr_block"                   : "10.0.24.0/28",
-                                "dns_label"                    : "finopsoac",
+                                "dns_label"                    : "snfrafinopsoac",
                                 "prohibit_public_ip_on_vnic"   : true,
                                 "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
                                 "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
@@ -26,7 +26,7 @@
                             "SN-FRA-LZ-FINOPS-DB-KEY": {
                                 "display_name"                 : "sn-fra-lz-finops-db",
                                 "cidr_block"                   : "10.0.24.16/28",
-                                "dns_label"                    : "finopsdb",
+                                "dns_label"                    : "snfrafinopsdb",
                                 "prohibit_public_ip_on_vnic"   : true,
                                 "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
                                 "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
@@ -35,7 +35,7 @@
                             "SN-FRA-LZ-FINOPS-INFRA-KEY": {
                                 "display_name"                 : "sn-fra-lz-finops-infra",
                                 "cidr_block"                   : "10.0.24.32/28",
-                                "dns_label"                    : "finopsinfra",
+                                "dns_label"                    : "snfrafinopsinf",
                                 "prohibit_public_ip_on_vnic"   : true,
                                 "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
                                 "security_list_keys"           : ["SL-FRA-LZ-FINOPS-INFRA-KEY"]
