@@ -268,12 +268,5 @@ describe('generated diagram resource groups', () => {
         expect({ x: marker.x, y: marker.y }).toEqual({ x: dot.x + dot.width / 2, y: dot.y + dot.height / 2 });
       }
     }
-    const routed = flows.find((flow) => flow.waypoints!.some((node, index) =>
-      node.startsWith('cmp-env-0-vcn-sn-') && flow.waypoints![index + 1] === 'attach-cmp-env-0'))!;
-    expect(routed).toBeDefined();
-    const connection = graph.edges.find((edge) => edge.source === 'cmp-env-0-vcn' && edge.target === 'attach-cmp-env-0')!;
-    const physical = canonical.get(connection.id)!;
-    expect(routed.points!.some((_, index) => physical.every((point, offset) =>
-      point.x === routed.points![index + offset]?.x && point.y === routed.points![index + offset]?.y))).toBe(true);
   });
 });

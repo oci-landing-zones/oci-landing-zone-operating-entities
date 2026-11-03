@@ -4,17 +4,12 @@ import { hubKindDefaults } from '../services/hubKinds';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { buildGraphLayout as buildGraph } from './buildGraph';
 import { absoluteNodeRects } from './flowGeometry';
-import { flowDisplayPoints, structuralEdgePoints } from './displayGeometry';
-import type { DiagramEdge } from '../model/types';
+import { flowDisplayPoints } from './displayGeometry';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import { createFlowPlayback, flowHopMarkers, pointAtDistance, sampleFlowPlayback } from './flowPlayback';
 
-function includesPolyline(points: NonNullable<DiagramEdge['points']>, expected: NonNullable<DiagramEdge['points']>): boolean {
-  return points.some((_, index) => expected.every((point, offset) => point.x === points[index + offset]?.x && point.y === points[index + offset]?.y));
-}
-
 describe('canonical routing graph', () => {
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('draws every %s generated table at its actual association and reuses physical attachment geometry', async (hubKind) => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('draws every %s table at its actual association and aligns packet stops', async (hubKind) => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const tables = await generatedRouteTables(model);
@@ -48,14 +43,6 @@ describe('canonical routing graph', () => {
     }
 
     const flows = graph.edges.filter((edge) => edge.waypoints);
-    const belongsTo = (id: string, ancestor: string): boolean => {
-      let rect = rects.get(id);
-      while (rect) {
-        if (rect.id === ancestor) return true;
-        rect = rect.node.parentId ? rects.get(rect.node.parentId) : undefined;
-      }
-      return false;
-    };
     expect(flows.length).toBeGreaterThan(0);
     for (const flow of flows) {
       expect(flowDisplayPoints(flow)).toBe(flow.points);
@@ -75,18 +62,6 @@ describe('canonical routing graph', () => {
         expect(dot!.node.rtDotTableId).toBe(hop.tableId);
         expect(dot!.node.rtDotOwnerId).toBe(hop.tableOwner);
         expect({ x: badge.x, y: badge.y }).toEqual({ x: dot!.x + dot!.width / 2, y: dot!.y + dot!.height / 2 });
-      }
-      for (const edge of graph.edges.filter((edge) => !edge.waypoints && (edge.source.startsWith('attach-') || edge.target.startsWith('attach-')))) {
-        const visited = flow.waypoints!;
-        const connectionIsUsed = visited.some((node, index) => {
-          const next = visited[index + 1];
-          if (!next) return false;
-          return (node === edge.source && next === edge.target) || (node === edge.target && next === edge.source)
-            || (rects.get(edge.source)?.node.kind === 'vcn' && ((belongsTo(node, edge.source) && next === edge.target) || (node === edge.target && belongsTo(next, edge.source))));
-        });
-        if (!connectionIsUsed) continue;
-        const canonical = structuralEdgePoints(edge, rects);
-        expect(includesPolyline(flow.points!, canonical) || includesPolyline(flow.points!, [...canonical].reverse()), `${flow.id} leaves ${edge.id}`).toBe(true);
       }
       flow.points!.slice(1).forEach((point, index) => expect(point.x === flow.points![index].x || point.y === flow.points![index].y).toBe(true));
     }

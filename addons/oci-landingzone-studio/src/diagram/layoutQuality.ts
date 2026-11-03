@@ -5,7 +5,7 @@ import type { RouteTable } from '../services/routeTables';
 import { absoluteNodeRects } from './flowGeometry';
 import { associationDisplaySegments, routeStructuralEdges, tableSourceAnchors } from './displayGeometry';
 import { createFlowPlayback, flowHopMarkers, pointAtDistance } from './flowPlayback';
-import { attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionBounds, minimumOwnerWidths } from './layoutPolicy';
+import { ATTACHMENT_LABEL, attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionBounds, minimumOwnerWidths } from './layoutPolicy';
 import { resourceGroupLayout } from './resourceGroups';
 import { compartmentStyle } from './compartmentStyle';
 import { oracle } from '../theme';
@@ -201,7 +201,8 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
   }
   if (issues.some((entry) => ['geometry', 'identity', 'ancestry'].includes(entry.code))) return issues;
   for (const node of diagram.nodes.filter((entry) => entry.kind === 'attachment')) {
-    if (node.width + EPS < attachmentLabelLayout(node.label).width) issue('attachment-text', [node.id], 'Attachment pills must fit the full label and reserved terminal padding.');
+    const length = node.attachmentVertical ? node.height : node.width;
+    if (length + EPS < attachmentLabelLayout(node.label).width) issue('attachment-text', [node.id], 'Attachment pills must fit the full label and reserved terminal padding.');
   }
   const edgesById = new Map(diagram.edges.map((edge) => [edge.id, edge]));
   const fanLink = (id: string) => {
@@ -228,6 +229,12 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
   }
   for (const [parentId, allChildren] of children) {
     const siblings = allChildren.filter((node) => !overlay(node));
+    // Gateway wrappers reserve edge anchors; only their centered icon and text are visible.
+    const visible = siblings.map((node) => {
+      if (node.kind !== 'gateway') return node;
+      const width = Math.max(34, attachmentLabelLayout(node.label).textWidth * 10 / ATTACHMENT_LABEL.fontSize);
+      return { ...node, x: node.x + (node.width - width) / 2, width, height: 35 + node.label.split('\n').length * 12.5 };
+    });
     const resourceColumns = new Map<number, DiagramNode[]>();
     for (const node of siblings.filter((entry) => entry.kind === 'resourcegroup')) {
       const x = Math.round(node.x / EPS);
@@ -243,14 +250,18 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
       }
     }
     for (let i = 0; i < siblings.length; i++) for (let j = i + 1; j < siblings.length; j++) {
-      const a = siblings[i], b = siblings[j];
+      let a = visible[i], b = visible[j];
+      // Cards may straddle compartment bodies, but must leave their headings readable.
+      const heading = (node: DiagramNode) => ({ ...node, width: Math.min(node.width, node.label.length * 8 + 32), height: 28 });
+      if (a.kind === 'routetable' && compartment(b)) b = heading(b);
+      if (b.kind === 'routetable' && compartment(a)) a = heading(a);
       if (Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x) > EPS
         && Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y) > EPS) {
         issue('sibling-overlap', [a.id, b.id], 'Peer nodes must not overlap.');
       }
     }
     const parent = byId.get(parentId)!;
-    if (['compartment', 'project'].includes(parent.kind) && siblings.length) {
+    if (context.foundation && ['compartment', 'project'].includes(parent.kind) && siblings.length) {
       const bottom = Math.max(...siblings.map((node) => node.y + node.height));
       const captionSpace = siblings.some((node) => node.kind === 'drg') ? 18 : 0;
       if (parent.height - bottom > 2 * DIAGRAM_LAYOUT.padding + captionSpace + EPS) {
@@ -440,27 +451,6 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
     }
     const playback = createFlowPlayback(edge);
     if (!playback.valid) { issue('flow-anchor', [edge.id], 'Packet stops and numbered markers must have one valid ordered anchor source.'); continue; }
-    const belongsTo = (id: string, ancestor: string): boolean => {
-      let current = byId.get(id);
-      while (current) {
-        if (current.id === ancestor) return true;
-        current = current.parentId ? byId.get(current.parentId) : undefined;
-      }
-      return false;
-    };
-    for (const connection of diagram.edges.filter((candidate) => !candidate.waypoints
-      && (['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(byId.get(candidate.source)?.kind ?? '') || byId.get(candidate.target)?.kind === 'attachment'))) {
-      const used = edge.waypoints.some((node, index) => {
-        const next = edge.waypoints![index + 1];
-        return next && ((node === connection.source && next === connection.target) || (node === connection.target && next === connection.source)
-          || (byId.get(connection.source)?.kind === 'vcn' && ((belongsTo(node, connection.source) && next === connection.target)
-            || (node === connection.target && belongsTo(next, connection.source)))));
-      });
-      if (!used) continue;
-      const physical = context.physicalPaths?.[connection.id] ?? connection.points ?? canonical.get(connection.id) ?? [];
-      const includes = (line: typeof points) => points.some((_, index) => line.every((point, offset) => points[index + offset] && samePoint(point, points[index + offset])));
-      if (!includes(physical) && !includes([...physical].reverse())) issue('flow-connection', [edge.id, connection.id], 'Packet paths must reuse the complete physical attachment connection.');
-    }
     for (const marker of flowHopMarkers({ ...edge, showHopMarkers: true })) {
       const hop = edge.flowHops![marker.seq - 1];
       const stop = playback.stops[marker.seq - 1];

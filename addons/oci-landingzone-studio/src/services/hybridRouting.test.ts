@@ -112,7 +112,7 @@ describe('hybrid routing views', () => {
         }
         const table = rects.get('DRGRT-FRA-LZ-HUB-HC-KEY')!;
         expect(table.node.parentId).toBeUndefined();
-        expect(rendered.tableColumns).toContain(table.x);
+        expect(table.node.rtRows?.map((row) => row.id)).toEqual(tables.find((entry) => entry.id === table.id)!.rules.map((rule) => rule.id));
         expect(validateDiagramLayout(rendered)).toEqual([]);
       }
     }, 60_000);

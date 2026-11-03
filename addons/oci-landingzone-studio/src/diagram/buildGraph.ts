@@ -681,7 +681,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
     const stackX = drgX + drgSize / 2 + drgFootprint / 2 + attachmentGap;
     const drgY = clusterTop;
     const hubVcnBottom = TITLE + PAD + hubVcnH;
-    const hubAttachmentY = (hubVcnBottom + drgY - hubAttachmentHeight) / 2;
+    const hubAttachmentY = (hubVcnBottom + sharedNetworkH + drgY - hubAttachmentHeight) / 2;
     nodes.push({ id: 'drg', kind: 'drg', label: generatorNames.hubDrg(regionTok), parentId: 'cmp-network', x: drgX, y: drgY, width: drgSize, height: drgSize });
 
     // Gutter-routed attachments: one per spoke VCN (step 3) and one per platform

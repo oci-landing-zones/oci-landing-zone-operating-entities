@@ -164,14 +164,39 @@ describe('generated diagram quality matrix', () => {
 });
 
 describe('layout quality regressions', () => {
-  it('rejects a fixed-width attachment pill that clips its full generated label or terminal padding', () => {
+  it.each([false, true])('rejects clipped attachment labels, vertical=%s', (attachmentVertical) => {
     const graph: DiagramModel = { nodes: [
-      { id: 'attachment', kind: 'attachment', label: 'drgatt-fra-lz-preprod-proj', x: 0, y: 0, width: 150, height: 26 },
+      { id: 'attachment', kind: 'attachment', label: 'drgatt-fra-lz-preprod-proj', attachmentVertical,
+        x: 0, y: 0, width: attachmentVertical ? 26 : 150, height: attachmentVertical ? 150 : 26 },
     ], edges: [] };
     expect(attachmentLabelLayout(graph.nodes[0].label).width).toBeGreaterThan(150);
     expect(validateDiagramLayout(graph).map((issue) => issue.code)).toContain('attachment-text');
-    graph.nodes[0].width = attachmentLabelLayout(graph.nodes[0].label).width;
+    graph.nodes[0][attachmentVertical ? 'height' : 'width'] = attachmentLabelLayout(graph.nodes[0].label).width;
     expect(validateDiagramLayout(graph)).toEqual([]);
+  });
+
+  it('allows gateway anchor space beside a subnet but rejects visible label overlap', () => {
+    const graph: DiagramModel = { nodes: [
+      { id: 'vcn', kind: 'vcn', label: '', x: 0, y: 0, width: 362, height: 180 },
+      { id: 'gateway', kind: 'gateway', parentId: 'vcn', label: 'Internet\nGateway', x: -38, y: 50, width: 76, height: 74 },
+      { id: 'subnet', kind: 'subnet', parentId: 'vcn', label: '', x: 31, y: 50, width: 300, height: 80 },
+    ], edges: [] };
+    const overlaps = () => validateDiagramLayout(graph).filter((issue) => issue.code === 'sibling-overlap');
+    expect(overlaps()).toEqual([]);
+    graph.nodes[2].x = 20;
+    expect(overlaps()).toHaveLength(1);
+  });
+
+  it('allows route cards across compartment bodies while protecting their headings', () => {
+    const graph: DiagramModel = { nodes: [
+      { id: 'lz', kind: 'landingzone', label: '', x: 0, y: 0, width: 800, height: 400 },
+      { id: 'network', kind: 'compartment', parentId: 'lz', label: 'Network', x: 100, y: 50, width: 400, height: 300 },
+      { id: 'table', kind: 'routetable', parentId: 'lz', label: '', x: 110, y: 100, width: 200, height: 80 },
+    ], edges: [] };
+    const overlaps = () => validateDiagramLayout(graph).filter((issue) => issue.code === 'sibling-overlap');
+    expect(overlaps()).toEqual([]);
+    graph.nodes[2].y = 60;
+    expect(overlaps()).toHaveLength(1);
   });
 
   it('rejects shared physical DRG trunks even when the connections share a DRG, while allowing point crossings', () => {

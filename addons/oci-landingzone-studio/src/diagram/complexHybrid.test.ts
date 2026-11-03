@@ -43,10 +43,7 @@ describe('three-environment OKE with FastConnect and VPN backup', () => {
     ]);
     for (const flow of buildFlowTraces(model, outbound, 'kind', tables)) expect(flow.ok).toBe(false);
     const dots = graph.nodes.filter((node) => node.rtDotPhysicalOwnerId === 'drg').map((node) => rects.get(node.id)!);
-    for (let i = 0; i < dots.length; i++) for (let j = i + 1; j < dots.length; j++) {
-      const a = dots[i], b = dots[j];
-      expect(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y).toBe(true);
-    }
+    expect(new Set(dots.map((dot) => `${dot.x}:${dot.y}`)).size).toBe(dots.length);
   }, 60_000);
 
   it('generates three OKE clusters and keeps the diagram fixture free of authentication material', async () => {

@@ -385,13 +385,13 @@ describe('generator-aligned graph', () => {
       const vcn = nodes.get(gateway.parentId!)!;
       const network = nodes.get(vcn.parentId!)!;
       expect(gateway.x + gateway.width / 2, gateway.id).toBe(0);
-      expect(vcn.x).toBe(46);
-      expect(vcn.x + gateway.x, `${gateway.id} compartment inset`).toBeGreaterThanOrEqual(8);
+      expect(vcn.x).toBe((network.width - vcn.width) / 2);
+      expect(vcn.x + gateway.x + gateway.width / 2 - 17, `${gateway.id} icon inset`).toBeGreaterThanOrEqual(8);
       expect(vcn.x + vcn.width).toBeLessThanOrEqual(network.width);
       expect(gateway.label).toBe({ igw: 'Internet\nGateway', natgw: 'NAT\nGateway', sgw: 'Service\nGateway' }[gateway.icon as 'igw' | 'natgw' | 'sgw']);
       const subnets = graph.nodes.filter((node) => node.parentId === vcn.id && node.kind === 'subnet');
       subnets.forEach((subnet) => {
-        expect(subnet.x).toBeGreaterThanOrEqual(gateway.x + gateway.width + 8);
+        expect(subnet.x).toBe((vcn.width - subnet.width) / 2);
         expect(subnet.width).toBe(300);
         expect(vcn.width - subnet.x - subnet.width - 10).toBeGreaterThanOrEqual(6);
         expect(subnet.label.split('\n')).toHaveLength(2);
@@ -580,6 +580,6 @@ describe('generator-aligned graph', () => {
 
     const drgEdges = graph.edges.filter((edge) => edge.target === 'drg' && edge.source.startsWith('attach-'));
     expect(drgEdges).toHaveLength(6);
-    expect(new Set(drgEdges.map((edge) => edge.targetPort)).size).toBe(drgEdges.length);
+    expect(new Set(drgEdges.map((edge) => `${edge.targetSide}:${edge.targetPort}`)).size).toBe(drgEdges.length);
   });
 });
