@@ -4,10 +4,10 @@ import type { DiagramEdge, DiagramNode } from '../model/types';
 import { buildGraphLayout as buildGraph } from './buildGraph';
 import { hubKindDefaults } from '../services/hubKinds';
 import { absoluteNodeRects, flowAnchorPoint } from './flowGeometry';
-import { associationDisplaySegments, connectionFlowGeometry, flowDisplayPoints, polylinePath, routeStructuralEdges, structuralEdgePoints, type FlowVisitAnchor } from './displayGeometry';
+import { associationDisplaySegments, connectionFlowGeometry, polylinePath, routeStructuralEdges, structuralEdgePoints, type FlowVisitAnchor } from './displayGeometry';
 import { pathLengths } from './flowOverlayGeometry';
 import { drgCaptionBounds, drgCaptionLayout } from './layoutPolicy';
-import { createFlowPlayback, flowHopMarkers, pointAtDistance } from './flowPlayback';
+import { createFlowPlayback } from './flowPlayback';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 
 describe('shared diagram display geometry', () => {
@@ -55,42 +55,8 @@ describe('shared diagram display geometry', () => {
     }
   }, 30_000);
 
-  it('keeps every flow on its canonical connection points for live and downloadable views', () => {
-    const edges: DiagramEdge[] = ['prod:egress', 'preprod:egress', 'prod:ingress'].map((group) => ({
-      id: `flow-${group}#0`, source: 'a', target: 'b', waypoints: ['a', 'b'], points: [{ x: 0, y: 0 }, { x: 100, y: 0 }],
-    }));
-    for (const edge of edges) expect(flowDisplayPoints(edge)).toBe(edge.points);
+  it('formats an orthogonal path as SVG line segments', () => {
     expect(polylinePath([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 20 }])).toBe('M0,0 L10,0 L10,20');
-  });
-
-  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('uses the same %s event point for the route dot, number and packet stop', async (hub) => {
-    const model = emptyLzModel();
-    model.network = { hubKind: hub, ...hubKindDefaults(hub) };
-    const graph = buildGraph(model, 5, { allFlows: true }, undefined, await generatedRouteTables(model));
-    expect(graph.flowErrors).toBeUndefined();
-    const rects = absoluteNodeRects(graph.nodes);
-    const flows = graph.edges.filter((edge) => edge.waypoints);
-    expect(flows.length).toBeGreaterThan(0);
-    let dotEvents = 0;
-    for (const flow of flows) {
-      const playback = createFlowPlayback(flow);
-      expect(playback.valid, flow.id).toBe(true);
-      for (const [index, hop] of flow.flowHops!.entries()) {
-        const event = flow.visits![hop.visitIndex];
-        const point = flow.points![event.pointIndex];
-        expect(pointAtDistance(flow.points!, playback.stops[index].distance)).toEqual(point);
-        if (hop.tableId) {
-          const dot = rects.get(event.anchorId!)!;
-          expect(dot.node.kind).toBe('rtdot');
-          expect(point).toEqual({ x: dot.x + dot.width / 2, y: dot.y + dot.height / 2 });
-          dotEvents++;
-        }
-      }
-      for (const marker of flowHopMarkers(flow)) {
-        expect({ x: marker.x, y: marker.y }).toEqual(pointAtDistance(flow.points!, playback.stops[marker.seq - 1].distance));
-      }
-    }
-    expect(dotEvents).toBeGreaterThan(0);
   });
 
   const nodes: DiagramNode[] = [

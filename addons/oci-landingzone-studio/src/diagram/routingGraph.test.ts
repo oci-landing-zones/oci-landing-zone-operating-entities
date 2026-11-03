@@ -14,6 +14,7 @@ describe('canonical routing graph', () => {
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const tables = await generatedRouteTables(model);
     const graph = buildGraph(model, 5, { allFlows: true }, undefined, tables);
+    expect(graph.flowErrors).toBeUndefined();
     const rects = absoluteNodeRects(graph.nodes);
     expect(graph.nodes.filter((node) => node.kind === 'routetable').map((node) => node.id).sort()).toEqual(tables.map((table) => table.id).sort());
     const lz = rects.get('landingzone')!;
@@ -44,6 +45,7 @@ describe('canonical routing graph', () => {
 
     const flows = graph.edges.filter((edge) => edge.waypoints);
     expect(flows.length).toBeGreaterThan(0);
+    expect(flows.some((flow) => flow.flowHops?.some((hop) => hop.tableId))).toBe(true);
     for (const flow of flows) {
       expect(flowDisplayPoints(flow)).toBe(flow.points);
       expect(flow.visits?.map((visit) => visit.node)).toEqual(flow.waypoints);

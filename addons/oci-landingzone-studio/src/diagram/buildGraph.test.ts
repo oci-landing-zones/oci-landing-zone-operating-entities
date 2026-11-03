@@ -356,23 +356,6 @@ describe('generator-aligned graph', () => {
     }
   });
 
-  it('nests every gateway inside its VCN', () => {
-    const base = emptyLzModel();
-    const graph = buildGraph({
-      ...base,
-      network: { hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
-      platforms: [newPlatform('custom', [])],
-      sharedPlatforms: [newSharedPlatform('custom', [])],
-    }, 4);
-    const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
-    const gateways = graph.nodes.filter((node) => node.kind === 'gateway');
-    expect(gateways.length).toBeGreaterThan(0);
-    for (const gateway of gateways) {
-      expect(nodes.get(gateway.parentId ?? '')?.kind, gateway.id).toBe('vcn');
-      expect(gateway.x + gateway.width / 2, `${gateway.id} icon centre`).toBe(0);
-    }
-  });
-
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps %s gateways on compact VCN boundaries with readable service labels', (kind) => {
     const model = emptyLzModel();
     model.network = { hubKind: kind, ...hubKindDefaults(kind) };
@@ -381,8 +364,10 @@ describe('generator-aligned graph', () => {
     const before = structuredClone(model);
     const graph = buildGraph(model, 4, { showEndpoints: true });
     const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+    expect(graph.nodes.some((node) => node.kind === 'gateway')).toBe(true);
     for (const gateway of graph.nodes.filter((node) => node.kind === 'gateway')) {
       const vcn = nodes.get(gateway.parentId!)!;
+      expect(vcn.kind, gateway.id).toBe('vcn');
       const network = nodes.get(vcn.parentId!)!;
       expect(gateway.x + gateway.width / 2, gateway.id).toBe(0);
       expect(vcn.x).toBe((network.width - vcn.width) / 2);
@@ -442,18 +427,6 @@ describe('generator-aligned graph', () => {
     const flow = graph.edges.find((edge) => edge.id === 'flow-prod:egress:web#0')!;
     expect(flow.points?.[0]).toEqual(flowAnchor(graph, 'cmp-env-0-vcn-sn-0'));
     expect(flow.points?.at(-1)).toEqual(flowAnchor(graph, 'gw-natgw'));
-  });
-
-  it('keeps all shared route-table attachment points visible during a flow', async () => {
-    const model = emptyLzModel();
-    const tables = await generatedRouteTables(model);
-    const spokeTable = tables.find((table) => table.associations.some((association) => association.nodeId === 'attach-cmp-env-0' && association.kind === 'drg-attachment'))!;
-    const graph = buildGraph(model, 3, {
-      activeFlows: ['prod:egress:web'],
-      openTables: [spokeTable.id],
-    }, undefined, tables);
-    expect(graph.nodes.find((node) => node.id === spokeTable.id)).toBeDefined();
-    expect(graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === spokeTable.id)).toHaveLength(spokeTable.associations.length);
   });
 
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)(

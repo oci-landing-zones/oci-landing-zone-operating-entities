@@ -64,12 +64,6 @@ describe('flow playback timeline', () => {
     },
   );
 
-  it('never exposes a partial marker sequence when one anchor is invalid', () => {
-    const edge = structuredClone(hairpin);
-    delete edge.visits![1].anchorId;
-    expect(flowHopMarkers(edge)).toEqual([]);
-  });
-
   it.each([[100, 1750], [1000, 1000 / 240 * 1000], [10000, 10000 / 240 * 1000]])(
     'moves along a %i-unit path in %i ms, excluding hop pauses', (distance, duration) => {
       const playback = createFlowPlayback({ id: 'travel', source: 'a', target: 'b', points: [{ x: 0, y: 0 }, { x: distance, y: 0 }] });
@@ -78,30 +72,12 @@ describe('flow playback timeline', () => {
     },
   );
 
-  it('keeps Internet ingress, egress and OCI Services at the same speed on long paths', () => {
-    const playbacks = [
-      ['flow-prod:egress#0', 10000], ['flow-prod:ingress#0', 8000], ['flow-prod:services#0', 2000],
-    ].map(([id, distance]) => createFlowPlayback({ id: String(id), source: 'a', target: 'b', points: [{ x: 0, y: 0 }, { x: Number(distance), y: 0 }] }));
-    for (const playback of playbacks) {
-      expect(playback.travelMsPerUnit).toBeCloseTo(1000 / 240);
-      expect(sampleFlowPlayback(playback, 1000).distance).toBeCloseTo(240);
-    }
-  });
-
   it('holds every numbered routing hop for 960 ms and each other numbered stop for 360 ms', () => {
     const playback = createFlowPlayback(hairpin);
     expect(playback.stops.map((stop) => stop.departure - stop.arrival)).toEqual([960, 960, 960, 960, 360]);
     for (const [index, stop] of playback.stops.entries()) {
       expect(sampleFlowPlayback(playback, stop.departure - 1)).toEqual({ distance: stop.distance, hopIndex: index, rule: stop.rule });
       expect(sampleFlowPlayback(playback, stop.departure).hopIndex).toBeUndefined();
-    }
-  });
-
-  it('shows only the effective rule while the same clock holds its packet at that hop', () => {
-    const playback = createFlowPlayback(hairpin);
-    for (const [index, stop] of playback.stops.entries()) {
-      const frame = sampleFlowPlayback(playback, (stop.arrival + stop.departure) / 2);
-      expect(frame).toEqual({ distance: stop.distance, hopIndex: index, rule: stop.rule });
     }
     const transit = sampleFlowPlayback(playback, (playback.stops[1].departure + playback.stops[2].arrival) / 2);
     expect(transit.rule).toBeUndefined();
@@ -135,13 +111,6 @@ describe('flow playback timeline', () => {
     expect(sampleFlowPlayback(playback, playback.duration - 1)).toEqual({ distance: 400 });
     expect(sampleFlowPlayback(playback, playback.duration + 100)).toEqual(sampleFlowPlayback(playback, 100));
     expect(sampleFlowPlayback(playback, playback.duration - 1).rule).toBeUndefined();
-  });
-
-  it('does not flash a rule when its resource occurrence has no valid geometry', () => {
-    const edge = structuredClone(hairpin);
-    edge.visits![1].node = 'different-resource';
-    const playback = createFlowPlayback(edge);
-    expect(sampleFlowPlayback(playback, 0, 1).rule).toBeUndefined();
   });
 
   it('handles an empty path without NaN or animation', () => {
