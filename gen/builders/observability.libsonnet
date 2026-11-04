@@ -1,11 +1,8 @@
 // gen/builders/observability.libsonnet
 // Observability builder: alarms, events, notifications, service connectors, and logging.
 //
-// Generates the same structures as:
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2.json
+// Builds pre and complete variants for composition consumers. Published One-OE
+// entrypoints project the complete variants into two shared CIS configurations.
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 

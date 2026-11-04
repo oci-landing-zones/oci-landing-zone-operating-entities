@@ -11,7 +11,13 @@ SOURCE = 'gen/blueprints/one-oe/runtime/one-stack'
 TAG_PREFIX = 'tagns-lz-cost-governance.tag-lz-'
 
 
-class OneOEHubEObservabilityTests(unittest.TestCase):
+class OneOEObservabilityTests(unittest.TestCase):
+    def test_only_two_common_observability_files_are_published(self):
+        self.assertEqual(
+            {'oneoe_observability_cis1.json', 'oneoe_observability_cis2.json'},
+            {path.name for path in DIRECTORY.glob('oneoe_observability*.json')},
+        )
+
     def test_complete_files_cover_every_hub_e_network_target(self):
         network = json.loads((DIRECTORY / 'oneoe_network_hub_e.json').read_text())
         targets = {}
@@ -23,7 +29,7 @@ class OneOEHubEObservabilityTests(unittest.TestCase):
 
         for cis in (1, 2):
             with self.subTest(cis=cis):
-                document = render_jsonnet_object(f'{SOURCE}/oneoe_observability_hub_e_cis{cis}.jsonnet')
+                document = render_jsonnet_object(f'{SOURCE}/oneoe_observability_cis{cis}.jsonnet')
                 logging = document['logging_configuration']
                 self.assertFalse(logging.get('flow_logs'))
                 logs = logging['service_logs']
@@ -50,6 +56,17 @@ publish(profiles.hub_e).observability_cis{cis}
                     if family != 'logging_configuration':
                         self.assertEqual(baseline[family], document[family])
                 self.assertEqual(baseline['logging_configuration']['log_groups'], logging['log_groups'])
+
+                for hub in 'abce':
+                    other = json.loads((DIRECTORY / f'oneoe_network_hub_{hub}.json').read_text())
+                    vcns = {}
+                    subnets = set()
+                    for category in other['network_configuration']['network_configuration_categories'].values():
+                        for key, vcn in category.get('vcns', {}).items():
+                            vcns[key] = vcn
+                            subnets.update(vcn.get('subnets', {}))
+                    self.assertEqual(set(vcns), {log['resource_id'] for log in logs.values() if log['category'] == 'vcn'})
+                    self.assertTrue({log['resource_id'] for log in logs.values() if log['category'] == 'subnet'}.issubset(subnets))
 
 
 if __name__ == '__main__':

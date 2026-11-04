@@ -50,7 +50,7 @@ class OneOEPublishedTagCoverageTests(unittest.TestCase):
         self.check_files('oneoe_network*.json', NETWORK_COLLECTIONS, 'network', 5)
 
     def test_every_published_observability_variant_is_tagged(self):
-        self.check_files('oneoe_observability*.json', OBSERVABILITY_COLLECTIONS, 'observability', 6)
+        self.check_files('oneoe_observability*.json', OBSERVABILITY_COLLECTIONS, 'observability', 2)
 
 
 if __name__ == '__main__':
