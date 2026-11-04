@@ -1,7 +1,7 @@
 # Cost governance tags
 
-One-OE uses one governance file, `oneoe_governance.json`, for the cost tag namespace,
-the six tag definitions, and six required Tag Defaults. The IAM, Hub A/B/C/E
+One-OE uses one governance file, `oneoe_governance.json`, for the
+`tagns-lz-cost-governance` namespace, the six tag definitions, and six required Tag Defaults. The IAM, Hub A/B/C/E
 network, security, and observability files assign the six tags explicitly to
 resources that support them.
 
@@ -34,12 +34,12 @@ Observability, including flow logs, uses `platform=observability`.
 
 ## One plan and one apply
 
-This governance file requires the Tag Default ordering implemented in the
-orchestrator's [`feature/tag-order`](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/feature/tag-order)
-branch. The revision selected for this validation is
-`aeec73b7b3742d457c1ce14cc2f496d2bd9d8e7a`. Pin and review the orchestrator revision
-used by a deployment; earlier ordering, such as v2.2.0, cannot create these Tag
-Defaults against new same-stack compartments in one apply.
+Use [Orchestrator v2.4.1](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/releases/tag/v2.4.1)
+with this governance file. This release supports Tag Defaults targeting logical
+compartments created in the same apply, and manages tag namespaces, definitions,
+and defaults through the tenancy home-region provider. Earlier ordering, such as
+v2.2.0, cannot create these Tag Defaults against new same-stack compartments in
+one apply.
 
 Use `oneoe_governance.json` together with `oneoe_iam.json`, the selected hub network
 file, and the security and observability files required by the chosen deployment
@@ -52,7 +52,7 @@ consume them through the pinned orchestrator workflow. Terraform CLI is also
 supported. For a fresh deployment, no compartment dependency output needs to be
 exported and re-imported just to create these Tag Defaults.
 
-The orchestrator orders a single apply as follows:
+The orchestrator establishes the following dependencies in a single apply:
 
 ```text
 Tag namespaces and tag definitions
@@ -60,18 +60,17 @@ Tag namespaces and tag definitions
           Propagation wait
                     ↓
 Compartments with all six tags explicitly assigned
-                    ↓
-         Mandatory Tag Defaults
-                    ↓
-          Propagation wait
-                    ↓
-Networking, load balancers, Vault, buckets, and other services
-         according to their dependencies
+                    ├── Mandatory Tag Defaults for their target compartments
+                    └── Networking, load balancers, Vault, buckets, and other
+                        services according to their resource dependencies
 ```
 
 Compartments must carry explicit tags because their Tag Defaults are created
-after them. The tag definitions and namespaces themselves are not assigned cost
-tags that do not exist yet; the governance file avoids that bootstrap dependency.
+after them. Downstream services do not wait for Tag Defaults or their propagation
+in v2.4.1, so their configuration must also assign the tags explicitly. Resources
+created before defaults take effect are not backfilled later. The tag definitions
+and namespaces themselves are not assigned cost tags that do not exist yet; the
+governance file avoids that bootstrap dependency.
 
 ## Mandatory Tag Defaults
 
@@ -109,9 +108,15 @@ After applying, inspect the effective tags and confirm that all six defaults hav
 is rejected and that creation with valid values succeeds.
 Remove temporary test resources afterward.
 
-Existing deployments upgrading to the changed orchestrator ordering must review
-its state-address migration instructions before applying. Moving Tag Defaults
-between Terraform resource addresses must not unintentionally recreate them.
+Orchestrator v2.4.1 includes a built-in `moved` block for existing Tag Default
+resources, from `module.oci_lz_tags[0].oci_identity_tag_default.these` to
+`module.oci_lz_tag_defaults[0].oci_identity_tag_default.these`. It preserves their OCI identities when configuration keys and target
+compartments are unchanged; no manual state commands are needed in that case.
+Review the upgrade plan to confirm there are no unintended replacements.
+
+Managed compartment keys take precedence over matching external dependency keys.
+Review collisions before upgrading: a changed target or `compartment_ids`
+reference can require replacement and a separately reviewed state migration.
 
 ## Workload extensions and add-ons
 
