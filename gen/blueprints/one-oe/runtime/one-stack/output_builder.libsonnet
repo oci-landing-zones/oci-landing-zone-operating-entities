@@ -1,6 +1,7 @@
 // Published One-OE cost tags and governance for single-apply Tag Default ordering.
 local lz = import '../../../../landing_zone.libsonnet';
 local budgets = import './budgets.libsonnet';
+local explicitFlowLogs = import './explicit_flow_logs.libsonnet';
 local namespace = 'tagns-lz-cost-governance';
 local collections = [
   'compartments', 'children', 'groups', 'identity_domains', 'supplied_policies',
@@ -104,6 +105,8 @@ function(profile) {
   observability_cis1_pre: tagObservability(rendered.observability_cis1_pre),
   observability_cis2: tagObservability(rendered.observability_cis2),
   observability_cis2_pre: tagObservability(rendered.observability_cis2_pre),
+  observability_cis1_explicit: explicitFlowLogs(rendered.network, tagObservability(rendered.observability_cis1)),
+  observability_cis2_explicit: explicitFlowLogs(rendered.network, tagObservability(rendered.observability_cis2)),
   security_cis1: tagSecurity(rendered.security_cis1),
   security_cis1_pre: tagSecurity(rendered.security_cis1_pre),
   security_cis2: tagSecurity(rendered.security_cis2),

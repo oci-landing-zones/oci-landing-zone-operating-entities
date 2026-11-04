@@ -15,7 +15,7 @@ NETWORK_COLLECTIONS = {
     'drg_attachments', 'drg_route_tables', 'drg_route_distributions', 'l7_load_balancers',
     'network_firewalls', 'network_firewall_policies', 'nlbs',
 }
-OBSERVABILITY_COLLECTIONS = {'alarms', 'event_rules', 'log_groups', 'flow_logs', 'topics', 'buckets', 'service_connectors'}
+OBSERVABILITY_COLLECTIONS = {'alarms', 'event_rules', 'log_groups', 'flow_logs', 'service_logs', 'topics', 'buckets', 'service_connectors'}
 
 
 def resources(value, collections, path=''):
@@ -50,7 +50,7 @@ class OneOEPublishedTagCoverageTests(unittest.TestCase):
         self.check_files('oneoe_network*.json', NETWORK_COLLECTIONS, 'network', 5)
 
     def test_every_published_observability_variant_is_tagged(self):
-        self.check_files('oneoe_observability*.json', OBSERVABILITY_COLLECTIONS, 'observability', 4)
+        self.check_files('oneoe_observability*.json', OBSERVABILITY_COLLECTIONS, 'observability', 6)
 
 
 if __name__ == '__main__':
