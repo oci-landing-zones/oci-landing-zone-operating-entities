@@ -16,7 +16,6 @@ local expected_regional = [
   'network.json',
   'network_backends.json',
   'observability_cis2.json',
-  'observability_cis2_pre.json',
   'security_cis2.json',
   'security_cis2_pre.json',
 ];

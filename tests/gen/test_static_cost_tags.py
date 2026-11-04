@@ -25,7 +25,7 @@ COLLECTIONS = {
     'drg_attachments', 'drg_route_tables', 'drg_route_distributions', 'l7_load_balancers',
     'alarms', 'event_rules', 'topics', 'buckets', 'service_connectors', 'targets',
     'host_recipes', 'host_targets', 'recipes', 'security_zones', 'vaults', 'keys',
-    'network_firewalls', 'network_firewall_policies', 'nlbs', 'log_groups', 'flow_logs',
+    'network_firewalls', 'network_firewall_policies', 'nlbs', 'log_groups', 'flow_logs', 'service_logs',
     'remote_peering_connections', 'instances', 'resolvers', 'views', 'zones',
     'tsig_keys', 'steering_policies', 'attached_views', 'dns_zones',
 }

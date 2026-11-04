@@ -32,6 +32,7 @@ local collections = [
   'service_connectors',
   'log_groups',
   'flow_logs',
+  'service_logs',
   'streams',
   'targets',
   'host_recipes',

@@ -1151,6 +1151,7 @@
 
     "logging_configuration": {
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+        "flow_logs"                                                : {},
 
         "default_defined_tags": {
             "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
@@ -1159,68 +1160,6 @@
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
             "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
-        },
-
-        "flow_logs": {
-            "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
-                "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                             : "subnet",
-
-                "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
-                }
-            },
-
-            "LOG-LZ-PROD-VCN-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
-                "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                             : "vcn",
-
-                "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
-                }
-            },
-
-            "LOG-LZ-SUBNET-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                             : "subnet",
-
-                "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
-                }
-            },
-
-            "LOG-LZ-VCN-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                             : "vcn",
-
-                "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
-                }
-            }
         },
 
         "log_groups": {
@@ -1241,6 +1180,224 @@
             "LGRP-LZ-VCN-FLOW-KEY": {
                 "name"                                             : "lgrp-lz-vcn-flow",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            }
+        },
+
+        "service_logs": {
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY-SN-AMS-LZ-PROD-APP-KEY": {
+                "name"                                             : "sn-ams-lz-prod-app-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-PROD-APP-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY-SN-AMS-LZ-PROD-DB-KEY": {
+                "name"                                             : "sn-ams-lz-prod-db-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-PROD-DB-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY-SN-AMS-LZ-PROD-INFRA-KEY": {
+                "name"                                             : "sn-ams-lz-prod-infra-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-PROD-INFRA-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY-SN-AMS-LZ-PROD-WEB-KEY": {
+                "name"                                             : "sn-ams-lz-prod-web-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-PROD-WEB-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-PROD-VCN-FLOW-KEY-VCN-AMS-LZ-PROD-PROJECTS-KEY": {
+                "name"                                             : "vcn-ams-lz-prod-projects-flow-log",
+                "category"                                         : "vcn",
+                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "resource_id"                                      : "VCN-AMS-LZ-PROD-PROJECTS-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-DNS-KEY": {
+                "name"                                             : "sn-ams-lz-hub-dns-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-DNS-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-FW-DMZ-KEY": {
+                "name"                                             : "sn-ams-lz-hub-fw-dmz-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-FW-DMZ-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-FW-INT-KEY": {
+                "name"                                             : "sn-ams-lz-hub-fw-int-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-FW-INT-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-LB-KEY": {
+                "name"                                             : "sn-ams-lz-hub-lb-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-LB-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-MGMT-KEY": {
+                "name"                                             : "sn-ams-lz-hub-mgmt-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-MGMT-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY-SN-AMS-LZ-HUB-MON-KEY": {
+                "name"                                             : "sn-ams-lz-hub-mon-flow-log",
+                "category"                                         : "subnet",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "SN-AMS-LZ-HUB-MON-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                }
+            },
+
+            "LOG-LZ-VCN-FLOW-KEY-VCN-AMS-LZ-HUB-KEY": {
+                "name"                                             : "vcn-ams-lz-hub-flow-log",
+                "category"                                         : "vcn",
+                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+                "resource_id"                                      : "VCN-AMS-LZ-HUB-KEY",
+                "retention_duration"                               : 90,
+                "service"                                          : "flowlogs",
 
                 "defined_tags": {
                     "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",

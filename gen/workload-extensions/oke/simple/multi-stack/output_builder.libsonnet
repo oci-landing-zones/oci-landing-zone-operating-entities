@@ -93,6 +93,19 @@ function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
       },
     },
 
+  local owned_log_targets = std.flattenArrays([
+    [key] + std.objectFields(multi_stack_category.vcns[key].subnets)
+    for key in std.objectFields(multi_stack_category.vcns)
+  ]),
+  local scoped_observability(doc) = doc + {
+    logging_configuration+: {
+      service_logs: {
+        [key]: doc.logging_configuration.service_logs[key]
+        for key in std.objectFields(doc.logging_configuration.service_logs)
+        if std.member(owned_log_targets, doc.logging_configuration.service_logs[key].resource_id)
+      },
+    },
+  },
   oke_network: {
     network_configuration: {
       network_configuration_categories: {
@@ -121,9 +134,9 @@ function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
   // Multi-stack is deployed over an existing Landing Zone, so publish only
   // the OKE platform tag namespace and not the baseline role namespace.
   oke_governance: aggregated.governance,
-  oke_observability_cis1: rendered_lz.observability_cis1,
+  oke_observability_cis1: scoped_observability(rendered_lz.observability_cis1),
   oke_observability_cis1_pre: rendered_lz.observability_cis1_pre,
-  oke_observability_cis2: rendered_lz.observability_cis2,
+  oke_observability_cis2: scoped_observability(rendered_lz.observability_cis2),
   oke_observability_cis2_pre: rendered_lz.observability_cis2_pre,
   oke_clusters: rendered_lz.extra.oke_clusters,
   oke_workers: rendered_lz.extra.oke_workers,

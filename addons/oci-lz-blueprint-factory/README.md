@@ -148,7 +148,7 @@ observability pair selected by `cis_level` (`2` by default):
 - `security_cis1.json` or `security_cis2.json`
 - `observability_cis1.json` or `observability_cis2.json`
 
-Security and observability include `*_pre.json` files where resources must exist before dependent controls are configured.
+Security includes `*_pre.json` files for staged controls. Use the complete observability file from the initial apply; its Flow Logs reference declared VCN and subnet keys.
 
 See the [Generator README](/gen/README.md) for local setup and command details.
 
