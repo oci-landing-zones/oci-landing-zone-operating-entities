@@ -157,36 +157,46 @@ Existing deployments are not modified by editing these files. Review a migration
 plan that updates resource values and tag validators together; changing a Tag
 Default does not rewrite tags already present on existing resources.
 
-## Monthly tag budgets
+## Monthly budgets
 
 `budgets_configuration` is a sibling of `tags_configuration` in the published
 `oneoe_governance.json`. Its publication source is
 `gen/blueprints/one-oe/runtime/one-stack/budgets.libsonnet`.
 
-| Tag | Value | Monthly amount |
+| Target | Value | Monthly amount |
 |---|---|---:|
-| `tag-lz-project` | `proj1` | 500 |
+| Compartment | `cmp-landingzone` and its children | 10000 |
+| `tag-lz-cost-center` | `CC12345` | 5000 |
+| `tag-lz-business-unit` | `IT` | 5000 |
+| `tag-lz-business-unit` | `Finance` | 5000 |
+| `tag-lz-business-unit` | `Retail` | 5000 |
 | `tag-lz-environment` | `prod` | 3000 |
 | `tag-lz-environment` | `preprod` | 2000 |
-| `tag-lz-business-unit` | `IT` | 5000 |
-| `tag-lz-cost-center` | `CC12345` | 5000 |
+| `tag-lz-project` | `proj1` | 500 |
+
+An additional monthly budget of 10000 targets the complete `cmp-landingzone`
+compartment hierarchy, including its child compartments. It uses target type
+`COMPARTMENT` and the dependency key `CMP-LANDINGZONE-KEY`, which the Orchestrator
+resolves to the deployed compartment OCID. Its scope is the Landing Zone, not the
+entire tenancy.
 
 Amounts use the tenancy's rate-card currency. Each budget starts on day 1 of the
 month and has an actual-spend alert at 80%, addressed to
 `email.address@example.com`. Replace this example recipient before relying on
 email delivery. These are independent views of spending and must not be added:
 the same resource can count toward a project, environment, business unit, and
-cost-center budget simultaneously. Shared-resource spending is not included in
+cost-center budget simultaneously, as well as the overall Landing Zone budget.
+Shared-resource spending is not included in
 the `prod` or `preprod` targets unless the resource has that environment value.
 
-Each target has the form `namespace.key.value`. The target selects the spending
+Tag targets have the form `namespace.key.value`. The target selects the spending
 being measured; the budget's own `defined_tags` label the budget resource. Budget
 and alert metadata contain all six cost tags, using the module's inherited tags
 for the alert. The budgets are created in the tenancy root.
 
-The `IT` and `CC12345` budgets only count resources assigned those values. This
+The `IT`, `Finance`, `Retail`, and `CC12345` budgets only count resources assigned their respective values. This
 budget configuration does not replace `tobedefined` on existing resource inputs.
-Confirm the organization and resource assignments before relying on those two
+Confirm the organization and resource assignments before relying on those
 budgets. Budgets generate alerts; they do not stop resources or enforce spending
 caps. See [OCI Budgets](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/budgetsoverview.htm).
 

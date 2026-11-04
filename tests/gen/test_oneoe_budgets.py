@@ -14,20 +14,22 @@ class OneOEBudgetTests(unittest.TestCase):
     def test_agreed_budget_targets_and_amounts(self):
         budgets = self.governance['budgets_configuration']['budgets']
         actual = {
-            budget['target']['values'][0]: budget['amount']
+            (budget['target']['type'], budget['target']['values'][0]): budget['amount']
             for budget in budgets.values()
         }
         prefix = 'tagns-lz-cost-governance.tag-lz-'
         self.assertEqual({
-            prefix + 'project.proj1': 500,
-            prefix + 'environment.prod': 3000,
-            prefix + 'environment.preprod': 2000,
-            prefix + 'business-unit.IT': 5000,
-            prefix + 'cost-center.CC12345': 5000,
+            ('TAG', prefix + 'project.proj1'): 500,
+            ('TAG', prefix + 'environment.prod'): 3000,
+            ('TAG', prefix + 'environment.preprod'): 2000,
+            ('TAG', prefix + 'business-unit.IT'): 5000,
+            ('TAG', prefix + 'business-unit.Finance'): 5000,
+            ('TAG', prefix + 'business-unit.Retail'): 5000,
+            ('TAG', prefix + 'cost-center.CC12345'): 5000,
+            ('COMPARTMENT', 'CMP-LANDINGZONE-KEY'): 10000,
         }, actual)
-        self.assertEqual(5, len(budgets))
+        self.assertEqual(8, len(budgets))
         for budget in budgets.values():
-            self.assertEqual('TAG', budget['target']['type'])
             self.assertEqual(1, len(budget['target']['values']))
             self.assertEqual({'reset_period': 'MONTHLY', 'processing_period_type': 'MONTH',
                               'day_of_month_to_begin': 1}, budget['schedule'])
@@ -43,8 +45,9 @@ class OneOEBudgetTests(unittest.TestCase):
             self.assertEqual(80, alert['threshold_value'])
             self.assertEqual('email.address@example.com', alert['recipients'])
             self.assertEqual(set(allowed), set(budget['defined_tags']))
-            target_key, target_value = budget['target']['values'][0].rsplit('.', 1)
-            self.assertEqual(target_value, budget['defined_tags'][target_key])
+            if budget['target']['type'] == 'TAG':
+                target_key, target_value = budget['target']['values'][0].rsplit('.', 1)
+                self.assertEqual(target_value, budget['defined_tags'][target_key])
             for key, value in budget['defined_tags'].items():
                 self.assertIn(value, allowed[key])
         # Budget creation must not tag the namespace with its own definitions.

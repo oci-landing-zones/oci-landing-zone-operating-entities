@@ -1,14 +1,14 @@
 {
     "budgets_configuration": {
         "budgets": {
-            "BUDGET-BUSINESS-UNIT-IT-KEY": {
-                "name"                                             : "budget-business-unit-it",
-                "description"                                      : "Monthly budget for tag-lz-business-unit=IT.",
-                "amount"                                           : 5000,
+            "BUDGET-LANDINGZONE-KEY": {
+                "name"                                             : "budget-landingzone",
+                "description"                                      : "Monthly budget for compartment cmp-landingzone and its child compartments.",
+                "amount"                                           : 10000,
 
                 "alert_rule": {
-                    "name"                                         : "budget-business-unit-it-80",
-                    "message"                                      : "Actual spending for tag-lz-business-unit=IT has reached 80% of the monthly budget.",
+                    "name"                                         : "budget-landingzone-80",
+                    "message"                                      : "Actual spending for compartment cmp-landingzone and its child compartments has reached 80% of the monthly budget.",
                     "recipients"                                   : "email.address@example.com",
                     "threshold_metric"                             : "ACTUAL",
                     "threshold_type"                               : "PERCENTAGE",
@@ -16,7 +16,7 @@
                 },
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "IT",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
@@ -31,8 +31,8 @@
                 },
 
                 "target": {
-                    "type"                                         : "TAG",
-                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-business-unit.IT"]
+                    "type"                                         : "COMPARTMENT",
+                    "values"                                       : ["CMP-LANDINGZONE-KEY"]
                 }
             },
 
@@ -71,14 +71,14 @@
                 }
             },
 
-            "BUDGET-ENV-PREPROD-KEY": {
-                "name"                                             : "budget-env-preprod",
-                "description"                                      : "Monthly budget for tag-lz-environment=preprod.",
-                "amount"                                           : 2000,
+            "BUDGET-BUSINESS-UNIT-IT-KEY": {
+                "name"                                             : "budget-business-unit-it",
+                "description"                                      : "Monthly budget for tag-lz-business-unit=IT.",
+                "amount"                                           : 5000,
 
                 "alert_rule": {
-                    "name"                                         : "budget-env-preprod-80",
-                    "message"                                      : "Actual spending for tag-lz-environment=preprod has reached 80% of the monthly budget.",
+                    "name"                                         : "budget-business-unit-it-80",
+                    "message"                                      : "Actual spending for tag-lz-business-unit=IT has reached 80% of the monthly budget.",
                     "recipients"                                   : "email.address@example.com",
                     "threshold_metric"                             : "ACTUAL",
                     "threshold_type"                               : "PERCENTAGE",
@@ -86,9 +86,9 @@
                 },
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "IT",
                     "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
@@ -102,7 +102,77 @@
 
                 "target": {
                     "type"                                         : "TAG",
-                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-environment.preprod"]
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-business-unit.IT"]
+                }
+            },
+
+            "BUDGET-BUSINESS-UNIT-FINANCE-KEY": {
+                "name"                                             : "budget-business-unit-finance",
+                "description"                                      : "Monthly budget for tag-lz-business-unit=Finance.",
+                "amount"                                           : 5000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-business-unit-finance-80",
+                    "message"                                      : "Actual spending for tag-lz-business-unit=Finance has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "Finance",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-business-unit.Finance"]
+                }
+            },
+
+            "BUDGET-BUSINESS-UNIT-RETAIL-KEY": {
+                "name"                                             : "budget-business-unit-retail",
+                "description"                                      : "Monthly budget for tag-lz-business-unit=Retail.",
+                "amount"                                           : 5000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-business-unit-retail-80",
+                    "message"                                      : "Actual spending for tag-lz-business-unit=Retail has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "Retail",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-business-unit.Retail"]
                 }
             },
 
@@ -138,6 +208,41 @@
                 "target": {
                     "type"                                         : "TAG",
                     "values"                                       : ["tagns-lz-cost-governance.tag-lz-environment.prod"]
+                }
+            },
+
+            "BUDGET-ENV-PREPROD-KEY": {
+                "name"                                             : "budget-env-preprod",
+                "description"                                      : "Monthly budget for tag-lz-environment=preprod.",
+                "amount"                                           : 2000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-env-preprod-80",
+                    "message"                                      : "Actual spending for tag-lz-environment=preprod has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-environment.preprod"]
                 }
             },
 
