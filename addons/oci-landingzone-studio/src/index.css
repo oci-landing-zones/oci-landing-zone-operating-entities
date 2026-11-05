@@ -451,17 +451,122 @@ a:focus:not(:focus-visible) {
   font-weight: 800;
 }
 
+.deployment-guide {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .deployment-guide code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
+}
+
+.deployment-step {
+  display: flow-root;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #D9D6D3;
+  border-radius: 6px;
+  background: #F4F2F0;
+  font-size: 12.5px;
+  color: #65615C;
   line-height: 1.6;
-  font-weight: 600;
+}
+
+.deployment-step h3,
+.deployment-step summary {
+  margin: 0 0 8px;
+  color: #201F1C;
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.deployment-step > *,
+.deployment-list {
+  margin: 0;
+}
+
+.deployment-step > * + *,
+.deployment-list > li + li {
+  margin-top: 10px;
+}
+
+.deployment-step h3 + * {
+  margin-top: 0;
+}
+
+.deployment-list {
+  padding-left: 18px;
+}
+
+.deployment-alternative {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.deployment-alternative summary {
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 0;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.deployment-alternative[open] {
+  padding-bottom: 16px;
+}
+
+.deployment-alternative[open] summary {
+  margin-bottom: 8px;
+}
+
+.deployment-guide .required-setting {
+  display: inline;
+  margin: 0;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   color: #174d75;
+  font-size: 11.5px;
+  font-weight: 600;
 }
 
 .deployment-guide .required-setting-name,
 .deployment-guide .required-setting-value {
   font-weight: inherit;
+}
+
+.deployment-guide .deployment-code {
+  color: #201F1C;
+  font-size: 11.5px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.deployment-guide .deployment-file {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid #D9D6D3;
+  border-radius: 4px;
+  background: #FFFFFF;
+  color: #201F1C;
+  font-size: 11.5px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.deployment-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.deployment-files li {
+  min-width: 0;
+  max-width: 100%;
+  line-height: 1.5;
 }
 
 .guide-link {

@@ -153,12 +153,28 @@ it('shows each phase input list before its apply action and keeps unrelated alte
   expect(html).not.toContain('README.txt');
 });
 
-it('highlights CLI commands, variables and filenames using the deployment code style', () => {
+it('distinguishes deployment filenames from settings and omits design-source explanations', () => {
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={emptyLzModel()}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
   const cli = html.split('Terraform CLI or CI/CD alternative')[1];
-  for (const text of ['rms-facade', 'deployment.tfvars', 'local_config_file_paths', 'tenancy_ocid', 'region', 'terraform init',
-    'terraform plan -var-file=deployment.tfvars -out=deployment.tfplan', 'terraform apply deployment.tfplan']) {
-    expect(cli).toContain(`<code class="required-setting">${text}</code>`);
+  for (const text of ['local_config_file_paths', 'tenancy_ocid', 'region']) {
+    expect(cli).toContain(`<span class="required-setting-name">${text}</span>`);
   }
+  for (const text of ['rms-facade', 'terraform init',
+    'terraform plan -var-file=deployment.tfvars -out=deployment.tfplan', 'terraform apply deployment.tfplan']) {
+    expect(cli).toContain(`<code class="deployment-code">${text}</code>`);
+  }
+  expect(cli).toContain('<span class="required-setting-value">&quot;file&quot;</span>');
+  expect(cli).toContain('<code class="deployment-file">deployment.tfvars</code>');
+  expect(html).toContain('<code class="deployment-file">network.json</code>');
+  expect(html).toContain('<ul class="deployment-files" aria-label="Phase 1 files"><li><code class="deployment-file">');
+  expect(html).toContain('<ul class="deployment-files" aria-label="Phase 2 files"><li><code class="deployment-file">');
+  expect(html).not.toContain('config.jsonnet');
   expect(cli).not.toContain('`');
+});
+
+it('renders boolean settings consistently in the deployment instructions', () => {
+  const model = emptyLzModel();
+  model.foundation.drRegion = 'eu-amsterdam-1';
+  const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
+  expect(html).toContain('<span class="required-setting-name">save_output</span><span class="required-setting-equals"> = </span><span class="required-setting-value">true</span>');
 });
