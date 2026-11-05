@@ -50,7 +50,7 @@ const entries = (value: unknown): [string, Obj][] => Object.entries(object(value
 const text = (value: unknown): string => typeof value === 'string' ? value : '';
 const strings = (value: unknown): string[] => Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 type ResourceKind = 'vcn' | 'subnet' | 'igw' | 'natgw' | 'sgw' | 'drg' | 'attachment' | 'rpc' | 'ipsec' | 'circuit' | 'firewall' | 'nlb' | 'table' | 'drg-table' | 'distribution';
-interface Resource { key: string; kind: ResourceKind; data: Obj; vcnKey?: string; drgKey?: string }
+interface Resource { key: string; kind: ResourceKind; data: Obj; vcnKey?: string; drgKey?: string; tunnel?: 1 | 2 }
 
 export const routePriority = (rule: RouteRule): number => rule.routeType === 'Static' ? 0 : rule.routeType === 'Implicit' ? 1 : 2;
 
@@ -97,20 +97,24 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
       add(drg.drg_route_tables, 'drg-table', { drgKey: key });
       add(drg.drg_route_distributions, 'distribution', { drgKey: key });
       add(drg.remote_peering_connections, 'rpc', { drgKey: key });
-      // Networking creates these attachments implicitly; both VPN tunnels use the generated selector.
-      for (const [collection, kind, selector, type] of [
-        [nonVcn.ipsecs, 'ipsec', 'ipsec_tunnel', 'IPSEC_TUNNEL'],
-        [nonVcn.fast_connect_virtual_circuits, 'circuit', 'virtual_circuit', 'VIRTUAL_CIRCUIT'],
+      // Networking manages the automatically created attachment for each tunnel or circuit.
+      for (const [collection, kind, type] of [
+        [nonVcn.ipsecs, 'ipsec', 'IPSEC_TUNNEL'],
+        [nonVcn.fast_connect_virtual_circuits, 'circuit', 'VIRTUAL_CIRCUIT'],
       ] as const) {
         for (const [resourceKey, data] of entries(collection)) {
-          if ((data.drg_key ?? data.gateway_key) !== key || data.provision_fc_virtual_circuit === false) continue;
+          if ((data.drg_key ?? data.gateway_key) !== key
+            || kind === 'circuit' && (data.provision_fc_virtual_circuit === false || data.type !== 'PRIVATE')) continue;
           resources.set(resourceKey, { key: resourceKey, kind, data, drgKey: key });
-          const attachmentKey = resourceKey + '/attachment';
-          resources.set(attachmentKey, { key: attachmentKey, kind: 'attachment', drgKey: key, data: {
-            display_name: data.display_name,
-            drg_route_table_key: object(object(drg.default_drg_route_tables)[selector]).drg_route_table_id,
-            network_details: { type, attached_resource_key: resourceKey },
-          } });
+          for (const tunnel of kind === 'ipsec' ? [1, 2] as const : [undefined]) {
+            const attachmentKey = resourceKey + (tunnel ? '/tunnel_' + tunnel : '') + '/attachment';
+            resources.set(attachmentKey, { key: attachmentKey, kind: 'attachment', drgKey: key, tunnel, data: {
+              display_name: data.display_name,
+              drg_route_table_key: tunnel
+                ? object(object(data.tunnels_management)['tunnel_' + tunnel]).drg_route_table_id : data.drg_route_table_id,
+              network_details: { type, attached_resource_key: resourceKey },
+            } });
+          }
         }
       }
     }
@@ -165,7 +169,8 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
   const nodeFor = (resource: Resource | undefined): string | undefined => {
     if (!resource) return undefined;
     if (resource.kind === 'firewall' || resource.kind === 'nlb') return nodeFor(resources.get(text(resource.data.subnet_key ?? resource.data.subnet_id)));
-    return names.get(text(resource.data.display_name).toLowerCase());
+    const node = names.get(text(resource.data.display_name).toLowerCase());
+    return node && resource.tunnel ? node + ':tunnel-' + resource.tunnel : node;
   };
 
   const tables = new Map<string, RouteTable>();
@@ -183,9 +188,7 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
     const table = tables.get(text(tableKey));
     const nodeId = nodeFor(resource);
     if (!table || !nodeId) return;
-    const nodeIds = object(resource.data.network_details).type === 'IPSEC_TUNNEL'
-      ? [nodeId + ':tunnel-1', nodeId + ':tunnel-2'] : [nodeId];
-    for (const id of nodeIds) if (!table.associations.some((item) => item.nodeId === id && item.kind === kind)) table.associations.push({ nodeId: id, kind });
+    if (!table.associations.some((item) => item.nodeId === nodeId && item.kind === kind)) table.associations.push({ nodeId, kind });
     if (kind === 'gateway') table.kind = 'gateway';
   };
   for (const resource of resources.values()) {
@@ -262,14 +265,18 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
             const connection = hybridRoutes(model).find((entry) => entry.id === nodeFor(attached));
             prefixes = (connection?.cidrs ?? []).map((cidr) => ({ id: attached.key + '/' + cidr, cidr, provenance: 'expected-remote' }));
           }
+          const routeAttachment = attached?.kind === 'ipsec'
+            ? candidates.find((candidate) => object(candidate.data.network_details).attached_resource_key === attached.key
+              && tables.has(text(candidate.data.drg_route_table_key))) ?? attachment : attachment;
           for (const prefix of prefixes) {
-            const identity = attachment.key + '/' + prefix.cidr;
+            // Remote VPN prefixes describe the connection, not separate learned tunnel routes.
+            const identity = (attached?.kind === 'ipsec' ? attached.key : attachment.key) + '/' + prefix.cidr;
             if (!prefix.cidr || advertised.has(identity)) continue;
             advertised.add(identity);
             table.rules.push({
               id: key + '/' + table.importDistributionKey + '/' + statementKey + '/' + prefix.id,
               provenance: prefix.provenance, destination: prefix.cidr, matchCidr: prefix.cidr,
-              ...target(attachment.key), routeType: 'Dynamic', sourceAttachmentKey: attachment.key,
+              ...target(routeAttachment.key), routeType: 'Dynamic', sourceAttachmentKey: routeAttachment.key,
               importPriority: Number(statement.priority),
             });
           }
