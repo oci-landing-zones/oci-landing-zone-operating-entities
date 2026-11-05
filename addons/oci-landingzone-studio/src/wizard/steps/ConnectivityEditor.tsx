@@ -269,7 +269,7 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
               {mapping.bgp_md5auth_mode === 'inline' && <Field label="BGP MD5 key (session only)" help={help.bgpKey} secret value={mapping.bgp_md5auth_key} invalid={Boolean(keyError)} note={keyError} onChange={(value) => mapField('bgp_md5auth_key', value)} />}
             </div></div>;
           })}
-          <div className="connectivity-mapping-add" style={{ gridColumn: '1 / -1' }}><AddEntry label="BGP mapping" owner={`FastConnect ${name}`} names={Object.keys(circuit.cross_connect_mappings ?? {})} onAdd={(key) => field('cross_connect_mappings', { ...circuit.cross_connect_mappings, [key]: {} })} /></div>
+          {Object.keys(circuit.cross_connect_mappings ?? {}).length === 0 && <div className="connectivity-mapping-add" style={{ gridColumn: '1 / -1' }}><AddEntry label="BGP mapping" owner={`FastConnect ${name}`} names={Object.keys(circuit.cross_connect_mappings ?? {})} onAdd={(key) => field('cross_connect_mappings', { ...circuit.cross_connect_mappings, [key]: {} })} /></div>}
           <details className="connectivity-disclosure" style={{ ...group, paddingTop: 0, gridColumn: '1 / -1' }}><summary style={disclosure}>Advanced circuit settings<Chevron /></summary>
             <div className="connectivity-grid" style={{ marginTop: 14 }}>
               <Field label="Partner service key (optional)" help={help.partnerKey} value={circuit.provider_service_key_name} onChange={(value) => field('provider_service_key_name', value)} />

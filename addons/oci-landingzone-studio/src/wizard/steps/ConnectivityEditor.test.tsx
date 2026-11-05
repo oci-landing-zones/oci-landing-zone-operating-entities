@@ -161,13 +161,36 @@ it('keeps services separate and describes every editable field, including condit
   expect(tunnels[0][2]).toContain('BGP');
   expect(tunnels[1][2]).toContain('Tunnel 2');
   expect(tunnels[1][2]).toContain('Static');
-  expect(fcHtml).toContain('Add BGP mapping to FastConnect private');
-  expect(fcHtml).toContain('aria-label="BGP mapping name for FastConnect private"');
+  expect(fcHtml).not.toContain('Add BGP mapping to FastConnect private');
+  expect(fcHtml).not.toContain('aria-label="BGP mapping name for FastConnect private"');
   expect(fcHtml).not.toContain('Known choices for');
   expect(fcHtml).toContain('oci network fast-connect-provider-service list');
   expect(fcHtml).toContain('--compartment-id &lt;tenancy-ocid&gt;');
   expect(fcHtml).not.toContain('--auth');
   expect(fcHtml).toContain('Use lowercase letters, numbers, hyphens or underscores. Up to 40 characters.');
+});
+
+it.each<[string, FastConnectConfig['cross_connect_mappings'], boolean]>([
+  ['missing', undefined, true],
+  ['empty', {}, true],
+  ['one', { primary: {} }, false],
+  ['multiple', { primary: {}, secondary: {} }, false],
+])('offers BGP creation only for a circuit without mappings (%s)', (_, mappings, canAdd) => {
+  const model = emptyLzModel();
+  const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+  hybrid.fast_connect_virtual_circuits.private = { type: 'PRIVATE', cross_connect_mappings: mappings };
+  hybrid.fast_connect_virtual_circuits.other = { type: 'PRIVATE' };
+  const before = JSON.stringify(model);
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><ConnectivityEditor kind="fastconnect" /></WizardProvider>);
+  for (const control of ['Add BGP mapping to FastConnect private', 'BGP mapping name for FastConnect private']) {
+    expect(html.includes(`aria-label="${control}"`)).toBe(canAdd);
+  }
+  expect(html).toContain('aria-label="Add BGP mapping to FastConnect other"');
+  for (const key of Object.keys(mappings ?? {})) {
+    expect(html).toContain(`aria-label="BGP mapping ${key} for FastConnect private"`);
+    expect(html).toContain(`aria-label="Remove BGP mapping ${key} from FastConnect private"`);
+  }
+  expect(JSON.stringify(model)).toBe(before);
 });
 
 it('shows algorithm overrides only for enabled custom proposals and retains their values', () => {
