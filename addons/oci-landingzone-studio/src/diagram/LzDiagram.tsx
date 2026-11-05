@@ -93,7 +93,8 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
     case 'attachment':
       return { background: '#ffffff', border: '1.5px solid #6b7a99', borderRadius: 5, color: '#1f3a63', fontWeight: 800 };
     case 'project':
-      // Project nodes represent generated project compartments.
+    case 'operator':
+      // The external operator shares the existing neutral project-box style.
       return { background: oracle.compProjectFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'routetable':
     case 'rtdot':
@@ -164,6 +165,7 @@ function SubnetNode({ data }: NodeProps) {
         style={{ position: 'absolute', top: '50%', right: -10, transform: 'translateY(-50%)', width: 20, height: 20, lineHeight: 0, background: '#ffffff' }}
         dangerouslySetInnerHTML={{ __html: ROUTE_TABLE_SVG }}
       />
+      <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
     </div>
   );
 }
@@ -233,10 +235,11 @@ function AttachmentNode({ data }: NodeProps) {
 
 /** Project compartment: a square white box with its full generated name. */
 function ProjectNode({ data }: NodeProps) {
-  const d = data as { label?: string; container?: boolean };
+  const d = data as { label?: string; container?: boolean; kind?: DiagramNode['kind'] };
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', justifyContent: 'center', padding: d.container ? '7px 8px' : '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
       {d.label}
+      {d.kind === 'operator' && <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />}
     </div>
   );
 }
@@ -293,8 +296,14 @@ function RouteTableNode({ id, data }: NodeProps) {
 function ResourceGroupNode({ data }: NodeProps) {
   const d = data as unknown as DiagramNode;
   if (!d.resourceKind) return null;
-  return <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
-    dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />;
+  return <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
+      dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />
+    {d.resourceKind === 'bastion' && <>
+      <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+      <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+    </>}
+  </div>;
 }
 
 function ConnectivityNode({ data }: NodeProps) {
@@ -327,7 +336,7 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, operator: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
 
 /** Nodes stay fixed; screen and export consume the same model-derived connector. */
 function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
@@ -339,7 +348,7 @@ const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker: string): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
-    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'operator' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
     return {
     id: n.id,
     position: { x: n.x, y: n.y },

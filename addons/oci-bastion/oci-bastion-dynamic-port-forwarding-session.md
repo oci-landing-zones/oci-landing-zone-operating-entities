@@ -1,242 +1,59 @@
-# OCI Bastion Dynamic Port Forwarding Session
+# OCI Bastion dynamic port forwarding sessions
 
-Use an OCI Bastion dynamic port forwarding session when one hub Bastion service should provide controlled operator access to multiple private endpoints or spokes.
+Configure the [Landing Zone integration](./landing-zone-integration.md) before creating a session. Use the [macOS](./macos.md) or [Windows](./windows.md) guide for workstation commands.
 
-Dynamic forwarding supports SOCKS5. It can also carry explicit local forwards with `ssh -L`, which is useful for clients that are not SOCKS-aware, such as a normal SSH client connecting to a private VM or SQL Developer connecting to a private database endpoint.
+## Before connecting
 
-## 1. Why This Is The Preferred Service Pattern For Hub And Spoke
+You need the Bastion OCID, its region, an authorized OCI identity, a local SSH key pair and the actual private target hostname/IP and port. Register the session key's public half with OCI; keep the private half on the workstation. The target VM's SSH key or Windows account and the database account are separate credentials.
 
-The desired Landing Zone pattern is often one Bastion in the hub that can reach private targets in multiple spokes. Static port forwarding and managed SSH are better suited to targets in the Bastion's VCN. Dynamic port forwarding is the service pattern validated for hub-to-spoke access when routing and security allow it.
+Verify that the Bastion is active with FQDN/SOCKS5 enabled, your current public egress IP is allowlisted, and the target permits traffic from the Bastion path. Private hostnames must resolve there. Dynamic sessions do not require the Oracle Cloud Agent Bastion plugin on the target. A Linux target still needs an SSH server for SSH access, and a Windows target needs an enabled RDP service for RDP access.
 
-A June 29, 2026 validation confirmed:
+## Create a session in the Console
 
-- hub Bastion in `eu-frankfurt-1`;
-- hub and spoke connected through a DRG;
-- hub route table pointed spoke CIDR to the DRG;
-- spoke route table returned hub CIDR to the DRG;
-- spoke target allowed TCP `22` from the hub bastion subnet;
-- dynamic session worked from hub Bastion to a private spoke VM when the Bastion was created with DNS proxy/SOCKS5 enabled.
+1. In the intended region and compartment, open **Identity & Security > Bastion** and select the deployed Bastion.
+2. Select **Sessions > Create session**, then **Dynamic port forwarding (SOCKS5) session**.
+3. Enter a session name and upload or paste your OpenSSH public key. Do not upload the private key.
+4. Set a lifetime between 30 minutes and the Bastion maximum, up to 3 hours. Create the session and wait until it is **Active**.
+5. Select **Copy SSH command** from that session's actions. Retain the exact session OCID and Bastion host from the command; follow the OS guide to bind the listener to `127.0.0.1`.
 
-The same validation found:
+The username in that command is the session identifier, not the target VM's operating-system user. Keep the tunnel terminal open while using the session. See Oracle's [creation](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-session-dynamic-port-forwarding.htm) and [connection](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/connect-dynamic-port-forwarding.htm) guides.
 
-- a Bastion created without DNS proxy/SOCKS5 accepted the SSH connection but rejected target channel opens;
-- fixed port forwarding rejected the spoke target because it was outside the Bastion VCN.
+## Create a session with OCI CLI
 
-Because OCI documentation states that a Bastion is associated with one VCN, customer designs should explicitly validate this pattern in their own topology and keep per-VCN Bastions or VM-based bastion as alternatives.
+The OS guides use the documented generic command `oci bastion session create`, with this target-details JSON:
 
-## 2. Benefits And Downsides
+```json
+{"sessionType":"DYNAMIC_PORT_FORWARDING"}
+```
 
-| Benefits | Downsides |
+They pass the JSON through a local file so native-shell quote handling does not change it. Supply the session public key using `--ssh-public-key-file`, a supported session TTL, and your configured CLI profile and region. Wait for creation to succeed, then get the session's details or copy its SSH command in the Console. Do not supply a fixed target resource for this session type. See the [CLI command reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/bastion/session/create.html).
+
+## Application access
+
+For a private Oracle database web interface, copy the **private access URL** for Database Actions or APEX from the database's tools page. In the dedicated Firefox profile configured by the OS guide, open that original HTTPS URL and authenticate as an enabled database user. The target rule must allow TCP 443. The browser sends the hostname through SOCKS5; the Bastion path must resolve it. Keep TLS certificate validation enabled. See [Database Actions](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/connect-database-actions.html) and [private endpoint network requirements](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/private-endpoints-autonomous.html).
+
+For a Linux VM, configure the SSH client to use the SOCKS5 listener and connect to the VM's private name/IP using the VM account and key. Verify the VM host-key fingerprint through an approved source before trusting it.
+
+For Windows RDP, the OS guides add `-L 127.0.0.1:13389:<windows-private-ip>:3389` to the SSH connection authenticated to the dynamic session. The RDP client connects to `127.0.0.1:13389`. This is a client-side local listener on an OCI **dynamic** session; it does not create another OCI session type. OpenSSH documents local forwarding, but Oracle does not explicitly document this combination. Validate it with the intended Bastion, network and client before use. Verify the remote Windows identity/certificate and use the VM account; do not disable NLA or certificate checks to make a tunnel work.
+
+## Lifetime and cleanup
+
+The session expires at its configured TTL. SSH keepalives can prevent idle disconnects; they do not extend that TTL. Create a new dynamic session, copy its new SSH target and restart the tunnel after expiry. Changes to the Bastion client allowlist require a new session to take effect. See [Oracle troubleshooting](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/troubleshooting_connect_session_failed.htm).
+
+When finished, close the target clients, stop the tunnel with **Ctrl+C**, restore Firefox's previous proxy setting or close its dedicated profile, and delete the Bastion session in the Console. CLI users can delete it with the command in their OS guide. Session deletion does not delete the persistent Bastion. Protect and rotate keys according to your organization's policy; do not commit keys, credentials or session details to a source repository.
+
+## Troubleshooting
+
+| Symptom | Check |
 |---|---|
-| One hub Bastion service can support many routed targets after validation. | Requires FQDN/SOCKS5 support on the Bastion. |
-| Works well for private VMs, private UI apps, OIC internal endpoints, and private database endpoints. | Some applications are not SOCKS-aware and need local `-L` forwards over the dynamic session. |
-| No customer-managed bastion host OS. | Target routes, firewalls, security rules, and DNS must all be correct. |
-| Browser SOCKS5 preserves original application hostnames better than localhost HTTPS forwarding. | Session TTL requires operators to recreate sessions. |
-
-## 3. Landing Zone Requirements
-
-| Requirement | Details |
-|---|---|
-| Bastion placement | Hub security or management compartment, targeting a private hub management subnet. |
-| FQDN/SOCKS5 | Enable when creating the Bastion. With OCI CLI, use `--dns-proxy-status ENABLED`. |
-| Client allowlist | Bastion client CIDR allowlist contains only approved public workstation or VPN egress CIDRs. |
-| Routing | Hub and spoke route tables, DRG route tables, and firewall routes provide a complete return path. |
-| Target rules | Target subnet or NSG allows required ports from the Bastion private endpoint IP or hub bastion subnet CIDR. |
-| DNS | Hub path resolves private endpoint FQDNs. Use the Private DNS add-on when central resolution is needed. |
-| Host firewall | Target OS firewall allows the same ports as OCI security rules. |
-
-## 4. Create The Bastion With FQDN/SOCKS5 Enabled
-
-```bash
-oci bastion bastion create \
-  --bastion-type standard \
-  --compartment-id <security_compartment_ocid> \
-  --target-subnet-id <hub_management_subnet_ocid> \
-  --name <bastion_name> \
-  --dns-proxy-status ENABLED \
-  --client-cidr-list '["<approved_client_public_cidr>"]' \
-  --max-session-ttl 10800
-```
-
-After creation, record the actual Bastion private endpoint IP and use it in target security rules when the customer requires `/32` source scoping.
-
-## 5. Create A Dynamic Session
-
-OCI CLI shape:
-
-```bash
-oci bastion session create-session-create-dynamic-port-forwarding-session-target-resource-details \
-  --bastion-id <bastion_ocid> \
-  --display-name <session_name> \
-  --key-details '{"publicKeyContent":"<public_key_content>"}' \
-  --session-ttl-in-seconds 3600
-```
-
-Some OCI CLI versions also expose the shorter alias `oci bastion session create-dynamic-port-forwarding`. Use the command form available in the customer's installed CLI version.
-
-The Console can also create a **Dynamic port forwarding (SOCKS5) session** and provide the SSH command.
-
-## 6. Pattern A: SOCKS5 Browser Access For Private UI Or OIC
-
-Use this when the browser must keep the original endpoint FQDN, such as OIC internal endpoints, internal HTTPS applications, OAuth redirects, or certificates tied to the service hostname.
-
-Mac, Linux, or Windows OpenSSH:
-
-```bash
-ssh -i <private_key_path> \
-  -o ExitOnForwardFailure=yes \
-  -o ServerAliveInterval=30 \
-  -N \
-  -D 127.0.0.1:1080 \
-  -p 22 \
-  <bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-Configure the browser:
-
-```text
-SOCKS host: 127.0.0.1
-SOCKS port: 1080
-Proxy DNS through SOCKS: enabled when available
-```
-
-Then browse to the private endpoint FQDN, for example:
-
-```text
-https://<private_oic_endpoint_fqdn>
-```
-
-If the browser cannot proxy DNS through SOCKS, configure private DNS or a hosts-file entry so the FQDN resolves to the private endpoint IP through the customer-approved path.
-
-## 7. Pattern B: Local Forward Over Dynamic Session
-
-Use this when the target client is not SOCKS-aware or when connecting to one known private endpoint.
-
-Validated SSH-to-private-VM shape:
-
-```bash
-ssh -i <private_key_path> \
-  -o ExitOnForwardFailure=yes \
-  -o ServerAliveInterval=30 \
-  -N \
-  -L 127.0.0.1:2227:<target_private_ip>:22 \
-  -p 22 \
-  <bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-Then connect to the private VM through the local port:
-
-```bash
-ssh -i <target_private_key_path> -p 2227 <target_user>@127.0.0.1
-```
-
-Private HTTPS endpoint:
-
-```bash
-ssh -i <private_key_path> \
-  -o ExitOnForwardFailure=yes \
-  -N \
-  -L 127.0.0.1:8443:<private_app_fqdn_or_ip>:443 \
-  -p 22 \
-  <bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-Then browse to `https://127.0.0.1:8443`, or preserve the application hostname when TLS or redirects require it.
-
-## 8. Windows PuTTY
-
-### SOCKS5 dynamic tunnel
-
-1. Convert the private key to `.ppk` with PuTTYgen if needed.
-2. Open PuTTY.
-3. Set **Host Name** to:
-
-```text
-<bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-4. Set **Port** to `22`.
-5. Under **Connection > SSH**, select **Don't start a shell or command at all** if available.
-6. Under **Connection > SSH > Auth**, select the `.ppk` private key.
-7. Under **Connection > SSH > Tunnels**, set:
-   - **Source port**: `1080`
-   - **Dynamic** selected
-   - **Auto** selected
-8. Select **Add**.
-9. Select **Open** and keep the PuTTY session open.
-10. Configure the browser to use SOCKS5 `127.0.0.1:1080`.
-
-### Local forward over dynamic session
-
-Use PuTTY **Tunnels** with **Local** selected:
-
-```text
-Source port: 2227
-Destination: <target_private_ip>:22
-```
-
-Open the PuTTY session, then use an SSH client to connect to `127.0.0.1:2227`.
-
-## 9. SQL Developer And Private ATP
-
-For a database client that does not use SOCKS5 directly, use local forwarding over the dynamic session:
-
-```bash
-ssh -i <private_key_path> \
-  -o ExitOnForwardFailure=yes \
-  -N \
-  -L 127.0.0.1:1522:<adb_private_endpoint_fqdn_or_ip>:1521 \
-  -p 22 \
-  <bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-Then configure SQL Developer with the database wallet and customer-approved credentials. Use `127.0.0.1` and port `1522` when the connection type supports host and port override.
-
-If the wallet/TLS flow requires the database endpoint hostname, preserve that hostname through DNS, hosts-file mapping, or a SOCKS-aware JDBC/client configuration. Do not silently replace the endpoint hostname with localhost if that breaks certificate validation.
-
-## 10. Troubleshooting
-
-| Symptom | Likely cause |
-|---|---|
-| `channel open failed: administratively prohibited` | Bastion was not created with FQDN/SOCKS5 enabled, the session type is wrong, or Bastion policy blocks dynamic target opens. Recreate the Bastion with `--dns-proxy-status ENABLED` and recreate the dynamic session. |
-| Fixed port forwarding cannot target a spoke | Static port forwarding is VCN-bound in practice and should use a per-VCN Bastion or dynamic pattern. |
-| SSH tunnel opens but target times out | Hub/spoke route, DRG route import, firewall policy, security list/NSG, or host firewall is blocking traffic. |
-| Browser cannot open private FQDN | Browser DNS is not going through SOCKS, private DNS is missing, or the target endpoint is not reachable from the Bastion path. |
-| SQL Developer cannot connect | Check wallet/TLS hostname behavior, local port, target security rules, database endpoint DNS, and whether port `1521` is allowed. |
-| Session expires | Create a new dynamic session and restart the local tunnel. |
-| Package install on private VM fails during validation | The private VM may lack NAT, service gateway, mirror, or repository access. Bastion proves administrative connectivity, not package repository access. |
-
-## 11. Validation Commands
-
-Before giving the customer the access pattern, validate each layer:
-
-```bash
-# Keep the tunnel open in terminal 1.
-ssh -i <private_key_path> \
-  -o ExitOnForwardFailure=yes \
-  -N \
-  -L 127.0.0.1:2227:<target_private_ip>:22 \
-  -p 22 \
-  <bastion_session_ocid>@host.bastion.<region>.oci.oraclecloud.com
-```
-
-```bash
-# Validate from terminal 2.
-ssh -i <target_private_key_path> \
-  -o BatchMode=yes \
-  -o ConnectTimeout=30 \
-  -p 2227 \
-  <target_user>@127.0.0.1 \
-  'hostname; hostname -I; uptime'
-```
-
-For HTTP validation:
-
-```bash
-curl -v --max-time 10 http://127.0.0.1:<local_port>/
-```
-
-If HTTP fails but SSH works, check the target service listener, OCI security rules, and the target host firewall.
+| Session creation is unauthorized | Selected region/compartment, existing group membership, shared-security session permissions and supporting metadata reads. Regional deployments need Home IAM first. |
+| SSH authentication fails or connection closes | Session state/expiry, matching private key, copied session OCID/host, current public egress CIDR. Check host keys rather than disabling verification. |
+| `Address already in use` | Choose another loopback listener port and update the client to match. |
+| Listener opens but target access fails | Destination port, target service/host firewall, NSG/security list, actual Bastion source, DRG/return routes and inspection policy. `ExitOnForwardFailure` checks local listener setup, not destination reachability. |
+| Private URL cannot resolve | SOCKS v5 and proxy DNS enabled, private DNS from Bastion, and no private target accidentally listed under Firefox **No Proxy For**. |
+| Browser shows a certificate error or wrong redirect | Use the original private HTTPS URL and trusted certificate chain. Do not change the URL to `https://127.0.0.1:1080` or bypass TLS verification. |
+| RDP fails | Confirm the local `-L` port, Windows private IP/3389, RDP service, Windows account/NLA and the environment's dynamic-session forwarding validation. |
+| Access stops after inactivity or expiry | Keep the tunnel open; check session TTL. For diagnostics use SSH `-v`, as Oracle recommends, rather than `-vv` or `-vvv`. |
 
 #### License
 
@@ -244,4 +61,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE.txt) for more details.
+See [LICENSE](../../LICENSE.txt) for more details.

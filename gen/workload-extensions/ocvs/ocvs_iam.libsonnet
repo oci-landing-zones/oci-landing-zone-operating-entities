@@ -1,4 +1,5 @@
 local desc = import '../../descriptions.libsonnet';
+local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
 
 function(ctx) {
   local n = ctx.n,
@@ -15,7 +16,12 @@ function(ctx) {
   },
 
   policies_configuration+: {
-    supplied_policies+: {
+    supplied_policies+: bastion_policies(
+      if std.objectHas(ctx.params, 'bastion') then ctx.params.bastion else null,
+      n,
+      [group_name],
+      ctx.scope.key_segments + ['PLATFORM', ctx.plat]
+    ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
         name: policy_name,
         description: desc.policy.grants(

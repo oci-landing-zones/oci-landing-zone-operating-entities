@@ -21,6 +21,7 @@ import { premisesLayout, fastConnectHeight, FASTCONNECT_LINE_Y, HYBRID_LINK_WIDT
 import { providerServicesForRegion } from '../services/connectivityCatalog';
 import { FIREWALL_BACKEND_GAP } from './firewallBackends';
 import { optimizeTablePlacement, tableAssociations } from './tablePlacement';
+import { generatedBastionTopology } from '../services/bastionTopology';
 
 /**
  * Pure: canonical LzModel → renderer-agnostic DiagramModel.
@@ -342,11 +343,12 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   // Every selectable hub has its own derived route-table adapter.
   const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
   const allRouteTables = showSpokes && supportsFlowTracing ? routeTables : [];
+  const bastion = generatedBastionTopology(model, routeTables, inventory);
   // Active flows highlight matched route rows and draw their hop sequence over
   // the complete route-table layer.
   // "Show all flows" traces every flow, coloured by traffic type (as in ONTV).
-  const activeFlows = showSpokes && supportsFlowTracing ? (opts.allFlows ? allFlowIds(model) : opts.activeFlows ?? []) : [];
-  const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows, opts.allFlows ? 'kind' : 'flow', allRouteTables) : [];
+  const activeFlows = showSpokes && supportsFlowTracing ? (opts.allFlows ? allFlowIds(model, bastion) : opts.activeFlows ?? []) : [];
+  const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows, opts.allFlows ? 'kind' : 'flow', allRouteTables, bastion) : [];
   const flowActive = flowTraces.length > 0;
   // Keep the complete routing configuration visible; flow selection only changes
   // which rows are highlighted.
@@ -409,7 +411,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
       delete spec.icon;
       delete spec.caption;
     }
-    return showAllEndpoints || flowEndpointIds.has(`hub-vcn-sn-${j}`) ? withEndpoint(spec) : spec;
+    return (showAllEndpoints || flowEndpointIds.has(`hub-vcn-sn-${j}`)) && bastion?.subnetNode !== `hub-vcn-sn-${j}` ? withEndpoint(spec) : spec;
   });
   const hubVcnLabel = `${generatorNames.hubVcn(regionTok)}\n${model.network.hubVcnCidr}`;
   const hubVcnH = vcnHeight(hubSubnets);
@@ -1142,6 +1144,23 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
 
   // Wrapper-owned resources follow the final table lanes as well as the compartments.
   if (inventory) pushGeneratedResources(nodes, { ...inventory, groups: inventory.groups.filter((group) => outerResourceOwners.has(group.compartmentKey)) });
+
+  if (showHub && bastion) {
+    const rects = absoluteNodeRects(nodes);
+    const service = rects.get(bastion.serviceNode);
+    const subnet = rects.get(bastion.subnetNode);
+    const region = rects.get('region')!;
+    if (service && subnet) {
+      nodes.push({ id: 'bastion-operator', kind: 'operator', label: 'Operator workstation\nSOCKS5 over SSH',
+        x: region.x - 240 - HYBRID_REGION_GAP,
+        y: Math.max(service.y, ...nodes.filter((node) => !node.parentId && node.id !== 'region').map((node) => node.y + node.height + COMP_GAP)),
+        width: 240, height: 60 });
+      edges.push({ id: 'bastion-session', source: 'bastion-operator', target: service.id,
+        sourceSide: 'right', targetSide: 'left', label: 'Dynamic SSH session' });
+      edges.push({ id: 'bastion-private-endpoint', source: service.id, target: subnet.id,
+        sourceSide: 'left', targetSide: 'left', label: 'Private endpoint in hub management subnet' });
+    }
+  }
 
   // Animated flow path: ONE multi-waypoint edge per active flow. The shared
   // geometry router draws a continuous coloured line through every hop resource,

@@ -13,6 +13,7 @@ Regular clones, submodules, and linked Git worktrees are supported. Hook paths a
 - [`AGENTS.md`](AGENTS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
 - [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
 - [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
+- [OCI Bastion integration](../addons/oci-bastion/landing-zone-integration.md): optional hub Bastion configuration, IAM and operator prerequisites.
 
 ## Generator Workflow
 
@@ -47,6 +48,12 @@ operational management. Prefer shared subnets for address efficiency.
 traffic between different subnets through the hub firewall; Hub E rejects it.
 Same-subnet traffic remains local and requires NSGs and security lists. Hub C
 requires real firewall backend targets in place of the generated non-working placeholders. NLB backends support VM primary and qualified secondary-interface keys; see the [Hub C backend contract](../addons/oci-hub-models/hub_c/readme.md#backend-targets).
+
+### Optional hub Bastion
+
+Config mode accepts top-level `bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'], max_session_ttl_in_seconds: 3600 }`. Omitted or `null` disables it. Client CIDRs must be 1 to 20 canonical IPv4 ranges without `/0`; TTL is an integer from 1800 to 10800 seconds and defaults to 3600. The [Factory reference](../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#10-bastion) defines the full contract.
+
+Bastion is emitted in existing security pre/final outputs for both CIS levels and scopes. Complete IAM grants existing administrator groups access to shared-security sessions when enabled; regional scope relies on Home IAM. Extensions receive the normalized optional object as `params.bastion`; standalone wrappers default it to `null`. The resource enables FQDN/SOCKS5, while operators own session creation and target-access validation. The add-on directory is documentation-only and has no published runtime family.
 
 Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
 
