@@ -1,4 +1,4 @@
-// Builds hybrid resources and routes using Networking v0.9.0 contracts.
+// Builds hybrid resources and routes.
 // function(params) -> { route_entries, network_overlay }
 local contract = import '../addons/oci-hybrid-connectivity/config.libsonnet';
 local without(o, fields) = { [k]: o[k] for k in std.objectFields(o) if !std.member(fields, k) };
@@ -14,8 +14,8 @@ function(params)
   local hub_attachment = n.key('DRGATT', ['HUB', 'VCN']);
   local hc_table = key('DRGRT', 'HC');
   local remote_cidrs = contract.remote_cidrs(c);
-  local types = (if std.length(std.objectFields(c.ipsecs)) > 0 then [{ name: 'VPN', type: 'IPSEC_TUNNEL', selector: 'ipsec_tunnel' }] else [])
-              + (if std.length([v for v in std.objectValues(c.fast_connect_virtual_circuits) if v.provision_fc_virtual_circuit]) > 0 then [{ name: 'FASTCONNECT', type: 'VIRTUAL_CIRCUIT', selector: 'virtual_circuit' }] else []);
+  local types = (if std.length(std.objectFields(c.ipsecs)) > 0 then [{ name: 'VPN', type: 'IPSEC_TUNNEL' }] else [])
+              + (if std.length([v for v in std.objectValues(c.fast_connect_virtual_circuits) if v.provision_fc_virtual_circuit]) > 0 then [{ name: 'FASTCONNECT', type: 'VIRTUAL_CIRCUIT' }] else []);
   local routes = [
     { name: 'hybrid-%d' % i, display: 'External network', vcn: remote_cidrs[i], kind: 'remote',
       priority: 50000 + i, vcn_key: null, drg_att_key: null,
@@ -54,6 +54,10 @@ function(params)
         without(vpn, ['remote_cidrs', 'cpe_key']) + {
           display_name: n.display('ipsec', ['hub', segment(name)]), drg_key: drg_key, static_routes: vpn.remote_cidrs,
           [if std.objectHas(vpn, 'cpe_key') then 'cpe_key']: key('CPE', vpn.cpe_key),
+          tunnels_management: {
+            [tunnel]: vpn.tunnels_management[tunnel] + { drg_route_table_id: hc_table }
+            for tunnel in std.objectFields(vpn.tunnels_management)
+          },
         }
       for name in std.objectFields(c.ipsecs)
     },
@@ -63,6 +67,7 @@ function(params)
         without(circuit, ['remote_cidrs']) + {
           display_name: n.display('fcvc', ['hub', segment(name)]),
           gateway_key: drg_key,
+          [if circuit.provision_fc_virtual_circuit then 'drg_route_table_id']: hc_table,
         }
       for name in std.objectFields(c.fast_connect_virtual_circuits)
     },
@@ -86,7 +91,6 @@ function(params)
       network_configuration+: { network_configuration_categories+: { '0-shared'+: {
         non_vcn_specific_gateways+: resources + {
           dynamic_routing_gateways+: { [drg_key]+: {
-            default_drg_route_tables: { [t.selector]: { drg_route_table_id: hc_table } for t in types },
             drg_route_tables+: tables,
             drg_route_distributions+: {
               [n.key('DRGRD', ['HUB'])]+: { statements+: imports('HUB') },

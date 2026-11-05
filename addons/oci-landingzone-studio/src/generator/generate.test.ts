@@ -278,13 +278,19 @@ describe('generator (go-jsonnet wasm)', () => {
     hybrid.fast_connect_virtual_circuits.primary = {
       type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example',
     };
+    hybrid.fast_connect_virtual_circuits.draft = {
+      ...hybrid.fast_connect_virtual_circuits.primary, provision_fc_virtual_circuit: false,
+    };
     const out = await generateOutputs(model);
     const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
     const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
     const key = 'DRGRT-FRA-LZ-HUB-HC-KEY';
-    for (const selector of ['ipsec_tunnel', 'virtual_circuit']) {
-      expect(drg.default_drg_route_tables[selector]).toEqual({ drg_route_table_id: key });
+    expect(drg).not.toHaveProperty('default_drg_route_tables');
+    for (const tunnel of ['tunnel_1', 'tunnel_2']) {
+      expect(gateways.ipsecs['IPSEC-FRA-LZ-HUB-OFFICE-KEY'].tunnels_management[tunnel].drg_route_table_id).toBe(key);
     }
+    expect(gateways.fast_connect_virtual_circuits['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].drg_route_table_id).toBe(key);
+    expect(gateways.fast_connect_virtual_circuits['FCVC-FRA-LZ-HUB-DRAFT-KEY']).not.toHaveProperty('drg_route_table_id');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
     const table = drg.drg_route_tables[key];
@@ -299,7 +305,7 @@ describe('generator (go-jsonnet wasm)', () => {
       expect(rules.every((rule) => rule.destination !== '0.0.0.0/0' && rule.next_hop_drg_attachment_key === 'DRGATT-FRA-LZ-HUB-VCN-KEY')).toBe(true);
     }
     expect(Object.keys(gateways.ipsecs)).toHaveLength(1);
-    expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(1);
+    expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(2);
   }, 60_000);
 
   it('generates direct physical FastConnect after the provider OCID is cleared', async () => {

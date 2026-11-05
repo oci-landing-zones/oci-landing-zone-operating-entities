@@ -11,6 +11,13 @@ import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { validateDiagramLayout } from '../diagram/layoutQuality';
 import { complexHybridModel } from '../diagram/complexHybrid.testSupport';
 
+const hybridGateways = (network: unknown) => ['network_configuration', 'network_configuration_categories', '0-shared', 'non_vcn_specific_gateways']
+  .reduce<unknown>((value, key) => (value as Record<string, unknown>)[key], network) as {
+    dynamic_routing_gateways: Record<string, { drg_route_tables: Record<string, { display_name: string }> }>;
+    ipsecs: Record<string, { tunnels_management: Record<'tunnel_1' | 'tunnel_2', { drg_route_table_id?: string }> }>;
+    fast_connect_virtual_circuits: Record<string, { drg_route_table_id?: string; provision_fc_virtual_circuit?: boolean }>;
+  };
+
 describe('hybrid routing views', () => {
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s: shares one HC table between FastConnect and both VPN tunnels', async (kind) => {
     const model = complexHybridModel(kind);
@@ -19,14 +26,15 @@ describe('hybrid routing views', () => {
       .reduce<unknown>((value, key) => (value as Record<string, unknown>)[key], network) as Record<string, Record<string, unknown>>;
     expect(Object.values(cpes)).toEqual([expect.objectContaining({ ip_address: '203.0.113.10', cpe_device_shape_vendor_name: 'Other' })]);
     expect(Object.values(cpes)[0]).not.toHaveProperty('cpe_device_shape_id');
-    const drg = ['network_configuration', 'network_configuration_categories', '0-shared', 'non_vcn_specific_gateways',
-      'dynamic_routing_gateways', 'DRG-FRA-LZ-HUB-KEY']
-      .reduce<unknown>((value, key) => (value as Record<string, unknown>)[key], network) as {
-        default_drg_route_tables: Record<string, { drg_route_table_id: string }>;
-        drg_route_tables: Record<string, { display_name: string }>;
-      };
-    expect(drg.default_drg_route_tables.ipsec_tunnel.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
-    expect(drg.default_drg_route_tables.virtual_circuit.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
+    const gateways = hybridGateways(network);
+    const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
+    expect(drg).not.toHaveProperty('default_drg_route_tables');
+    for (const vpn of Object.values(gateways.ipsecs)) for (const tunnel of Object.values(vpn.tunnels_management)) {
+      expect(tunnel.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
+    }
+    for (const circuit of Object.values(gateways.fast_connect_virtual_circuits)) {
+      expect(circuit.drg_route_table_id).toBe('DRGRT-FRA-LZ-HUB-HC-KEY');
+    }
     expect(drg.drg_route_tables['DRGRT-FRA-LZ-HUB-HC-KEY'].display_name).toBe('drgrt-fra-lz-hc');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
@@ -47,6 +55,31 @@ describe('hybrid routing views', () => {
     expect(graph.nodes.filter((node) => node.id === hc.id)).toHaveLength(1);
     expect(graph.nodes.filter((node) => node.rtDotTableId === hc.id)).toHaveLength(3);
     expect(validateDiagramLayout(graph)).toEqual([]);
+  }, 60_000);
+
+  it('uses tunnel 2 independently when tunnel 1 references an external table', async () => {
+    const model = complexHybridModel('hub_e');
+    model.hybridConnectivity!.fast_connect_virtual_circuits.primary.remote_cidrs = ['172.23.0.0/16'];
+    const network = await generateNetwork(model);
+    const gateways = hybridGateways(network);
+    const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
+    const hcKey = 'DRGRT-FRA-LZ-HUB-HC-KEY';
+    drg.drg_route_tables.second = { ...drg.drg_route_tables[hcKey], display_name: 'Second tunnel ingress' };
+    const vpn = Object.values(gateways.ipsecs)[0];
+    vpn.tunnels_management.tunnel_1.drg_route_table_id = 'ocid1.drgroutetable.oc1..external';
+    vpn.tunnels_management.tunnel_2.drg_route_table_id = 'second';
+    const tables = buildRouteTables(model, network);
+    expect(tables.find((table) => table.id === hcKey)?.associations)
+      .toEqual([{ nodeId: 'hybrid-fc-primary', kind: 'drg-attachment' }]);
+    expect(tables.find((table) => table.id === 'second')?.associations)
+      .toEqual([{ nodeId: 'hybrid-vpn-backup:tunnel-2', kind: 'drg-attachment' }]);
+    for (const direction of ['in', 'out']) {
+      const flow = buildFlowTraces(model, [`prod:hybrid-${direction}@hybrid-vpn-backup:web`], 'flow', tables)[0];
+      expect(flow.ok).toBe(true);
+      const nodes = flow.segments.flatMap((segment) => [segment.from, segment.to]);
+      expect(nodes).toContain('hybrid-vpn-backup:tunnel-2');
+      expect(nodes).not.toContain('hybrid-vpn-backup:tunnel-1');
+    }
   }, 60_000);
   for (const kind of ['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const) {
     it(`${kind}: displays generated ingress tables and traces both directions`, async () => {
@@ -206,10 +239,8 @@ describe('hybrid routing views', () => {
       .toContainEqual({ nodeId: 'hybrid-fc-primary', kind: 'drg-attachment' });
     expect(buildFlowTraces(model, ['prod:hybrid-out@hybrid-fc-primary:web'], 'flow', tables)[0].ok).toBe(false);
     expect(buildFlowTraces(model, ['prod:hybrid-in@hybrid-fc-primary:web'], 'kind', tables)[0].ok).toBe(true);
-    const selectors = ['network_configuration', 'network_configuration_categories', '0-shared', 'non_vcn_specific_gateways',
-      'dynamic_routing_gateways', 'DRG-FRA-LZ-HUB-KEY', 'default_drg_route_tables']
-      .reduce<unknown>((value, key) => (value as Record<string, unknown>)[key], network) as Record<string, unknown>;
-    selectors.virtual_circuit = { drg_route_table_id: 'missing' };
+    const circuit = Object.values(hybridGateways(network).fast_connect_virtual_circuits)[0];
+    circuit.drg_route_table_id = 'ocid1.drgroutetable.oc1..external';
     const changed = buildRouteTables(model, network);
     expect(changed.find((table) => table.id === 'DRGRT-FRA-LZ-HUB-HC-KEY')?.associations)
       .toEqual([
