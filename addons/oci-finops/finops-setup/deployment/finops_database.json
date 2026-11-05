@@ -1,0 +1,35 @@
+{
+    "autonomous_databases_configuration": {
+        "default_compartment_id"                           : "CMP-FINOPS-KEY",
+
+        "databases": {
+            "ADB-FRA-LZ-FINOPS-KEY": {
+                "display_name"                             : "adb-fra-lz-finops",
+                "admin_password"                           : "<ADB_ADMIN_PASSWORD>",
+                "db_name"                                  : "FINOPS",
+                "db_workload"                              : "DW",
+                "dw_storage_size_in_tbs"                   : 1,
+                "ecpu_count"                               : 2,
+                "enable_cpu_auto_scaling"                  : false,
+                "enable_storage_auto_scaling"              : false,
+                "is_dedicated"                             : false,
+                "license_model"                            : "LICENSE_INCLUDED",
+
+                "networking": {
+                    "network_security_groups"              : ["NSG-FRA-LZ-FINOPS-ADB-KEY"],
+                    "enable_private_endpoint"              : true,
+                    "subnet_id"                            : "SN-FRA-LZ-FINOPS-DB-KEY"
+                }
+            }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"     : "finops",
+            "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+        }
+    }
+}
