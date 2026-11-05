@@ -12,7 +12,7 @@
     - [4.0. Prerequisite: Deploy the One-OE blueprint](#40-prerequisite-deploy-the-one-oe-blueprint)
     - [4.1. Deploy the One-OE DR extension](#41-deploy-the-one-oe-dr-extension)
       - [4.1.1. Deploy complete hub networking](#411-deploy-complete-hub-networking)
-      - [4.1.2. Complete staged observability](#412-complete-staged-observability)
+      - [4.1.2. Deploy complete observability](#412-deploy-complete-observability)
       - [4.1.3. Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication)
     - [4.2. Deploy inter-region RPC within the same tenancy](#42-deploy-inter-region-rpc-within-the-same-tenancy)
   - [License](#license)
@@ -65,7 +65,7 @@ The [`runtime`](./runtime/) directory contains the published Frankfurt/Amsterdam
 
 For cross-region DR, manage each target region as an independent deployment unit. Use a distinct OCI Resource Manager stack or Terraform state/workspace per region so that regional network and observability resources can be planned, applied, and operated independently.
 
-The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains regional network, security, observability, and selected workload-extension files, with the requester in its canonical network files. Platforms and registered extensions follow their normal placement contracts. The complete home stack must provision every required compartment, governance resource, and extension IAM policy before regional deployment. Hub A, Hub B, and Hub C each deploy complete networking from `network.json` using Orchestrator v2.2.0 resource-key routing. Hub C also emits `network_backends.json` for designs with third-party firewall backends.
+The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains regional network, security, observability, and selected workload-extension files, with the requester in its canonical network files. Platforms and registered extensions follow their normal placement contracts. The complete home stack must provision every required compartment, governance resource, and extension IAM policy before regional deployment. Hub A, Hub B, and Hub C each deploy complete networking from `network.json` using Orchestrator v2.4.1 resource-key routing. Hub C also emits `network_backends.json` for designs with third-party firewall backends.
 
 IAM compartments, identity resources, tenancy-wide governance, Cloud Guard, and Security Zones remain home-owned and are omitted from the generated DR directory. CIS2 regional security files deploy Vaults and keys in the DR region, including selected extension keys.
 
@@ -85,11 +85,11 @@ When deploying the published Frankfurt/Amsterdam preset with ORM, follow these s
 1. Update the home stack with `oneoe_bcdr_home_iam.json` and the matching complete `oneoe_bcdr_home_network_hub_*.json` file so it authorizes DR Object Storage and creates the RPC acceptor. Save its compartment and network dependency outputs.
 2. Replicate the required One-OE output dependency files from a home-region Object Storage bucket to a DR-region bucket. This is separate from the replication described in [Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication).
 3. Stage the reviewed generated DR files in a customer-controlled private Object Storage bucket or approved private Git source, then create the DR stack in `eu-amsterdam-1` (Netherlands Northwest, Amsterdam).
-4. Use the pinned [Orchestrator v2.2.0](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0) source and set the working directory to `rms-facade`.
+4. Use the pinned [Orchestrator v2.4.1](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.4.1) source and set the working directory to `rms-facade`.
 5. Set the stack name you prefer.
 6. Set the Terraform version to 1.5.x. Click Next.
 7. Review the selected generated JSON configuration files and confirm that they match the intended hub and CIS level. Click Next.
-8. Before creating the stack, replace `email.address@example.com` in the selected initial observability file with the operational notification email addresses and confirm each email subscription. Repeat this change in the matching final observability file before following [Complete staged observability](#412-complete-staged-observability); otherwise the final replacement restores the placeholder addresses.
+8. Before creating the stack, replace `email.address@example.com` in the selected observability file with the operational notification email addresses and confirm each email subscription.
 9. Configure the stack dependencies so the BCDR add-on consumes the required outputs from the blueprint One-OE stack.
 10. Clear the Run apply check box. Click Create.
 11. Run Plan and review the proposed regional network and observability changes before applying.
@@ -97,7 +97,7 @@ When deploying the published Frankfurt/Amsterdam preset with ORM, follow these s
 
 #### 4.1.1. Deploy complete hub networking
 
-Hub A and Hub B deploy their matching complete home or DR network file in one network apply. Managed firewall route targets use resource keys resolved by Orchestrator v2.2.0. Home files use the `oneoe_bcdr_home_network_*` prefix; DR files use `oneoe_bcdr_network_*`.
+Hub A and Hub B deploy their matching complete home or DR network file in one network apply. Managed firewall route targets use resource keys resolved by Orchestrator v2.4.1. Home files use the `oneoe_bcdr_home_network_*` prefix; DR files use `oneoe_bcdr_network_*`.
 
 Hub C follows the same complete-network process. Use `oneoe_bcdr_network_hub_c.json` for the standard design, or `oneoe_bcdr_network_hub_c_backends.json` when the design uses third-party firewall backend resources. Replace the example backend IP addresses and private-IP OCIDs with the reviewed firewall endpoints before deploying the backend variant.
 
@@ -105,9 +105,9 @@ Select `oneoe_bcdr_security_cis1.json` for regional [Vulnerability Scanning Serv
 
 Security Zones are not redeployed in the DR region. The One-OE blueprint already associates the shared tenancy-wide compartment hierarchy with its Security Zones; OCI does not allow a compartment to belong to multiple Security Zones. Cloud Guard remains managed by the home-region blueprint. Vaults and encryption keys are regional resources and are created in the DR stack for CIS2.
 
-#### 4.1.2. Complete staged observability
+#### 4.1.2. Deploy complete observability
 
-The initial deployment uses `oneoe_bcdr_observability_cis1_pre.json` or `oneoe_bcdr_observability_cis2_pre.json`. After the final hub network configuration is applied, update the same stack or Terraform state to use the matching final observability file (`oneoe_bcdr_observability_cis1.json` or `oneoe_bcdr_observability_cis2.json`). The final file creates the flow logs for the DR-region hub and production network resources.
+Include `oneoe_bcdr_observability_cis1.json` or `oneoe_bcdr_observability_cis2.json` in the initial regional deployment. The complete file includes explicit Flow Logs for the declared DR-region VCNs and subnets; no observability replacement is required.
 
 The BCDR observability files contain only regional DR resources. The home-region events remain managed by the home-region One-OE blueprint and are intentionally excluded from the DR stack.
 

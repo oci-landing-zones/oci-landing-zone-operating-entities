@@ -91,17 +91,19 @@ All notification topics are created in the shared security compartment. The publ
 
 ### VCN Flow Logs
 
-VCN Flow Logs are included in the non-`_pre` observability configurations (`oneoe_observability_cis1.json` and `oneoe_observability_cis2.json`).
+VCN Flow Logs are included in the two common observability configurations, `oneoe_observability_cis1.json` and `oneoe_observability_cis2.json`, from the initial deployment. Both use `logging_configuration.service_logs` with explicit logical resource keys, so the network and its logs can be planned together without OCI resource discovery.
 
-| Flow log key | Scope | Target resource type | Target network compartment | Log group key |
-|---|---|---|---|---|
-| `LOG-LZ-SUBNET-FLOW-KEY` | Shared network | Subnet | `CMP-LZ-NETWORK-KEY` | `LGRP-LZ-VCN-FLOW-KEY` |
-| `LOG-LZ-VCN-FLOW-KEY` | Shared network | VCN | `CMP-LZ-NETWORK-KEY` | `LGRP-LZ-VCN-FLOW-KEY` |
-| `LOG-LZ-PROD-SUBNET-FLOW-KEY` | Prod dedicated | Subnet | `CMP-LZ-PROD-NETWORK-KEY` | `LGRP-LZ-PROD-VCN-FLOW-KEY` |
-| `LOG-LZ-PROD-VCN-FLOW-KEY` | Prod dedicated | VCN | `CMP-LZ-PROD-NETWORK-KEY` | `LGRP-LZ-PROD-VCN-FLOW-KEY` |
-| `LOG-LZ-PREPROD-SUBNET-FLOW-KEY` | Preprod dedicated | Subnet | `CMP-LZ-PREPROD-NETWORK-KEY` | `LGRP-LZ-PREPROD-VCN-FLOW-KEY` |
-| `LOG-LZ-PREPROD-VCN-FLOW-KEY` | Preprod dedicated | VCN | `CMP-LZ-PREPROD-NETWORK-KEY` | `LGRP-LZ-PREPROD-VCN-FLOW-KEY` |
+Each configuration declares 15 logs: three VCN logs and twelve logs for subnets shared by the published Hub A, B, C, and E architectures.
 
+| Scope | VCN target | Explicit subnet targets | Log group |
+|---|---|---|---|
+| Shared network | `VCN-FRA-LZ-HUB-KEY` | Hub LB, management, monitoring, and DNS | `LGRP-LZ-VCN-FLOW-KEY` |
+| Production | `VCN-FRA-LZ-PROD-PROJECTS-KEY` | Prod web, app, DB, and infra | `LGRP-LZ-PROD-VCN-FLOW-KEY` |
+| Preproduction | `VCN-FRA-LZ-PREPROD-PROJECTS-KEY` | Preprod web, app, DB, and infra | `LGRP-LZ-PREPROD-VCN-FLOW-KEY` |
+
+Firewall-specific subnets in Hub A, B, and C do not have separate subnet log entries in these common files. Their existing and future VNICs are covered by the hub VCN log. See [OCI VCN Flow Logs](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/vcn-flow-logs.htm) for VCN-level coverage.
+
+When adding a separate VCN, add its corresponding `service_logs` entry. Retain the scope-specific defined tags and the appropriate log group.
 
 # License
 

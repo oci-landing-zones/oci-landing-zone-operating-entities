@@ -1,3 +1,4 @@
+local cost_tags = import '../../../../lib/cost_tags.libsonnet';
 local extensions = import '../../../../extensions.libsonnet';
 local lz = import '../../../../landing_zone.libsonnet';
 local publication_network = import '../../../../lib/publication_network.libsonnet';
@@ -5,7 +6,7 @@ local render_context = import '../../../../render_context.libsonnet';
 local oke_builder = import '../oke_builder.libsonnet';
 local public_lb = import '../oke_public_load_balancer.libsonnet';
 
-function(profile, env_name='prod', platform_name='oke') {
+function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
   local cis1_config = profile.cis1_config,
   local iam_cis2_config = profile.iam_cis2_config,
   local ctx = render_context.from_raw_config(cis1_config),
@@ -92,6 +93,19 @@ function(profile, env_name='prod', platform_name='oke') {
       },
     },
 
+  local owned_log_targets = std.flattenArrays([
+    [key] + std.objectFields(multi_stack_category.vcns[key].subnets)
+    for key in std.objectFields(multi_stack_category.vcns)
+  ]),
+  local scoped_observability(doc) = doc + {
+    logging_configuration+: {
+      service_logs: {
+        [key]: doc.logging_configuration.service_logs[key]
+        for key in std.objectFields(doc.logging_configuration.service_logs)
+        if std.member(owned_log_targets, doc.logging_configuration.service_logs[key].resource_id)
+      },
+    },
+  },
   oke_network: {
     network_configuration: {
       network_configuration_categories: {
@@ -120,10 +134,10 @@ function(profile, env_name='prod', platform_name='oke') {
   // Multi-stack is deployed over an existing Landing Zone, so publish only
   // the OKE platform tag namespace and not the baseline role namespace.
   oke_governance: aggregated.governance,
-  oke_observability_cis1: rendered_lz.observability_cis1,
+  oke_observability_cis1: scoped_observability(rendered_lz.observability_cis1),
   oke_observability_cis1_pre: rendered_lz.observability_cis1_pre,
-  oke_observability_cis2: rendered_lz.observability_cis2,
+  oke_observability_cis2: scoped_observability(rendered_lz.observability_cis2),
   oke_observability_cis2_pre: rendered_lz.observability_cis2_pre,
   oke_clusters: rendered_lz.extra.oke_clusters,
   oke_workers: rendered_lz.extra.oke_workers,
-}
+}, profile.cis1_config)

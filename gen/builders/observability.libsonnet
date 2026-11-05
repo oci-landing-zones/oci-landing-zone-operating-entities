@@ -1,17 +1,25 @@
 // gen/builders/observability.libsonnet
 // Observability builder: alarms, events, notifications, service connectors, and logging.
 //
-// Generates the same structures as:
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2.json
+// Builds pre and complete variants for composition consumers. Published One-OE
+// entrypoints project the complete variants into two shared CIS configurations.
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 
 function(config, n, realm_constants, topo)
   local env_entries = topo.ordered_env_entries();
   local networked_env_entries = topo.networked_env_entries();
+  local logging_env_entries = [
+    entry
+    for entry in env_entries
+    if std.objectHas(entry.env, 'project_network') || std.length([
+      platform
+      for platform in std.objectValues(
+        if std.objectHas(entry.env, 'platforms') then entry.env.platforms else {}
+      )
+      if std.objectHas(platform, 'network') && platform.network != null
+    ]) > 0
+  ];
   local security_cmp_key = n.key_global('CMP', ['SECURITY']);
   local shared_network_cmp_key = n.key_global('CMP', ['NETWORK']);
 
@@ -336,7 +344,7 @@ function(config, n, realm_constants, topo)
     },
   };
 
-  // --- Per-env flow logs and log groups (CIS2 only) ---
+  // --- Per-environment flow logs and log groups, including platform-only networks ---
   local env_flow_logs = std.foldl(
     function(acc, entry)
       acc + {
@@ -351,7 +359,7 @@ function(config, n, realm_constants, topo)
           target_resource_type: 'vcn',
         },
       },
-    networked_env_entries,
+    logging_env_entries,
     {}
   );
 
@@ -363,7 +371,7 @@ function(config, n, realm_constants, topo)
           compartment_id: topo.env_child_compartment_key(entry, 'SECURITY'),
         },
       },
-    networked_env_entries,
+    logging_env_entries,
     {}
   );
 

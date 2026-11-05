@@ -5,6 +5,8 @@
 //
 // function(raw_config) → { network, network_backends?, ... }
 //
+local cost_tags = import 'lib/cost_tags.libsonnet';
+local explicit_flow_logs = import 'lib/explicit_flow_logs.libsonnet';
 local governance_builder = import 'builders/governance.libsonnet';
 local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
@@ -160,7 +162,7 @@ function(raw_config)
     else network_base;
 
   // --- Compose output ---
-  {
+  cost_tags.apply({
     // Normalized config-mode selector used by landing_zone_multi.jsonnet.
     cis_level: config.cis_level,
     stack_scope: config.stack_scope,
@@ -188,13 +190,19 @@ function(raw_config)
     security_cis2_pre: security.cis2_pre + extension_security_cis2,
     security_cis2: security.cis2 + extension_security_cis2,
 
-    // Observability outputs: 4 CIS variants. Extension observability is
-    // non-logging by contract, so it belongs in pre and final variants.
+    // Complete observability uses explicit targets. Legacy pre fields remain
+    // internal for composition compatibility; factory outputs omit them.
     observability_cis1_pre: observability.cis1_pre + extension_observability_cis1,
-    observability_cis1: observability.cis1 + extension_observability_cis1,
+    observability_cis1: explicit_flow_logs(
+      assembled_network,
+      observability.cis1 + extension_observability_cis1
+    ),
     observability_cis2_pre: observability.cis2_pre + extension_observability_cis2,
-    observability_cis2: observability.cis2 + extension_observability_cis2,
+    observability_cis2: explicit_flow_logs(
+      assembled_network,
+      observability.cis2 + extension_observability_cis2
+    ),
 
     // Extra outputs from extensions (e.g. oke_clusters, oke_workers)
     [if std.length(std.objectFields(extension_extra)) > 0 then 'extra']: extension_extra,
-  }
+  }, config)

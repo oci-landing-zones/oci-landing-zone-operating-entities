@@ -56,16 +56,14 @@ The deployment uses five JSON configuration files.
 | `oke_clusters.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
 | `oke_workers.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
 
-### Staged Observability Files <!-- omit from toc -->
+### Observability Files <!-- omit from toc -->
 
-The folder includes companion JSONs with CIS-aligned observability settings. Multi-stack OKE is deployed on top of an existing Landing Zone, so it does not repeat the security baseline or security resources owned by that Landing Zone.
+Include the complete observability JSON for the selected CIS level in the initial extension deployment. Its explicit Flow Logs target only the OKE VCN and subnets managed by this stack. Multi-stack OKE is deployed on top of an existing Landing Zone, so it does not repeat the security baseline or security resources owned by that Landing Zone.
 
 | File | Purpose |
 | --- | --- |
 | `oke_observability_cis1.json` | Observability settings (CIS profile 1) |
-| `oke_observability_cis1_pre.json` | Pre-requisites for `oke_observability_cis1.json` |
 | `oke_observability_cis2.json` | Observability settings (CIS profile 2) |
-| `oke_observability_cis2_pre.json` | Pre-requisites for `oke_observability_cis2.json` |
 
 &nbsp;
 
@@ -85,12 +83,12 @@ Use ORM only when the customer specifically wants ORM. Prefer Terraform CLI loca
    - Use the Orchestrator tag selected by the deployment workflow and set the working directory to `rms-facade`.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_workers.json`, `oke_network.json`, `oke_identity.json`, and `oke_clusters.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_workers.json`, `oke_network.json`, `oke_identity.json`, `oke_clusters.json`, and the selected `oke_observability_cis1.json` or `oke_observability_cis2.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
    - If you depend on outputs from a previously deployed landing zone, stage those dependency files in the same controlled source.
 
 3. **Configure ORM Variables**
    - Set the configuration source to match the private location you chose.
-   - Point the stack at the five staged JSON files and any required dependency files.
+   - Point the stack at the five core JSON files, the selected observability file, and any required dependency files.
 
 4. **Review Configuration Keys**
 
@@ -124,7 +122,7 @@ This is the preferred customer path because it keeps the deployable files under 
    ```bash
    git clone https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator.git
    cd terraform-oci-modules-orchestrator
-   git checkout tags/v2.2.0
+   git checkout tags/v2.4.1
    ```
 
 2. **Copy Configuration Files**
