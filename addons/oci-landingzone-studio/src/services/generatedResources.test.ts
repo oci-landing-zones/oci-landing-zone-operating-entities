@@ -32,6 +32,13 @@ const artifacts = () => ({
 });
 
 describe('generated resource inventory', () => {
+  it('places the Bastion from generated names and owner references in the security compartment', () => {
+    const result = extractGeneratedResources({ 'security_cis2.json': {
+      bastions_configuration: { default_compartment_id: 'SECURITY', bastions: { 'actual-bastion-key': { name: 'actualBastionName' } } },
+    } }, compartments);
+    expect(result.groups).toEqual([{ id: 'bastion:SECURITY', kind: 'bastion', compartmentKey: 'SECURITY', items: [{ key: 'actual-bastion-key', name: 'actualBastionName' }] }]);
+  });
+
   it('uses canonical names, keys and owner inheritance for the six requested families', () => {
     const result = extractGeneratedResources(artifacts(), compartments);
     expect(result.compartments).toEqual([

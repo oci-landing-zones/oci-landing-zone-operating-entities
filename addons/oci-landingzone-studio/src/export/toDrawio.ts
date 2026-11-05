@@ -186,6 +186,7 @@ function nodeStyle(node: DiagramNode): string {
     case 'attachment':
       return `rounded=1;${node.attachmentVertical ? 'horizontal=0;' : ''}whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
     case 'project':
+    case 'operator':
       return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=${node.container ? 'top' : 'middle'};fillColor=#ECEAE8;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=12;`;
     case 'routetable':
       return `rounded=0;shadow=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;

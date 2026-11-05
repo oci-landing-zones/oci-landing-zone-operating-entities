@@ -40,7 +40,7 @@ describe('canonical generated routing inventory', () => {
     expect(tables.find((table) => table.name === 'rt-fra-lz-hub-ingress')!.associations)
       .toEqual([{ nodeId: 'hub-vcn', kind: 'vcn-ingress' }]);
     expect(tables.find((table) => table.name === 'drgrt-fra-lz-hub')!.associations)
-      .toEqual([{ nodeId: 'attach-hub', kind: 'drg-attachment' }]);
+      .toEqual([{ nodeId: 'attach-hub', kind: 'drg-attachment', vcnNodeId: 'hub-vcn' }]);
     expect(tables.find((table) => table.name === 'drgrt-fra-lz-spokes')!.associations.map((entry) => entry.nodeId).sort())
       .toEqual(['attach-cmp-env-0', 'attach-cmp-env-1']);
   });
@@ -95,7 +95,7 @@ describe('canonical generated routing inventory', () => {
     at(vcn, 'vcn_specific_gateways', 'service_gateways', 'SGW-FRA-LZ-HUB-KEY').route_table_key = 'EXTRA-TABLE';
     const result = buildRouteTables(models.get('hub_e')!, network);
     expect(result.find((table) => table.id === 'EXTRA-TABLE')!.associations).toEqual([{ nodeId: 'gw-sgw', kind: 'gateway' }]);
-    expect(result.find((table) => table.name === 'rt-fra-lz-hub-mgmt')!.associations).toContainEqual({ nodeId: 'hub-vcn-sn-0', kind: 'subnet' });
+    expect(result.find((table) => table.name === 'rt-fra-lz-hub-mgmt')!.associations).toContainEqual(expect.objectContaining({ nodeId: 'hub-vcn-sn-0', kind: 'subnet', resourceKey: 'SN-FRA-LZ-HUB-LB-KEY' }));
     delete at(vcn, 'vcn_specific_gateways', 'service_gateways', 'SGW-FRA-LZ-HUB-KEY').route_table_key;
     expect(buildRouteTables(models.get('hub_e')!, network).find((table) => table.id === 'EXTRA-TABLE')).toMatchObject({ associations: [], attachTo: undefined });
   });
@@ -118,7 +118,7 @@ describe('canonical generated routing inventory', () => {
     const tables = await generatedRouteTables(model);
     expect(tables.some((table) => table.name.includes('proj-generic'))).toBe(false);
     expect(tables.filter((table) => table.name.includes('-oke-')).every((table) => table.associations.some((entry) => entry.nodeId.includes('-plat-')))).toBe(true);
-    expect(tables.find((table) => table.name === 'rt-fra-lz-shared-core-generic')!.associations).toEqual([{ nodeId: 'shared-plat-vcn-0-sn-0', kind: 'subnet' }]);
+    expect(tables.find((table) => table.name === 'rt-fra-lz-shared-core-generic')!.associations).toMatchObject([{ nodeId: 'shared-plat-vcn-0-sn-0', kind: 'subnet', resourceKey: 'SN-FRA-LZ-SHARED-PLATFORM-CORE-CORE-KEY' }]);
     expect(tables.find((table) => table.name === 'rt-fra-lz-shared-exacs-generic')!.associations.length).toBeGreaterThan(0);
   }, 60_000);
 });

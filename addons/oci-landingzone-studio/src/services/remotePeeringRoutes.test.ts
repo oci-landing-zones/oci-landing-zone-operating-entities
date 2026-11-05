@@ -130,7 +130,7 @@ describe('canonical X-RPC routing', () => {
     model.exadata.exacs = { ...model.exadata.exacs, enabled: true, service: 'vmc', notifications: { default: 'dba@example.com' } };
     const tables = await generatedRouteTables(model);
     expect(tables.find((table) => table.name === 'drgrt-fra-lz-spokes')!.associations)
-      .toEqual([{ nodeId: 'attach-shared-0', kind: 'drg-attachment' }]);
+      .toEqual([{ nodeId: 'attach-shared-0', kind: 'drg-attachment', vcnNodeId: 'shared-plat-vcn-0' }]);
     expect(tables.find((table) => table.name === 'drgrt-fra-lz-rpc-home-region')!.rules)
       .toContainEqual(expect.objectContaining({ flowTarget: 'attach-shared-0', provenance: 'derived-import' }));
     expect(tables.find((table) => table.name === 'rt-fra-lz-shared-exacs-generic')!.rules)

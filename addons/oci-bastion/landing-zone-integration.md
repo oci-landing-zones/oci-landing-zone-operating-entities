@@ -1,143 +1,86 @@
-# OCI Bastion Landing Zone Integration
+# OCI Bastion Landing Zone integration
 
-This document describes how bastion access integrates with OCI Landing Zones. It is a design and implementation guide for repository users and maintainers. It does not change generator behavior by itself.
+## Enable Bastion
 
-## 1. Current Landing Zone Support
+Add the optional top-level `bastion` block to a [Blueprint Factory source configuration](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#10-bastion), alongside `hub`. In Landing Zone Studio, enable **OCI Bastion** in **Foundation** and enter the same client CIDRs and maximum session lifetime.
 
-The repository already prepares several bastion prerequisites:
-
-| Area | Existing behavior |
-|---|---|
-| Hub network | One-OE hub models create a private management subnet. The hub management security list includes an example inbound SSH rule from a Bastion service private endpoint IP. |
-| IAM | Network administrators can manage bastion sessions in network scopes and use bastions in security scopes. Security administrators can manage `bastion-family` in security scopes. Project administrators can manage sessions in project compartments and use bastions in security compartments. |
-| Spoke routing | One-OE hub-and-spoke topologies use DRG attachments and route tables to connect hub and spoke networks. Firewall hub models require the access path to follow the selected inspection topology. |
-| DNS | The Private DNS add-on can centralize private DNS resolution across hub and spokes. This is important for private endpoints and UI applications that require the original hostname. |
-| VM jump host example | The multi-OE service provider runtime includes a `jump_host_config.json` example that creates a private jump host with Cloud Agent plugins enabled. |
-
-The One-OE generator currently derives an example Bastion private endpoint `/32` from the hub management subnet. Treat this as a placeholder for generated security rules. After an OCI Bastion is created, verify the actual private endpoint IP and update target security rules if the real IP differs.
-
-## 2. Integration Principles
-
-1. Keep private resources private. Bastion access should not require public IPs on target VMs, private databases, or internal application endpoints.
-2. Place the access entry point in the hub, preferably in a security or network management compartment.
-3. Use the selected hub model's route and firewall path. Administrative traffic is still traffic that must be inspected when the hub model requires inspection.
-4. Scope source access tightly. The Bastion client CIDR allowlist should contain only approved customer workstation or VPN egress ranges.
-5. Scope target access tightly. Target subnets or NSGs should allow only required ports from the Bastion private endpoint IP or the approved bastion subnet CIDR.
-6. Use private DNS for endpoint hostnames. UI applications, OIC, and TLS-protected services often need the original hostname to work cleanly.
-7. Keep session lifetime short. OCI Bastion sessions are temporary and should be recreated as needed.
-
-## 3. Recommended Placement
-
-### OCI Bastion service
-
-Place the OCI Bastion resource in the hub security compartment or the hub network/security management scope, targeting a private hub management subnet that has routed access to the private targets.
-
-For dynamic hub-to-spoke access, create the Bastion with FQDN/SOCKS5 support enabled. With OCI CLI this is represented by:
-
-```bash
-oci bastion bastion create \
-  --bastion-type standard \
-  --compartment-id <security_compartment_ocid> \
-  --target-subnet-id <hub_management_subnet_ocid> \
-  --name <bastion_name> \
-  --dns-proxy-status ENABLED \
-  --client-cidr-list '["<approved_client_public_cidr>"]' \
-  --max-session-ttl 10800
+```jsonnet
+bastion: {
+  client_cidr_block_allow_list: ['203.0.113.10/32'],
+  max_session_ttl_in_seconds: 3600,
+},
 ```
 
-Use the customer-approved deployment method. For repository examples, avoid public raw GitHub URLs as the default customer path. Prefer Terraform CLI or customer-controlled CI/CD. If OCI Resource Manager is used, stage files in a customer-controlled private Object Storage bucket or approved private GitHub source.
+Replace the example TEST-NET address with your approved workstation or corporate/VPN public egress CIDR. Use the address OCI sees, which can differ from the workstation's private address.
 
-### VM-based bastion
-
-Place the VM in a private hub management subnet. The VM should have no public IP. Operators reach it through an approved access path such as VPN, FastConnect, OCI Bastion service, Secure Desktops, or another customer-approved private operator network.
-
-Use a VM-based bastion when the customer needs to install endpoint agents, custom tools, browser tooling, SQL clients, inspection tools, or compliance software on the bastion itself.
-
-## 4. Network Requirements
-
-For any bastion pattern, verify the complete path:
-
-| Requirement | What to verify |
+| Input | Contract |
 |---|---|
-| Client to OCI Bastion | Client public IP or VPN egress CIDR is in the Bastion client CIDR allowlist. |
-| Hub to spoke routing | Hub route table sends spoke CIDRs to the DRG or firewall path. Spoke route table returns hub/bastion subnet CIDRs through the DRG or firewall path. |
-| DRG routing | DRG route tables import and advertise the required hub and spoke CIDRs. |
-| Firewall policy | Hub firewall policy allows required ports from the bastion source to the private target and allows return traffic. |
-| Target security list or NSG | Target subnet or NSG allows the target port from the Bastion private endpoint IP or the bastion subnet CIDR. |
-| Host firewall | Target operating system firewall allows the target port. OCI security rules alone are not enough if the host firewall blocks the connection. |
-| DNS | The operator path can resolve private endpoint FQDNs to private IPs when the target is FQDN-based. |
+| `bastion` | Optional object. Omitted or `null` disables Bastion provisioning and its operator grants. |
+| `client_cidr_block_allow_list` | Required when enabled: 1 to 20 canonical IPv4 CIDRs. `/0` is rejected. Host bits must be zero for network prefixes, for example `203.0.113.0/24`. Prefer individual approved `/32` addresses where practical. |
+| `max_session_ttl_in_seconds` | Optional integer from `1800` to `10800` inclusive; default `3600`. This is the Bastion maximum; a session can request a shorter supported lifetime. |
 
-Example target rules:
+The [Bastion example](../oci-lz-blueprint-factory/examples/07-bastion.json) is a hub-only Hub E lab configuration. Select and review the hub model required for your deployment. Generate it with the normal [Factory workflow](../oci-lz-blueprint-factory/README.md#4-generation-workflow), then deploy through the existing Landing Zone phases.
 
-| Target | Port | Source |
+## Generated resources and responsibilities
+
+The generated `bastions_configuration` in the security outputs includes one standard Bastion in the shared security compartment, targeting the hub's private `mgmt` subnet, with DNS proxy/FQDN/SOCKS5 support enabled. The selected CIS level and complete or regional stack scope determine the usual security output files. No new output file or standalone deployment stack is needed.
+
+The Factory configures the Bastion resource and conditional IAM permissions. Operators create sessions after deployment. Public keys, private keys, session OCIDs and target credentials are not Factory inputs. A dynamic session has no fixed target IP, port or VM username.
+
+Create and delete the Bastion through the normal Landing Zone deployment principal, which must already have the IAM and network permissions required by the Orchestrator. Bastion service permissions alone do not provide the additional network permissions needed for creation/deletion. This add-on does not expand security administrators' shared-network management rights.
+
+**Manual post-deployment configuration required:** record the Bastion's actual private endpoint IP, permit the required target ports, and verify private DNS and the complete request/return path. Do not derive an endpoint address from the subnet's host offsets. A successful tunnel listener alone does not prove target access.
+
+| Target | Required TCP port | Target-side source |
 |---|---:|---|
-| Private Linux VM | `22` | Bastion private endpoint `/32` or bastion subnet CIDR |
-| Private Windows VM | `3389` | Bastion private endpoint `/32` or bastion subnet CIDR |
-| Autonomous Database private endpoint | `1521` | Bastion private endpoint `/32` or bastion subnet CIDR |
-| Internal HTTPS application or OIC endpoint | `443` | Bastion private endpoint `/32` or bastion subnet CIDR |
+| Database Actions, APEX or another private HTTPS interface | `443` | Actual Bastion private endpoint `/32`, or an approved source range covering it. |
+| Linux SSH server | `22` | Same source review. |
+| Windows RDP service | `3389` | Same source review; also enable RDP and its host firewall rule. |
 
-## 5. IAM Requirements
+If a firewall translates the source, use the source observed at the destination. Review NSGs, security lists and host firewalls together. The public client allowlist controls entry to Bastion; it does not grant access to these target ports. Database listener ports are separate from database web-interface HTTPS access.
 
-Minimum OCI Bastion service duties usually split into two roles:
+Oracle's [creation prerequisites](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-bastion.htm) include a service gateway and its route. Check the generated hub management path and [private DNS configuration](../oci-private-dns/README.md). Preserve the approved inspection path for Hub A/B/C; Hub C also requires working firewall appliances and NLB backends. Hub E uses DRG routing without a network firewall.
 
-| Role | Typical permissions |
+## Trace access in Landing Zone Studio
+
+Foundation shows the generated Bastion in shared security. The network diagram connects the operator workstation to that managed service and its private endpoint association in the hub management subnet. The Draw.io export preserves the same service, ownership and subnet association.
+
+From the traffic-flow view, select **Operator → environment** or **Operator → Shared platforms**, then choose a generated private subnet. This includes configured platform networks when project networking is disabled. Platforms without a generated subnet do not gain an invented endpoint. The preview follows the generated route rows and only shows firewall inspection where those routes traverse a firewall.
+
+These are configured route previews, not proof of a deployed connection. Verify the dynamic session, actual target address, target NSG/security rules, firewall policy and private DNS. Routed spoke access remains subject to the [topology validation](#validate-the-selected-topology) below.
+
+## IAM and regional deployment
+
+The integration reuses existing Landing Zone administrator groups; it creates no Bastion-specific group.
+
+| Existing role | Bastion access when enabled |
 |---|---|
-| Security administrator | Manage Bastion resources in the security compartment. |
-| Operator or application administrator | Use the Bastion and manage sessions for the resources they administer. |
+| Landing Zone security administrators | Bastion service permissions in shared security, including allowlist/session oversight. Creation and deletion also require the separate network prerequisites held by the deployment principal. |
+| Network, project and platform administrators | Use the shared-security Bastion and manage its sessions, with supporting resource metadata reads. |
+| Auditors | Existing read-only audit access. |
 
-The repository's generated IAM policies already include bastion-related permission patterns. For a customized customer design, review whether the intended operators have:
+Session permissions belong to the compartment containing the Bastion, rather than the VM or database compartment. Security administrators can update the Bastion allowlist and oversee sessions after deployment within their service permissions. Keep Factory-managed settings in the source configuration to avoid later deployment drift. Dynamic-session IAM does not restrict destinations by the operator's project: network controls and target authentication must enforce the intended access. Review group membership and the rendered policy scope before deployment. See [Bastion IAM policy requirements](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
 
-- `use bastion` on the compartment that contains the Bastion resource;
-- `manage bastion-session` where sessions are created;
-- read access to target Compute instances when using managed SSH or target-instance selection;
-- read/use network permissions where the Bastion target subnet is selected;
-- any database or application credentials required by the target service.
+Complete scope emits IAM. Regional scope creates a regional Bastion but does not emit home-owned IAM; deploy or update the complete Home stack with Bastion enabled first, using the matching compartments and administrator groups, then provide the usual Home dependencies to the regional stack. Each region has its own Bastion and sessions.
 
-Do not grant broad `manage bastion-family in tenancy` to normal operators when a compartment-scoped policy is sufficient.
+## Validate the selected topology
 
-## 6. Choosing A Pattern
+Oracle explicitly documents a same-VCN boundary. The single-hub, cross-VCN dynamic pattern is observed behavior that needs validation beyond that documented boundary; see the [service-boundary notice](./README.md#hub-placement-and-service-boundary).
 
-Use this decision sequence after the customer's baseline landing zone design, hub model, network scope, and CIDRs are known:
+Before handing access to operators:
 
-1. If the customer needs installed agents or persistent tools on the access host, use [VM-based bastion in the hub](./vm-bastion-in-hub.md).
-2. If the target is a private Compute instance that supports Oracle Cloud Agent Bastion plugin and OpenSSH, use [Managed SSH](./oci-bastion-managed-ssh-session.md).
-3. If the target is one known service endpoint and one TCP port, use [SSH port forwarding](./oci-bastion-port-forwarding-session.md).
-4. If one hub Bastion should reach many spokes or many endpoints, use [dynamic port forwarding](./oci-bastion-dynamic-port-forwarding-session.md), with FQDN/SOCKS5 enabled and customer topology validation.
-5. If the customer requires only OCI-documented same-VCN service behavior, deploy one Bastion per target VCN or use a VM-based hub bastion.
+1. Confirm the public client CIDR, Bastion FQDN/SOCKS5 setting, operator IAM and session lifetime.
+2. Verify hub/target subnet routes, DRG attachment tables, return routes, DNS and the selected firewall path. For Hub C, include appliance configuration, symmetric flow and any source translation.
+3. From each supported operator OS, test the private database HTTPS URL, Linux SSH and Windows RDP. Validate any `ssh -L` use against the dynamic session in that environment before relying on it.
+4. Confirm that an unapproved source, denied destination and expired/deleted session fail. Stop the tunnel and verify local access ends.
 
-## 7. What The Landing Zone Should And Should Not Do
+These are deployment acceptance checks, not claims that every Hub A/B/C/E and client combination has been live-tested by this add-on.
 
-Generated or prepared by the Landing Zone where supported:
+## Updating an existing Landing Zone
 
-- compartments and administrator groups;
-- IAM policies for Bastion administrators and session users;
-- hub and spoke VCNs, subnets, DRG attachments, route tables, gateways, and security rules;
-- DNS forwarding and resolver views when the Private DNS add-on is used;
-- logging, alarms, and vulnerability scanning where configured.
+Generate from the source configuration and review a Terraform plan before applying. Enabling Bastion adds its security resource and shared-security operator grants. An absent or `null` block adds neither; older unconditional network/project Bastion grants are removed by the updated IAM generation. Audit read access remains.
 
-Customer-specific setup:
-
-- OCI Bastion resource creation when not produced by a published runtime;
-- bastion session creation and expiration management;
-- SSH key pair handling;
-- VM bastion OS hardening, patching, host firewall, and agents;
-- target service credentials;
-- SQL Developer, browser, PuTTY, OpenSSH, and SOCKS5 client configuration;
-- final customer security, regulatory, and compliance review.
-
-## 8. Validation Checklist
-
-Before handing over the design:
-
-- Confirm the hub model and whether firewall inspection is mandatory.
-- Confirm target VCNs, subnets, FQDNs, and ports.
-- Confirm hub-to-target and target-to-hub route tables.
-- Confirm target security rules use the actual Bastion private endpoint IP or approved subnet CIDR.
-- Confirm client public CIDRs are tightly scoped.
-- Confirm DNS resolution from the bastion path.
-- Confirm a short-lived session can connect to each target type.
-- Confirm host firewalls permit the same ports as OCI security rules.
-- Confirm session expiration and key rotation procedures are documented.
+For a regional deployment, update Home IAM before the regional apply. Review whether existing operators need the new shared-security session scope. Check existing target rules for historical example endpoint addresses and replace them with the actual deployed source. An existing Bastion without FQDN/SOCKS5 support may require replacement; review that lifecycle change and active sessions in the plan. Disabling the block removes a Factory-managed Bastion, so terminate active work and review resource deletion first.
 
 #### License
 
@@ -145,4 +88,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE.txt) for more details.
+See [LICENSE](../../LICENSE.txt) for more details.

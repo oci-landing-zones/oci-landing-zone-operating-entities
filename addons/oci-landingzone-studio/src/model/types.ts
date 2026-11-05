@@ -208,6 +208,7 @@ export interface ExadataDesign {
 }
 
 export interface LzModel {
+  bastion?: BastionConfig;
   remotePeeringConnections?: RemotePeeringConnection[];
   hybridConnectivity?: HybridConnectivity;
   /** Schema version of this canonical object. */
@@ -223,6 +224,13 @@ export interface LzModel {
   sharedPlatforms: SharedPlatformConfig[];
   /** Optional Exadata extensions, configured in the Platforms step. */
   exadata: ExadataDesign;
+}
+
+export interface BastionConfig {
+  enabled: boolean;
+  /** Editable allowlist text; only enabled settings enter the Factory config. */
+  clientCidrs: string;
+  maxSessionTtlInSeconds: number;
 }
 
 export interface RemotePeeringConnection {
@@ -245,7 +253,7 @@ export interface RemotePeeringConnection {
 export interface DiagramNode {
   id: string;
   /** Semantic kind — drives styling in each renderer. */
-  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'premises' | 'vpn' | 'vpntunnel' | 'customerrouter' | 'fastconnect' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup';
+  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'premises' | 'vpn' | 'vpntunnel' | 'customerrouter' | 'fastconnect' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup' | 'operator';
   label: string;
   /** Compartment fill: yellow (shared), green (environment) or gray (projects). */
   tone?: 'yellow' | 'green' | 'gray' | 'platform' | 'projects';
