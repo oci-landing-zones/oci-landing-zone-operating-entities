@@ -276,7 +276,19 @@ function edgeGeometry(points: Point[], offsetX: number, offsetY: number): string
     `            <mxPoint x="${last.x}" y="${last.y}" as="targetPoint" />${pointArray}\n          </mxGeometry>`;
 }
 
+export interface DrawioPage { name: string; diagram: DiagramModel }
+
 export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone'): string {
+  return toDrawioPagesXml([{ name: diagramName, diagram }]);
+}
+
+export function toDrawioPagesXml(pages: readonly DrawioPage[]): string {
+  return `<mxfile host="oci-landingzone-studio" type="device">\n`
+    + pages.map((page, index) => drawioPageXml(page.diagram, page.name, index ? `lz-${index + 1}` : 'lz')).join('')
+    + `</mxfile>\n`;
+}
+
+function drawioPageXml(diagram: DiagramModel, diagramName: string, pageId: string): string {
   const bounds = diagramBounds(diagram.nodes);
   const offsetX = Math.max(20, Math.round((PAGE_W - bounds.width) / 2)) - bounds.x;
   const offsetY = Math.max(20, Math.round((PAGE_H - bounds.height) / 2)) - bounds.y;
@@ -387,8 +399,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
   });
 
   return (
-    `<mxfile host="oci-landingzone-studio" type="device">\n` +
-    `  <diagram id="lz" name="${escapeXml(diagramName)}">\n` +
+    `  <diagram id="${pageId}" name="${escapeXml(diagramName)}">\n` +
     `    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" ` +
     `arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">\n` +
     `      <root>\n` +
@@ -397,7 +408,6 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     [...nodeCells, ...shieldCells, ...routeTableCells, ...osnCells, ...backendCells, ...iconCells, ...endpointCells, ...gatewayChildCells, ...publicBadgeCells, ...structuralCells, ...flowCases, ...edgeCells, ...flowAnnotations].join('\n') + '\n' +
     `      </root>\n` +
     `    </mxGraphModel>\n` +
-    `  </diagram>\n` +
-    `</mxfile>\n`
+    `  </diagram>\n`
   );
 }

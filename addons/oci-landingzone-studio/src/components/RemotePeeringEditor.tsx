@@ -33,7 +33,7 @@ export default function RemotePeeringEditor() {
         <InfoButton title="Remote peering connection (RPC)"><p>Configure an <strong>acceptor</strong> in one landing zone first. Its deployment provides the RPC OCID or dependency output used by the <strong>requester</strong> in the other landing zone.</p><p>Enter only the remote VCN ranges that should be reachable. Keep them separate from local and other remote ranges, and review routing and firewall policies on both sides.</p><p>{regional ? 'DR supports same-tenancy peering. Cross-tenancy peering requires IAM from a Home Region deployment.' : 'Leave the peer tenancy blank for same-tenancy peering. A cross-tenancy acceptor also needs the foreign requester network-admin group OCID.'}</p></InfoButton>
       </div>
       {regional && <p style={{ ...s.help, marginBottom: 12 }}>DR supports same-tenancy peering. Cross-tenancy peering requires IAM from a Home Region deployment.</p>}
-      {!connections.length && <p style={{ ...s.help, marginBottom: 16 }}>No remote connections. RPC is optional.</p>}
+      {!connections.length && <p style={{ ...s.help, marginBottom: 16 }}>No remote connections configured.</p>}
       {connections.map((connection, index) => <div key={connection.id} className="rpc-connection" role="group" aria-labelledby={`rpc-${connection.id}-title`}>
         <div className="rpc-connection-header">
           <h3 id={`rpc-${connection.id}-title`}>Connection {index + 1}</h3>
