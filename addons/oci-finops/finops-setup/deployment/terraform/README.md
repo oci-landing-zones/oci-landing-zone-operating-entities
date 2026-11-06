@@ -21,4 +21,4 @@ terraform apply -auto-approve
 > Resource Principal access for the ADB to fetch FOCUS reports is already handled through dynamic group and policy configurations included in the OCI Landing Zone IAM setup.
 > As these policies are already provisioned, make sure the variable `create_policy` remains set to `false` (which is the default).
 
-For the existing ADB resource principal and reporting policy, use [`finops_service_access.json`](../finops_service_access.json) after replacing its compartment OCID placeholder. Supply the existing identity-domain dependency; do not create a duplicate group or policy with this Terraform example.
+For the ADB resource principal and reporting policy, use the final consolidated [`finops_iam.json`](../finops_iam.json) after replacing both its compartment and ADB OCID placeholders. Follow the [staged IAM setup and ownership migration](../../README.md#staged-iam-setup-and-existing-resource-ownership), supply the existing identity-domain dependency, and do not create duplicate resources with this Terraform example.

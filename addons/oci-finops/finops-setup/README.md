@@ -20,11 +20,10 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 
 | File | Purpose |
 |---|---|
-| [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
+| [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops`, two administrator groups and their policies, plus the ADB dynamic group and resource-principal policy. Resolve the compartment and ADB OCIDs in the final deployment copy; see the staged IAM setup below. |
 | [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
 | [finops_bastion.json](deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
-| [finops_service_access.json](deployment/finops_service_access.json) | After provisioning, enable the ADB report-reading principal and tag-metadata access. Replace the compartment OCID placeholder before using this file. |
 
 The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace and its six tags: `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`. Provision them through the One-OE [governance configuration](../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json) before deploying the FinOps addon. The addon reuses these tags; their definitions, allowed values, and tag defaults remain managed by One-OE.
 
@@ -47,7 +46,7 @@ Terraform creates the `nott-lz-finops` topic and its configured subscriptions. C
    ]
    ```
 
-2. Add `finops_observability.json` to the stack inputs while preserving existing FinOps IAM and network inputs. A separate stack must receive `CMP-FINOPS-KEY` through compartment dependencies. Apply the ADB dynamic group's `ONS_TOPIC_PUBLISH` grant from `finops_service_access.json` in `cmp-finops`; creating the topic alone does not authorize publishing.
+2. Add `finops_observability.json` to the stack inputs while preserving existing FinOps IAM and network inputs. A separate stack must receive `CMP-FINOPS-KEY` through compartment dependencies. Apply the ADB dynamic group's `ONS_TOPIC_PUBLISH` grant from `finops_iam.json` in `cmp-finops`; creating the topic alone does not authorize publishing.
 3. Validate the configuration, review the Terraform plan for the expected topic and email subscriptions, then apply it. OCI sends a confirmation email to each configured recipient.
 4. Open the OCI confirmation email and confirm each subscription. Verify that its state is `ACTIVE` before continuing; Terraform creation alone does not confirm an email subscription. An empty `subscriptions` list creates only the topic and does not provide email delivery.
 5. Supply the deployed topic OCID when the FOCUS shared core installer requests it. To change recipients later, update the deployment configuration, review and apply a new Terraform plan, and confirm each new subscription.
@@ -85,7 +84,7 @@ For OAC private dashboard endpoint creation/changes, have LZ network administrat
 
 ### Workload setup helpers
 
-The [Terraform ADB example](deployment/terraform/README.md) and [SQL ingestion scripts](deployment/sql/) are retained as workload setup helpers. They are separate from the V2 IAM/network infrastructure stack. Use the V2 compartment, subnet, and NSG outputs when configuring ADB, and keep `create_policy = false` to reuse the service-access configuration. Review and adapt the SQL scripts before execution; they are not run by the infrastructure stack.
+The [Terraform ADB example](deployment/terraform/README.md) and [SQL ingestion scripts](deployment/sql/) are retained as workload setup helpers. They are separate from the V2 IAM/network infrastructure stack. Use the V2 compartment, subnet, and NSG outputs when configuring ADB, and keep `create_policy = false` to reuse the resource-principal configuration in `finops_iam.json`. Review and adapt the SQL scripts before execution; they are not run by the infrastructure stack.
 
 ### Existing One-OE dependencies
 
@@ -104,7 +103,16 @@ Adapt domain/compartment names in the policies and regional names/CIDRs to the d
 
 Use `finops_iam.json` and `finops_network.json` together for the infrastructure stack. Do **not** also pass the existing One-OE IAM/network configurations as extra inputs: Orchestrator v2.2.0's RMS facade selects the first occurrence of a top-level configuration key; it does not recursively merge duplicate blocks. For a single-stack deployment, merge the additions into the owning configuration before deployment.
 
-After `cmp-finops` exists, replace `<FINOPS_COMPARTMENT_OCID>` in `finops_service_access.json`. The IAM module does not substitute symbolic compartment keys inside dynamic-group matching-rule strings. Apply this file through a separate service-access stack using the same identity-domain dependency, or merge its policy entries and dynamic-group configuration into the infrastructure IAM file. Do not replace the infrastructure stack's entire input list with this smaller file: that would remove resources from its configuration.
+### Staged IAM setup and existing resource ownership
+
+The consolidated `finops_iam.json` includes both administrator access and ADB resource-principal access. It still requires two provisioning phases when the compartment and ADB do not yet exist:
+
+1. In a private bootstrap copy, omit `identity_domain_dynamic_groups_configuration` and only the `PCY-LZ-FINOPS-ADB-RESOURCE-PRINCIPAL` entry from `policies_configuration.supplied_policies`. Keep the compartment, both human groups and their policies. Deploy that copy with the required network inputs, then provision the ADB.
+2. After provisioning, restore those two entries in the same private IAM configuration and replace `<FINOPS_COMPARTMENT_OCID>` and `<FINOPS_ADB_OCID>` with the actual resource OCIDs. Keep the existing identity-domain dependency and every other stack input. Review the plan and apply the update to the same owning stack.
+
+Do not deploy either placeholder unchanged. The IAM module does not substitute symbolic keys inside dynamic-group matching rules or policy statement strings.
+
+For installations that already manage the ADB dynamic group and policy in a separate service-access Terraform state, consolidating the JSON files does **not** transfer resource ownership. Keep the deployed source copies and both states until an explicit ownership migration is prepared and reviewed. Reconcile existing policy statements, transfer management to the intended IAM stack without creating duplicates, and verify that neither plan deletes or recreates the resources. Do not apply the consolidated IAM file against a second owner or remove the resources from the original stack's inputs before that migration.
 
 Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the preserved OCI report-read endorsement. Enable the database resource principal using [`sql/admin.sql`](deployment/sql/admin.sql), then adapt and run [`sql/finopsuser.sql`](deployment/sql/finopsuser.sql) as the FinOps database user to configure report ingestion.
 
@@ -212,7 +220,7 @@ python3 -m unittest discover -s addons/oci-finops/finops-setup/deployment/tests 
 
 These checks require exactly the DB and OAC administrator groups, reject Bastion grants outside `cmp-finops` and `cmp-lz-security`, and reject Bastion lifecycle or VCN topology management. They preserve the local fixed-destination session restrictions and require shared-security session access without fixed-target conditions for the central workflow.
 
-Before deployment, validate the two-group infrastructure configuration and the ADB service-access configuration against Orchestrator v2.2.0 using the actual dependency outputs. Static checks do not establish live OCI authorization or network connectivity.
+Before deployment, validate the bootstrap and final consolidated IAM configurations against Orchestrator v2.2.0 using the actual dependency outputs. Static checks do not establish live OCI authorization or network connectivity.
 
 The V2 files use new resource keys and current One-OE names. They are not an automatic in-place migration of the older `lzp` deployment. For an existing installation, reconcile resource ownership and Terraform state before applying; do not deploy both examples into the same address space.
 
@@ -242,7 +250,7 @@ Refer the [OCI documentation](https://docs.oracle.com/en-us/iaas/autonomous-data
 
 > [!NOTE]
 > When deploying the Autonomous Database, use the **compartment**, **VCN**, **subnet**, and **NSG** resources that were created as part of your Landing Zone setup for FinOps.  
-> Apply the V2 **service-access configuration** with the actual FinOps compartment OCID before relying on the ADB dynamic group and report-reading policy.
+> Complete the final `finops_iam.json` update with the actual FinOps compartment and ADB OCIDs before relying on the ADB dynamic group and report-reading policy. Existing separately managed resources require the ownership migration described above.
 > Ensure you reuse those instead of creating new ones.
 
 ## Step 3: Connect to ADW and Run SQL Scripts
