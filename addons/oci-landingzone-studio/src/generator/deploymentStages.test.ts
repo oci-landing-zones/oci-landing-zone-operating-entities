@@ -38,8 +38,9 @@ describe('canonical deployment file sets', () => {
       expect(stage.files.includes('iam.json')).toBe(!regional);
       expect(stage.files.includes('governance.json')).toBe(!regional);
     }
-    expect(stages[1].files.includes('oke_clusters.json')).toBe(oke);
-    expect(stages[1].files.includes('oke_workers.json')).toBe(oke);
+    expect(stages[1].files.includes('oke.json')).toBe(oke);
+    expect(stages[1].files).not.toContain('oke_clusters.json');
+    expect(stages[1].files).not.toContain('oke_workers.json');
     expect(stages[1].files.includes('network_backends.json')).toBe(hub === 'hub_c');
   }, 60_000);
 });

@@ -106,9 +106,9 @@
                                 "display_name"                              : "rt-fra-lz-prod-oke-pods",
 
                                 "route_rules": {
-                                    "rr-fra-hub": {
-                                        "description"                       : "Route to the Hub VCN through DRG",
-                                        "destination"                       : "10.0.0.0/21",
+                                    "rr-fra-hub-public-lb": {
+                                        "description"                       : "Route for Hub public load balancer backend responses",
+                                        "destination"                       : "10.0.0.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
                                         "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     },
@@ -126,9 +126,9 @@
                                 "display_name"                              : "rt-fra-lz-prod-oke-workers",
 
                                 "route_rules": {
-                                    "rr-fra-hub": {
-                                        "description"                       : "Route to the Hub VCN through DRG",
-                                        "destination"                       : "10.0.0.0/21",
+                                    "rr-fra-hub-public-lb": {
+                                        "description"                       : "Route for Hub public load balancer backend responses",
+                                        "destination"                       : "10.0.0.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
                                         "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     },

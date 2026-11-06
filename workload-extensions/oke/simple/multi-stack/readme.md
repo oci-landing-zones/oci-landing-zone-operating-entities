@@ -1,5 +1,9 @@
 # OKE Workload Extension - Multi-Stack Deployment  <!-- omit from toc -->
 
+Supported releases: Orchestrator **v2.4.1** with CIS OKE **v0.3.0** only.
+
+> **Migration warning:** Existing deployments require Terraform state and input migration from the legacy split OKE contract. Do not simply apply the new generated files to existing state; back up state and review the migration and plan first.
+
 - [**1. Summary**](#1-summary)
 - [**2. Architecture Overview**](#2-architecture-overview)
 - [**3. Configuration Files**](#3-configuration-files)
@@ -34,8 +38,8 @@ The simple multi-stack path is a Hub E quickstart that creates one production OK
 **Key Features:**
 - **Automated Dependency Resolution**: Network resources (VCN, subnets, NSGs) are automatically linked to the OKE cluster using configuration keys using dependency exchange across stacks
 - **CIS-Compliant**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **Encryption**: The included OKE cluster and worker files use CIS1 with OCI-managed encryption. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
-- **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 cluster and worker files contain no KMS key reference; keep unrelated keys out of the OKE platform compartment.
+- **Encryption**: The included `oke.json` uses CIS1 with OCI-managed encryption and explicit worker `pv_transit_encryption: false`. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
+- **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 `oke.json` contains no KMS key reference; keep unrelated keys out of the OKE platform compartment.
 - **OKE Network Mode**: The committed JSON uses VCN-native networking
 - **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet; the quickstart does not provision a Terraform-managed Hub L7 Load Balancer
 - **Multi-Step Deployment**: Deploy the Hub E landing zone first, then deploy the OKE stack separately
@@ -46,15 +50,14 @@ Before granting Kubernetes Service permissions, review the shared [private and p
 
 ## **3. Configuration Files**
 
-The deployment uses five JSON configuration files.
+The deployment uses four JSON configuration files.
 
 | File | Purpose |
 | --- | --- |
 | `oke_identity.json` | IAM resources rendered from CIS2: compartments, groups, and policies for OKE |
 | `oke_governance.json` | OKE platform tag namespace and tag definition; include it in the initial apply before introducing tagged network, IAM, or cluster resources |
 | `oke_network.json` | Network infrastructure: OKE VCN, subnets, NSGs, route tables, service gateway, DRG attachment, and a Hub-network-owned, platform-tagged frontend NSG injected into the existing Hub VCN through `network_dependency` |
-| `oke_clusters.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
-| `oke_workers.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
+| `oke.json` | Consolidated OKE configuration: cluster settings and managed worker pools |
 
 ### Staged Observability Files <!-- omit from toc -->
 
@@ -79,18 +82,18 @@ The folder includes companion JSONs with CIS-aligned observability settings. Mul
 
 ### Option A: Deploy via OCI Resource Manager
 
-Use ORM only when the customer specifically wants ORM. Prefer Terraform CLI locally or from customer-controlled CI/CD for the default secure deployment path.
+Prefer ORM with configuration files staged in a customer-controlled private OCI Object Storage bucket. Terraform CLI and customer-controlled CI/CD remain supported alternatives.
 
 1. **Create ORM Stack**
-   - Use the Orchestrator tag selected by the deployment workflow and set the working directory to `rms-facade`.
+   - Use Orchestrator `v2.4.1` with CIS OKE `v0.3.0` and set the working directory to `rms-facade`.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_workers.json`, `oke_network.json`, `oke_identity.json`, and `oke_clusters.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_network.json`, `oke_identity.json`, and `oke.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
    - If you depend on outputs from a previously deployed landing zone, stage those dependency files in the same controlled source.
 
 3. **Configure ORM Variables**
    - Set the configuration source to match the private location you chose.
-   - Point the stack at the five staged JSON files and any required dependency files.
+   - Point the stack at the four staged JSON files and any required dependency files.
 
 4. **Review Configuration Keys**
 
@@ -118,13 +121,13 @@ Use ORM only when the customer specifically wants ORM. Prefer Terraform CLI loca
 
 ### Option B: Deploy via Terraform CLI
 
-This is the preferred customer path because it keeps the deployable files under the customer's local or CI/CD control.
+Use this alternative when local Terraform or customer-controlled CI/CD is required.
 
 1. **Clone Repository**
    ```bash
    git clone https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator.git
    cd terraform-oci-modules-orchestrator
-   git checkout tags/v2.2.0
+   git checkout tags/v2.4.1
    ```
 
 2. **Copy Configuration Files**
@@ -183,25 +186,26 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ### Cluster Configuration <!-- omit from toc -->
 
-Edit `oke_clusters.json`:
+In `oke.json`, each `oke_configuration.<cluster-key>` contains `cluster_configuration` and `workers_configuration.worker_pools`. Review `cluster_configuration` for:
 
 - **Kubernetes Version**: Change `kubernetes_version` to upgrade/downgrade
-- **Cluster Type**: Set `is_enhanced: false` for basic clusters
+- **Cluster Type**: Enhanced clusters and private API endpoints are implicit in the supported contract; basic/public flags and `add_ons` are not supported.
 - **Network CIDRs**: Adjust the OKE VCN CIDR and `options.kubernetes_network_config.services_cidr` for your networking requirements.
 - **CNI Mode**: The committed multi-stack JSON uses native networking.
-- **Security**: Modify `is_api_endpoint_public` and NSG settings
+- **Security**: Review `networking.api_endpoint_nsg_ids` and private access routes. Service load-balancer subnets are a list under `networking.service_lb_subnet_ids`, not `services_subnet_id`.
 
 ### Worker Pool Configuration <!-- omit from toc -->
 
-Edit `oke_workers.json`:
+In the same `oke.json`, edit `oke_configuration.<cluster-key>.workers_configuration.worker_pools.<nodepool-key>`. Compartment and CIS settings are inherited from the cluster; worker properties are flat:
 
 - **Node Count**: Change `size` to scale worker nodes
-- **Instance Shape**: Modify `node_shape`, `ocpus`, `memory` for different compute resources
-- **Worker Image**: The default `9\\.[0-9]+` selector chooses a matching Oracle Linux 9 OKE image; update `node_config_details.image` after checking the supported images for the target Kubernetes version
-- **Encryption**: The committed multi-stack files use CIS1 with OCI-managed encryption and leave boot-volume encryption in transit disabled.
-- **Boot Volume**: Adjust `node_config_details.boot_volume_size` for storage requirements. Keep the generated `oci-growfs` cloud-init command so the root filesystem uses the configured capacity.
+- **Instance Shape**: Modify `shape`, `ocpus`, and `memory` for different compute resources.
+- **Worker Image**: Source `worker_image` defaults to the numeric version string `'9'`; use an OL8/OL9 major or minor version, or an image OCID. Generated workers use `os_version` or `image_id`, not regex image selectors. Only the deprecated known family selectors `8\\.[0-9]+` and `9\\.[0-9]+` are normalized to `8` and `9` for compatibility.
+- **Encryption**: The committed CIS1 worker has explicit `pv_transit_encryption: false` and no `volume_kms_key_id`. CIS2 sets `pv_transit_encryption: true` and the generated `volume_kms_key_id`.
+- **Boot Volume**: Adjust `boot_volume_size`; upstream cloud-init remains enabled and handles filesystem growth and OKE bootstrap.
+- **Networking**: Worker placement uses `subnet_id` and `nsg_ids`; native pod placement uses `pod_subnet_id` and `pod_nsg_ids`. Overlay workers omit the pod fields.
 - **SSH Access**: Update `default_ssh_public_key_path` with your SSH public key path
-- **Cloud-init**: Customize `node_config_details.cloud_init.heredoc_script` for additional node configuration without removing the generated `oci-growfs` command or the OKE bootstrap fetched from instance metadata.
+- **Cloud-init**: CIS1 emits no custom cloud-init. CIS2 adds only a cloud-config installing `oci-fss-utils` with `dnf` from the runtime OL major-version developer repository. Do not replace upstream growfs/bootstrap.
 
 ### Network Configuration <!-- omit from toc -->
 
@@ -247,7 +251,7 @@ terraform destroy
 **Issue**: Cluster creation fails
 - **Solution**: Check IAM policies are correctly configured
 - For native clusters, verify VCN-native CNI policy grants required permissions (see `oke_identity.json`)
-- For overlay clusters, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker node pool does not include `pods_subnet_id` or `pods_nsg_ids`
+- For overlay clusters, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker pool does not include `pod_subnet_id` or `pod_nsg_ids`. Overlay `pods_cidr` defaults to `10.244.0.0/16`; native mode rejects `pods_cidr`.
 
 **Issue**: Nodes not joining cluster
 - **Solution**: Verify NSG rules allow required traffic

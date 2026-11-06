@@ -40,9 +40,9 @@ describe('default deployment settings', () => {
   it('retains the pinned Orchestrator and private Object Storage default', () => {
     const url = new URL(DEPLOY_TO_OCI_URL);
     expect(`${url.origin}${url.pathname}`).toBe('https://cloud.oracle.com/resourcemanager/stacks/create');
-    expect(url.searchParams.get('zipUrl')).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.2.0.zip');
+    expect(url.searchParams.get('zipUrl')).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.4.1.zip');
     expect(JSON.parse(url.searchParams.get('zipUrlVariables')!)).toEqual({ configuration_source: 'ocibucket' });
-    expect(ORCHESTRATOR_RELEASE_URL).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/releases/tag/v2.2.0');
+    expect(ORCHESTRATOR_RELEASE_URL).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/releases/tag/v2.4.1');
   });
 
   it('packages the default settings and exact phase file lists without design values', () => {
@@ -107,7 +107,7 @@ describe('default deployment settings', () => {
     model.platforms = [newPlatform('oke_simple', [])];
     const config = buildConfig(model);
     const files = expectedDeploymentFiles(config);
-    expect(files).toEqual(expect.arrayContaining(['network_backends.json', 'oke_clusters.json', 'oke_workers.json']));
+    expect(files).toEqual(expect.arrayContaining(['network_backends.json', 'oke.json']));
     const guide = deploymentReadme(config, files);
     const second = guide.split('3. Update and apply phase 2')[1];
     expect(second).toContain('  network_backends.json');
