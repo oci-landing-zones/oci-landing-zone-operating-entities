@@ -9,6 +9,7 @@ import { drDesignFingerprint } from '../services/disasterRecoverySavedDesign';
 import { serializeConfig } from '../services/lzConfig';
 import { generateOutputs } from '../generator/generate';
 import { generateDrFileBundle } from '../services/disasterRecoveryGeneration';
+import { emptyHybridConnectivity, newVpn } from '../services/hybridConnectivity';
 import { downloadBlob } from '../export/zip';
 import { WizardProvider } from '../wizard/wizardContext';
 import ReviewStep from '../wizard/steps/ReviewStep';
@@ -57,14 +58,46 @@ async function downloadedFiles() {
 }
 
 describe('deployment downloads use the current factory', () => {
+  it('keeps session keys in explicit artifacts while omitting them from the guide and browser cache', async () => {
+    const model = emptyLzModel();
+    model.foundation.notifications!.default = 'ops@example.com';
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+    hybrid.ipsecs.office = { ...newVpn('office'), remote_cidrs: ['172.20.0.0/16'] };
+    Object.assign(hybrid.ipsecs.office.tunnels_management.tunnel_1, { secretMode: 'inline', shared_secret: 'SyntheticSessionKey123' });
+    const record = createLZ('Home', model).record!;
+    controls.id = record.id;
+    const config = serializeConfig(model);
+    vi.mocked(generateOutputs).mockResolvedValue({ config, files: { 'network.json': '{"shared_secret":"SyntheticSessionKey123"}' }, primary: ['network.json'], secondary: [] });
+    renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
+    await button('Download files')();
+    const files = await downloadedFiles();
+    expect(files['config.jsonnet']).toContain('SyntheticSessionKey123');
+    expect(files['network.json']).toContain('SyntheticSessionKey123');
+    expect(files['README.txt']).not.toContain('SyntheticSessionKey123');
+    expect(files['README.txt']).toContain('both Oracle tunnel endpoints');
+    expect(getOutputs(record.id)).toBeNull();
+  });
+
+  it('renders preliminary Hub C files when a cached package lacks the backend alternative', () => {
+    const model = emptyLzModel();
+    model.network.hubKind = 'hub_c';
+    const record = createLZ('Hub C', model).record!;
+    controls.id = record.id;
+    saveOutputs(record.id, { config: serializeConfig(model), files: { 'network.json': '{}' } });
+    const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Hub C" /></WizardProvider></MemoryRouter>);
+    expect(html).toContain('File lists are a preview');
+    expect(html.split('3. Update and apply phase 2')[1]).toContain('network_backends.json');
+  });
+
   it.each(['Review', 'saved card'])('regenerates matching cached outputs for every %s download', async (surface) => {
     const model = emptyLzModel();
     model.foundation.notifications!.default = 'ops@example.com';
     const record = createLZ('Home', model).record!;
     controls.id = record.id;
     const config = serializeConfig(model);
-    saveOutputs(record.id, { config, files: { 'network.json': 'old', 'removed.json': 'old' } });
-    vi.mocked(generateOutputs).mockResolvedValue({ config, files: { 'network.json': 'fresh' }, primary: ['network.json'], secondary: [] });
+    saveOutputs(record.id, { config, files: { 'network.json': '{"revision":"old"}', 'removed.json': '{"revision":"old"}' } });
+    vi.mocked(generateOutputs).mockResolvedValue({ config, files: { 'network.json': '{"revision":"fresh"}' }, primary: ['network.json'], secondary: [] });
     renderToStaticMarkup(<MemoryRouter>{surface === 'Review'
       ? <WizardProvider initialModel={model}><ReviewStep designName="Home" /></WizardProvider>
       : <SavedLzList />}</MemoryRouter>);
@@ -74,8 +107,9 @@ describe('deployment downloads use the current factory', () => {
     await click();
 
     expect(generateOutputs).toHaveBeenCalledTimes(2);
-    expect(await downloadedFiles()).toEqual({ 'config.jsonnet': config, 'network.json': 'fresh' });
-    expect(getOutputs(record.id)?.files).toEqual({ 'network.json': 'fresh' });
+    expect(await downloadedFiles()).toEqual({ 'config.jsonnet': config, 'network.json': '{"revision":"fresh"}',
+      'README.txt': expect.stringContaining('configuration_source = "ocibucket"') });
+    expect(getOutputs(record.id)?.files).toEqual({ 'network.json': '{"revision":"fresh"}' });
   });
 
   it('regenerates each legacy regional download without merging cached files', async () => {
@@ -83,17 +117,32 @@ describe('deployment downloads use the current factory', () => {
     const draft = createDrDraft(model);
     const record = saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Home' }).record!;
     saveOutputs(record.id, { config: drDesignFingerprint(model, draft), files: {
-      'Home/config.jsonnet': '{}', 'Home/network.json': 'old', 'DR/config.jsonnet': '{}', 'DR/network.json': 'old', 'Home/removed.json': 'old',
+      'Home/config.jsonnet': '{}', 'Home/network.json': '{"revision":"old"}', 'DR/config.jsonnet': '{}', 'DR/network.json': '{"revision":"old"}', 'Home/removed.json': '{"revision":"old"}',
     } });
-    vi.mocked(generateDrFileBundle).mockResolvedValue({ 'Home/network.json': 'fresh-home', 'DR/network.json': 'fresh-dr' });
+    vi.mocked(generateDrFileBundle).mockResolvedValue({ 'Home/network.json': '{"revision":"fresh-home"}', 'DR/network.json': '{"revision":"fresh-dr"}' });
     renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
 
     await button('Download LZ config')();
-    expect(await downloadedFiles()).toEqual({ 'network.json': 'fresh-home' });
+    expect(await downloadedFiles()).toEqual({ 'network.json': '{"revision":"fresh-home"}' });
     await button('Download LZ DR config')();
-    expect(await downloadedFiles()).toEqual({ 'network.json': 'fresh-dr' });
+    expect(await downloadedFiles()).toEqual({ 'network.json': '{"revision":"fresh-dr"}' });
     expect(generateDrFileBundle).toHaveBeenCalledTimes(2);
-    expect(getOutputs(record.id)?.files).toEqual({ 'Home/network.json': 'fresh-home', 'DR/network.json': 'fresh-dr' });
+    expect(getOutputs(record.id)?.files).toEqual({ 'Home/network.json': '{"revision":"fresh-home"}', 'DR/network.json': '{"revision":"fresh-dr"}' });
+  });
+
+  it('uses the scope-specific guide instead of the combined guide for legacy downloads', async () => {
+    const model = emptyLzModel();
+    const draft = createDrDraft(model);
+    saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Home' });
+    vi.mocked(generateDrFileBundle).mockResolvedValue({
+      'Home/network.json': '{}', 'Home/README.txt': 'Home instructions',
+      'DR/network.json': '{}', 'DR/README.txt': 'DR instructions', 'README.txt': 'Combined instructions',
+    });
+    renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    await button('Download LZ config')();
+    expect((await downloadedFiles())['README.txt']).toBe('Home instructions');
+    await button('Download LZ DR config')();
+    expect((await downloadedFiles())['README.txt']).toBe('DR instructions');
   });
 
   it.each(['Review', 'saved card', 'legacy card'])('retains the previous saved package without downloading it after %s generation fails', async (surface) => {
@@ -105,8 +154,8 @@ describe('deployment downloads use the current factory', () => {
       : createLZ('Home', model).record!;
     controls.id = record.id;
     const files: Record<string, string> = surface === 'legacy card'
-      ? { 'Home/config.jsonnet': '{}', 'Home/network.json': 'old', 'DR/config.jsonnet': '{}', 'DR/network.json': 'old' }
-      : { 'network.json': 'old' };
+      ? { 'Home/config.jsonnet': '{}', 'Home/network.json': '{"revision":"old"}', 'DR/config.jsonnet': '{}', 'DR/network.json': '{"revision":"old"}' }
+      : { 'network.json': '{"revision":"old"}' };
     saveOutputs(record.id, { config: surface === 'legacy card' ? drDesignFingerprint(model, draft) : serializeConfig(model), files });
     const saved = getOutputs(record.id);
     vi.mocked(generateOutputs).mockRejectedValue(new Error('Factory failed'));

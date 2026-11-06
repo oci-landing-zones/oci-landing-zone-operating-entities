@@ -19,11 +19,12 @@ import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformsStep from '../wizard/steps/PlatformsStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
-import { createDiagramGraph } from '../wizard/diagramGraph';
+import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from '../wizard/diagramGraph';
 import { allFlowIds, buildFlowTraces, specFromId } from '../services/flowTrace';
 import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
+import { hybridRoutes } from '../services/hybridConnectivity';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import { flowPickerEnvironments } from '../services/flowNetworks';
@@ -33,7 +34,7 @@ import type { FlowFocus } from '../diagram/FlowOverlay';
 import TopBar from '../components/TopBar';
 import { oracle } from '../theme';
 import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
-import { ErrorNotice } from '../components/FieldError';
+import FieldError, { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
 import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
@@ -206,7 +207,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const diagramStatus = diagramResult.error ? 'error' : routing.status;
   function exportDiagram() {
     if (diagramStatus !== 'ready' || !getDiagram || snapshot?.model !== model) throw new Error('Wait for the current diagram preview before exporting.');
-    return getDiagram(WIZARD_STEPS.length, chosenOpts);
+    return getDiagram(WIZARD_STEPS.length, REVIEW_DIAGRAM_OPTIONS);
   }
   // Flow traces drive the step-by-step hop list in the sidebar (the diagram reads
   // the same traces via buildGraph). Only meaningful in diagram-only mode.
@@ -232,7 +233,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       return { ...prev, [id]: next };
     });
   }
-  const configText = useMemo(() => serializeConfig(model, activeStep), [model, activeStep]);
+  const configText = useMemo(() => serializeConfig(model, activeStep, true), [model, activeStep]);
 
   function resetWizard() {
     if (!window.confirm('Clear all inputs for this Landing Zone?')) return;
@@ -246,14 +247,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   }
 
   const previewError = diagramStatus === 'error' && <div style={{ margin: '0 20px 12px' }}>
-    <ErrorNotice title="Diagram unavailable">
-      <div>{diagramError?.split('\n')[0].replace(/^RUNTIME ERROR:\s*/, '')}</div>
-      {diagramError?.includes('\n') && <details style={{ marginTop: 8 }}>
-        <summary>Technical details</summary>
-        <pre style={{ maxHeight: 160, overflow: 'auto', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontSize: 12 }}>{diagramError}</pre>
-      </details>}
-    </ErrorNotice>
-    <button type="button" style={layout.secondary} onClick={routing.retry}>Retry diagram preview</button>
+    <FieldError id="diagram-preview-error" error={diagramError?.split('\n')[0].replace(/^RUNTIME ERROR:\s*/, '')} />
   </div>;
 
   // Back / Next live in one full-width footer beneath the workspace so they do
@@ -336,7 +330,6 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   }
                 }}
                 style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
-                {!showDiagram && previewError}
                 {activeStep === 1 ? (
                   <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
                 ) : activeStep === 2 ? (
@@ -348,6 +341,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 5 ? (
                   <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} />
                 ) : null}
+                {previewError}
               </div>
             )}
 
@@ -367,7 +361,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   )}
                   <DiagramZoomControls disabled={!diagram || routing.pending} />
                 </div>
-                {previewError}
+                {!showForm && previewError}
                 {!!diagram?.flowErrors?.length && <div style={{ margin: '0 20px 12px' }}>
                   <ErrorNotice title="Flow preview unavailable">{diagram.flowErrors.map((message) => <div key={message}>{message}</div>)}</ErrorNotice>
                 </div>}
@@ -390,6 +384,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>
                 <FlowSidebar
+                  externalConnections={hybridRoutes(renderedModel)}
                   ingressAvailable={hasHubLoadBalancer(renderedModel)}
                   environments={flowPickerEnvironments(renderedModel)}
                   active={effectiveOpts.activeFlows ?? []}

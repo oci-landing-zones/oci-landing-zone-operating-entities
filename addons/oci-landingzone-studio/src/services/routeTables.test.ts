@@ -81,7 +81,7 @@ describe('canonical generated routing inventory', () => {
     const ruleTable = at(vcn, 'route_tables', 'RT-FRA-LZ-HUB-LB-KEY');
     ruleTable.route_rules = { 'reviewed-rule': { destination: '192.0.2.0/24', destination_type: 'CIDR_BLOCK', network_entity_id: 'external-private-ip' } };
     const table = buildRouteTables(models.get('hub_a')!, network).find((entry) => entry.name === 'rt-fra-lz-hub-lb')!;
-    expect(table.rules).toEqual([expect.objectContaining({ id: 'reviewed-rule', destination: '192.0.2.0/24', targetKey: 'external-private-ip', nextHopKind: 'unresolved' })]);
+    expect(table.rules.filter((rule) => rule.provenance === 'configured')).toEqual([expect.objectContaining({ id: 'reviewed-rule', destination: '192.0.2.0/24', targetKey: 'external-private-ip', nextHopKind: 'unresolved' })]);
     expect(table.note).toContain('dependency outputs');
   });
 

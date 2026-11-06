@@ -25,7 +25,7 @@ describe('Kubernetes API Server flow', () => {
     const picker = flowPickerEnvironments(model);
     const source = picker.findIndex((n) => n.name === 'preprod');
     expect(picker[source].rolesFor('api', 'prod/oke')).toEqual(['web']);
-    expect(flowChoices(picker, source).find((c) => c.id === 'preprod>prod/oke:api')?.label).toBe('Spoke → prod/oke API Server');
+    expect(flowChoices(picker, source).find((c) => c.id === 'preprod>prod/oke:api')?.label).toBe('preprod → prod/oke API Server');
     const id = 'preprod>prod/oke:api:web';
     expect(allFlowIds(model)).toContain(id);
     const tables = await generatedRouteTables(model);

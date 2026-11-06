@@ -17,7 +17,7 @@ interface PreviewState {
 export function diagramPreviewView(state: PreviewState | undefined, model: LzModel, attempt: number, deferred = false) {
   const current = state?.outcome?.model === model && state.outcome.attempt === attempt ? state.outcome : undefined;
   const status = deferred ? 'editing' : current?.error !== undefined ? 'error' : current && state?.snapshot?.model === model ? 'ready' : 'loading';
-  const snapshot = status === 'error' ? undefined : state?.snapshot;
+  const snapshot = state?.snapshot;
   return {
     snapshot,
     pending: status === 'loading' || status === 'editing',

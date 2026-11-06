@@ -59,7 +59,7 @@ function okeParams(params: ObjectValue, path: string): OkePlatformParams {
     servicesCidr: text(params.services_cidr, `${path}.services_cidr`),
     apiAllowedCidrs: strings(params.api_endpoint_allowed_cidrs, `${path}.api_endpoint_allowed_cidrs`),
     ...(params.create_node_pools === undefined ? {} : { createNodePools: bool(params.create_node_pools, `${path}.create_node_pools`) }),
-    workerImage: text(params.create_node_pools === false ? '9\\.[0-9]+' : params.worker_image, `${path}.worker_image`),
+    workerImage: params.create_node_pools === false || params.worker_image === undefined || params.worker_image === '9' ? '9\\.[0-9]+' : params.worker_image === '8' ? '8\\.[0-9]+' : text(params.worker_image, `${path}.worker_image`),
     workerBootVolumeSize: number(params.create_node_pools === false ? 60 : params.worker_boot_volume_size, `${path}.worker_boot_volume_size`),
     cniType: choice(params.cni_type, ['native', 'overlay'], `${path}.cni_type`),
     createFss: bool(params.create_fss, `${path}.create_fss`),
@@ -275,8 +275,11 @@ export function importConfig(value: unknown): ImportedConfig {
       const extension = object(entry.extension, 'extension');
       const params = object(extension.params, 'extension.params');
       if (params.module_version !== undefined && params.module_version !== '0.3.0') invalid('extension.params.module_version');
-      if (params.module_version === undefined) warnings.push('This OKE design used the legacy module. Regenerated packages target CIS OKE 0.3.0 and require Orchestrator 2.4.0; they are not an in-place upgrade for deployed clusters.');
-      return [key, { ...entry, extension: { ...extension, params: { ...params, module_version: '0.3.0' } } }];
+      const currentParams = { ...params };
+      delete currentParams.module_version;
+      if (currentParams.worker_image === '8\\.[0-9]+') currentParams.worker_image = '8';
+      if (currentParams.worker_image === '9\\.[0-9]+') currentParams.worker_image = '9';
+      return [key, { ...entry, extension: { ...extension, params: currentParams } }];
     }));
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };

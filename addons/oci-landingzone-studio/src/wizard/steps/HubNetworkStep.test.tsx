@@ -1,6 +1,33 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { VcnEditor } from './HubNetworkStep';
+import HubNetworkStep, { VcnEditor } from './HubNetworkStep';
+import { WizardProvider } from '../wizardContext';
+import { emptyLzModel } from '../../model/defaults';
+import { emptyHybridConnectivity } from '../../services/hybridConnectivity';
+
+it('uses shared inline feedback for connectivity errors', () => {
+  const model = emptyLzModel();
+  model.hybridConnectivity = emptyHybridConnectivity();
+  model.hybridConnectivity.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', remote_cidrs: [] };
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><HubNetworkStep /></WizardProvider>);
+  expect(html).toContain('id="hub-connectivity-errors" class="field-error" aria-live="polite"');
+  expect(html).toContain('FastConnect primary: enter at least one remote CIDR.');
+});
+
+it('gives RPC, VPN and FastConnect independent, initially collapsed panels', () => {
+  const model = emptyLzModel();
+  model.remotePeeringConnections = [{ id: 'rpc', name: 'peer', role: 'acceptor', remoteCidrs: [], peerRegionName: '' }];
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><HubNetworkStep /></WizardProvider>);
+  const toggles = [...html.matchAll(/<button[^>]*class="connectivity-service-toggle"[^>]*aria-expanded="false"[^>]*aria-controls="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g)];
+  expect(toggles).toHaveLength(3);
+  expect(new Set(toggles.map(([, id]) => id)).size).toBe(3);
+  expect(toggles[0][2]).toContain('Remote peering connection (RPC)');
+  expect(toggles[0][2]).toContain('1 connection');
+  expect(toggles[1][2]).toContain('VPN');
+  expect(toggles[2][2]).toContain('FastConnect');
+  for (const [, id] of toggles) expect(html).toContain(`id="${id}" hidden=""`);
+  expect(html).toContain('Add remote connection');
+});
 
 describe('VCN subnet validation', () => {
   it('associates an invalid VCN range with its visible error', () => {

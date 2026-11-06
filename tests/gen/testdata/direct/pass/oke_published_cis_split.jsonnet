@@ -3,7 +3,7 @@
 // contains: "multi_iam_kms_statement_count": 3
 // contains: "single_cluster_cis_levels": [
 // contains: "1"
-// contains: "single_worker_cis_levels": [
+// contains: "worker_inherited_field_failures": []
 // contains: "single_cluster_kms_references": []
 // contains: "single_worker_kms_references": []
 // contains: "multi_cluster_kms_references": []
@@ -22,14 +22,8 @@ local single_security_cis1 = import 'gen/workload-extensions/oke/simple/single-s
 local single_security_cis2 = import 'gen/workload-extensions/oke/simple/single-stack/oke_security_cis2.jsonnet';
 local single_observability_cis1 = import 'gen/workload-extensions/oke/simple/single-stack/oke_observability_cis1.jsonnet';
 local single_observability_cis2 = import 'gen/workload-extensions/oke/simple/single-stack/oke_observability_cis2.jsonnet';
-local single_clusters = (import 'gen/workload-extensions/oke/simple/single-stack/oke_clusters.jsonnet')
-  .oke_clusters_configuration.clusters;
-local single_workers = (import 'gen/workload-extensions/oke/simple/single-stack/oke_workers.jsonnet')
-  .oke_workers_configuration.node_pools;
-local multi_clusters = (import 'gen/workload-extensions/oke/simple/multi-stack/oke_clusters.jsonnet')
-  .oke_clusters_configuration.clusters;
-local multi_workers = (import 'gen/workload-extensions/oke/simple/multi-stack/oke_workers.jsonnet')
-  .oke_workers_configuration.node_pools;
+local single_oke = (import 'gen/workload-extensions/oke/simple/single-stack/oke.jsonnet').oke_configuration;
+local multi_oke = (import 'gen/workload-extensions/oke/simple/multi-stack/oke.jsonnet').oke_configuration;
 local published_security = import 'gen/workload-extensions/oke/simple/single-stack/oke_security_cis2.jsonnet';
 local security_policy_key = 'PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY';
 local kms_statement_count(identity) =
@@ -39,33 +33,37 @@ local kms_statement_count(identity) =
     if std.length(std.findSubstr(' keys ', statement)) > 0 ||
        std.length(std.findSubstr(' key-delegate', statement)) > 0
   ]);
-local cluster_kms_references(clusters) = [
+local cluster_kms_references(deployments) = [
   key
-  for key in std.objectFields(clusters)
-  if std.objectHas(clusters[key], 'encryption')
+  for key in std.objectFields(deployments)
+  if std.objectHas(deployments[key].cluster_configuration, 'encryption')
 ];
-local worker_kms_references(workers) = [
-  key
-  for key in std.objectFields(workers)
-  if std.objectHas(workers[key].node_config_details, 'encryption') &&
-     std.objectHas(workers[key].node_config_details.encryption, 'kms_key_id')
+local worker_kms_references(deployments) = [
+  pool_key
+  for deployment in std.objectValues(deployments)
+  for pool_key in std.objectFields(deployment.workers_configuration.worker_pools)
+  if std.objectHas(deployment.workers_configuration.worker_pools[pool_key], 'volume_kms_key_id')
 ];
 
 {
   single_iam_kms_statement_count: kms_statement_count(single_identity),
   multi_iam_kms_statement_count: kms_statement_count(multi_identity),
   single_cluster_cis_levels: std.uniq(std.sort([
-    single_clusters[key].cis_level
-    for key in std.objectFields(single_clusters)
+    deployment.cluster_configuration.cis_level
+    for deployment in std.objectValues(single_oke)
   ])),
-  single_worker_cis_levels: std.uniq(std.sort([
-    single_workers[key].cis_level
-    for key in std.objectFields(single_workers)
-  ])),
-  single_cluster_kms_references: cluster_kms_references(single_clusters),
-  single_worker_kms_references: worker_kms_references(single_workers),
-  multi_cluster_kms_references: cluster_kms_references(multi_clusters),
-  multi_worker_kms_references: worker_kms_references(multi_workers),
+  worker_inherited_field_failures: [
+    { worker: pool_key, field: field }
+    for deployments in [single_oke, multi_oke]
+    for deployment in std.objectValues(deployments)
+    for pool_key in std.objectFields(deployment.workers_configuration.worker_pools)
+    for field in ['cis_level', 'compartment_id', 'cluster_id']
+    if std.objectHas(deployment.workers_configuration.worker_pools[pool_key], field)
+  ],
+  single_cluster_kms_references: cluster_kms_references(single_oke),
+  single_worker_kms_references: worker_kms_references(single_oke),
+  multi_cluster_kms_references: cluster_kms_references(multi_oke),
+  multi_worker_kms_references: worker_kms_references(multi_oke),
   published_security_oke_keys: [
     key
     for key in
@@ -82,9 +80,7 @@ local worker_kms_references(workers) = [
     single_security_cis2 == cis1.security_cis2 &&
     single_observability_cis1 == cis1.observability_cis1 &&
     single_observability_cis2 == cis1.observability_cis2 &&
-    single_clusters == cis1.extra.oke_clusters.oke_clusters_configuration.clusters &&
-    single_workers == cis1.extra.oke_workers.oke_workers_configuration.node_pools,
+    single_oke == cis1.extra.oke.oke_configuration,
   multi_cluster_worker_outputs_match_cis1_render:
-    multi_clusters == cis1.extra.oke_clusters.oke_clusters_configuration.clusters &&
-    multi_workers == cis1.extra.oke_workers.oke_workers_configuration.node_pools,
+    multi_oke == cis1.extra.oke.oke_configuration,
 }

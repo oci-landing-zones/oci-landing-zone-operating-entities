@@ -189,7 +189,6 @@ describe('serializeConfig', () => {
     expect(c.environments.prod.platforms.oke.extension).toEqual({
       type: 'oke_simple',
       params: {
-        module_version: '0.3.0',
         kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.3.0/24'],
         create_node_pools: false, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
       },

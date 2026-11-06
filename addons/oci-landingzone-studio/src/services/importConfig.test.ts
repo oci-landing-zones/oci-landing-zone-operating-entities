@@ -196,3 +196,32 @@ it('round-trips independent worker and pod spoke connectivity selections', async
   expect(restored.model.platforms[0].okeParams?.podSpokeAccess).toBe(true);
   expect(restored.model.platforms[0].okeParams?.peerVcnCidrs).toEqual(['10.50.0.0/16']);
 });
+
+
+it.each(['8', '9'])('round-trips released OKE worker OS version %s', (version) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', [], model.environments);
+  platform.okeParams!.createNodePools = true;
+  platform.okeParams!.workerImage = version;
+  model.platforms = [platform];
+  const config = buildConfig(model);
+  const params = config.environments.prod.platforms.oke.extension!.params!;
+  expect(params.worker_image).toBe(version);
+  expect(params).not.toHaveProperty('module_version');
+  expect(buildConfig(importConfig(config).model)).toEqual(config);
+});
+
+it('normalizes earlier Studio OKE image expressions into the released contract', () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', [], model.environments);
+  platform.okeParams!.createNodePools = true;
+  model.platforms = [platform];
+  const config = buildConfig(model);
+  for (const env of Object.values(config.environments)) {
+    env.platforms.oke.extension!.params!.worker_image = platform.okeParams!.workerImage;
+    env.platforms.oke.extension!.params!.module_version = '0.3.0';
+  }
+  const current = buildConfig(importConfig(config).model);
+  expect(current.environments.prod.platforms.oke.extension!.params!.worker_image).toBe('9');
+  expect(current.environments.prod.platforms.oke.extension!.params!).not.toHaveProperty('module_version');
+});

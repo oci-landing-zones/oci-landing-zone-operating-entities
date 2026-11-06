@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { HubKind } from '../model/types';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { generateOutputs } from '../generator/generate';
+import { generateNetwork } from '../generator/network';
 import { evaluate, setAssetLoader } from '../generator/jsonnetVm';
 import { generatePreview } from '../generator/preview';
 import { buildVirtualFs } from '../generator/virtualFs';
@@ -38,8 +39,7 @@ function resourcesIn(value: unknown, resources = new Map<string, Resource>()): M
 async function generatedRoutes(hubKind: HubKind) {
   const model = emptyLzModel();
   model.network = { hubKind, ...hubKindDefaults(hubKind) };
-  const { files } = await generateOutputs(model);
-  const network = JSON.parse(files['network.json']);
+  const network = await generateNetwork(model);
   return { tables: buildRouteTables(model, network), resources: resourcesIn(network) };
 }
 
@@ -63,7 +63,7 @@ describe('generated route preview parity', () => {
     const tables = buildRouteTables(model, preview.network);
     for (const table of tables.filter((table) => table.columns === 'vcn')) {
       const raw = resources.get(table.id)!.route_rules!;
-      expect(table.rules.map((rule) => [rule.id, rule.destination, rule.targetKey]), table.name)
+      expect(table.rules.filter((rule) => rule.provenance === 'configured').map((rule) => [rule.id, rule.destination, rule.targetKey]), table.name)
         .toEqual(Object.entries(raw).map(([id, rule]) => [id,
           rule.destination === 'all-services' ? 'OSN Services' : rule.destination,
           rule.network_entity_key ?? rule.network_entity_id]));
@@ -135,12 +135,27 @@ describe('generated route preview parity', () => {
     }
   });
 
-  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('shows every generated route table in %s exactly once', async (hubKind) => {
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('matches every %s generated table and its dynamic DRG imports', async (hubKind) => {
     const { tables, resources } = await generatedRoutes(hubKind);
     const generatedNames = [...resources.entries()]
       .filter(([key, resource]) => /^(RT|DRGRT)-/.test(key) && resource.display_name !== undefined)
       .map(([, resource]) => resource.display_name);
     expect(tables.map((table) => table.name).sort()).toEqual(generatedNames.sort());
+    const importedTables = hubKind === 'hub_e' ? ['drgrt-fra-lz-hub', 'drgrt-fra-lz-spokes'] : ['drgrt-fra-lz-hub'];
+    for (const name of importedTables) {
+      const preview = tables.find((table) => table.name === name)!;
+      const generated = [...resources.values()].find((resource) => resource.display_name === name)!;
+      const distribution = resources.get(generated.import_drg_route_distribution_key!)!;
+      const expected = Object.values(distribution.statements!).flatMap(({ match_criteria }) => {
+        const attachment = resources.get(match_criteria.drg_attachment_key)!;
+        // OCI defaults omitted VCN route types to SUBNET_CIDRS.
+        expect(attachment.network_details!.vcn_route_type).toBeUndefined();
+        const vcn = resources.get(attachment.network_details!.attached_resource_key)!;
+        return Object.values(vcn.subnets!).map((subnet) => `${subnet.cidr_block}:${attachment.display_name}:Dynamic`);
+      });
+      expect(preview.rules.map((rule) => `${rule.destination}:${rule.target}:${rule.routeType}`).sort(), name)
+        .toEqual(expected.sort());
+    }
   }, 60_000);
 
   it('matches every Hub E VCN route, including local spoke NAT gateways', async () => {
@@ -158,7 +173,7 @@ describe('generated route preview parity', () => {
         const node = envIndex === undefined ? `gw-${kind}` : `cmp-env-${envIndex}-${kind}`;
         return `${destination}:${kind}:${node}`;
       });
-      expect(table.rules.map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort(), table.name)
+      expect(table.rules.filter((rule) => rule.provenance === 'configured').map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort(), table.name)
         .toEqual(expected.sort());
     }
   }, 60_000);
@@ -176,38 +191,8 @@ describe('generated route preview parity', () => {
         ? `${rule.destination}:drg:drg`
         : `${rule.destination}:firewall:${resources.get(key)!.ipv4address}`;
     });
-    expect(preview.rules.map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort())
+    expect(preview.rules.filter((rule) => rule.provenance === 'configured').map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort())
       .toEqual(expected.sort());
   }, 60_000);
 
-  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('shows the subnet prefixes imported by %s hub DRG', async (hubKind) => {
-    const { tables, resources } = await generatedRoutes(hubKind);
-    const preview = tables.find((table) => table.name === 'drgrt-fra-lz-hub')!;
-    const generated = [...resources.values()].find((resource) => resource.display_name === preview.name)!;
-    const distribution = resources.get(generated.import_drg_route_distribution_key!)!;
-    const expected = Object.values(distribution.statements!).flatMap(({ match_criteria }) => {
-      const attachment = resources.get(match_criteria.drg_attachment_key)!;
-      // OCI defaults omitted VCN route types to SUBNET_CIDRS.
-      expect(attachment.network_details!.vcn_route_type).toBeUndefined();
-      const vcn = resources.get(attachment.network_details!.attached_resource_key)!;
-      return Object.values(vcn.subnets!).map((subnet) => `${subnet.cidr_block}:${attachment.display_name}:Dynamic`);
-    });
-    expect(preview.rules.map((rule) => `${rule.destination}:${rule.target}:${rule.routeType}`).sort())
-      .toEqual(expected.sort());
-  }, 60_000);
-
-  it('shows all Hub E spoke DRG imports, including the hub and other spokes', async () => {
-    const { tables, resources } = await generatedRoutes('hub_e');
-    const preview = tables.find((table) => table.name === 'drgrt-fra-lz-spokes')!;
-    const generated = [...resources.values()].find((resource) => resource.display_name === preview.name)!;
-    const distribution = resources.get(generated.import_drg_route_distribution_key!)!;
-    const expected = Object.values(distribution.statements!).flatMap(({ match_criteria }) => {
-      const attachment = resources.get(match_criteria.drg_attachment_key)!;
-      expect(attachment.network_details!.vcn_route_type).toBeUndefined();
-      const vcn = resources.get(attachment.network_details!.attached_resource_key)!;
-      return Object.values(vcn.subnets!).map((subnet) => `${subnet.cidr_block}:${attachment.display_name}:Dynamic`);
-    });
-    expect(preview.rules.map((rule) => `${rule.destination}:${rule.target}:${rule.routeType}`).sort())
-      .toEqual(expected.sort());
-  }, 60_000);
 });

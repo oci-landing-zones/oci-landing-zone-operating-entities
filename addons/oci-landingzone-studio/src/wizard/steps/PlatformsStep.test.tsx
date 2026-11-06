@@ -31,9 +31,6 @@ describe('platform selection and readiness', () => {
     expect(markup).toContain('Shared platforms');
     expect(markup).toContain('Environment platforms');
     expect(markup).not.toContain('Platform placement');
-  });
-  it('only shows Exadata cards after they have been added', () => {
-    const markup = render(emptyLzModel());
     expect(markup).not.toContain('Include EXACC in this landing zone');
     expect(markup).not.toContain('Include EXACS in this landing zone');
     expect(markup).not.toContain('platform-section-title');
@@ -107,6 +104,7 @@ describe('platform selection and readiness', () => {
     expect(markup).toContain('Environment platforms');
     expect(markup).toContain(model.sharedPlatforms[0].key);
     expect(markup).toContain(model.platforms[0].key);
+    expect(markup).not.toContain('Existing custom networks');
     expect(buildConfig(model)).toEqual(before);
   });
   it('marks complete EXACC as configured', () => {
@@ -132,9 +130,6 @@ describe('platform selection and readiness', () => {
     for (const type of ['oke_simple', 'custom'] as const) {
       expect(platformReadiness(model, type).errors).toContain('Duplicate environment platform config key: oke.');
     }
-  });
-  it('does not put custom networks in a separate legacy section', () => {
-    expect(render(emptyLzModel())).not.toContain('Existing custom networks');
   });
 });
 

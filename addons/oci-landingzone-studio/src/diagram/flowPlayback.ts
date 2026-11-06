@@ -76,7 +76,9 @@ export function flowHopMarkers(edge: DiagramEdge): FlowHopMarker[] {
 /** One route clock controls both the packet position and the effective rule. */
 export function createFlowPlayback(edge: DiagramEdge): FlowPlayback {
   const totalDistance = pathLengths(edge.points ?? []).total;
-  const travelMsPerUnit = totalDistance > 0 ? Math.min(6000, Math.max(1750, totalDistance / 240 * 1000)) / totalDistance : 0;
+  // Keep longer Internet paths at the same pace as service paths, rather than
+  // accelerating them to fit a fixed maximum travel duration.
+  const travelMsPerUnit = totalDistance > 0 ? Math.max(1750, totalDistance / 240 * 1000) / totalDistance : 0;
   const events = hopEvents(edge);
   if (!events) return { valid: false, stops: [], totalDistance, travelMsPerUnit, duration: 1 };
   let distance = 0;

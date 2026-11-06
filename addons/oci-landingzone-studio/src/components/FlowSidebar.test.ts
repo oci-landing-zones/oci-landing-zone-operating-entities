@@ -44,12 +44,21 @@ describe('flowChoices', () => {
 
   it('makes every east-west destination explicit', () => {
     expect(flowChoices(environments, 0)).toEqual([
-      { id: 'prod:egress', label: 'Spoke → Internet', sub: 'egress' },
-      { id: 'prod:ingress', label: 'Internet → Spoke', sub: 'ingress' },
-      { id: 'prod>preprod:east-west', label: 'Spoke → preprod', sub: 'east-west' },
-      { id: 'prod>dev:east-west', label: 'Spoke → dev', sub: 'east-west' },
-      { id: 'prod:services', label: 'Spoke → OCI Services', sub: 'Service Gateway' },
+      { id: 'prod:egress', label: 'prod → Internet', sub: 'egress' },
+      { id: 'prod:ingress', label: 'Internet → prod', sub: 'ingress' },
+      { id: 'prod>preprod:east-west', label: 'prod → preprod', sub: 'east-west' },
+      { id: 'prod>dev:east-west', label: 'prod → dev', sub: 'east-west' },
+      { id: 'prod:services', label: 'prod → OCI Services', sub: 'Service Gateway' },
     ]);
+  });
+
+  it('uses the selected environment name for ingress, egress and hybrid flows', () => {
+    const choices = flowChoices(environments, 1, true, [{ id: 'fc', name: 'Datacenter', type: 'FastConnect' }]);
+    expect(choices.map((choice) => choice.label)).toEqual([
+      'preprod → Internet', 'Internet → preprod', 'preprod → prod', 'preprod → dev',
+      'preprod → OCI Services', 'preprod → Datacenter', 'Datacenter → preprod',
+    ]);
+    expect(choices[0].id).toBe('preprod:egress');
   });
 
   it('omits east-west choices when there is no destination environment', () => {
