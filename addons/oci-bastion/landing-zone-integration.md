@@ -43,7 +43,7 @@ Oracle's [creation prerequisites](https://docs.oracle.com/en-us/iaas/Content/Bas
 
 ## Trace access in Landing Zone Studio
 
-Foundation shows the generated Bastion in shared security. The network diagram connects the operator workstation to that managed service and its private endpoint association in the hub management subnet. The Draw.io export preserves the same service, ownership and subnet association.
+The diagram shows the generated Bastion inside the hub management subnet and VCN, with an operator workstation connected through a dynamic SSH session. This network placement is visible from Foundation onward; the service's IAM compartment remains shared security. The Draw.io export preserves the same placement and connections.
 
 From the traffic-flow view, select **Operator → environment** or **Operator → Shared platforms**, then choose a generated private subnet. This includes configured platform networks when project networking is disabled. Platforms without a generated subnet do not gain an invented endpoint. The preview follows the generated route rows and only shows firewall inspection where those routes traverse a firewall.
 
