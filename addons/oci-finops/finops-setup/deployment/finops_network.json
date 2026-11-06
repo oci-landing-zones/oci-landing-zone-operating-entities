@@ -150,7 +150,7 @@
                                 "ingress_rules": {
                                     "hub_mgmt_https": {
                                         "description"          : "Private access to Database Actions.",
-                                        "src"                  : "10.0.3.0/24",
+                                        "src"                  : "10.0.1.0/24",
                                         "src_type"             : "CIDR_BLOCK",
                                         "dst_port_min"         : 443,
                                         "dst_port_max"         : 443,
@@ -160,7 +160,7 @@
 
                                     "hub_mgmt_mtls": {
                                         "description"          : "Private administration connections to Autonomous Database.",
-                                        "src"                  : "10.0.3.0/24",
+                                        "src"                  : "10.0.1.0/24",
                                         "src_type"             : "CIDR_BLOCK",
                                         "dst_port_min"         : 1522,
                                         "dst_port_max"         : 1522,
@@ -218,7 +218,7 @@
                                 "ingress_rules": {
                                     "hub_mgmt_https": {
                                         "description"          : "Private access to the OAC dashboard endpoint.",
-                                        "src"                  : "10.0.3.0/24",
+                                        "src"                  : "10.0.1.0/24",
                                         "src_type"             : "CIDR_BLOCK",
                                         "dst_port_min"         : 443,
                                         "dst_port_max"         : 443,

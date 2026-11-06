@@ -9,6 +9,7 @@ import unittest
 CONFIG_DIR = Path(__file__).resolve().parents[1]
 FINOPS = "compartment cmp-landingzone:cmp-lz-platform:cmp-finops"
 NETWORK = "compartment cmp-landingzone:cmp-lz-network"
+SECURITY = "compartment cmp-landingzone:cmp-lz-security"
 GROUPS = {"grp-lz-finops-db-admins", "grp-lz-finops-oac-admins"}
 STATEMENT = re.compile(
     r"Allow group (?P<principal>\S+) to (?P<verb>inspect|read|use|manage) "
@@ -43,15 +44,28 @@ class FinOpsIamBoundaries(unittest.TestCase):
             with self.subTest(grant=grant):
                 self.assertIn(grant["group"], GROUPS)
 
-    def test_bastion_permissions_stay_in_finops(self):
+    def test_bastion_permissions_stay_in_finops_or_shared_security(self):
         for grant in self.grants:
             if grant["resource"].startswith("bastion"):
                 with self.subTest(grant=grant):
-                    self.assertEqual(grant["scope"], FINOPS)
+                    self.assertIn(grant["scope"], {FINOPS, SECURITY})
                     # The aggregate would bypass the separate session restriction.
                     self.assertNotEqual(grant["resource"], "bastion-family")
                     if grant["resource"] == "bastion":
                         self.assertEqual(grant["verb"], "use")
+
+    def test_shared_bastion_sessions_have_access_without_fixed_target_conditions(self):
+        for group in GROUPS:
+            grants = [g for g in self.grants if g["group"] == group and g["scope"] == SECURITY]
+            with self.subTest(group=group):
+                capabilities = {(g["verb"], g["resource"]) for g in grants if g["condition"] is None}
+                self.assertEqual(capabilities, {
+                    ("use", "bastion"),
+                    ("read", "bastion-session"),
+                    ("manage", "bastion-session"),
+                    ("inspect", "work-requests"),
+                })
+                self.assertFalse(any(g["resource"] == "bastion-family" for g in grants))
 
     def test_sessions_require_finops_destination_and_port_forwarding(self):
         network = json.loads((CONFIG_DIR / "finops_network.json").read_text())
@@ -96,7 +110,7 @@ class FinOpsIamBoundaries(unittest.TestCase):
         }
         for grant in self.grants:
             with self.subTest(grant=grant):
-                self.assertIn(grant["scope"], {FINOPS, NETWORK})
+                self.assertIn(grant["scope"], {FINOPS, NETWORK, SECURITY})
                 self.assertFalse(grant["verb"] == "manage" and grant["resource"] in infrastructure)
 
 

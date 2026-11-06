@@ -22,7 +22,7 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 |---|---|
 | [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
 | [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
-| [finops_bastion.json](deployment/finops_bastion.json) | Optionally create OCI Bastion in `cmp-finops`, targeting the existing FinOps infra subnet. Replace the client IP placeholder before deployment. |
+| [finops_bastion.json](deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
 | [finops_service_access.json](deployment/finops_service_access.json) | After provisioning, enable the ADB report-reading principal and tag-metadata access. Replace the compartment OCID placeholder before using this file. |
 
@@ -30,7 +30,7 @@ The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace a
 
 **FOCUS installer compatibility:** The tag catalog installer in `finops-focus-platform` must support the six tag names above, including `tag-lz-platform`. Versions that require `tag-lz-application` must be updated before installing the tag catalog; commit `ffe4956` alone does not establish compatibility with this renamed tag. The installer checks existing OCI tags and does not create them. Apply the One-OE governance configuration before running a compatible tag catalog installer.
 
-The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the Bastion in `cmp-finops`, targeting the FinOps VCN's infra subnet in `cmp-lz-network`. Both FinOps groups have session access only in `cmp-finops`.
+The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the central Bastion in `cmp-lz-security`, targeting the hub management subnet in `cmp-lz-network`. Both FinOps groups have shared-security session access. Restricted session grants in `cmp-finops` are retained for installations that still use the previous local Bastion.
 
 ### Configure the FinOps notification email before deployment
 
@@ -54,13 +54,13 @@ Terraform creates the `nott-lz-finops` topic and its configured subscriptions. C
 
 ### Configure Bastion access before deployment
 
-Use [finops_bastion.json](deployment/finops_bastion.json) to create OCI Bastion in `CMP-FINOPS-KEY` with `SN-FRA-LZ-FINOPS-INFRA-KEY` as its target subnet. The existing FinOps subnet routing and security rules provide access to the private ADB endpoint within the same VCN.
+Use [finops_bastion.json](deployment/finops_bastion.json) for the central Bastion in `CMP-LZ-SECURITY-KEY`, targeting `SN-FRA-LZ-HUB-MGMT-KEY`. Reuse an already managed hub Bastion. When migrating from the previous FinOps-local Bastion, preserve its deployed configuration and state until central access has been validated: replacing its resource key or target subnet can delete and recreate the resource.
 
 Before planning, replace `<YOUR_IP>` in `cidr_block_allow_list` with the public IPv4 address used by the Bastion client; keep `/32` for a single source IP. For an approved corporate range, replace the entire `<YOUR_IP>/32` entry with the required CIDR. The placeholder is not a valid CIDR and must not be deployed unchanged. Keep `enable_cidr_check` enabled and restrict the allowlist to the required sources.
 
-The configuration sets a one-hour maximum session lifetime and disables FQDN/SOCKS5 support. It creates the Bastion service; create temporary TCP port-forwarding sessions separately using the client's SSH public key and the ADB private IP on port 1522, or port 443 for HTTPS access. See [Creating a Bastion](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-bastion.htm).
+The configuration sets a one-hour maximum session lifetime and enables FQDN/SOCKS5 support. Operators create temporary dynamic sessions separately using their SSH public keys. Use proxy-side DNS and the original private Database Actions/APEX HTTPS URL on port 443; database listener connections use their separately configured port and authentication. Follow the [OCI Bastion add-on](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/feature/bastion-addon-docs/addons/oci-bastion) for session and client setup.
 
-When adding the Bastion to an existing FinOps stack, retain its IAM, network, database, and any deployed security inputs. A separate Bastion stack must consume the FinOps compartment and network dependency outputs. LZ administrators manage the Bastion lifecycle; the FinOps administrator groups retain their existing session permissions.
+Add the central Bastion to the owning LZ stack and retain every existing input. If the central resource is managed by the FinOps stack, provide the existing shared-security compartment and hub management subnet through compartment/network dependencies. Do not create another state owner for an existing Bastion. LZ administrators manage its lifecycle; the FinOps groups manage sessions. **Manual post-deployment configuration required:** verify the actual Bastion private endpoint, target security rules, DNS and the complete routed path. Oracle documents a same-VCN service boundary; the hub-to-FinOps cross-VCN pattern requires live validation and must not be presented as guaranteed support. See [Bastion Overview](https://docs.oracle.com/en-us/iaas/Content/Bastion/Concepts/bastionoverview.htm).
 
 ### Roles and compartment scope
 
@@ -69,17 +69,17 @@ When adding the Bastion to an existing FinOps stack, retain its IAM, network, da
 | `grp-lz-finops-db-admins` | Manage Autonomous Database and its VNICs; read Database Tools and use connections; use Bastions and manage restricted sessions. | Read networking; use VCNs/subnets/NSGs; manage private IPs and VNICs for ADB private endpoints. |
 | `grp-lz-finops-oac-admins` | Manage OAC instances/PAC and VNICs; use private IPs; use Bastions and manage restricted sessions. | Read networking and use VCNs/subnets/NSGs. |
 
-ADB/OAC, Database Tools, and Bastion permissions target `cmp-landingzone:cmp-lz-platform:cmp-finops`. Neither policy grants access to Bastions or sessions in `cmp-landingzone:cmp-lz-network`. DB/OAC administrators retain the separate private-endpoint dependencies listed above; those grants must not be mistaken for read-only networking.
+ADB/OAC and Database Tools permissions target `cmp-landingzone:cmp-lz-platform:cmp-finops`. Both policies additionally grant `use bastion`, session read/manage and work-request inspection in `cmp-landingzone:cmp-lz-security`. They do not grant Bastion access in `cmp-lz-network`. The shared-security grants allow session management across that compartment and do not restrict SOCKS5 destinations to FinOps; enforce the intended reachability with target security rules, routing and target authentication. DB/OAC administrators retain their separate private-endpoint dependencies.
 
-**Bastion lifecycle boundary:** Both FinOps groups have `use bastion` and restricted session permissions in `cmp-finops`. LZ administrators create and delete the Bastion, including its network dependencies in `cmp-lz-network`. Neither FinOps group has `manage bastion`, so these templates do not authorize Bastion creation or deletion. Do not expand shared-network permissions to make those operations succeed. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
+**Bastion lifecycle boundary:** Both FinOps groups have `use bastion` and session permissions in shared security, plus the previous restricted grants in `cmp-finops`. LZ administrators create and delete the Bastion, including its network dependencies in `cmp-lz-network`. Neither FinOps group has `manage bastion`, so these templates do not authorize Bastion creation or deletion. Do not expand shared-network permissions to make those operations succeed. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
 
-**Session visibility:** Each group has unconditional `read bastion-session` access within `cmp-finops` to list and inspect sessions. Listing has no individual destination IP or session type against which to evaluate creation conditions. This read grant covers session metadata throughout `cmp-finops`; it grants no session creation, update, or deletion permissions.
+**Session visibility:** Each group has unconditional `read bastion-session` access within `cmp-finops` and `cmp-lz-security` to list and inspect sessions. Listing has no individual destination IP or session type against which to evaluate creation conditions. The read grants cover session metadata throughout those compartments; write permissions come from the separate session-management grants.
 
-**Session restriction:** Each group's separate `manage bastion-session` statement permits TCP port forwarding to destination IPs within the FinOps VCN, `10.0.24.0/26`. Update this condition when adapting the VCN CIDR. This is a destination-IP restriction, not a VCN-OCID condition on Bastion creation. Keep network rules limited to the approved endpoint ports. Do not add an unconditional `manage bastion-family` or session write grant that bypasses the restriction; also review inherited policies and other group memberships. Oracle documents the session-type and destination-IP conditions in its [Bastion access example](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupbastion.htm). The Bastion's target VCN must be the FinOps VCN; its compartment and subnet compartment can differ. [Oracle: creating a Bastion](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-bastion.htm).
+**Previous local Bastion restriction:** In `cmp-finops`, each group's separate `manage bastion-session` statement permits TCP port forwarding to destination IPs within the FinOps VCN, `10.0.24.0/26`. Update this condition when adapting the VCN CIDR. This is a destination-IP restriction, not a VCN-OCID condition on Bastion creation. Keep network rules limited to the approved endpoint ports. Do not add an unconditional `manage bastion-family` or session write grant that bypasses the restriction; also review inherited policies and other group memberships. Oracle documents the session-type and destination-IP conditions in its [Bastion access example](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupbastion.htm). This retained local pattern targets the FinOps VCN; the central cross-VCN pattern requires the separate topology validation described above. [Oracle: creating a Bastion](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-bastion.htm).
 
 **A DBA connection OCID is not required in the human policy.** DBAs can use any Database Tools connection in `cmp-finops`. OAC administrators are not granted Database Tools connection access by these templates. Database permissions come from each connection's database account. Use resource principal runtime identity and grant each connection principal access only to its credential secret; this prerequisite is configured with the connection, outside these templates. [Oracle: connection permissions](https://docs.oracle.com/en-us/iaas/database-tools/doc/oracle-database-connections.html).
 
-The common Bastion access is for TCP forwarding to managed-service endpoints. Managed SSH and dynamic SOCKS5 sessions are not authorized by these session statements. If Managed SSH is introduced, review the session condition, target-host scope, and `read instance-agent-plugins` permission together. Configure a client allowlist and session lifetime when creating the Bastion. OAC application roles remain separate: assign the FinOps authors and OAC administrators their agreed application roles.
+Shared-security session grants support the central SOCKS5 workflow and are not restricted to that session type. The retained `cmp-finops` grants authorize only fixed TCP port forwarding. If Managed SSH is introduced, review the session condition, target-host scope, and `read instance-agent-plugins` permission together. Configure a client allowlist and session lifetime when creating the Bastion. OAC application roles remain separate: assign the FinOps authors and OAC administrators their agreed application roles.
 
 For OAC private dashboard endpoint creation/changes, have LZ network administrators perform the network operation: Oracle documents broader network permissions than the PAC permissions granted to the OAC group here. PAC connectivity alone does not make the dashboard URL private. [Oracle: private endpoint requirements](https://docs.oracle.com/en-us/iaas/analytics-cloud/doc/control-incoming-and-outgoingtraffic-private-endpoint-ingress-and-egress.html).
 
@@ -97,6 +97,8 @@ For a separate FinOps infrastructure stack, supply the LZ dependency outputs thr
 | Identity domains | `COMMON-DOMAIN`, referring to `id_lz_common` |
 | Network resources / dynamic routing gateways | `DRG-FRA-LZ-HUB-KEY` |
 | Network resources / DRG route tables | `DRGRT-FRA-LZ-SPOKES-KEY` |
+
+If the FinOps stack also manages the optional central Bastion, additionally supply `CMP-LZ-SECURITY-KEY` and `SN-FRA-LZ-HUB-MGMT-KEY` from the LZ outputs. Omit the Bastion configuration when that resource is already managed by the owning LZ stack.
 
 Adapt domain/compartment names in the policies and regional names/CIDRs to the deployed LZ. Confirm existing LZ policies provide Console compartment discovery and permission to apply the required defined tags. These templates do not create a second identity domain, hub, or base LZ.
 
@@ -119,15 +121,44 @@ DNS labels follow the One-OE regional naming pattern: `vcnfralzfinops` for the V
 
 The infra subnet is included in the JSON and is created when that configuration is applied. To omit it, remove `SN-FRA-LZ-FINOPS-INFRA-KEY`, `SL-FRA-LZ-FINOPS-INFRA-KEY`, and the `infra_*` rules in both NSGs. There is no per-subnet enable switch in this module. The high-level architecture drawing does not include infra.
 
-Attach `NSG-FRA-LZ-FINOPS-ADB-KEY` to ADB, and `NSG-FRA-LZ-FINOPS-OAC-KEY` to the applicable OAC endpoint and PAC. Rules allow OAC to ADB on TCP 1522, infra and Hub A management (`10.0.3.0/24`) to ADB on TCP 1522/443, and those administration sources to private OAC on TCP 443. Infra's security list supplies the corresponding outbound rules because a Bastion endpoint cannot be assumed to use a workload NSG. Service subnets have only path-MTU ingress in their security list; endpoint NSGs supply application access. No unrestricted egress rule overrides those controls.
+Attach `NSG-FRA-LZ-FINOPS-ADB-KEY` to ADB, and `NSG-FRA-LZ-FINOPS-OAC-KEY` to the applicable OAC endpoint and PAC. Rules allow OAC to ADB on TCP 1522, infra and hub management (`10.0.1.0/24` in this example; adapt it to the selected hub) to ADB on TCP 1522/443, and those administration sources to private OAC on TCP 443. Infra's security list supplies the corresponding outbound rules because a Bastion endpoint cannot be assumed to use a workload NSG. Service subnets have only path-MTU ingress in their security list; endpoint NSGs supply application access. No unrestricted egress rule overrides those controls.
 
 OAC and infra source rules initially use their dedicated subnet CIDRs. After provisioning, narrow them to the PAC egress IPs, Bastion private-endpoint IP, and Database Tools reverse-connection IPs as appropriate. Stateful rules allow return traffic. No SSH port is opened on ADB or OAC. ADB's HTTPS egress to regional Oracle services supports FOCUS ingestion; Operations must configure and verify `ROUTE_OUTBOUND_CONNECTIONS = 'ENFORCE_PRIVATE_ENDPOINT'` before assuming DBMS_CLOUD uses that VCN path. [Oracle: ADB private endpoints](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/private-endpoints-autonomous.html).
 
 Use OAC Enterprise Edition for PAC, register the ADB private DNS name, and check capacity for PAC and private dashboard endpoint together. Configure private DNS and routed client access for dashboard users. Additional on-premises client CIDRs and DNS forwarding are deployment-specific. [Oracle: PAC prerequisites](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html).
 
-### Required Hub A integration in the owning LZ stack
+### FinOps integration steps for an existing One-OE deployment
 
-The FinOps attachment uses the existing spoke DRG route table, whose default route must lead to the hub attachment. The FinOps subnet route table uses `0.0.0.0/0 → DRG` and `all-services → local SGW`. Complete the following additions in the **existing LZ configuration/state**; the addon stack does not take ownership of hub route tables.
+These additions belong to the FinOps deployment. **Do not add FinOps CIDRs, routes, attachment imports or operator grants to the repository's generic One-OE blueprints.** Keep those blueprints unchanged and make deployment-specific additions in customer-controlled private source configurations. If a configuration is generated by Blueprint Factory, change its source and regenerate it rather than editing generated JSON.
+
+1. **Prepare the private inputs.** Copy/adapt the FinOps configurations for the deployed region and hub. Set the administration source rules to the actual hub management CIDR; `10.0.1.0/24` is the Hub E example here. Record which existing Terraform stack owns the hub network, the FinOps attachment and the central Bastion. Preserve their ownership and every existing stack input.
+2. **Provision or update the FinOps resources.** Use `finops_iam.json` and `finops_network.json` with the existing LZ dependencies. The IAM configuration grants both FinOps groups session access in shared security while retaining the previous local-Bastion grants. Export `network_output.json` and obtain the actual attachment OCID from `network_resources.drg_attachments.DRGATT-FRA-LZ-FINOPS-KEY.id`.
+3. **Prepare the hub integration in a private source configuration.** Add the FinOps route and attachment import described below to the configuration consumed by the existing hub-owning stack. Preserve its other routes and imports. The FinOps stack continues to own its attachment; the hub stack owns only its own route and import. Use the complete resulting network configuration as that stack's network input, rather than adding a second file with another top-level `network_configuration` block.
+4. **Review each owning stack's plan before applying.** Confirm the intended IAM and network changes, retain any deployed database/security inputs and keep the existing Bastion until central access is validated. Review unrelated changes, replacements and deletions separately. After an approved apply, retain the updated private input lists for subsequent runs; otherwise a later run could remove the integration.
+5. **Validate access as an operator.** Confirm the public source IP is allowlisted, create a temporary SOCKS5 session and test the original private Database Actions/APEX URL on TCP 443 and the database listener connection on its configured port, such as 1522. Verify DNS, forward and return routes, target security rules and database authentication. Also test denied destinations and session expiry. An active Bastion or local SSH listener alone does not establish database access; the cross-VCN service-boundary caveat above still applies.
+
+The following snippets are additions to a private deployment configuration, not patches to the published One-OE blueprint files. They require no changes to `blueprints/` or `gen/` in this repository.
+
+#### Hub E routing
+
+For Hub E, add `10.0.24.0/26 → DRG-FRA-LZ-HUB-KEY` to `RT-FRA-LZ-HUB-MGMT-KEY` and import the FinOps attachment into `DRGRD-FRA-LZ-HUB-KEY` using the statement below. The published Hub E spoke table key is `DRGRT-FRA-LZ-SPOKE-KEY`; adapt the FinOps attachment dependency accordingly. Its existing hub-return routes must include the management subnet. The example administration source is `10.0.1.0/24`; for the published Hub A shape, adapt it to `10.0.3.0/24`.
+
+Add this entry to the private configuration's existing `RT-FRA-LZ-HUB-MGMT-KEY.route_rules` map:
+
+```json
+"rr-fra-finops": {
+    "description": "Route from hub management to the FinOps VCN through the DRG.",
+    "destination": "10.0.24.0/26",
+    "destination_type": "CIDR_BLOCK",
+    "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+}
+```
+
+Adapt the destination to the actual FinOps VCN CIDR. Confirm the DRG table associated with the hub attachment learns the FinOps subnets, and that the FinOps attachment's table has return routes to the hub management subnet. The subnet route alone is insufficient.
+
+#### Hub A routing
+
+For Hub A, preserve firewall inspection using the following integration. The FinOps attachment uses the existing spoke DRG route table, whose default route must lead to the hub attachment. The FinOps subnet route table uses `0.0.0.0/0 → DRG` and `all-services → local SGW`. Complete the following additions in the **existing LZ configuration/state**; the addon stack does not take ownership of hub route tables.
 
 Add a `rr-fra-finops` rule for `10.0.24.0/26` to these hub VCN route tables:
 
@@ -151,7 +182,9 @@ For the first two tables, add this object to the existing `route_rules` map:
 
 For the last two, use the same destination with `network_entity_key: DRG-FRA-LZ-HUB-KEY` instead of `network_entity_id`, and describe the route as going through the DRG. If the hub LB is used to reach FinOps, add the DRG-targeted route to `RT-FRA-LZ-HUB-LB-KEY` as well; no FinOps LB backend is created here.
 
-In `DRGRD-FRA-LZ-HUB-KEY`, add an import statement for the new attachment. Use an unused priority; `30` follows the current runtime's PROD/PREPROD priorities. For a separate addon stack, substitute the attachment OCID from its outputs:
+#### FinOps attachment import
+
+For either hub, in the private configuration's `DRGRD-FRA-LZ-HUB-KEY`, add an import statement for the new attachment. Use an unused priority; `30` follows the current runtime's PROD/PREPROD priorities. For a separate addon stack, substitute the attachment OCID from its outputs:
 
 ```json
 "ROUTE-TO-VCN-FINOPS-KEY": {
@@ -165,7 +198,7 @@ In `DRGRD-FRA-LZ-HUB-KEY`, add an import statement for the new attachment. Use a
 }
 ```
 
-For a single stack, move the FinOps attachment into the existing DRG's `drg_attachments` map, remove its `inject_into_existing_drgs` block, and use `drg_attachment_key: DRGATT-FRA-LZ-FINOPS-KEY` in this import statement. Preserve all existing routes and imports. Do not import FinOps directly into the spoke route table: that would bypass the hub inspection path. Add the required firewall policy rules for permitted FinOps traffic and verify both directions. The local service-gateway and same-VCN paths intentionally do not traverse the hub firewall.
+For a new single-stack deployment, compose the FinOps attachment into the existing DRG's `drg_attachments` map, omit its `inject_into_existing_drgs` block, and use `drg_attachment_key: DRGATT-FRA-LZ-FINOPS-KEY` in this import statement. For an existing multistack deployment, keep the attachment in its current owner unless a separate state migration is planned and reviewed. Preserve all existing routes and imports. For firewalled hubs, do not import FinOps directly into the spoke route table: that would bypass the hub inspection path. Add the required firewall policy rules for permitted FinOps traffic and verify both directions. The local service-gateway and same-VCN paths intentionally do not traverse the hub firewall.
 
 ### Validation and migration
 
@@ -177,13 +210,13 @@ Run the static IAM boundary regression checks from the repository root:
 python3 -m unittest discover -s addons/oci-finops/finops-setup/deployment/tests -v
 ```
 
-These checks require exactly the DB and OAC administrator groups and reject policies referring to other human groups. They also reject Bastion grants outside `cmp-finops`, Bastion lifecycle management, and VCN topology management grants. Session destinations must match the FinOps VCN, and aggregate Bastion grants cannot bypass the session conditions.
+These checks require exactly the DB and OAC administrator groups, reject Bastion grants outside `cmp-finops` and `cmp-lz-security`, and reject Bastion lifecycle or VCN topology management. They preserve the local fixed-destination session restrictions and require shared-security session access without fixed-target conditions for the central workflow.
 
 Before deployment, validate the two-group infrastructure configuration and the ADB service-access configuration against Orchestrator v2.2.0 using the actual dependency outputs. Static checks do not establish live OCI authorization or network connectivity.
 
 The V2 files use new resource keys and current One-OE names. They are not an automatic in-place migration of the older `lzp` deployment. For an existing installation, reconcile resource ownership and Terraform state before applying; do not deploy both examples into the same address space.
 
-Validate the adapted configuration and inspect the plan for unintended replacements, missing dependencies, and unresolved placeholders. Then verify that neither FinOps group can manage shared VCN topology, use Bastions, or manage sessions in `cmp-lz-network` through these policies. Test LZ-admin Bastion creation/deletion in `cmp-finops`, session creation/list/get/delete as each role, and rejection of destinations outside the FinOps CIDR and non-port-forwarding session types. Also test DBA connection access, the absence of Database Tools grants for OAC administrators, OAC-to-ADB connectivity, FOCUS ingestion, and hub forward/return routing. Mocked plans verify configuration wiring, not live OCI IAM enforcement or network connectivity.
+Validate the adapted configuration and inspect the plan for unintended replacements, missing dependencies, and unresolved placeholders. Then verify that neither FinOps group can manage shared VCN topology, use Bastions, or manage sessions in `cmp-lz-network` through these policies. Test central Bastion lifecycle as LZ administrators and shared-security session creation/list/get/delete as each FinOps role. Validate permitted and denied destinations through network controls. For the retained local Bastion, verify rejection of destinations outside the FinOps CIDR and non-port-forwarding session types. Also test DBA connection access, the absence of Database Tools grants for OAC administrators, OAC-to-ADB connectivity, FOCUS ingestion, and hub forward/return routing. Mocked plans verify configuration wiring, not live OCI IAM enforcement or network connectivity.
 
 ## Step 2: Create Autonomous Database
 
