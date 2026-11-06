@@ -13,14 +13,19 @@
   "hub_l7_load_balancers_present": false,
   "hub_lb_nsg_present": true,
   "hub_lb_subnet_present": true,
-  "node_pool_compartment_ids": {
-    "preprod": "CMP-LZ-PREPROD-OKE-KEY",
-    "prod": "CMP-LZ-PROD-OKE-KEY"
-  },
   "route_statement_priorities": {
     "preprod": 20,
     "preprod_oke": 40,
     "prod": 10,
     "prod_oke": 30
+  },
+  "worker_inherited_field_failures": [],
+  "worker_pool_keys": {
+    "CLR-FRA-LZ-PREPROD-OKE-KEY": [
+      "NDP-FRA-LZ-PREPROD-OKE-KEY"
+    ],
+    "CLR-FRA-LZ-PROD-OKE-KEY": [
+      "NDP-FRA-LZ-PROD-OKE-KEY"
+    ]
   }
 }

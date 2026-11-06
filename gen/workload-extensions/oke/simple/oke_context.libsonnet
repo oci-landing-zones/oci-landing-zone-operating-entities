@@ -115,8 +115,11 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
   local cluster_cni_type =
     if cni == 'vcn_native' then 'native'
     else 'flannel';
+  assert is_overlay_network || !std.objectHas(params.config_params, 'pods_cidr') ||
+         params.config_params.pods_cidr == null :
+    'native OKE must omit config_params.pods_cidr; pod addresses come from the OCI pod subnet';
   local optional_cluster_kubernetes_network_config =
-    if is_overlay_network || (std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null) then
+    if is_overlay_network then
       local raw_pods_cidr =
         if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
           params.config_params.pods_cidr
@@ -131,13 +134,31 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
       { pods_cidr: pods_cidr }
     else
       {};
-  local worker_image =
+  local raw_worker_image =
     if std.objectHas(params.config_params, 'worker_image') && params.config_params.worker_image != null then
       assert std.type(params.config_params.worker_image) == 'string' :
         'config_params.worker_image must be a string';
       params.config_params.worker_image
     else
-      '9\\.[0-9]+';
+      '9';
+  local worker_image =
+    if raw_worker_image == '8\\.[0-9]+' then '8'
+    else if raw_worker_image == '9\\.[0-9]+' then '9'
+    else raw_worker_image;
+  local image_version_parts = std.split(worker_image, '.');
+  assert std.startsWith(worker_image, 'ocid1.image.') || (
+    std.length(image_version_parts) <= 2 &&
+    std.member(['8', '9'], image_version_parts[0]) &&
+    std.length([
+      part
+      for part in image_version_parts
+      if std.length(part) == 0 || std.length([
+        digit
+        for digit in std.stringChars(part)
+        if !std.member(std.stringChars('0123456789'), digit)
+      ]) > 0
+    ]) == 0
+  ) : 'config_params.worker_image must be an Oracle Linux 8/9 version or image OCID';
   local worker_boot_volume_size =
     if std.objectHas(params.config_params, 'worker_boot_volume_size') &&
        params.config_params.worker_boot_volume_size != null then

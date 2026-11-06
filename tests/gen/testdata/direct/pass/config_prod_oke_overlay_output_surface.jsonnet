@@ -2,6 +2,8 @@
 // contains: "cluster_cni_type": "flannel"
 // contains: "pod_nsg_reference_count": 0
 // contains: "public_lb_rule_count": 6
+// contains: "worker_pod_fields_present": []
+// contains: "pods_cidr": "10.244.0.0/16"
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
@@ -27,10 +29,10 @@ local outputs = multi({
     },
   },
 });
-local clusters = outputs['oke_clusters.json'].oke_clusters_configuration.clusters;
-local cluster_key = std.objectFields(clusters)[0];
-local cluster = clusters[cluster_key];
-local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
+local deployments = outputs['oke.json'].oke_configuration;
+local deployment = deployments[std.objectFields(deployments)[0]];
+local cluster = deployment.cluster_configuration;
+local node_pools = deployment.workers_configuration.worker_pools;
 local node_pool_key = std.objectFields(node_pools)[0];
 local node_pool = node_pools[node_pool_key];
 local network_category =
@@ -46,7 +48,9 @@ local rule_references_pods(rule) =
 {
   cluster_cni_type: cluster.cni_type,
   kubernetes_network_config: cluster.options.kubernetes_network_config,
-  node_pool_networking: node_pool.networking,
+  worker_subnet_id: node_pool.subnet_id,
+  worker_nsg_ids: node_pool.nsg_ids,
+  worker_pod_fields_present: [key for key in ['pod_subnet_id', 'pod_nsg_ids'] if std.objectHas(node_pool, key)],
   oke_subnet_keys: std.sort(std.objectFields(vcn.subnets)),
   oke_route_table_keys: std.sort(std.objectFields(vcn.route_tables)),
   oke_security_list_keys: std.sort(std.objectFields(vcn.security_lists)),

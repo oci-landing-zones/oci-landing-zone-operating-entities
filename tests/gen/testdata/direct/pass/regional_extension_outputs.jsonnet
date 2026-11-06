@@ -82,11 +82,12 @@ local render(kind, cis) =
     {
       name: 'regional OKE encryption references do not resolve to regional keys',
       ok:
-        local cluster = std.objectValues(outputs['oke_clusters.json'].oke_clusters_configuration.clusters)[0];
-        local worker = std.objectValues(outputs['oke_workers.json'].oke_workers_configuration.node_pools)[0];
+        local deployment = std.objectValues(outputs['oke.json'].oke_configuration)[0];
+        local cluster = deployment.cluster_configuration;
+        local worker = std.objectValues(deployment.workers_configuration.worker_pools)[0];
         local keys = security.vaults_configuration.keys;
         std.objectHas(keys, cluster.encryption.kube_secret_kms_key_id) &&
-        std.objectHas(keys, worker.node_config_details.encryption.kms_key_id) &&
+        std.objectHas(keys, worker.volume_kms_key_id) &&
         keys[cluster.encryption.kube_secret_kms_key_id].compartment_id == cluster.compartment_id,
     },
   ] else [];
