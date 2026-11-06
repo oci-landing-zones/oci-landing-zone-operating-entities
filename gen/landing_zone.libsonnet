@@ -195,6 +195,6 @@ function(raw_config)
     observability_cis2_pre: observability.cis2_pre + extension_observability_cis2,
     observability_cis2: observability.cis2 + extension_observability_cis2,
 
-    // Extra outputs from extensions (e.g. oke_clusters, oke_workers)
+    // Extra outputs from extensions (e.g. oke)
     [if std.length(std.objectFields(extension_extra)) > 0 then 'extra']: extension_extra,
   }

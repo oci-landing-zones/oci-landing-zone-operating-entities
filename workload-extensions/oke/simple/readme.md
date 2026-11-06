@@ -16,6 +16,10 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 ## **3. Deployment Options**
 
+Only released Orchestrator **v2.4.1** with CIS OKE **v0.3.0** is supported. Both published deployment options and Blueprint Factory generation now emit one `oke.json`: `oke_configuration` maps each cluster key to `cluster_configuration` and `workers_configuration.worker_pools` (keyed by node-pool key). The publication still includes a sample managed worker pool. Clusters are enhanced with private API endpoints; basic/public flags and `add_ons` are not supported.
+
+> **Migration warning:** Existing deployments require Terraform state and input migration from the legacy split OKE contract. Do not simply apply the new generated files to existing state; back up state and review the migration and plan first.
+
 This OKE Landing Zone Extension provides **two quickstart approaches**, [single-stack](single-stack/) and [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both use the committed JSON configurations as-is and are based on **Hub E**.
 
 For requirements outside the quickstart configurations, such as other hub models or additional OKE platforms, see [OKE generation options](oke-blueprint-factory.md).
@@ -273,7 +277,11 @@ The extension does not create a file system, mount target, or Kubernetes storage
 
 CIS2 worker initialization installs `oci-fss-utils` from the developer repository matching the runtime Oracle Linux major version. This prepares CIS2 workers for FSS in-transit encryption. CIS1 workers do not install the package.
 
-Worker boot volumes default to `60` GB. Set `worker_boot_volume_size` to an integer from `50` through `32768` in the `oke_simple` parameters to choose another size. Worker initialization runs `oci-growfs` at both CIS levels so the root partition and filesystem use the configured capacity, then executes the OKE-provided bootstrap script so the node can join the cluster.
+Worker boot volumes default to `60` GB. Set `worker_boot_volume_size` to an integer from `50` through `32768` in the `oke_simple` parameters to choose another size. Upstream cloud-init remains enabled and handles filesystem growth and OKE bootstrap at both CIS levels. CIS1 emits explicit `pv_transit_encryption: false` and no custom cloud-init; CIS2 enables in-transit encryption and adds only a cloud-config installing `oci-fss-utils` with `dnf` from the runtime OL major-version developer repository.
+
+Source `worker_image` defaults to the numeric version string `'9'`; OL8/OL9 major or minor versions and image OCIDs are supported. General regex selectors are rejected; only deprecated known `8\\.[0-9]+` / `9\\.[0-9]+` family selectors are normalized to `8` / `9`. Generated worker fields are flat, using `os_version` or `image_id`. See the [generated output contract](oke-blueprint-factory.md#10-generated-output-contract) for field details.
+
+Source CNI settings remain `cni_type: 'native'` with `cni: 'vcn_native'`, or `cni_type: 'overlay'` with `cni: 'flannel'`. Native mode rejects `pods_cidr` and uses the OCI pod subnet. Overlay defaults `pods_cidr` to `10.244.0.0/16` and emits no OCI pod subnet or worker pod references.
 
 ### Additional operational notes
 

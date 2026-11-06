@@ -325,6 +325,10 @@ The generated directory contains the JSON files to use with the OCI Landing Zone
 
 ## **10. Generated Output Contract**
 
+Only released Orchestrator **v2.4.1** with CIS OKE **v0.3.0** is supported.
+
+> **Migration warning:** Existing deployments require Terraform state and input migration from the legacy split OKE contract. Do not simply apply the new generated files to existing state; back up state and review the migration and plan first.
+
 The generated file set commonly includes:
 
 | File | Purpose |
@@ -332,28 +336,33 @@ The generated file set commonly includes:
 | `network.json` | Hub, spoke, platform, OKE VCNs, subnets, route tables, gateways, security lists, and NSGs. Every platform with `public_load_balancer: true` receives its own tagged frontend NSG in the Hub VCN and Hub network compartment. |
 | `iam.json` | Compartments, groups, and policies. |
 | `governance.json` | Tag namespaces and governance configuration. |
-| `oke_clusters.json` | OKE cluster configuration. |
-| `oke_workers.json` | OKE node pool configuration. |
+| `oke.json` | Consolidated OKE clusters and managed worker pools. |
 | `security_cis*.json` | Security baseline. For CIS2, this also includes the shared security-compartment Vault and one encryption key in each OKE platform compartment. CIS1 omits OKE Vault and CMEK resources. |
 | `observability_cis*.json` | Observability baseline configuration. |
 
 Public frontend NSGs scale as one Hub network resource per opted-in OKE platform. Each NSG permits public TCP 80/443 and TCP egress only to its owning OKE VCN. The shared Hub IAM policy remains one seven-statement policy as platforms are added; a generated allowlist selects enabled source platforms and source-to-target platform tag comparison isolates public LB reconciliation and post-create NSG attachment. The network team owns NSG rules, tags, movement, deletion, and lifecycle. OKE receives only matching-tag membership permission in the Hub network compartment. Approval is cluster-to-NSG rather than Service-to-NSG, so the cluster may reuse an approved NSG on its other public LBs even if Kubernetes admission or RBAC is bypassed.
 
-For native OKE, the generated worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.
+`oke.json` contains an `oke_configuration` map keyed by cluster configuration key. Each entry contains `cluster_configuration` and `workers_configuration.worker_pools`, whose entries are keyed by node-pool configuration key. Both published single-stack and multi-stack packages use this same consolidated file and retain a sample managed worker pool; the legacy split output files are removed.
+
+Clusters are enhanced with private API endpoints in the supported contract; do not emit `is_enhanced`, public-endpoint flags, or `add_ons`. Cluster service load-balancer placement uses `cluster_configuration.networking.service_lb_subnet_ids`, a list of subnet references, instead of `services_subnet_id`.
+
+Worker pools inherit compartment and CIS settings from their cluster. Each pool uses flat `shape`, `ocpus`, `memory`, `boot_volume_size`, `os_version` or `image_id`, `subnet_id`, `nsg_ids`, `pv_transit_encryption`, and, for CIS2, `volume_kms_key_id`. Native pools also include `pod_subnet_id` and `pod_nsg_ids`; overlay pools omit these fields. Do not use the legacy `node_config_details` nesting.
+
+Source configuration retains `cni_type: 'native'` / `cni: 'vcn_native'` and `cni_type: 'overlay'` / `cni: 'flannel'`. Native mode rejects an explicit `pods_cidr`: pod addresses come from the OCI pod subnet.
 
 The top-level `cis_level` controls OKE encryption behavior as well as the selected security and observability files. For CIS2, each cluster's `encryption.kube_secret_kms_key_id` references its generated key in `security_cis2.json`, and the worker node pool uses the same key for boot-volume encryption with in-transit encryption enabled. The generator derives these configuration keys from the canonical landing-zone naming convention rather than accepting a customer-supplied OKE KMS-key option. The pinned Orchestrator resolves both references through `kms_dependency`; no key OCID or policy substitution is required. The shared Vault remains in the Landing Zone security compartment, while each HSM key is created in its owning OKE platform compartment. For CIS1, cluster and worker CMEK references and OKE Vault/key resources are omitted; worker boot volumes use OCI-managed encryption and in-transit encryption is disabled.
 
-`worker_boot_volume_size` defaults to `60` GB and accepts an integer from `50` through `32768`. Worker initialization runs `oci-growfs` at both CIS levels so the root partition and filesystem consume the configured boot-volume size. It then fetches and executes the OKE-provided bootstrap script from instance metadata; this step must remain in custom worker initialization so nodes can join the cluster. CIS2 initialization also installs `oci-fss-utils` from the developer repository matching the node's runtime Oracle Linux major version (`ol8_developer` or `ol9_developer`). This prepares CIS2 workers for encrypted OCI File Storage mounts; CIS1 does not install the package.
+`worker_boot_volume_size` defaults to `60` GB and accepts an integer from `50` through `32768`. Upstream cloud-init remains enabled at both CIS levels and handles filesystem growth and OKE bootstrap. CIS1 emits explicit `pv_transit_encryption: false` and no custom cloud-init. CIS2 emits `pv_transit_encryption: true` and adds only a `text/cloud-config` installing `oci-fss-utils` with `dnf` from the developer repository matching the node's runtime Oracle Linux major version (`ol8_developer` or `ol9_developer`). It does not replace upstream growfs/bootstrap.
 
 For CIS2 deployment validation, confirm the Vault and key compartments, confirm that the cluster and node pool reference the same generated configuration key, and verify the three generated platform-compartment KMS statements before deployment. Worker boot-volume delegation is granted only to same-compartment node-pool principals. Confirm the Landing Zone baseline service policy supplies Block Storage key use. Persistent volumes use a separately governed key. For split stacks, pass the security-stack KMS dependency output to the OKE stack instead of replacing configuration keys with literal OCIDs or editing generated IAM.
 
-The default worker image selector is `9\\.[0-9]+`.
+Source `worker_image` defaults to the numeric version string `'9'`. It accepts OL8/OL9 major or minor versions (for example `'8'`, `'9'`, or `'9.6'`) or an image OCID. Versions emit `os_version`; an image OCID emits `image_id`. General regex selectors are not supported. Only the deprecated known OL family selectors `8\\.[0-9]+` and `9\\.[0-9]+` are accepted for compatibility and normalized to `'8'` and `'9'`.
 
 For overlay OKE, the generator:
 
 - Requests Flannel in the downstream OKE cluster configuration.
-- Emits `pods_cidr` and `services_cidr` in `oke_clusters.json`.
-- Omits `pods_subnet_id` and `pods_nsg_ids` from `oke_workers.json`.
+- Emits `pods_cidr` (default `10.244.0.0/16`) and `services_cidr` under `cluster_configuration.options.kubernetes_network_config` in `oke.json`.
+- Omits `pod_subnet_id` and `pod_nsg_ids` from worker pools in `oke.json`.
 - Omits the OKE pod subnet, pod route table, pod security list, and pod NSG from `network.json`.
 
 &nbsp;

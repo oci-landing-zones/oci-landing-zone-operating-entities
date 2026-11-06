@@ -35,9 +35,7 @@ local rendered_vcn(cni_params) =
   .network_configuration.network_configuration_categories['prod-platform-oke']
   .vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'];
 
-local native_vcn = rendered_vcn({
-  pods_cidr: '10.244.0.0/16',
-});
+local native_vcn = rendered_vcn({});
 local overlay_vcn = rendered_vcn({ cni_type: 'overlay' });
 local pods_subnet_key = 'SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY';
 local pods_nsg_key = 'NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY';
