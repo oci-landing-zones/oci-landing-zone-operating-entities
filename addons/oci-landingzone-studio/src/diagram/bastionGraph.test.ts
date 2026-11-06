@@ -36,28 +36,36 @@ describe('generated Bastion diagram and route preview', () => {
     const pick = `${target.scope}:bastion:${target.id}`;
     const graph = buildGraph(model, 5, { activeFlows: [pick] }, undefined, tables, inventory);
     const service = graph.nodes.find((node) => node.id === bastion.serviceNode)!;
-    expect(service.parentId).toBe('cmp-security');
+    expect(service.parentId).toBe(bastion.subnetNode);
+    expect(graph.nodes.find((node) => node.id === service.parentId)?.parentId).toBe('hub-vcn');
+    expect(graph.nodes.find((node) => node.id === service.parentId)?.container).toBe(true);
+    expect(service.y).toBeGreaterThanOrEqual(50);
+    expect(inventory.groups.find((group) => group.kind === 'bastion')?.compartmentKey).toBe('CMP-LZ-SECURITY-KEY');
     expect(service.resourceItems?.map((item) => item.name)).toEqual(['bastionfralzhub']);
     expect(graph.nodes.filter((node) => node.resourceKind === 'bastion')).toHaveLength(1);
     expect(graph.nodes.find((node) => node.id === bastion.subnetNode)?.endpointName).toBeUndefined();
-    expect(graph.edges.find((edge) => edge.id === 'bastion-private-endpoint')).toMatchObject({ source: bastion.serviceNode, target: bastion.subnetNode });
+    expect(graph.edges.some((edge) => edge.id === 'bastion-private-endpoint')).toBe(false);
+    expect(validateDiagramLayout(graph, { inventory, routeTables: tables, showRouteTables: true })).toEqual([]);
     const flow = graph.edges.find((edge) => edge.id === `flow-${pick}#0`)!;
     expect(flow?.waypoints?.slice(0, 3)).toEqual(['bastion-operator', bastion.serviceNode, bastion.subnetNode]);
     expect(flow.waypoints?.at(-1)).toBe('cmp-env-0-vcn-sn-0');
     expect(graph.flowErrors).toBeUndefined();
     const xml = toDrawioXml(graph);
     expect(xml).toContain('bastionfralzhub');
-    expect(xml).toContain('bastion-private-endpoint');
+    expect(xml).toContain(`parent="${bastion.subnetNode}"`);
     expect(xml).toContain('bastion-operator');
   }, 60_000);
 
-  it('keeps Foundations ownership and network/flow step visibility separate', async () => {
+  it('shows the Bastion in its VCN from Foundations without enabling spoke flows early', async () => {
     const { model, inventory, tables } = await preview();
     const foundation = buildGraph(model, 1, {}, undefined, tables, inventory);
     expect(foundation.nodes.filter((node) => node.resourceKind === 'bastion')).toHaveLength(1);
-    expect(foundation.nodes.some((node) => node.id === 'bastion-operator')).toBe(false);
+    const bastion = generatedBastionTopology(model, tables, inventory)!;
+    expect(foundation.nodes.find((node) => node.id === bastion.serviceNode)?.parentId).toBe(bastion.subnetNode);
+    expect(foundation.nodes.some((node) => node.id === 'hub-vcn')).toBe(true);
+    expect(validateDiagramLayout(foundation, { inventory, routeTables: tables, foundation: true })).toEqual([]);
     const network = buildGraph(model, 2, { activeFlows: ['prod:bastion'] }, undefined, tables, inventory);
-    expect(network.edges.some((edge) => edge.id === 'bastion-private-endpoint')).toBe(true);
+    expect(network.edges.some((edge) => edge.id === 'bastion-session')).toBe(true);
     expect(network.edges.some((edge) => edge.waypoints)).toBe(false);
   });
 
@@ -158,7 +166,7 @@ describe('generated Bastion diagram and route preview', () => {
     expect(bastion.targets).toEqual([]);
     expect(allFlowIds(model, bastion)).toEqual([]);
     const graph = buildGraph(model, 5, { allFlows: true }, undefined, tables, inventory);
-    expect(graph.edges.some((edge) => edge.id === 'bastion-private-endpoint')).toBe(true);
+    expect(graph.edges.some((edge) => edge.id === 'bastion-session')).toBe(true);
     expect(graph.edges.some((edge) => edge.waypoints)).toBe(false);
   });
 });

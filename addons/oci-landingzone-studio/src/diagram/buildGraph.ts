@@ -114,6 +114,7 @@ const RT_RIGHT_W = RT_W + RT_GAP + PAD; // reserved right margin (spoke tables)
 interface SubnetSpec {
   name: string;
   cidr: string;
+  resourceGroup?: GeneratedResourceInventory['groups'][number];
   backendGapAfter?: number;
   icon?: DiagramNode['icon'];
   caption?: string;
@@ -128,7 +129,8 @@ interface SubnetSpec {
 const SUB_H_ICON_IP = SUB_H_ICON + 16; // icon + caption + an IP line
 const SUB_H_ENDPOINT = 110;            // plain subnet grown to hold a VM (name + icon + IP)
 const subnetHeight = (sn: SubnetSpec) =>
-  sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H;
+  sn.resourceGroup ? SUB_H + resourceGroupLayout(sn.resourceGroup.kind, sn.resourceGroup.items, SUB_W - 2 * PAD).height + PAD
+    : sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H;
 
 /**
  * Give an icon-less subnet a VM endpoint and a host `.10` inside its range.
@@ -262,10 +264,19 @@ function pushVcn(
     const height = subnetHeight(sn);
     nodes.push({
       id: `${id}-sn-${i}`, kind: 'subnet', label: `${sn.name}\n${sn.cidr}`, parentId: id,
+      container: sn.resourceGroup ? true : undefined,
       icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
       endpointName: sn.endpoint?.name, endpointIp: sn.endpoint?.ip, publicSubnet: sn.isPublic,
       x: SUB_X, y: sy, width: SUB_W, height,
     });
+    if (sn.resourceGroup) {
+      const group = sn.resourceGroup;
+      const width = SUB_W - 2 * PAD;
+      const layout = resourceGroupLayout(group.kind, group.items, width);
+      nodes.push({ id: `resource-${group.id}`, kind: 'resourcegroup', label: layout.label,
+        resourceKind: group.kind, resourceItems: group.items.map((item) => ({ ...item })),
+        parentId: `${id}-sn-${i}`, x: PAD, y: SUB_H, width, height: layout.height });
+    }
     placed.push({ y: sy, height });
     if (sn.backendGapAfter && subnets[i + 1]?.name.endsWith('-trust')) {
       const vcn = nodes.find((node) => node.id === id)!;
@@ -327,7 +338,8 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   // compartment, their Service Gateways, the spoke attachments — plus the
   // endpoints and the whole route-table layer. Before step 3 the environment
   // compartments are empty rows.
-  const showHub = upToStep >= 2 && hubImplemented;
+  const bastion = generatedBastionTopology(model, routeTables, inventory);
+  const showHub = (upToStep >= 2 || !!bastion) && hubImplemented;
   const showSpokes = upToStep >= 3 && hubImplemented;
   // Platforms (step 4) build on the spoke layer: the shared platform row outside
   // the environments, and a platforms compartment inside each environment.
@@ -343,7 +355,6 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   // Every selectable hub has its own derived route-table adapter.
   const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
   const allRouteTables = showSpokes && supportsFlowTracing ? routeTables : [];
-  const bastion = generatedBastionTopology(model, routeTables, inventory);
   // Active flows highlight matched route rows and draw their hop sequence over
   // the complete route-table layer.
   // "Show all flows" traces every flow, coloured by traffic type (as in ONTV).
@@ -405,6 +416,9 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   // ---- hub network (left column), driven by the step 2 fields
   const hubSubnets = model.network.subnets.map((sn, j) => {
     const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
+    if (bastion?.subnetNode === `hub-vcn-sn-${j}`) {
+      spec.resourceGroup = inventory?.groups.find((group) => `resource-${group.id}` === bastion.serviceNode);
+    }
     if (spec.icon === 'lb' && model.platforms.some((p) => p.type === 'oke_simple' && p.okeParams?.publicLoadBalancer && model.environments.some((env) => platformInEnv(p, env.id)))) {
       spec.caption = 'Example OKE public LB';
     } else if (spec.icon === 'lb' && !hasHubLoadBalancer(model)) {
@@ -903,7 +917,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   };
   const outerResourceOwners = new Set(inventory?.compartments.filter((compartment) =>
     nodes.some((node) => ['landingzone', 'tenancy'].includes(node.kind) && matchesCompartmentPath(compartment.key, node))).map((compartment) => compartment.key));
-  if (inventory) pushGeneratedResources(nodes, { ...inventory, groups: inventory.groups.filter((group) => !outerResourceOwners.has(group.compartmentKey)) });
+  if (inventory) pushGeneratedResources(nodes, { ...inventory, groups: inventory.groups.filter((group) => group.kind !== 'bastion' && !outerResourceOwners.has(group.compartmentKey)) });
   if (!showSpokes) stackEnvironments(nodes, envs.map((env) => env.id), rightX, innerTop);
 
   if (showHub && model.remotePeeringConnections?.length) {
@@ -1143,7 +1157,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   }
 
   // Wrapper-owned resources follow the final table lanes as well as the compartments.
-  if (inventory) pushGeneratedResources(nodes, { ...inventory, groups: inventory.groups.filter((group) => outerResourceOwners.has(group.compartmentKey)) });
+  if (inventory) pushGeneratedResources(nodes, { ...inventory, groups: inventory.groups.filter((group) => group.kind !== 'bastion' && outerResourceOwners.has(group.compartmentKey)) });
 
   if (showHub && bastion) {
     const rects = absoluteNodeRects(nodes);
@@ -1154,11 +1168,9 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
       nodes.push({ id: 'bastion-operator', kind: 'operator', label: 'Operator workstation\nSOCKS5 over SSH',
         x: region.x - 240 - HYBRID_REGION_GAP,
         y: Math.max(service.y, ...nodes.filter((node) => !node.parentId && node.id !== 'region').map((node) => node.y + node.height + COMP_GAP)),
-        width: 240, height: 60 });
+        width: 240, height: 100 });
       edges.push({ id: 'bastion-session', source: 'bastion-operator', target: service.id,
         sourceSide: 'right', targetSide: 'left', label: 'Dynamic SSH session' });
-      edges.push({ id: 'bastion-private-endpoint', source: service.id, target: subnet.id,
-        sourceSide: 'left', targetSide: 'left', label: 'Private endpoint in hub management subnet' });
     }
   }
 

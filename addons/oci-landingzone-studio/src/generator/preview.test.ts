@@ -11,6 +11,7 @@ import { defaultBastion } from '../services/bastion';
 import { buildGraph } from '../diagram/buildGraph';
 import { resourceGroupSvg } from '../diagram/resourceGroups';
 import { toDrawioXml } from '../export/toDrawio';
+import { buildRouteTables } from '../services/routeTables';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
@@ -23,15 +24,15 @@ describe('canonical diagram preview', () => {
     const final = JSON.parse(generated.files[`security_cis${cisLevel}.json`]).bastions_configuration;
     const pre = JSON.parse(generated.files[`security_cis${cisLevel}_pre.json`]).bastions_configuration;
     expect(pre).toEqual(final);
-    const { inventory } = await generatePreview(model);
+    const { inventory, network } = await generatePreview(model);
     const group = inventory.groups.find((entry) => entry.kind === 'bastion')!;
     expect(group.items).toEqual(Object.entries(final.bastions).map(([key, value]) => ({ key,
       name: (value as { name: string }).name, subnetKey: (value as { subnet_id: string }).subnet_id,
     })));
     expect(group.compartmentKey).toBe('CMP-LZ-SECURITY-KEY');
-    const graph = buildGraph(model, 5, {}, undefined, [], inventory);
+    const graph = buildGraph(model, 5, {}, undefined, buildRouteTables(model, network), inventory);
     const node = graph.nodes.find((entry) => entry.resourceKind === 'bastion')!;
-    expect(graph.nodes.find((entry) => entry.id === node.parentId)?.label).toBe('cmp-lz-security');
+    expect(graph.nodes.find((entry) => entry.id === node.parentId)).toMatchObject({ kind: 'subnet', parentId: 'hub-vcn' });
     expect(node.resourceItems).toEqual(group.items);
     const xml = toDrawioXml(graph);
     const encoded = xml.match(new RegExp(`id="${node.id}"[^>]*image=data:image/svg\\+xml,([^;]+);`))?.[1];

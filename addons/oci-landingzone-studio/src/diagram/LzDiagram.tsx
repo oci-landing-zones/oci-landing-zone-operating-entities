@@ -56,6 +56,7 @@ import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBacken
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from './layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
 import { hybridTopologySvg } from './hybridTopology';
+import { operatorWorkstationSvg } from './operatorWorkstation';
 
 const COOPERATIVE_QUERY = '(max-width: 1100px)';
 const ZOOM_KEYS = ['Meta', 'Control'];
@@ -93,12 +94,11 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
     case 'attachment':
       return { background: '#ffffff', border: '1.5px solid #6b7a99', borderRadius: 5, color: '#1f3a63', fontWeight: 800 };
     case 'project':
-    case 'operator':
-      // The external operator shares the existing neutral project-box style.
       return { background: oracle.compProjectFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'routetable':
     case 'rtdot':
     case 'resourcegroup':
+    case 'operator':
     case 'vpn':
     case 'premises':
     case 'vpntunnel':
@@ -131,11 +131,11 @@ function CompartmentNode({ data }: NodeProps) {
  * right border.
  */
 function SubnetNode({ data }: NodeProps) {
-  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean };
+  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
   const [name = '', cidr = ''] = (d.label ?? '').split('\n');
   const iconSvg = d.icon ? ICONS[d.icon] : undefined;
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName || d.container ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
       {/* Public (IGW-routed) subnet badge — the LB / DMZ front-ends face the internet. */}
       {d.publicSubnet && (
         <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: CAPTION_COLORS.green, borderRadius: 8, lineHeight: 1.5 }}>
@@ -235,13 +235,20 @@ function AttachmentNode({ data }: NodeProps) {
 
 /** Project compartment: a square white box with its full generated name. */
 function ProjectNode({ data }: NodeProps) {
-  const d = data as { label?: string; container?: boolean; kind?: DiagramNode['kind'] };
+  const d = data as { label?: string; container?: boolean };
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', justifyContent: 'center', padding: d.container ? '7px 8px' : '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
       {d.label}
-      {d.kind === 'operator' && <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />}
     </div>
   );
+}
+
+function OperatorNode({ data }: NodeProps) {
+  const node = data as unknown as DiagramNode;
+  return <div role="img" aria-label={`${node.label.replace('\n', ': ')}; connected over the Internet`} style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div dangerouslySetInnerHTML={{ __html: operatorWorkstationSvg(node) }} />
+    <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
+  </div>;
 }
 
 const RT_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spoke: '#2E6E3F' } as const;
@@ -336,7 +343,7 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, operator: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, operator: OperatorNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
 
 /** Nodes stay fixed; screen and export consume the same model-derived connector. */
 function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
