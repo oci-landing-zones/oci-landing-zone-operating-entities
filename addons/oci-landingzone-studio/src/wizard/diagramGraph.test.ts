@@ -11,7 +11,16 @@ import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { complexHybridModel } from '../diagram/complexHybrid.testSupport';
 import type { DiagramModel } from '../model/types';
 
-beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
+let defaultSnapshot: Awaited<ReturnType<typeof generated>>;
+let editedSnapshot: Awaited<ReturnType<typeof generated>>;
+
+beforeAll(async () => {
+  setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') }));
+  defaultSnapshot = await generated();
+  const model = structuredClone(defaultSnapshot.model);
+  model.foundation.regionShortName = 'ams';
+  editedSnapshot = await generated(model);
+}, 60_000);
 
 async function generated(model = emptyLzModel()) {
   const preview = await generatePreview(model);
@@ -53,8 +62,8 @@ describe('diagram geometry and chosen export layers', () => {
     } finally { build.mockRestore(); }
   });
 
-  it('exports the chosen endpoints, table and flows after rendering a clean overview', async () => {
-    const { model, preview } = await generated();
+  it('exports the chosen endpoints, table and flows after rendering a clean overview', () => {
+    const { model, preview } = structuredClone(defaultSnapshot);
     const getDiagram = createDiagramGraph(model, preview);
     const chosen = { showDots: true, showEndpoints: true, activeFlows: ['prod:egress:web'], focusFlow: 'prod:egress' };
     const visible = getDiagram(5, chosen);
@@ -70,8 +79,8 @@ describe('diagram geometry and chosen export layers', () => {
     expect(exported.display?.focusFlow).toBe('prod:egress');
   });
 
-  it('keeps open route cards and physical connections in the same places across endpoint and Flow views', async () => {
-    const { model, preview } = await generated();
+  it('keeps open route cards and physical connections in the same places across endpoint and Flow views', () => {
+    const { model, preview } = structuredClone(defaultSnapshot);
     const getDiagram = createDiagramGraph(model, preview);
     const flow = getDiagram(5, { showFlows: true });
     const cardIds = flow.nodes.filter((node) => node.kind === 'routetable').map((node) => node.id);
@@ -124,8 +133,8 @@ describe('diagram geometry and chosen export layers', () => {
       .toEqual(flows.edges.filter((edge) => edge.target === id).map((edge) => edge.points));
   }, 30_000);
 
-  it('exports the full static routing design after arbitrary live flow and endpoint selections', async () => {
-    const { model, preview } = await generated();
+  it('exports the full static routing design after arbitrary live flow and endpoint selections', () => {
+    const { model, preview } = structuredClone(defaultSnapshot);
     const getDiagram = createDiagramGraph(model, preview);
     getDiagram(5, { showDots: true, showEndpoints: true, openTables: [preview.tables[0].id] });
     const live = getDiagram(5, { showFlows: true, allFlows: true, activeFlows: ['prod:egress:web'], focusFlow: 'prod:egress' });
@@ -143,11 +152,10 @@ describe('diagram geometry and chosen export layers', () => {
     expect(xml).not.toContain('-ep-icon');
   }, 30_000);
 
-  it('builds edited export layers only when requested and uses their current generated snapshot', async () => {
-    const initial = await generated();
+  it('builds edited export layers only when requested and uses their current generated snapshot', () => {
+    const initial = structuredClone(defaultSnapshot);
     const previous = createDiagramGraph(initial.model, initial.preview)(5, { showEndpoints: true });
-    const model = { ...initial.model, foundation: { ...initial.model.foundation, regionShortName: 'ams' } };
-    const current = await generated(model);
+    const current = structuredClone(editedSnapshot);
     const build = vi.spyOn(graphBuilder, 'buildGraph');
     try {
       const getDiagram = createDiagramGraph(current.model, current.preview);

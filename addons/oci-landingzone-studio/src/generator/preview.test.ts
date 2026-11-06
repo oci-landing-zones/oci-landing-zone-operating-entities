@@ -16,15 +16,23 @@ import { buildRouteTables } from '../services/routeTables';
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
 describe('canonical diagram preview', () => {
-  it.each([1, 2] as const)('uses the generated CIS%d Bastion identity in the live graph and Draw.io export', async (cisLevel) => {
+  it.each([1, 2] as const)('matches deployable CIS%d artifacts and exports their Bastion identity', async (cisLevel) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = cisLevel;
     model.bastion = { ...defaultBastion(), enabled: true, clientCidrs: '203.0.113.10/32' };
     const generated = await generateOutputs(model);
-    const final = JSON.parse(generated.files[`security_cis${cisLevel}.json`]).bastions_configuration;
-    const pre = JSON.parse(generated.files[`security_cis${cisLevel}_pre.json`]).bastions_configuration;
+    const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
+    const final = outputs[`security_cis${cisLevel}.json`].bastions_configuration;
+    const pre = outputs[`security_cis${cisLevel}_pre.json`].bastions_configuration;
     expect(pre).toEqual(final);
     const { inventory, network } = await generatePreview(model);
+    expect(network).toEqual(outputs['network.json']);
+    expect(inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
+    if (cisLevel === 2) {
+      expect([...new Set(inventory.groups.map((group) => group.kind))].sort()).toEqual(['bastion', 'events', 'flowlogs', 'notifications', 'scanning', 'securityrecipes', 'vault']);
+      expect(inventory.groups.find((group) => group.kind === 'vault')?.items).toEqual([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
+      expect(inventory.groups.find((group) => group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
+    }
     const group = inventory.groups.find((entry) => entry.kind === 'bastion')!;
     expect(group.items).toEqual(Object.entries(final.bastions).map(([key, value]) => ({ key,
       name: (value as { name: string }).name, subnetKey: (value as { subnet_id: string }).subnet_id,
@@ -38,18 +46,6 @@ describe('canonical diagram preview', () => {
     const encoded = xml.match(new RegExp(`id="${node.id}"[^>]*image=data:image/svg\\+xml,([^;]+);`))?.[1];
     expect(encoded).toBeDefined();
     expect(decodeURIComponent(encoded!)).toBe(resourceGroupSvg('bastion', group.items, node.width));
-  }, 60_000);
-
-  it('matches the selected deployable final artifacts and produces all six CIS2 resource families', async () => {
-    const model = emptyLzModel();
-    const preview = await generatePreview(model);
-    const generated = await generateOutputs(model);
-    const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
-    expect(preview.network).toEqual(outputs['network.json']);
-    expect(preview.inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
-    expect([...new Set(preview.inventory.groups.map((group) => group.kind))].sort()).toEqual(['events', 'flowlogs', 'notifications', 'scanning', 'securityrecipes', 'vault']);
-    expect(preview.inventory.groups.find((group) => group.kind === 'vault')?.items).toEqual([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
-    expect(preview.inventory.groups.find((group) => group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
   }, 60_000);
 
   it('uses canonical CIS1 conditions instead of showing CIS2 vaults', async () => {
