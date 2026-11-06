@@ -25,6 +25,7 @@ import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
 import { hybridRoutes } from '../services/hybridConnectivity';
+import { generatedBastionTopology } from '../services/bastionTopology';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import FlowSidebar from '../components/FlowSidebar';
@@ -129,13 +130,26 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const routing = useDiagramPreview(model);
   const snapshot = routing.snapshot;
   const renderedModel = snapshot?.model ?? model;
+  const bastion = useMemo(() => snapshot ? generatedBastionTopology(snapshot.model, snapshot.preview.tables, snapshot.preview.inventory) : undefined, [snapshot]);
+  const flowEnvironments = useMemo(() => {
+    const rows = renderedModel.environments.flatMap((env, index) => {
+      const name = env.name.trim() || `env${index + 1}`;
+      const projectNetwork = env.projectNetworkEnabled !== false && env.network.subnets.length > 0;
+      const targets = bastion?.targets.filter((target) => target.scope === name) ?? [];
+      return projectNetwork || targets.length ? [{ name, roles: projectNetwork ? env.network.subnets.map((sn) => sn.name.split('-').pop() || '') : [],
+        bastionOnly: !projectNetwork, bastionRoles: targets.map((target) => ({ id: target.id, label: target.label })) }] : [];
+    });
+    const shared = bastion?.targets.filter((target) => target.scope === '@shared') ?? [];
+    return [...rows, ...(shared.length ? [{ name: '@shared', label: 'Shared platforms', roles: [], bastionOnly: true,
+      bastionRoles: shared.map((target) => ({ id: target.id, label: target.label })) }] : [])];
+  }, [renderedModel, bastion]);
   React.useEffect(() => {
     setDiagramOpts((previous) => {
-      const activeFlows = previous.activeFlows?.filter((id) => specFromId(renderedModel, id, '') !== null);
+      const activeFlows = previous.activeFlows?.filter((id) => specFromId(renderedModel, id, '', bastion) !== null);
       return activeFlows?.length === previous.activeFlows?.length ? previous : { ...previous, activeFlows };
     });
-  }, [renderedModel]);
-  const supportsFlowTracing = renderedModel.environments.some((env) => env.projectNetworkEnabled !== false && env.network.subnets.length > 0)
+  }, [renderedModel, bastion]);
+  const supportsFlowTracing = flowEnvironments.length > 0
     && ['hub_a', 'hub_b', 'hub_c', 'hub_e'].includes(renderedModel.network.hubKind);
 
   // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
@@ -151,12 +165,12 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       // the picks stay in state and return with Show flows.
       if (!supportsFlowTracing || !diagramOpts.showFlows) return { ...diagramOpts, activeFlows: [], allFlows: false, focusFlow: undefined };
       // A clicked flow only stays selected while it is still being traced.
-      const activeFlows = diagramOpts.activeFlows?.filter((id) => specFromId(renderedModel, id, '') !== null);
-      const traced = diagramOpts.allFlows ? allFlowIds(renderedModel) : activeFlows ?? [];
+      const activeFlows = diagramOpts.activeFlows?.filter((id) => specFromId(renderedModel, id, '', bastion) !== null);
+      const traced = diagramOpts.allFlows ? allFlowIds(renderedModel, bastion) : activeFlows ?? [];
       const focusFlow = traced.some((id) => flowGroup(id) === diagramOpts.focusFlow) ? diagramOpts.focusFlow : undefined;
       return { ...diagramOpts, activeFlows, focusFlow };
     },
-    [diagramOpts, supportsFlowTracing, renderedModel],
+    [diagramOpts, supportsFlowTracing, renderedModel, bastion],
   );
   const effectiveOpts = useMemo<DiagramOptions>(() => flowLayer ? chosenOpts : {
     ...chosenOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [], allFlows: false, focusFlow: undefined,
@@ -212,10 +226,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     () => {
       if (!diagramOnly || !snapshot) return [];
       return effectiveOpts.allFlows
-        ? buildFlowTraces(snapshot.model, allFlowIds(snapshot.model), 'kind', snapshot.preview.tables)
-        : buildFlowTraces(snapshot.model, effectiveOpts.activeFlows ?? [], 'flow', snapshot.preview.tables);
+        ? buildFlowTraces(snapshot.model, allFlowIds(snapshot.model, bastion), 'kind', snapshot.preview.tables, bastion)
+        : buildFlowTraces(snapshot.model, effectiveOpts.activeFlows ?? [], 'flow', snapshot.preview.tables, bastion);
     },
-    [diagramOnly, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot],
+    [diagramOnly, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot, bastion],
   );
   // Manual packet stepping: null = auto-play, a number = that 0-based hop.
   function onFlowStep(id: string, action: 'prev' | 'next' | 'play' | 'goto', hop?: number) {
@@ -372,12 +386,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>
                 <FlowSidebar
+                  bastionAvailable={!!bastion?.targets.length}
                   externalConnections={hybridRoutes(renderedModel)}
                   ingressAvailable={hasHubLoadBalancer(renderedModel)}
-                  environments={renderedModel.environments.filter((env) => env.projectNetworkEnabled !== false).map((e, i) => ({
-                    name: e.name.trim() || `env${i + 1}`,
-                    roles: (e.network?.subnets ?? []).map((sn) => sn.name.split('-').pop() || ''),
-                  }))}
+                  environments={flowEnvironments}
                   active={effectiveOpts.activeFlows ?? []}
                   traces={flowTraces}
                   steps={flowSteps}

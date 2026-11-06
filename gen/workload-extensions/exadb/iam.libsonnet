@@ -1,3 +1,5 @@
+local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
+
 {
   render(inputs)::
     local product = inputs.product;
@@ -407,8 +409,9 @@
       },
     } else {};
 
+    local groups = global_groups + environment_groups + project_groups;
     {
-      groups: global_groups + environment_groups + project_groups,
+      groups: groups,
       policies:
         global_infra_policy
         + global_db_policy
@@ -418,6 +421,12 @@
         + environment_generic_policy
         + shared_infrastructure_use_policy
         + project_policies
-        + platform_acd_read_policy,
+        + platform_acd_read_policy
+        + bastion_policies(
+          inputs.bastion,
+          n,
+          [groups[key].name for key in std.objectFields(groups)],
+          scope.key_segments + ['PLATFORM', scope.platform_name]
+        ),
     },
 }

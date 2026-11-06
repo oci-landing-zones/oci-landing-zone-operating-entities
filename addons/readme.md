@@ -25,6 +25,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 |  | Guidance add-ons | Description |
 |:--:|:-|:-|
 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="28" align="center"> | **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)** | A Landing Zone **training** to learn how to design and run a Landing Zone without code. |
+|  | **[OCI Bastion Access](./oci-bastion/README.md)** | Configure optional hub Bastion access with Blueprint Factory or Studio, then use dynamic SOCKS5 sessions for private database web interfaces and VMs. Includes macOS and Windows guides. |
 | <img src="oci-lz-ai-agent/images/oci-lz-ai-agent-icon.png" height="32" align="center"> | **[OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md)** | Guidelines to use **AI coding agents** for OCI Landing Zone Operating Entities design and review. |
 | <img src="oci-lz-blueprint-factory/images/oci-lz-blueprint-factory-icon.png" height="32" align="center"> | **[OCI LZ Blueprint Factory](/addons/oci-lz-blueprint-factory/README.md)** | Guidance for **config-driven** Landing Zone blueprint generation. |
 | </br><img src="oci-lz-subnetting/content/subnetting.png" height="28" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | **[Subnetting Guide](/addons/oci-lz-subnetting/readme.md)** | Guidelines to design your network subnetting between tenancies, landing zone & workload environments, and regions, **improving your landing zone scalability and planning for your future growth**. |

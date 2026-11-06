@@ -3,6 +3,7 @@ import { emptyLzModel } from '../model/defaults';
 import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
 import { buildConfig } from './lzConfig';
 import { exadataNotificationSource } from './exadata';
+import { validateBastion } from './bastion';
 
 type ObjectValue = Record<string, unknown>;
 export interface ImportedConfig { model: LzModel; warnings: string[] }
@@ -188,6 +189,14 @@ export function importConfig(value: unknown): ImportedConfig {
   };
   if (config.stack_scope !== undefined) model.foundation.stackScope = choice(config.stack_scope, ['complete', 'regional'] as const, 'stack_scope');
   if (config.dr_region !== undefined) model.foundation.drRegion = text(config.dr_region, 'dr_region');
+  const bastion = config.bastion == null ? undefined : object(config.bastion, 'bastion');
+  if (bastion) {
+    model.bastion = { enabled: true,
+      clientCidrs: strings(bastion.client_cidr_block_allow_list, 'bastion.client_cidr_block_allow_list').join('\n'),
+      maxSessionTtlInSeconds: number(bastion.max_session_ttl_in_seconds ?? 3600, 'bastion.max_session_ttl_in_seconds'),
+    };
+    if (validateBastion(model).length) invalid('bastion');
+  }
   if (config.remote_peering_connections !== undefined) model.remotePeeringConnections = Object.entries(object(config.remote_peering_connections, 'remote_peering_connections')).map(([name, value], index) => {
     const path = `remote_peering_connections.${name}`;
     const connection = object(value, path);
@@ -261,10 +270,12 @@ export function importConfig(value: unknown): ImportedConfig {
   if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
-  const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
+  const expected: ObjectValue = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     return [name, { ...env, projects: env.projects ?? {}, platforms: env.platforms ?? {} }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
+  if (config.bastion === null) delete expected.bastion;
+  if (bastion) expected.bastion = { ...bastion, max_session_ttl_in_seconds: bastion.max_session_ttl_in_seconds ?? 3600 };
   const diff = difference(expected, buildConfig(model));
   if (diff) invalid(diff);
   return { model, warnings };

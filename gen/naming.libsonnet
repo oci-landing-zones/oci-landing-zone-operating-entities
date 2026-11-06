@@ -26,6 +26,14 @@ function(region_short_name) {
   display(type, segments=[])::
     std.join('-', [std.asciiLower(type), region_lower, 'lz'] + [std.asciiLower(s) for s in segments]),
 
+  // Bastion service names accept alphanumeric characters only.
+  bastion_name(segments=[])::
+    std.join('', [
+      character
+      for character in std.stringChars(self.display('bastion', segments))
+      if std.member('abcdefghijklmnopqrstuvwxyz0123456789', character)
+    ]),
+
   // Landing-zone-global display name (lowercase, no region): cmp-lz-prod
   display_global(type, segments=[])::
     std.join('-', [std.asciiLower(type), 'lz'] + [std.asciiLower(s) for s in segments]),

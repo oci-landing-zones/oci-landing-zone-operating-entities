@@ -50,6 +50,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       product: product,
       naming: n,
       descriptions: descriptions,
+      bastion: if std.objectHas(params, 'bastion') then params.bastion else null,
       model: model,
       scope: scope,
       tag_key: tag_key,

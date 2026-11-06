@@ -36,24 +36,38 @@ export interface FlowChoice {
   id: string;
   label: string;
   sub: string;
+  roles?: { id: string; label: string }[];
+}
+
+export interface FlowEnvironment {
+  name: string;
+  label?: string;
+  bastionOnly?: boolean;
+  bastionRoles?: { id: string; label: string }[];
 }
 
 /** Concrete choices for one source environment, including every east-west destination. */
-export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = []): FlowChoice[] {
+export function flowChoices(environments: FlowEnvironment[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = [], bastionAvailable = false): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
-  const sourceLabel = source.name;
+  const sourceLabel = source.label ?? source.name;
+  const bastionChoice = bastionAvailable && source.bastionRoles?.length !== 0 ? [{
+    id: flowId(source.name, 'bastion'), label: `Operator → ${sourceLabel}`, sub: 'Bastion SOCKS5 route preview',
+    ...(source.bastionRoles ? { roles: source.bastionRoles } : {}),
+  }] : [];
+  if (source.bastionOnly) return bastionChoice;
   return [
     { id: flowId(source.name, 'egress'), label: `${sourceLabel} → Internet`, sub: 'egress' },
     ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: `Internet → ${sourceLabel}`, sub: 'ingress' }] : []),
     ...environments
-      .filter((_, index) => index !== sourceIndex)
+      .filter((destination, index) => index !== sourceIndex && !destination.bastionOnly)
       .map((destination) => ({
         id: `${source.name}>${destination.name}:east-west`,
         label: `${sourceLabel} → ${destination.name}`,
         sub: 'east-west',
       })),
     { id: flowId(source.name, 'services'), label: `${sourceLabel} → OCI Services`, sub: 'Service Gateway' },
+    ...bastionChoice,
     ...externalConnections.flatMap((connection) => [
       { id: flowId(source.name, `hybrid-out@${connection.id}`), label: `${sourceLabel} → ${connection.name}`, sub: connection.type },
       { id: flowId(source.name, `hybrid-in@${connection.id}`), label: `${connection.name} → ${sourceLabel}`, sub: connection.type },
@@ -177,11 +191,12 @@ const styles = {
 const picked = (color: string): React.CSSProperties => ({ background: `${color}1f`, color: oracle.ink, border: `1px solid ${color}` });
 
 /** Hop list, step controls and inspection summary for one traced endpoint. */
-function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: {
+function FlowDetail({ trace, step, roles, focus, labels, onFocus, onStep, onHoverHop }: {
   trace: FlowTrace;
   step: number | null | undefined;
   roles: string[];
   focus: string;
+  labels?: Record<string, string>;
   onFocus: (role: string) => void;
   onStep: (action: 'prev' | 'next' | 'play' | 'goto', hop?: number) => void;
   onHoverHop: (hop: number | undefined) => void;
@@ -198,13 +213,14 @@ function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: 
           : inspections > 0 ? <span style={{ ...styles.badge, ...styles.badgeOk }}>Firewall inspected{inspections > 1 ? ` ×${inspections}` : ''}</span>
           : <span style={{ ...styles.badge, ...styles.badgeNone }}>No firewall in path</span>}
       </div>
+      {trace.note && <p style={styles.stepInfo}>{trace.note}</p>}
       {roles.length > 1 && (
         <div style={styles.focusRow} role="group" aria-label="Show hops for endpoint">
           <span style={styles.chipLabel}>Hops for</span>
           {roles.map((role) => (
             <button key={role} type="button" aria-pressed={role === focus} onClick={() => onFocus(role)}
               style={{ ...styles.focusBtn, ...(role === focus ? picked(trace.color) : null) }}>
-              {role}
+              {labels?.[role] ?? role}
             </button>
           ))}
         </div>
@@ -240,15 +256,16 @@ function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: 
   );
 }
 
-const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out'];
+const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out', 'bastion'];
 
 export default function FlowSidebar({
   environments, externalConnections = [], active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
-  allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true,
+  allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true, bastionAvailable = false,
 }: {
-  environments: { name: string; roles: string[] }[];
+  environments: (FlowEnvironment & { roles: string[] })[];
   externalConnections?: { id: string; name: string; type: string }[];
   ingressAvailable?: boolean;
+  bastionAvailable?: boolean;
   active: string[];
   traces: FlowTrace[];
   steps: Record<string, number | null | undefined>;
@@ -313,11 +330,12 @@ export default function FlowSidebar({
     onChange([...next]);
   };
 
+  const rolesFor = (env: { roles: string[] }, choice: FlowChoice) => choice.roles?.map((role) => role.id) ?? env.roles;
   const clearEnvironment = (env: { name: string; roles: string[] }, choices: FlowChoice[]) => {
     const next = new Set(set);
     choices.forEach((choice) => {
       next.delete(choice.id);
-      env.roles.forEach((role) => next.delete(`${choice.id}:${role}`));
+      rolesFor(env, choice).forEach((role) => next.delete(`${choice.id}:${role}`));
     });
     onChange([...next]);
   };
@@ -346,7 +364,7 @@ export default function FlowSidebar({
         {allFlows ? (
           <>
             <div style={styles.legend} aria-label="Traffic types">
-              {KIND_ORDER.map((kind) => (
+              {KIND_ORDER.filter((kind) => kind !== 'bastion' || bastionAvailable).map((kind) => (
                 <span key={kind} style={styles.legendItem}>
                   <span style={{ ...styles.legendLine, background: FLOW_KIND_COLORS[kind] }} />
                   {FLOW_KIND_LABELS[kind]}
@@ -354,7 +372,7 @@ export default function FlowSidebar({
               ))}
             </div>
             {environments.map((env, envIndex) => {
-              const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
+              const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections, bastionAvailable);
               const hasSelected = choices.some((choice) => choice.id === selected);
               const open = hasSelected || (openEnvs[env.name] ?? true);
               return (
@@ -363,7 +381,7 @@ export default function FlowSidebar({
                     <button type="button" style={styles.envToggle} aria-expanded={open}
                       onClick={() => setOpenEnvs((prev) => ({ ...prev, [env.name]: !open }))}>
                       <span aria-hidden="true">{open ? '▾' : '▸'}</span>
-                      <span>{env.name}</span>
+                      <span>{env.label ?? env.name}</span>
                     </button>
                   </div>
                   {open && choices.map((choice) => {
@@ -409,8 +427,8 @@ export default function FlowSidebar({
           <div style={styles.empty}>No environments yet — add one in the form to pick flows.</div>
         ) : (
           environments.map((env, envIndex) => {
-            const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
-            const activeChoices = choices.filter((choice) => set.has(choice.id) || env.roles.some((role) => set.has(`${choice.id}:${role}`)));
+            const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections, bastionAvailable);
+            const activeChoices = choices.filter((choice) => set.has(choice.id) || rolesFor(env, choice).some((role) => set.has(`${choice.id}:${role}`)));
             const open = choices.some((choice) => choice.id === selected) || (openEnvs[env.name] ?? (envIndex === 0 || activeChoices.length > 0));
             return (
               <div key={env.name} style={styles.envGroup}>
@@ -418,19 +436,21 @@ export default function FlowSidebar({
                   <button type="button" style={styles.envToggle} aria-expanded={open}
                     onClick={() => setOpenEnvs((prev) => ({ ...prev, [env.name]: !open }))}>
                     <span aria-hidden="true">{open ? '▾' : '▸'}</span>
-                    <span>{env.name}</span>
+                    <span>{env.label ?? env.name}</span>
                     {activeChoices.length > 0 && <span style={styles.envCount}>{activeChoices.length}</span>}
                   </button>
                   {activeChoices.length > 0 && <button type="button" style={styles.envLink} onClick={() => clearEnvironment(env, choices)}>Clear</button>}
                 </div>
                 {open && choices.map((choice) => {
                   const allId = choice.id;
-                  const roleIds = env.roles.map((r) => `${allId}:${r}`);
+                  const roles = rolesFor(env, choice);
+                  const labels = Object.fromEntries(choice.roles?.map((role) => [role.id, role.label]) ?? []);
+                  const roleIds = roles.map((r) => `${allId}:${r}`);
                   const allOn = set.has(allId);
-                  const traced = selectedRoles(set, allId, env.roles);
+                  const traced = selectedRoles(set, allId, roles);
                   const isActive = allOn || traced.length > 0;
                   const focusRole = traced.includes(focus[allId]) ? focus[allId] : traced[0];
-                  const trace = isActive ? (focusRole ? traceFor(allId, env.roles, focusRole) : traces.find((t) => t.id.startsWith(`${allId}#`))) : undefined;
+                  const trace = isActive ? (focusRole ? traceFor(allId, roles, focusRole) : traces.find((t) => t.id.startsWith(`${allId}#`))) : undefined;
                   const color = trace?.color ?? oracle.ink;
                   return (
                     <div key={choice.id} id={`lz-flow-${allId}`}
@@ -442,7 +462,7 @@ export default function FlowSidebar({
                           checked={isActive}
                           disabled={!isActive && capped}
                           aria-label={`Trace ${choice.label} for ${env.name}`}
-                          onChange={() => onChange(toggleFlow(active, allId, env.roles))}
+                          onChange={() => onChange(toggleFlow(active, allId, roles))}
                         />
                         {isActive && <span style={{ ...styles.swatch, background: color }} />}
                         <span>
@@ -451,10 +471,10 @@ export default function FlowSidebar({
                         </span>
                         {selected === allId && <span style={styles.selectedTag}>Selected</span>}
                       </label>
-                      {isActive && env.roles.length > 0 && (
+                      {isActive && roles.length > 0 && (
                         <div style={styles.chipsRow} role="group" aria-label={`Endpoints traced for ${choice.label}`}>
                           <span style={styles.chipLabel}>Endpoints</span>
-                          {env.roles.map((r) => {
+                          {roles.map((r) => {
                             const rid = `${allId}:${r}`;
                             const on = allOn || set.has(rid);
                             return (
@@ -462,18 +482,18 @@ export default function FlowSidebar({
                                 type="button"
                                 key={r}
                                 aria-pressed={on}
-                                title={on ? `Stop tracing ${r}` : `Also trace ${r}`}
+                                title={on ? `Stop tracing ${labels[r] ?? r}` : `Also trace ${labels[r] ?? r}`}
                                 onClick={() => toggleRole(allId, rid, roleIds)}
                                 style={{ ...styles.chip, ...(on ? picked(color) : styles.chipOff) }}
                               >
-                                {r}
+                                {labels[r] ?? r}
                               </button>
                             );
                           })}
-                          {env.roles.length > 1 && (
+                          {roles.length > 1 && (
                             <button type="button" aria-pressed={allOn} title={allOn ? 'Trace only the first endpoint' : 'Trace every endpoint'}
                               // Turning "all" off drops back to the default single endpoint (untick, then re-tick).
-                              onClick={() => (allOn ? onChange(toggleFlow(toggleFlow(active, allId, env.roles), allId, env.roles)) : toggleAll(allId, roleIds))}
+                              onClick={() => (allOn ? onChange(toggleFlow(toggleFlow(active, allId, roles), allId, roles)) : toggleAll(allId, roleIds))}
                               style={{ ...styles.chip, ...(allOn ? picked(color) : styles.chipOff) }}>
                               all
                             </button>
@@ -485,6 +505,7 @@ export default function FlowSidebar({
                           trace={trace}
                           step={steps[allId]}
                           roles={traced}
+                          labels={labels}
                           focus={focusRole ?? ''}
                           onFocus={(role) => setFocus((prev) => ({ ...prev, [allId]: role }))}
                           onStep={(action, hop) => onStep(allId, action, hop)}

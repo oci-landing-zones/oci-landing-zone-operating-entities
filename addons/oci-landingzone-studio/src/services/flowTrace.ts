@@ -5,11 +5,13 @@ import { hasHubLoadBalancer } from './hubKinds';
 import { contains, hostIpInSubnet, parseCidr } from './cidr';
 
 import { hybridRoutes, vpnCpeNodeId } from './hybridConnectivity';
+import type { BastionTarget, BastionTopology } from './bastionTopology';
 
-export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services' | 'hybrid-in' | 'hybrid-out';
+export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services' | 'hybrid-in' | 'hybrid-out' | 'bastion';
 
 /** A resolved flow to trace. Subnet indices default to 0 (web). */
 export interface FlowSpec {
+  bastionTarget?: BastionTarget;
   hybridId?: string;
   id: string;
   kind: FlowKind;
@@ -37,6 +39,7 @@ export interface FlowHop {
 export interface FlowSegment { from: string; to: string }
 
 export interface FlowTrace {
+  note?: string;
   id: string;
   kind: FlowKind;
   color: string;
@@ -67,6 +70,7 @@ export const FLOW_KIND_COLORS: Record<FlowKind, string> = {
   ingress: '#d03f86',
   'hybrid-in': '#d03f86',
   'hybrid-out': '#2a78d6',
+  bastion: '#d03f86',
 };
 
 export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
@@ -76,18 +80,19 @@ export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
   services: 'Spoke → OCI Services',
   'hybrid-in': 'External network → Spoke',
   'hybrid-out': 'Spoke → External network',
+  bastion: 'Operator → private endpoint',
 };
 
 /**
  * Every flow in the landing zone, traced from each environment's first endpoint:
  * egress, ingress, east-west to every other environment, and OCI services.
  */
-export function allFlowIds(model: LzModel): string[] {
+export function allFlowIds(model: LzModel, bastion?: BastionTopology): string[] {
   const envs = model.environments.filter((env) => env.projectNetworkEnabled !== false && env.network.subnets.length > 0).map((env) => ({
     name: env.name.trim(),
     role: env.network?.subnets?.[0]?.name.split('-').pop() ?? '',
   })).filter((env) => env.name);
-  return envs.flatMap((env) => {
+  const ordinary = envs.flatMap((env) => {
     const pick = (id: string) => (env.role ? `${id}:${env.role}` : id);
     return [
       pick(`${env.name}:egress`),
@@ -97,6 +102,8 @@ export function allFlowIds(model: LzModel): string[] {
       ...hybridRoutes(model).flatMap((connection) => [pick(`${env.name}:hybrid-in@${connection.id}`), pick(`${env.name}:hybrid-out@${connection.id}`)]),
     ];
   });
+  const scopes = [...new Set(bastion?.targets.map((target) => target.scope) ?? [])];
+  return [...ordinary, ...(model.bastion?.enabled && bastion ? scopes.map((scope) => `${scope}:bastion:${bastion.targets.find((target) => target.scope === scope)!.id}`) : [])];
 }
 
 const fwIp = (cidr: string) => hostIpInSubnet(cidr, 10);
@@ -113,6 +120,11 @@ function buildTopo(model: LzModel, tables: RouteTable[]) {
     const matches = tablesFor(node, kind);
     return matches.length === 1 ? matches[0] : undefined;
   };
+  const attachmentVcns = new Map(tables.flatMap((table) => table.associations)
+    .filter((binding) => binding.kind === 'drg-attachment' && binding.vcnNodeId)
+    .map((binding) => [binding.nodeId, binding.vcnNodeId!]));
+  const subnetNames = new Map(tables.flatMap((table) => table.associations)
+    .filter((binding) => binding.subnet?.name).map((binding) => [binding.nodeId, binding.subnet!.name]));
   const hubSub = (suffix: string) => {
     const key = suffix.replace(/^-/, '');
     const i = model.network.subnets.findIndex((sn) => sn.name === key || sn.name.endsWith(suffix));
@@ -151,9 +163,9 @@ function buildTopo(model: LzModel, tables: RouteTable[]) {
     const subnet = node.match(/^cmp-env-(\d+)-vcn-sn-(\d+)$/);
     if (subnet) return `${envs[+subnet[1]]?.name ?? ''} ${envs[+subnet[1]]?.subnets[+subnet[2]]?.role ?? ''}`.trim();
     const hub = node.match(/^hub-vcn-sn-(\d+)$/);
-    return hub ? model.network.subnets[+hub[1]]?.name ?? node : node;
+    return hub ? model.network.subnets[+hub[1]]?.name ?? node : subnetNames.get(node) ?? node;
   };
-  return { tableFor, hasConflictingBinding: (node: string, kind: RouteTable['associations'][number]['kind']) => tablesFor(node, kind).length > 1, fwNodes, trust, untrust, lb, envs, human, externalEndpoints };
+  return { tableFor, attachmentVcns, hasConflictingBinding: (node: string, kind: RouteTable['associations'][number]['kind']) => tablesFor(node, kind).length > 1, fwNodes, trust, untrust, lb, envs, human, externalEndpoints };
 }
 type Topo = ReturnType<typeof buildTopo>;
 
@@ -206,7 +218,7 @@ function deliverLocal(topo: Topo, acc: Acc, rule: RouteRule, destination: string
 }
 
 /** Route bindings distinguish VCN→DRG and DRG→VCN; they are never interchangeable. */
-function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: number | 'hub'; kind?: RouteTable['associations'][number]['kind'] }, dstNode: string | null) {
+function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: number | string; kind?: RouteTable['associations'][number]['kind'] }, dstNode: string | null) {
   let node = start.node;
   let zone = start.zone;
   let kind: RouteTable['associations'][number]['kind'] = start.kind ?? 'subnet';
@@ -219,7 +231,10 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
     switch (rule.nextHopKind) {
       case 'local': deliverLocal(topo, acc, rule, dstNode); return;
       case 'drg': {
-        node = zone === 'hub' ? 'attach-hub' : `attach-cmp-env-${zone}`;
+        const vcn = zone === 'hub' ? 'hub-vcn' : typeof zone === 'number' ? `cmp-env-${zone}-vcn` : zone;
+        node = [...topo.attachmentVcns].find(([, owner]) => owner === vcn)?.[0]
+          ?? (zone === 'hub' ? 'attach-hub' : typeof zone === 'number' ? `attach-cmp-env-${zone}` : '');
+        if (!node) { acc.ok = false; return; }
         pushVisual(acc, node);
         pushVisual(acc, 'drg');
         kind = 'drg-attachment';
@@ -230,9 +245,9 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
         if (!node) { acc.ok = false; return; }
         pushVisual(acc, node);
         const destination = node.match(/^attach-cmp-env-(\d+)$/);
-        const vcn = node === 'attach-hub' ? 'hub-vcn' : destination ? `cmp-env-${destination[1]}-vcn` : '';
+        const vcn = topo.attachmentVcns.get(node) ?? (node === 'attach-hub' ? 'hub-vcn' : destination ? `cmp-env-${destination[1]}-vcn` : '');
         if (!vcn) { acc.ok = false; return; }
-        zone = node === 'attach-hub' ? 'hub' : +destination![1];
+        zone = node === 'attach-hub' ? 'hub' : destination ? +destination[1] : vcn;
         if (topo.hasConflictingBinding(vcn, 'vcn-ingress')) { acc.ok = false; return; }
         const ingress = topo.tableFor(vcn, 'vcn-ingress');
         if (ingress) {
@@ -254,7 +269,7 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
           kind = 'subnet';
           break;
         }
-        if (!dstNode || !destination || !dstNode.startsWith(`cmp-env-${destination[1]}-vcn-sn-`)) { acc.ok = false; return; }
+        if (!dstNode || !dstNode.startsWith(vcn + '-sn-')) { acc.ok = false; return; }
         pushVisual(acc, dstNode);
         hop(acc, dstNode, `→ ${topo.human(dstNode)}`);
         return;
@@ -302,7 +317,7 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
   acc.ok = false;
 }
 
-export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] = []): FlowTrace {
+export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] = [], bastion?: BastionTopology): FlowTrace {
   const topo = buildTopo(model, tables);
   const acc: Acc = { hops: [], visual: [], highlights: new Map(), ok: true };
   const source = topo.envs[spec.srcEnv];
@@ -312,6 +327,19 @@ export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] =
   const srcTag = `${source?.name ?? ''} ${srcSub?.role ?? 'vm'}`.trim();
   const backend = dstSub ?? srcSub;
   const dstTag = `${destination?.name ?? source?.name ?? ''} ${backend?.role ?? ''}`.trim();
+  if (spec.kind === 'bastion') {
+    const target = spec.bastionTarget;
+    const label = `Operator → ${target?.label ?? 'private endpoint'} (Bastion route preview)`;
+    if (!model.bastion?.enabled || !bastion || !target) return finish(spec, { ...acc, ok: false }, label);
+    pushVisual(acc, 'bastion-operator');
+    hop(acc, 'bastion-operator', 'Operator workstation: SOCKS5 through an encrypted SSH session');
+    pushVisual(acc, bastion.serviceNode);
+    hop(acc, bastion.serviceNode, `${bastion.name}: OCI Bastion dynamic session`);
+    pushVisual(acc, bastion.subnetNode);
+    walk(topo, acc, { node: bastion.subnetNode, dest: host32(target.cidr), zone: 'hub' }, target.node);
+    if (acc.visual.at(-1) !== target.node) acc.ok = false;
+    return { ...finish(spec, acc, label), note: 'Configured route preview. Validate session access, target NSG/security rules and firewall policy. Routed spoke access is beyond Oracle’s documented Bastion VCN boundary.' };
+  }
   if (spec.kind === 'hybrid-in' || spec.kind === 'hybrid-out') {
     const connection = hybridRoutes(model).find((entry) => entry.id === spec.hybridId);
     const local = spec.kind === 'hybrid-in' ? backend : srcSub;
@@ -369,10 +397,15 @@ function finish(spec: FlowSpec, acc: Acc, label: string): FlowTrace {
  * into a FlowSpec against the model. East-west without an explicit dest defaults
  * to the first other environment.
  */
-export function specFromId(model: LzModel, id: string, color: string): FlowSpec | null {
+export function specFromId(model: LzModel, id: string, color: string, bastion?: BastionTopology): FlowSpec | null {
   const [scope, kindPart, role] = id.split(':');
   const [kind, hybridId] = (kindPart ?? '').split('@');
-  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out'].includes(kind)) return null;
+  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out', 'bastion'].includes(kind)) return null;
+  if (kind === 'bastion' && (!model.bastion?.enabled || !bastion)) return null;
+  if (kind === 'bastion') {
+    if (!bastion!.targets.some((target) => target.scope === scope && (!role || target.id === role))) return null;
+    return { id, kind, color, srcEnv: -1 };
+  }
   if (kind === 'ingress' && !hasHubLoadBalancer(model)) return null;
   const available = (index: number) => index >= 0 && model.environments[index].projectNetworkEnabled !== false
     && model.environments[index].network.subnets.length > 0;
@@ -403,7 +436,7 @@ export function specFromId(model: LzModel, id: string, color: string): FlowSpec 
  * web/app/db/infra together — with sub-trace ids `<baseId>#<subnetIdx>` that all
  * share the base flow's colour. A distinct colour is assigned per base flow.
  */
-export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'flow' | 'kind' = 'flow', tables: RouteTable[] = []): FlowTrace[] {
+export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'flow' | 'kind' = 'flow', tables: RouteTable[] = [], bastion?: BastionTopology): FlowTrace[] {
   const out: FlowTrace[] = [];
   // `<env>:<kind>` = all endpoints; `<env>:<kind>:<role>` = a single endpoint.
   const allPicks = new Set(activeIds.filter((id) => id.split(':').length === 2));
@@ -419,8 +452,15 @@ export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'f
     const role = parts.length >= 3 ? parts[2] : undefined;
     // Skip a specific-endpoint pick that's already covered by its all-endpoints pick.
     if (role && allPicks.has(`${parts[0]}:${parts[1]}`)) return;
-    const base = specFromId(model, id, color);
+    const base = specFromId(model, id, color, bastion);
     if (!base) return;
+    if (base.kind === 'bastion') {
+      bastion!.targets.filter((target) => target.scope === parts[0] && (!role || target.id === role)).forEach((target, index) => {
+        const trace = traceFlow(model, { ...base, id: `${id}#${index}`, bastionTarget: target }, tables, bastion);
+        if (trace.hops.length) out.push(trace);
+      });
+      return;
+    }
     const env = model.environments[base.srcEnv];
     const roleIdx = (r: string) => env ? env.network.subnets.findIndex((sn) => (sn.name.split('-').pop() || '') === r) : -1;
     const idxs = role ? [roleIdx(role)].filter((k) => k >= 0) : (env ? env.network.subnets.map((_, k) => k) : [0]);
@@ -440,7 +480,7 @@ export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'f
         srcSubnet: base.kind === 'ingress' ? base.srcSubnet : k,
         dstSubnet: base.kind === 'hybrid-in' ? k : dstSubnet,
       };
-      const trace = traceFlow(model, spec, tables);
+      const trace = traceFlow(model, spec, tables, bastion);
       if (trace.hops.length > 0) out.push(trace);
     }
   });
