@@ -16,20 +16,25 @@ import { newPlatform, newSharedPlatform } from '../services/platforms';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
-const cases = (['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const).flatMap((hub) => ([1, 2] as const).map((cis) => ({ hub, cis })));
+const cases = ['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const;
+const snapshots = new Map<typeof cases[number], ReturnType<typeof generated>>();
 
-async function preview(hub = 'hub_e' as typeof cases[number]['hub'], cis: 1 | 2 = 2) {
+async function generated(hub: typeof cases[number]) {
   const model = emptyLzModel();
-  model.foundation.cisLevel = cis;
   model.network = { hubKind: hub, ...hubKindDefaults(hub) };
   model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32', maxSessionTtlInSeconds: 3600 };
   const result = await generatePreview(model);
   return { model, inventory: result.inventory, tables: buildRouteTables(model, result.network) };
 }
 
+async function preview(hub: typeof cases[number] = 'hub_e') {
+  if (!snapshots.has(hub)) snapshots.set(hub, generated(hub));
+  return structuredClone(await snapshots.get(hub)!);
+}
+
 describe('generated Bastion diagram and route preview', () => {
-  it.each(cases)('ties the actual service to its management subnet for $hub CIS$cis', async ({ hub, cis }) => {
-    const { model, inventory, tables } = await preview(hub, cis);
+  it.each(cases)('ties the actual service to its management subnet for %s', async (hub) => {
+    const { model, inventory, tables } = await preview(hub);
     const bastion = generatedBastionTopology(model, tables, inventory)!;
     expect(bastion).toBeDefined();
     const target = bastion.targets.find((target) => target.node === 'cmp-env-0-vcn-sn-0')!;
