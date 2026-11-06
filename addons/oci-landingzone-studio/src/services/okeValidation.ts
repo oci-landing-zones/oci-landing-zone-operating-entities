@@ -1,5 +1,4 @@
 import type { LzModel, PlatformConfig } from '../model/types';
-import { OKE_VERSION_SUGGESTIONS } from './okeVersions';
 import { normalizeCidr, overlaps, parseCidr, validateSubnetCidr } from './cidr';
 import { okeProfileCidrError, platformInEnv, platformVcnForEnv } from './platforms';
 
@@ -12,7 +11,7 @@ export function okePlatformIssues(platform: PlatformConfig): { field: string; me
   if (!p) return [{ field: 'settings', message: 'OKE settings are required.' }];
   const errors: { field: string; message: string }[] = [];
   const add = (field: string, message: string) => errors.push({ field, message });
-  if (!OKE_VERSION_SUGGESTIONS.some((version) => version === p.kubernetesVersion)) add('kubernetesVersion', 'Select a Kubernetes version from the list.');
+  if (!/^v?\d+\.\d+\.\d+$/.test(p.kubernetesVersion)) add('kubernetesVersion', 'Enter a Kubernetes version, for example v1.36.4.');
   for (const cidr of p.peerVcnCidrs ?? []) {
     if (!parseCidr(cidr) || normalizeCidr(cidr) !== cidr || cidr === '0.0.0.0/0') add('peerVcnCidrs', 'Peer CIDRs must be IPv4 network addresses; 0.0.0.0/0 is not allowed.');
   }

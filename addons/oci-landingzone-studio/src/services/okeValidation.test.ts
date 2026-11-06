@@ -53,3 +53,16 @@ it('validates explicit peer CIDRs and rejects overlap with an OKE environment VC
   platform.okeParams!.peerVcnCidrs = ['10.50.0.0/16'];
   expect(validateOkeModel(model)).toEqual([]);
 });
+
+
+it.each(['v1.36.4', 'v1.40.2', '1.40.2'])('allows a manually entered Kubernetes version %s', (kubernetesVersion) => {
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.kubernetesVersion = kubernetesVersion;
+  expect(validateOkePlatform(platform)).toEqual([]);
+});
+
+it.each(['', 'latest', '1.36'])('rejects an incomplete Kubernetes version %s', (kubernetesVersion) => {
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.kubernetesVersion = kubernetesVersion;
+  expect(validateOkePlatform(platform)).toContain('Enter a Kubernetes version, for example v1.36.4.');
+});

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildConfig, serializeConfig } from './lzConfig';
+import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
@@ -270,4 +270,10 @@ describe('serializeConfig', () => {
     expect(out).toContain('security_targets: [],');
     expect(out).toContain('subnets: {},');
   });
+});
+
+
+it.each(['1.40.2', 'v1.40.2'])('exports manually entered Kubernetes version %s in OCI format', (kubernetesVersion) => {
+  const params = newPlatform('oke_simple', []).okeParams!;
+  expect(okeExtension({ ...params, kubernetesVersion }).params!.kubernetes_version).toBe('v1.40.2');
 });

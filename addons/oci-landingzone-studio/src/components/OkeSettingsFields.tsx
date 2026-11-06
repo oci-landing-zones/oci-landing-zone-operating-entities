@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { PlatformConfig } from '../model/types';
 import { oracle } from '../theme';
-import { OKE_VERSION_SUGGESTIONS } from '../services/okeVersions';
 import { okeDefaultParams, okeNetworkProfilePatch } from '../services/platforms';
 import { s } from '../wizard/steps/networkEditorStyles';
 import Switch from './Switch';
@@ -38,10 +37,7 @@ export default function OkeSettingsFields({ platform, onPlatform }: { platform: 
                 <div style={local.group}>
                   <div style={local.groupTitle}>Cluster</div>
                   <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label><select id={`${platform.id}-k8s`} {...fieldErrorProps(`${platform.id}-k8s-error`, errors('kubernetesVersion'))} value={oke.kubernetesVersion} onChange={(e) => setOke({ kubernetesVersion: e.target.value })}>
-                      {!OKE_VERSION_SUGGESTIONS.some((version) => version === oke.kubernetesVersion) && <option value={oke.kubernetesVersion} disabled>Select a Kubernetes version</option>}
-                      {OKE_VERSION_SUGGESTIONS.map((version) => <option key={version} value={version}>{version}</option>)}
-                    </select><FieldError id={`${platform.id}-k8s-error`} error={errors('kubernetesVersion')} /></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label><ValidatedInput id={`${platform.id}-k8s`} error={errors('kubernetesVersion')} style={s.rowInput} value={oke.kubernetesVersion} placeholder="v1.36.4" onChange={(e) => setOke({ kubernetesVersion: e.target.value })} /></div>
                     <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                       <legend style={s.addLabel}>API Server allowed CIDRs</legend>
                       {oke.apiAllowedCidrs.map((cidr, index) => <div key={index} style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>

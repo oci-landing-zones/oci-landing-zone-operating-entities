@@ -88,7 +88,7 @@ export function okeExtension(p: NonNullable<PlatformConfig['okeParams']>): NonNu
   return {
     type: 'oke_simple',
     params: {
-      kubernetes_version: p.kubernetesVersion,
+      kubernetes_version: p.kubernetesVersion.startsWith('v') ? p.kubernetesVersion : `v${p.kubernetesVersion}`,
       services_cidr: p.servicesCidr,
       api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
       ...(p.createNodePools === false ? { create_node_pools: false } : {

@@ -101,6 +101,8 @@ it('hides worker settings when creating a cluster without node pools', () => {
   expect(html).not.toContain('Worker node image');
   expect(html).not.toContain('Worker boot volume');
   expect(html).toContain('Kubernetes version');
+  expect(html).toMatch(/<input[^>]*id="oke-k8s"/);
+  expect(html).toContain('value="v1.36.4"');
 });
 
 it('shows default-on worker and pod internet switches, with pods only for native CNI', () => {
