@@ -1,16 +1,16 @@
 {
     "bastions_configuration": {
-        "default_compartment_id"                           : "CMP-FINOPS-KEY",
+        "default_compartment_id"                           : "CMP-LZ-SECURITY-KEY",
         "enable_cidr_check"                                : true,
 
         "bastions": {
-            "BST-FRA-LZ-FINOPS-KEY": {
-                "name"                                     : "bstfralzfinops",
+            "BASTION-FRA-LZ-HUB-KEY": {
+                "name"                                     : "bastionfralzhub",
                 "bastion_type"                             : "STANDARD",
                 "cidr_block_allow_list"                    : ["<YOUR_IP>/32"],
-                "enable_dns_proxy"                         : false,
+                "enable_dns_proxy"                         : true,
                 "max_session_ttl_in_seconds"               : 3600,
-                "subnet_id"                                : "SN-FRA-LZ-FINOPS-INFRA-KEY"
+                "subnet_id"                                : "SN-FRA-LZ-HUB-MGMT-KEY"
             }
         },
 
