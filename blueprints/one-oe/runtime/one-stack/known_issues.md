@@ -51,6 +51,25 @@ The destroy operation will keep failing until you reach the key deletion date. I
 
 &nbsp; 
 
+## Required tags on implicitly created resources
+
+Tags present in a JSON input do not prove that every resource created internally
+by its Terraform module receives them. Review the complete plan before using an
+extension with required Tag Defaults. In particular:
+
+- OCVS module `v1.1.0` accepts tag inputs but does not assign them to its SDDC or
+  VLAN resources. Those resources require a downstream module correction; the
+  generated OCVS payload alone does not resolve this limitation.
+- Compute/storage module `v0.2.9` does not expose/pass tags for the primary VNIC
+  and boot volume created implicitly with an instance. Tagging the instance in
+  DB Observability and other add-ons does not cover those implicit resources.
+
+These module paths require corrections and complete plan verification before
+using required tags. Required defaults do not fill missing values, so a tagged
+input alone is not proof that every implicit resource will receive its labels.
+
+&nbsp;
+
 # License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
