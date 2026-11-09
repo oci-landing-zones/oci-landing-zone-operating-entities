@@ -47,7 +47,7 @@ export const s: Record<string, CSSProperties> = {
   envHeadTitle: { fontSize: 15, fontWeight: 700, color: oracle.ink },
   baseRow:  { display: 'flex', gap: 8, flexWrap: 'wrap' },
   basePill: { minHeight: 44, padding: '7px 12px', fontSize: 13, fontWeight: 600, fontFamily: FONT, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, background: oracle.surface, color: oracle.text, cursor: 'pointer' },
-  basePillActive: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.red },
+  basePillActive: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.redDark },
   derivedNote: { fontSize: 12.5, color: oracle.textMuted, marginBottom: 14, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
 
   calcCard: { marginTop: 18, border: `1px solid ${oracle.border}`, borderRadius: 8, background: oracle.surface, overflow: 'hidden' },

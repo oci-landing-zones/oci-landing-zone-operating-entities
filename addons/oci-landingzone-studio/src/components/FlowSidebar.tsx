@@ -41,31 +41,32 @@ export interface FlowChoice {
 }
 
 /** Concrete choices for one source environment, including every east-west destination. */
-export function flowChoices(environments: { name: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = []): FlowChoice[] {
+export function flowChoices(environments: { name: string; scope?: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = []): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
   const sourceLabel = source.oke ? 'Spoke' : source.name;
+  const sourceScope = source.scope ?? source.name;
   const choices = [
     ...(source.publicLb ? [
-      { id: flowId(source.name, 'lb'), label: 'Hub public LB → Spoke', sub: 'example LB backend' },
-      { id: flowId(source.name, 'lb-return'), label: 'Spoke → Hub public LB (response)', sub: 'LB response' },
+      { id: flowId(sourceScope, 'lb'), label: 'Hub public LB → Spoke', sub: 'example LB backend' },
+      { id: flowId(sourceScope, 'lb-return'), label: 'Spoke → Hub public LB (response)', sub: 'LB response' },
     ] : []),
-    { id: flowId(source.name, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
-    ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' }] : []),
+    { id: flowId(sourceScope, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
+    ...(ingressAvailable ? [{ id: flowId(sourceScope, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' }] : []),
     ...environments
       .filter((_, index) => index !== sourceIndex)
       .map((destination) => ({
-        id: `${source.name}>${destination.name}:east-west`,
+        id: `${sourceScope}>${destination.scope ?? destination.name}:east-west`,
         label: `${sourceLabel} → ${destination.name}`,
         sub: 'east-west',
       })),
     ...environments.filter((destination) => destination.apiServer).map((destination) => ({
-      id: `${source.name}>${destination.name}:api`, label: `Spoke → ${destination.name} API Server`, sub: 'TCP 6443',
+      id: `${sourceScope}>${destination.scope ?? destination.name}:api`, label: `Spoke → ${destination.name} API Server`, sub: 'TCP 6443',
     })),
-    { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
+    { id: flowId(sourceScope, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
     ...externalConnections.flatMap((connection) => [
-      { id: flowId(source.name, `hybrid-out@${connection.id}`), label: `Spoke → ${connection.name}`, sub: connection.type },
-      { id: flowId(source.name, `hybrid-in@${connection.id}`), label: `${connection.name} → Spoke`, sub: connection.type },
+      { id: flowId(sourceScope, `hybrid-out@${connection.id}`), label: `Spoke → ${connection.name}`, sub: connection.type },
+      { id: flowId(sourceScope, `hybrid-in@${connection.id}`), label: `${connection.name} → Spoke`, sub: connection.type },
     ]),
   ].filter((choice) => {
     const [scope, kind] = choice.id.split(':');
@@ -272,7 +273,7 @@ export default function FlowSidebar({
   environments, externalConnections = [], active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
   allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true,
 }: {
-  environments: { name: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; roles: string[]; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[];
+  environments: { name: string; scope?: string; oke?: boolean; apiOnly?: boolean; apiServer?: boolean; publicLb?: boolean; roles: string[]; peersFor?: (role: string, destination: string) => { role: string; cidr: string }[]; rolesFor?: (kind: string, destination?: string) => string[] }[];
   externalConnections?: { id: string; name: string; type: string }[];
   ingressAvailable?: boolean;
   active: string[];
@@ -380,14 +381,15 @@ export default function FlowSidebar({
               ))}
             </div>
             {environments.map((env, envIndex) => {
+              const envScope = env.scope ?? env.name;
               const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
               const hasSelected = choices.some((choice) => choice.id === selected);
-              const open = hasSelected || (openEnvs[env.name] ?? true);
+              const open = hasSelected || (openEnvs[envScope] ?? true);
               return (
-                <div key={env.name} style={styles.envGroup}>
+                <div key={envScope} style={styles.envGroup}>
                   <div style={styles.envHead}>
                     <button type="button" style={styles.envToggle} aria-expanded={open}
-                      onClick={() => setOpenEnvs((prev) => ({ ...prev, [env.name]: !open }))}>
+                      onClick={() => setOpenEnvs((prev) => ({ ...prev, [envScope]: !open }))}>
                       <span aria-hidden="true">{open ? '▾' : '▸'}</span>
                       <span>{env.name}</span>
                     </button>
@@ -435,14 +437,15 @@ export default function FlowSidebar({
           <div style={styles.empty}>No Projects or OKE networks available to trace.</div>
         ) : (
           environments.map((env, envIndex) => {
+            const envScope = env.scope ?? env.name;
             const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
             const activeChoices = choices.filter((choice) => set.has(choice.id) || env.roles.some((role) => set.has(`${choice.id}:${role}`)));
-            const open = choices.some((choice) => choice.id === selected) || (openEnvs[env.name] ?? (envIndex === 0 || activeChoices.length > 0));
+            const open = choices.some((choice) => choice.id === selected) || (openEnvs[envScope] ?? (envIndex === 0 || activeChoices.length > 0));
             return (
-              <div key={env.name} style={styles.envGroup}>
+              <div key={envScope} style={styles.envGroup}>
                 <div style={styles.envHead}>
                   <button type="button" style={styles.envToggle} aria-expanded={open}
-                    onClick={() => setOpenEnvs((prev) => ({ ...prev, [env.name]: !open }))}>
+                    onClick={() => setOpenEnvs((prev) => ({ ...prev, [envScope]: !open }))}>
                     <span aria-hidden="true">{open ? '▾' : '▸'}</span>
                     <span>{env.name}</span>
                     {activeChoices.length > 0 && <span style={styles.envCount}>{activeChoices.length}</span>}

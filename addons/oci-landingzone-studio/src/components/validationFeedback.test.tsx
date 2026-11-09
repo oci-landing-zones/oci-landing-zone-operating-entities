@@ -88,7 +88,7 @@ it('renders API endpoint CIDRs as individually validated list entries', () => {
   expect(html).toContain('API Server allowed CIDR 1');
   expect(html).toContain('API Server allowed CIDR 2');
   expect(html).toContain('Remove API Server CIDR 2');
-  expect(html).toContain('Add CIDR block');
+  expect(html).toMatch(/<button[^>]*>Add CIDR block<\/button>/);
   expectLinkedError(html, `${platform.id}-api-1`);
 });
 
@@ -123,4 +123,25 @@ it('shows default-off peering attachment controls only for supported components'
   expect(render()).toContain('Allow pod spoke connectivity');
   platform.okeParams = { ...platform.okeParams!, cniType: 'overlay', podsCidr: '10.244.0.0/16' };
   expect(render()).not.toContain('Allow pod spoke connectivity');
+});
+
+it.each(['disable worker peering', 'switch pod peering to Flannel'] as const)('keeps invalid peer CIDRs editable after %s', (change) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, peerVcnCidrs: ['10.'],
+    workerSpokeAccess: change === 'disable worker peering', podSpokeAccess: change !== 'disable worker peering' };
+  model.platforms = [platform];
+  const render = () => renderToStaticMarkup(<WizardProvider initialModel={model}><OkeSettingsFields platform={platform} onPlatform={() => {}} /></WizardProvider>);
+  expect(render()).toContain('Peer VCN CIDR 1');
+
+  if (change === 'disable worker peering') platform.okeParams.workerSpokeAccess = false;
+  else platform.okeParams = { ...platform.okeParams, cniType: 'overlay', podsCidr: '10.244.0.0/16' };
+  const html = render();
+  expectLinkedError(html, `${platform.id}-peer-0`);
+  expect(html).toContain('Peer CIDRs must be IPv4 network addresses');
+  expect(html).toContain('Remove peer CIDR 1');
+  expect(html).toMatch(/<button[^>]*>Add peer CIDR block<\/button>/);
+
+  platform.okeParams.peerVcnCidrs = ['10.40.0.0/24'];
+  expect(render()).not.toContain('Peer VCN CIDR blocks');
 });

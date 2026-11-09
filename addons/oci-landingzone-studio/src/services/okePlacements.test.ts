@@ -43,6 +43,19 @@ describe('independent OKE placements', () => {
     expect(createOkeEntries({ ...model, environments: [] }, [])).toEqual([]);
   });
 
+  it('adds OKE only to selected active environments without changing existing cards', () => {
+    const model = emptyLzModel();
+    model.platforms = createOkeEntries(model, []);
+    const before = structuredClone(model.platforms);
+    const occupied = [model.network.hubVcnCidr, ...model.environments.map((env) => env.network.vcnCidr), ...model.platforms.map((platform) => platform.vcnCidr)];
+    const entries = createOkeEntries(model, occupied, 'ok2', [model.environments[1].id, 'removed']);
+    expect(entries.map((entry) => entry.environments)).toEqual([[model.environments[1].id]]);
+    expect(occupied.some((cidr) => overlaps(entries[0].vcnCidr, cidr))).toBe(false);
+    expect(model.platforms).toEqual(before);
+    expect(createOkeEntries(model, occupied, 'ok2', [])).toEqual([]);
+    expect(createOkeEntries(model, occupied, 'ok2', ['removed'])).toEqual([]);
+  });
+
   it('keeps a cluster network stable across environment reorder, profile changes and independent edits', () => {
     const model = emptyLzModel();
     model.platforms = createOkeEntries(model, []);

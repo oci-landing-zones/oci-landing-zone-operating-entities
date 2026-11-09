@@ -50,13 +50,34 @@ describe('Kubernetes API Server flow', () => {
     expect(traces.every((t) => t.segments.length === 1 && !t.segments.some((s) => s.to === 'drg'))).toBe(true);
   });
 
+  it('keeps hub API flows distinct from an environment named Hub', async () => {
+    const { model, oke } = fixture();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    oke.okeParams!.apiAllowedCidrs = [model.network.subnets.find((subnet) => subnet.name === 'mgmt')!.cidr];
+    model.environments[0].name = 'Hub';
+    const picker = flowPickerEnvironments(model);
+    const hubIndex = picker.findIndex((network) => network.apiOnly);
+    const choice = flowChoices(picker, hubIndex).find((entry) => entry.id.includes(':api'))!;
+    expect(choice).toMatchObject({ id: '@hub>Hub/oke:api', label: 'Hub → Hub/oke API Server' });
+    const id = `${choice.id}:mgmt`;
+    expect(allFlowIds(model)).toContain(id);
+    const [trace] = buildFlowTraces(model, [id], 'kind', await generatedRouteTables(model));
+    expect(trace.ok).toBe(true);
+    expect(trace.segments[0].from).toBe('hub-vcn-sn-1');
+    expect(specFromId(model, 'Hub>Hub/oke:api:mgmt', '#000')).toBeNull();
+    expect(specFromId(model, 'Hub:egress:web', '#000')).toMatchObject({ srcEnv: 0 });
+    model.environments[0].name = '@hub';
+    const scopes = flowPickerEnvironments(model).map((network) => network.scope ?? network.name);
+    expect(new Set(scopes).size).toBe(scopes.length);
+  });
+
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('traces allowed hub sources over the generated %s route', async (hubKind) => {
     const { model, oke } = fixture();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const hub = flowNetworks(model).find((n) => n.apiOnly)!;
     const subnet = hub.subnets.find((sn) => sn.role === 'mgmt') ?? hub.subnets[0];
     oke.okeParams!.apiAllowedCidrs = [subnet.cidr];
-    const id = `Hub>prod/oke:api:${subnet.role}`;
+    const id = `@hub>prod/oke:api:${subnet.role}`;
     const [trace] = buildFlowTraces(model, [id], 'kind', await generatedRouteTables(model));
     expect(trace.ok).toBe(true);
     expect(trace.segments[0].from).toBe(subnet.node);

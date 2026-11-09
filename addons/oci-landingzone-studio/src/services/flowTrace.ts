@@ -96,7 +96,8 @@ export function allFlowIds(model: LzModel): string[] {
     const picks = (kind: FlowKind, destination?: typeof source) => {
       const roles = source.subnets.filter((sn) => flowRoleAllowed(source, sn.role, kind, destination));
       if (!roles.length) return [];
-      const scope = destination ? `${source.name}>${destination.name}` : source.name;
+      const sourceScope = source.scope ?? source.name;
+      const scope = destination ? `${sourceScope}>${destination.scope ?? destination.name}` : sourceScope;
       return (source.oke ? roles : roles.slice(0, 1)).flatMap((sn) => {
         const peers = kind === 'east-west' && destination ? flowPeerTargets(source, sn.role, destination) : [];
         return peers.length ? peers.map((peer) => `${scope}:${kind}:${sn.role}:${peer.role}`) : [`${scope}:${kind}:${sn.role}`];
@@ -333,7 +334,8 @@ export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] =
     const connection = hybridRoutes(model).find((entry) => entry.id === spec.hybridId);
     const local = spec.kind === 'hybrid-in' ? backend : srcSub;
     const label = spec.kind === 'hybrid-in' ? `${connection?.name} → ${dstTag}` : `${srcTag} → ${connection?.name}`;
-    if (!connection || !local || !connection.cidrs[0] || !parseCidr(connection.cidrs[0])) return finish(spec, { ...acc, ok: false }, label);
+    if (!connection || !local || !connection.cidrs[0] || !parseCidr(connection.cidrs[0])
+      || !flowRoleAllowed(source, local.role, `${spec.kind}@${connection.id}`)) return finish(spec, { ...acc, ok: false }, label);
     if (spec.kind === 'hybrid-in') {
       pushVisual(acc, topo.externalEndpoints.get(connection.id)!);
       const ingress = connection.type === 'VPN' ? connection.id + ':tunnel-1' : connection.id;
@@ -408,9 +410,9 @@ export function specFromId(model: LzModel, id: string, color: string): FlowSpec 
   if (kind === 'ingress' && !hasHubLoadBalancer(model)) return null;
   const networks = flowNetworks(model);
   const available = (index: number) => index >= 0 && networks[index].available && networks[index].subnets.length > 0;
-  const envIdx = (name: string) => networks.findIndex((e, index) => e.name === name && available(index));
+  const envIdx = (name: string) => networks.findIndex((e, index) => (e.scope ?? e.name) === name && available(index));
   const hasRole = (index: number, destination?: number) => networks[index].subnets.some((subnet) =>
-    (!role || subnet.role === role) && flowRoleAllowed(networks[index], subnet.role, kind, destination === undefined ? undefined : networks[destination], targetRole),
+    (!role || subnet.role === role) && flowRoleAllowed(networks[index], subnet.role, kindPart, destination === undefined ? undefined : networks[destination], targetRole),
   );
 
   if (kind === 'east-west' || kind === 'api') {

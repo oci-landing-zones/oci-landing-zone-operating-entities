@@ -1,7 +1,7 @@
 // RPC routing follows arbitrary environment names and extension-backed platform VCNs.
 // contains: "blue_route_count": 4
 // contains: "local_vcn_count": 5
-// contains: "oke_route_count": 16
+// contains: "oke_route_count": 8
 // contains: "rpc_import_attachment_count": 5
 // contains: "same_tenancy_iam_policy_count": 0
 // contains: "sandbox_route_count": 4

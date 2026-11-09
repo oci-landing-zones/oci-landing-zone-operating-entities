@@ -71,7 +71,7 @@ The first OKE platform starts at `10.0.80.0/20` for the `small` profile. Changin
 
 OKE platforms include a **Create sample node pool** switch, disabled by default. Turn it off for a cluster-only deployment. Worker image and boot-volume fields are hidden, and generated configuration omits worker pools. The cluster and its network/security prerequisites are retained.
 
-Adding OKE creates one independent cluster card for each active environment. Placement is a read-only environment label; network and cluster settings are edited per card. Saved shared OKE entries are expanded into separate cards while preserving each environment’s effective configuration. Custom platforms retain shared placement controls.
+Choose **All** or select individual environments before adding OKE. Studio creates one independent cluster card for each selected environment. Placement is a read-only environment label; network and cluster settings are edited per card. Saved shared OKE entries are expanded into separate cards while preserving each environment’s effective configuration. Custom platforms retain shared placement controls.
 
 Worker and VCN Native pod internet access can be toggled separately; both default to enabled. Disabling access removes the corresponding subnet default route and broad internet NSG egress rule while retaining OCI service access, its opted-in peer CIDRs, and the hub public LB subnet when that feature is enabled. Unselected hub and spoke prefixes are omitted from worker and pod routes. Hub A/B/C use the DRG egress path; Hub E uses its local NAT gateway. Flannel pods share the worker internet setting. These controls prepare network policy for the subnet, including when worker pools are not created.
 

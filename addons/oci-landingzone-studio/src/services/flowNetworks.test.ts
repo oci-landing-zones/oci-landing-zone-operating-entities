@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform } from './platforms';
 import { flowNetworks, flowPickerEnvironments } from './flowNetworks';
-import { allFlowIds, buildFlowTraces, specFromId } from './flowTrace';
+import { allFlowIds, buildFlowTraces, specFromId, traceFlow } from './flowTrace';
 import { generatedRouteTables } from './routingFixtures.testSupport';
 import { hubKindDefaults } from './hubKinds';
 import { flowChoices } from '../components/FlowSidebar';
+import { emptyHybridConnectivity, hybridRoutes, newVpn } from './hybridConnectivity';
 
 function fixture() {
   const model = emptyLzModel();
@@ -61,6 +62,41 @@ describe('OKE flow sources', () => {
     platform.okeParams!.peerVcnCidrs = [];
     expect(picker()[1].rolesFor('east-west', 'prod/oke')).toEqual([]);
     expect(oke().rolesFor('east-west', 'preprod')).toEqual([]);
+  });
+
+  it('applies OKE component peering controls to incoming and outgoing hybrid flows', async () => {
+    const { model, platform } = fixture();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+    hybrid.ipsecs.office = { ...newVpn('office'), remote_cidrs: ['172.20.0.0/16'] };
+    const incoming = 'prod/oke:hybrid-in@hybrid-vpn-office:workers';
+    const outgoing = 'prod/oke:hybrid-out@hybrid-vpn-office:workers';
+    const choices = () => {
+      const picker = flowPickerEnvironments(model);
+      return flowChoices(picker, picker.findIndex((network) => network.oke), false, hybridRoutes(model))
+        .filter((choice) => choice.id.includes(':hybrid-')).map((choice) => choice.id);
+    };
+    expect(choices()).toEqual([]);
+    expect(specFromId(model, incoming, '#000')).toBeNull();
+    const source = flowNetworks(model).findIndex((network) => network.oke);
+    expect(traceFlow(model, { id: incoming, kind: 'hybrid-in', hybridId: 'hybrid-vpn-office', color: '#000', srcEnv: source, dstEnv: source, srcSubnet: 1, dstSubnet: 1 }, await generatedRouteTables(model)).ok).toBe(false);
+    platform.okeParams!.workerSpokeAccess = true;
+    platform.okeParams!.peerVcnCidrs = ['172.21.0.0/16'];
+    expect(choices()).toEqual([]);
+    platform.okeParams!.peerVcnCidrs = ['172.20.0.0/16'];
+    expect(choices()).toEqual([outgoing, incoming]);
+    expect(allFlowIds(model)).toEqual(expect.arrayContaining([incoming, outgoing]));
+    expect(buildFlowTraces(model, [incoming, outgoing], 'kind', await generatedRouteTables(model)).map((trace) => trace.ok)).toEqual([true, true]);
+    platform.okeParams!.peerVcnCidrs = ['172.20.0.0/24'];
+    expect(choices()).toEqual([outgoing, incoming]);
+    expect(buildFlowTraces(model, [incoming, outgoing], 'kind', await generatedRouteTables(model)).map((trace) => trace.ok)).toEqual([true, true]);
+    platform.okeParams!.peerVcnCidrs = ['172.20.1.0/24'];
+    expect(choices()).toEqual([]);
+    platform.okeParams!.workerSpokeAccess = false;
+    platform.okeParams!.workerInternetAccess = true;
+    expect(choices()).toEqual([outgoing]);
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    expect(choices()).toEqual([]);
   });
 
   it.each(['hub_a', 'hub_e'] as const)('traces OKE endpoints through generated %s routes', async (hubKind) => {

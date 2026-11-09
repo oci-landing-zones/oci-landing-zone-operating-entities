@@ -1,15 +1,18 @@
 import type { LzModel, OkePlatformParams } from '../model/types';
 import { contains, hostIpInSubnet } from './cidr';
 import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from './platforms';
+import { hybridRoutes, type HybridRoute } from './hybridConnectivity';
 
 export interface FlowNetwork {
   name: string;
+  scope?: string;
   available: boolean;
   vcnNode: string;
   attachment: string;
   cidr: string;
   oke?: OkePlatformParams;
   internetViaDrg?: boolean;
+  hybridConnections?: HybridRoute[];
   apiOnly?: boolean;
   hubLb?: { cidr: string; node: string };
   apiEndpoint?: { cidr: string; node: string; role: string };
@@ -18,6 +21,9 @@ export interface FlowNetwork {
 
 /** Keep original project indices; append only OKE placements using graph resource IDs. */
 export function flowNetworks(model: LzModel): FlowNetwork[] {
+  const hybridConnections = hybridRoutes(model);
+  let hubScope = '@hub';
+  while (model.environments.some((env) => env.name.trim() === hubScope)) hubScope = `@${hubScope}`;
   const projects: FlowNetwork[] = model.environments.map((env, i) => ({
     name: env.name.trim() || `env${i + 1}`, available: env.projectNetworkEnabled !== false && !!env.network.subnets.length,
     vcnNode: `cmp-env-${i}-vcn`, attachment: `attach-cmp-env-${i}`, cidr: env.network.vcnCidr,
@@ -28,7 +34,7 @@ export function flowNetworks(model: LzModel): FlowNetwork[] {
       if (p.type !== 'oke_simple' || !p.okeParams) return [];
       const vcnNode = `cmp-env-${i}-plat-${slot}`;
       return [{ name: `${env.name.trim()}/${p.key}`, available: true, vcnNode, attachment: `attach-${vcnNode}`,
-        cidr: platformVcnForEnv(p, env.id, i), oke: p.okeParams, internetViaDrg: model.network.hubKind !== 'hub_e',
+        cidr: platformVcnForEnv(p, env.id, i), oke: p.okeParams, internetViaDrg: model.network.hubKind !== 'hub_e', hybridConnections,
         hubLb: p.okeParams.publicLoadBalancer ? model.network.subnets.flatMap((sn, j) => sn.name === 'lb' || sn.name.endsWith('-lb') ? [{ cidr: sn.cidr, node: `hub-vcn-sn-${j}` }] : [])[0] : undefined,
         apiEndpoint: platformSubnetsForEnv(p, env.id, i).flatMap((sn, j) => sn.name === 'control-plane' ? [{ cidr: sn.cidr, node: `${vcnNode}-sn-${j}`, role: 'API Server' }] : [])[0],
         subnets: platformSubnetsForEnv(p, env.id, i).flatMap((sn, j) =>
@@ -36,7 +42,7 @@ export function flowNetworks(model: LzModel): FlowNetwork[] {
       }];
     }),
   )).concat(model.platforms.some((p) => p.type === 'oke_simple') ? [{
-    name: 'Hub', available: true, apiOnly: true, vcnNode: 'hub-vcn', attachment: 'attach-hub', cidr: model.network.hubVcnCidr,
+    name: 'Hub', scope: hubScope, available: true, apiOnly: true, vcnNode: 'hub-vcn', attachment: 'attach-hub', cidr: model.network.hubVcnCidr,
     subnets: model.network.subnets.map((sn, j) => ({ cidr: sn.cidr, node: `hub-vcn-sn-${j}`, role: sn.name.split('-').pop() || `sn${j}` })),
   }] : []);
 }
@@ -79,6 +85,11 @@ export function flowRoleAllowed(source: FlowNetwork, role: string, kind: string,
   }
   if (source.apiOnly || destination?.apiOnly) return false;
   const internet = source.oke ? (role === 'pods' ? source.oke.podInternetAccess : source.oke.workerInternetAccess) !== false : true;
+  const [hybridKind, connectionId] = kind.split('@');
+  if (source.oke && (hybridKind === 'hybrid-in' || hybridKind === 'hybrid-out')) {
+    const remoteCidr = source.hybridConnections?.find((connection) => connection.id === connectionId)?.cidrs[0];
+    return !!remoteCidr && ((hybridKind === 'hybrid-out' && internet && !!source.internetViaDrg) || permitsPeer(source, role, `${hostIpInSubnet(remoteCidr, 10)}/32`));
+  }
   if (kind === 'egress') return internet;
   if (kind === 'ingress') return !source.oke;
   if (kind !== 'east-west' || !destination) return true;
@@ -93,13 +104,13 @@ export function flowRoleAllowed(source: FlowNetwork, role: string, kind: string,
 
 export function flowPickerEnvironments(model: LzModel) {
   const networks = flowNetworks(model).filter((network) => network.available && network.subnets.length);
-  return networks.filter((network) => !network.apiOnly || networks.some((target) => network.subnets.some((sn) => flowRoleAllowed(network, sn.role, 'api', target)))).map((network) => ({ name: network.name, oke: !!network.oke, apiOnly: !!network.apiOnly, apiServer: !!network.apiEndpoint, publicLb: !!network.hubLb,
+  return networks.filter((network) => !network.apiOnly || networks.some((target) => network.subnets.some((sn) => flowRoleAllowed(network, sn.role, 'api', target)))).map((network) => ({ name: network.name, scope: network.scope, oke: !!network.oke, apiOnly: !!network.apiOnly, apiServer: !!network.apiEndpoint, publicLb: !!network.hubLb,
     peersFor: (role: string, destination: string) => {
-      const target = networks.find((n) => n.name === destination);
+      const target = networks.find((n) => (n.scope ?? n.name) === destination);
       return target ? flowPeerTargets(network, role, target).map((sn) => ({ role: sn.role, cidr: sn.cidr })) : [];
     }, roles: network.subnets.map((sn) => sn.role),
     rolesFor: (kind: string, destination?: string) => network.subnets.filter((sn) =>
-      flowRoleAllowed(network, sn.role, kind, networks.find((n) => n.name === destination)),
+      flowRoleAllowed(network, sn.role, kind, networks.find((n) => (n.scope ?? n.name) === destination)),
     ).map((sn) => sn.role),
   }));
 }

@@ -27,10 +27,11 @@ export function splitOkePlacements(model: LzModel): LzModel {
   return { ...model, platforms };
 }
 
-/** One new, independent cluster card per currently active environment. */
-export function createOkeEntries(model: LzModel, occupied: string[], key?: string): PlatformConfig[] {
-  if (!model.environments.length) return [];
+/** One new, independent cluster card per selected active environment. */
+export function createOkeEntries(model: LzModel, occupied: string[], key?: string, placements: PlatformConfig['environments'] = 'all'): PlatformConfig[] {
+  if (!model.environments.some((env) => placements === 'all' || placements.includes(env.id))) return [];
   const template = newPlatform('oke_simple', model.platforms, model.environments, occupied, model.network);
+  template.environments = placements;
   if (key?.trim()) template.key = key.trim();
   const entries = splitOkePlacements({ ...model, platforms: [template] }).platforms;
   const used = [...occupied];
