@@ -9,7 +9,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "ocvs",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "ocvs_clusters": {
@@ -32,7 +32,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "ocvs",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "networking": {

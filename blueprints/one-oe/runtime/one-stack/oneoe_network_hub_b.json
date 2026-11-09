@@ -35,7 +35,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -55,7 +55,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -75,7 +75,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -95,7 +95,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -115,7 +115,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -130,7 +130,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -173,7 +173,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -209,7 +209,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -245,7 +245,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -295,7 +295,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -340,7 +340,7 @@
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
                                 "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                             }
                         },
 
@@ -393,7 +393,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -445,7 +445,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -506,7 +506,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -601,7 +601,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -674,7 +674,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -685,7 +685,7 @@
                             "tagns-lz-cost-governance.tag-lz-environment"              : "shared",
                             "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"                 : "network",
-                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
+                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapplicable"
                         },
 
                         "vcn_specific_gateways": {
@@ -699,7 +699,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 }
                             },
@@ -715,7 +715,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 }
                             },
@@ -731,7 +731,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 }
                             }
@@ -750,7 +750,7 @@
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
                                 "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                             },
 
                             "drg_attachments": {
@@ -764,7 +764,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     },
 
                                     "network_details": {
@@ -784,7 +784,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     },
 
                                     "network_details": {
@@ -803,7 +803,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     },
 
                                     "network_details": {
@@ -824,7 +824,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     },
 
                                     "statements": {
@@ -866,7 +866,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 },
 
@@ -880,7 +880,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     },
 
                                     "route_rules": {
@@ -978,7 +978,7 @@
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
                                 "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                             },
 
                             "routing_policies": {
@@ -1145,7 +1145,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -1164,7 +1164,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "shared",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         }
@@ -1203,7 +1203,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1223,7 +1223,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1243,7 +1243,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1263,7 +1263,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -1278,7 +1278,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -1309,7 +1309,7 @@
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
                                 "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                             }
                         },
 
@@ -1369,7 +1369,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -1530,7 +1530,7 @@
                             "tagns-lz-cost-governance.tag-lz-environment"              : "prod",
                             "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"                 : "network",
-                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
+                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapplicable"
                         },
 
                         "vcn_specific_gateways": {
@@ -1545,7 +1545,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 }
                             }
@@ -1585,7 +1585,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1605,7 +1605,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1625,7 +1625,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             },
 
@@ -1645,7 +1645,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -1660,7 +1660,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 },
 
                                 "route_rules": {
@@ -1691,7 +1691,7 @@
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
                                 "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                             }
                         },
 
@@ -1751,7 +1751,7 @@
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
                                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                                 }
                             }
                         },
@@ -1912,7 +1912,7 @@
                             "tagns-lz-cost-governance.tag-lz-environment"              : "preprod",
                             "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"                 : "network",
-                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
+                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapplicable"
                         },
 
                         "vcn_specific_gateways": {
@@ -1927,7 +1927,7 @@
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
                                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                                     }
                                 }
                             }

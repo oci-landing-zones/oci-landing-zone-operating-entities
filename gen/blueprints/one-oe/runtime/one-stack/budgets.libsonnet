@@ -16,7 +16,7 @@ local default_tags = {
   [prefix + 'owner']: 'tobedefined',
   [prefix + 'platform']: 'tobedefined',
   [prefix + 'environment']: 'shared',
-  [prefix + 'project']: 'notapply',
+  [prefix + 'project']: 'notapplicable',
 };
 {
   default_defined_tags: default_tags,

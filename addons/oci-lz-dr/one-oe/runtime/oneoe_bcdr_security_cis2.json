@@ -8,7 +8,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "host_recipes": {
@@ -28,7 +28,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "file_scan_settings": {
@@ -57,7 +57,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }
@@ -72,7 +72,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "keys": {
@@ -88,7 +88,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         },
@@ -103,7 +103,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }

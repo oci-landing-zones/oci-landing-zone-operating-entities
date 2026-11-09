@@ -10,7 +10,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "targets": {
@@ -27,7 +27,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }
@@ -42,7 +42,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "host_recipes": {
@@ -62,7 +62,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "file_scan_settings": {
@@ -91,7 +91,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }
@@ -107,7 +107,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "recipes": {
@@ -123,7 +123,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             },
 
@@ -139,7 +139,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "security_policies_ocids": [
@@ -162,7 +162,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "security_policies_ocids": [
@@ -208,7 +208,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }
@@ -223,7 +223,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         },
 
         "keys": {
@@ -241,7 +241,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         },
@@ -256,7 +256,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 }
             }
         }

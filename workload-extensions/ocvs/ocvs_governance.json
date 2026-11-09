@@ -86,7 +86,7 @@
                         "is_retired"          : false,
 
                         "valid_values": [
-                            "notapply",
+                            "notapplicable",
                             "proj1",
                             "proj2"
                         ]

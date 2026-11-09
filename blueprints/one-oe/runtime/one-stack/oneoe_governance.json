@@ -21,7 +21,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -56,7 +56,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -91,7 +91,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -126,7 +126,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -161,7 +161,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -196,7 +196,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -231,7 +231,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
                     "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                 },
 
                 "schedule": {
@@ -288,7 +288,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         }
     },
 
@@ -421,13 +421,13 @@
                         "tag_defaults": {
                             "TAG-LZ-PROJECT-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                    : "notapply",
+                                "default_value"                    : "notapplicable",
                                 "is_user_required"                 : true
                             }
                         },
 
                         "valid_values": [
-                            "notapply",
+                            "notapplicable",
                             "proj1",
                             "proj2"
                         ]

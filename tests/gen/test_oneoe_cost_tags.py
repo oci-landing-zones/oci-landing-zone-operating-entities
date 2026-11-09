@@ -37,12 +37,12 @@ local p = publish(profiles.hub_e);
         self.assertEqual(6, len(tags))
         for key, tag in tags.items():
             self.assertNotIn("tag_defaults", bootstrap["namespaces"]["TAGNS-LZ-COST-GOVERNANCE-KEY"]["tags"][key])
-            self.assertIn("notapply" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", tag["valid_values"])
+            self.assertIn("notapplicable" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", tag["valid_values"])
             self.assertEqual(1, len(tag["tag_defaults"]))
             default = next(iter(tag["tag_defaults"].values()))
             self.assertEqual(["CMP-LANDINGZONE-KEY"], default["compartment_ids"])
             self.assertIs(True, default["is_user_required"])
-            self.assertEqual("notapply" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", default["default_value"])
+            self.assertEqual("notapplicable" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", default["default_value"])
         self.assertIn("network", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
         self.assertIn("security", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
         self.assertIn("observability", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
@@ -52,7 +52,7 @@ local p = publish(profiles.hub_e);
         lb = categories["0-shared"]["non_vcn_specific_gateways"]["l7_load_balancers"]["LB-FRA-LZ-PROD-01-KEY"]
         self.assertEqual("prod", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-environment"])
         self.assertEqual("network", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-platform"])
-        self.assertEqual("notapply", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])
+        self.assertEqual("notapplicable", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])
         nsg = categories["2-preprod"]["vcns"]["VCN-FRA-LZ-PREPROD-PROJECTS-KEY"]["network_security_groups"]["NSG-FRA-LZ-PREPROD-PROJ1-APP-KEY"]
         self.assertEqual("preprod", nsg["defined_tags"]["tagns-lz-cost-governance.tag-lz-environment"])
         self.assertEqual("proj1", nsg["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])

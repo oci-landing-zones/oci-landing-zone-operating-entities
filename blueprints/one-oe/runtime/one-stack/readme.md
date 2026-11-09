@@ -24,15 +24,17 @@ The deployment menu includes several Hub architectures, each with distinct netwo
 | [Overview and Deployment](one_oe_hub_a.md)  | [Overview and Deployment](one_oe_hub_b.md) | [Overview and Deployment](one_oe_hub_c.md) | [Overview and Deployment](one_oe_hub_e.md) |
 
 
-
 &nbsp; 
-
-&nbsp; 
-
 
 Review the [known issues](known_issues.md) for any potential problems, and feel free to contact us.
 
 See [Tags and budgets](cost-governance.md) for cost-governance requirements and configuration.
+
+All six cost-governance tags must use a value from the List of Values (LOV)
+defined for each tag in the [cost-governance configuration](oneoe_governance.json). Free-text values
+are not allowed. Before assigning a new value to a resource, add it to the
+corresponding tag's approved LOV. For more details about tags and budgets, see
+[Cost governance](cost-governance.md).
 
 &nbsp; 
 

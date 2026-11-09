@@ -52,7 +52,7 @@ tags.apply({
     def test_lb_scope_does_not_blindly_follow_shared_compartment(self):
         lb = self.doc['network_configuration']['l7_load_balancers']['LB-PROD-KEY']
         self.assertEqual('prod', self.value(lb, 'environment'))
-        self.assertEqual('notapply', self.value(lb, 'project'))
+        self.assertEqual('notapplicable', self.value(lb, 'project'))
         self.assertNotIn('defined_tags', lb['listeners']['main'])
 
     def test_oke_implicit_resources_keep_authorization(self):

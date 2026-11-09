@@ -6,7 +6,7 @@
             "tagns-lz-cost-governance.tag-lz-environment"              : "shared",
             "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"                 : "oke",
-            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
+            "tagns-lz-cost-governance.tag-lz-project"                  : "notapplicable"
         },
 
         "node_pools": {
@@ -24,7 +24,7 @@
                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
                     "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"         : "oke",
-                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
+                    "tagns-lz-cost-governance.tag-lz-project"          : "notapplicable"
                 },
 
                 "freeform_tags": {
@@ -53,7 +53,7 @@
                         "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
                         "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                         "tagns-lz-cost-governance.tag-lz-platform"     : "oke",
-                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                        "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
                     },
 
                     "flex_shape_settings": {

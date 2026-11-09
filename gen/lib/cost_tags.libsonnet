@@ -146,7 +146,7 @@ local token(text, word) =
         [namespace + 'owner']: 'tobedefined',
         [namespace + 'platform']: actual_platform,
         [namespace + 'environment']: if std.length(matched_envs) == 1 then matched_envs[0] else 'shared',
-        [namespace + 'project']: if std.length(matched_projects) == 1 then matched_projects[0] else 'notapply',
+        [namespace + 'project']: if std.length(matched_projects) == 1 then matched_projects[0] else 'notapplicable',
       };
     local resource(obj, path, platform) =
       if std.type(obj) != 'object' then obj else

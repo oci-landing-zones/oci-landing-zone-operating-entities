@@ -58,7 +58,7 @@ function(config, n)
             description: 'Project associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: std.set(['notapply', 'proj1', 'proj2'] + std.flattenArrays([
+            valid_values: std.set(['notapplicable', 'proj1', 'proj2'] + std.flattenArrays([
               std.objectFields(config.environments[env].projects)
               for env in std.objectFields(config.environments)
               if std.objectHas(config.environments[env], 'projects')

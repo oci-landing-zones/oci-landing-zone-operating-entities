@@ -42,7 +42,7 @@ do not automatically fill missing tags.
 | `tag-lz-owner` | `tobedefined` | `email.address@example.com` |
 | `tag-lz-platform` | `network`, `security`, `observability`, or `tobedefined`, according to resource purpose | `network`, `security`, `observability`, `oke`, `ocvs`, `exacs`, `exacc`, `ebs`, `hpc`, `finops`, `ai-services`, `apps` |
 | `tag-lz-environment` | `shared`, `prod`, or `preprod`, according to resource scope | `dev`, `preprod`, `prod`, `shared`, `staging`, `test` |
-| `tag-lz-project` | `notapply` or `proj1`, according to resource scope | `notapply`, `proj1`, `proj2` |
+| `tag-lz-project` | `notapplicable` or `proj1`, according to resource scope | `notapplicable`, `proj1`, `proj2` |
 
 ### 1.2. Tag assignments in the One-OE blueprint
 
@@ -52,7 +52,7 @@ The One-OE blueprint assigns tags according to each resource's purpose and scope
   resources; `tobedefined` for other IAM resources.
 - **Environment:** `shared`, `prod`, or `preprod`. The hub's public load balancer
   uses `prod` because it serves production.
-- **Project:** `proj1` for project-specific resources and `notapply` for shared
+- **Project:** `proj1` for project-specific resources and `notapplicable` for shared
   resources.
 
 Existing access-control tags are preserved. Components that do not support

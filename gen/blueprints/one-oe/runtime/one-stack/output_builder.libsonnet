@@ -28,7 +28,7 @@ local values(path, platform='tobedefined') =
     [namespace + '.tag-lz-owner']: 'tobedefined',
     [namespace + '.tag-lz-platform']: if platform == 'tobedefined' then compartmentPlatform else platform,
     [namespace + '.tag-lz-environment']: if contains('PREPROD') then 'preprod' else if contains('PROD') then 'prod' else 'shared',
-    [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'notapply',
+    [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'notapplicable',
   };
 
 local existingTags(resource, field='defined_tags') =
@@ -84,7 +84,7 @@ local defaultGovernance(governance) =
               tag_defaults: {
                 [key + '-REQUIRED']: {
                   compartment_ids: ['CMP-LANDINGZONE-KEY'],
-                  default_value: if key == 'TAG-LZ-PROJECT-KEY' then 'notapply' else 'tobedefined',
+                  default_value: if key == 'TAG-LZ-PROJECT-KEY' then 'notapplicable' else 'tobedefined',
                   is_user_required: true,
                 },
               },
