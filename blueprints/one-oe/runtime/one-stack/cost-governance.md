@@ -21,48 +21,42 @@ consistent cost data as teams add workloads and expand the environment.
 
 ### 1.1. Tag values
 
-The table lists the Tag Default values and the example allowed values provided
-by the blueprint in `oneoe_governance.json`. The configured allowed values
+The table lists the default tag values used in the One-OE blueprint and the
+example allowed values defined in `oneoe_governance.json`. The configured lists
 standardize tagging: users must select a value from the list defined for each
 tag rather than enter arbitrary values. Your cost-management team should define
 and maintain these lists so that resource tags follow the organization's cost
 allocation and reporting conventions. Update the tag validators and resource
 assignments together to use those approved values.
 
-Because the Tag Defaults require user-supplied values, the default values in the
-table do not automatically fill missing tags.
+`tobedefined` is an accepted placeholder. Replace it with an approved value before
+relying on cost-allocation reports.
 
-| Tag | Default value | Allowed values |
+The supplied configurations assign tag values explicitly. Required Tag Defaults
+do not automatically fill missing tags.
+
+| Tag | Default value in One-OE | Examples of allowed values |
 |---|---|---|
-| `tag-lz-cost-center` | `tobedefined` | `tobedefined`, `CC12345` |
-| `tag-lz-business-unit` | `tobedefined` | `tobedefined`, `IT`, `Finance`, `Retail` |
-| `tag-lz-owner` | `tobedefined` | `tobedefined`, `email.address@example.com` |
-| `tag-lz-platform` | `tobedefined` | `tobedefined`, `network`, `security`, `observability`, `oke`, `ocvs`, `exacs`, `exacc`, `ebs`, `hpc`, `finops`, `ai-services`, `apps` |
-| `tag-lz-environment` | `tobedefined` | `dev`, `preprod`, `prod`, `shared`, `staging`, `test`, `tobedefined` |
-| `tag-lz-project` | `notapply` | `notapply`, `proj1`, `proj2` |
+| `tag-lz-cost-center` | `tobedefined` | `CC12345` |
+| `tag-lz-business-unit` | `tobedefined` | `IT`, `Finance`, `Retail` |
+| `tag-lz-owner` | `tobedefined` | `email.address@example.com` |
+| `tag-lz-platform` | `network`, `security`, `observability`, or `tobedefined`, according to resource purpose | `network`, `security`, `observability`, `oke`, `ocvs`, `exacs`, `exacc`, `ebs`, `hpc`, `finops`, `ai-services`, `apps` |
+| `tag-lz-environment` | `shared`, `prod`, or `preprod`, according to resource scope | `dev`, `preprod`, `prod`, `shared`, `staging`, `test` |
+| `tag-lz-project` | `notapply` or `proj1`, according to resource scope | `notapply`, `proj1`, `proj2` |
 
 ### 1.2. Tag assignments in the One-OE blueprint
 
-The One-OE blueprint assigns tag values according to each resource's purpose,
-environment, and project scope. The following assignments describe the supplied
-configuration and should be reviewed against your organization's cost-allocation
-model.
+The One-OE blueprint assigns tags according to each resource's purpose and scope:
 
-Network compartments also use `platform=network`: `CMP-LZ-NETWORK-KEY`,
-`CMP-LZ-PROD-NETWORK-KEY`, and `CMP-LZ-PREPROD-NETWORK-KEY`. Security compartments
-use `platform=security`: `CMP-LZ-SECURITY-KEY`, `CMP-LZ-PROD-SECURITY-KEY`, and
-`CMP-LZ-PREPROD-SECURITY-KEY`. Other IAM resources retain `platform=tobedefined`.
+- **Platform:** `network`, `security`, or `observability` for the corresponding
+  resources; `tobedefined` for other IAM resources.
+- **Environment:** `shared`, `prod`, or `preprod`. The hub's public load balancer
+  uses `prod` because it serves production.
+- **Project:** `proj1` for project-specific resources and `notapply` for shared
+  resources.
 
-The public load balancer serves production and uses `environment=prod`, even
-though it resides in the shared hub. Shared project networks and subnets use
-`project=notapply`; project-specific NSGs use `project=proj1`. Existing IAM role tags
-are preserved. Components without their own tagging fields, such as listeners,
-backends, and NSG rules, do not receive a `defined_tags` field.
-
-All CIS security variants use `platform=security`, including Vaults and keys when
-the selected CIS2 security file creates them. Security configuration defaults
-also tag module-created resources such as cloned Cloud Guard recipes.
-Observability, including flow logs, uses `platform=observability`.
+Existing access-control tags are preserved. Components that do not support
+tagging, such as listeners, backends, and NSG rules, do not receive separate tags.
 
 ### 1.3. Required tagging
 
@@ -76,10 +70,11 @@ are not tagged retroactively. Review the supplied tag values and the
 before deploying add-ons or workload extensions, and preserve their existing
 access-control tags.
 
+By default, all six Tag Defaults use `is_user_required: true`.
+
 To allow resource creation without users explicitly supplying all six values,
 set `is_user_required` to `false` in each of the six `tag_defaults` entries in
-your deployment configuration. Once those Tag Defaults are effective, OCI applies
-the configured `default_value` when a tag is omitted. This changes tagging to
+your deployment configuration. This changes tagging to
 automatic defaults; it does not disable the tags or their allowed-value
 validators. Review the default values with your cost-management team before
 using this option. See [OCI Tag Defaults](https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm).
@@ -117,8 +112,9 @@ to match your organization's cost-management needs.
 | `tag-lz-project` | `proj1` | 500 |
 
 The overall budget covers `cmp-landingzone` and its child compartments.
-Tag-based budgets track spending on resources with matching tag values. Update
-placeholder values such as `tobedefined` so spending is attributed correctly.
+Tag-based budgets track matching tag values across the tenancy, so resources
+outside the landing zone can also contribute to those budgets. Update placeholder
+values such as `tobedefined` so spending is attributed correctly.
 
 Amounts use the tenancy's rate-card currency, and monthly periods start on day 1.
 Replace `email.address@example.com` with your notification recipients.
@@ -126,6 +122,7 @@ Budget totals can overlap because the same resource may contribute to several
 budgets; do not add them together.
 
 Budgets provide spending alerts, not spending caps: they do not stop resources.
+Budget alerts are evaluated periodically, not in real time.
 See [OCI Budgets](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/budgetsoverview.htm).
 
 ## 3. License
