@@ -64,6 +64,7 @@ describe('OKE flow sources', () => {
     expect(oke().rolesFor('east-west', 'preprod')).toEqual([]);
   });
 
+  // Three Jsonnet/WASM renders need the integration-test budget on CI runners.
   it('applies OKE component peering controls to incoming and outgoing hybrid flows', async () => {
     const { model, platform } = fixture();
     const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
@@ -97,7 +98,7 @@ describe('OKE flow sources', () => {
     expect(choices()).toEqual([outgoing]);
     model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
     expect(choices()).toEqual([]);
-  });
+  }, 60_000);
 
   it.each(['hub_a', 'hub_e'] as const)('traces OKE endpoints through generated %s routes', async (hubKind) => {
     const { model, platform } = fixture();

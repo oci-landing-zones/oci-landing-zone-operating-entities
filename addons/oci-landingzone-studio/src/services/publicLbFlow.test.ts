@@ -39,7 +39,7 @@ describe('OKE hub public LB flows', () => {
     expect(graph.flowErrors ?? []).toEqual([]);
     expect(graph.edges.filter((e) => e.animated)).toHaveLength(4);
     expect(graph.nodes.find((n) => n.id === network.hubLb!.node)).toMatchObject({ icon: 'lb', caption: 'Example OKE public LB' });
-  });
+  }, 60_000);
 
   it('omits pod paths with Flannel and removes saved LB paths when disabled', async () => {
     const { model, platform } = fixture();
@@ -52,5 +52,5 @@ describe('OKE hub public LB flows', () => {
     expect(traces).toEqual([]);
     const picker = flowPickerEnvironments(model);
     expect(flowChoices(picker, picker.findIndex((n) => n.oke)).some((c) => c.id.includes(':lb'))).toBe(false);
-  });
+  }, 60_000);
 });
