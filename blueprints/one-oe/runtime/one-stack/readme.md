@@ -23,18 +23,34 @@ The deployment menu includes several Hub architectures, each with distinct netwo
 | **Cost:** includes the [price](https://www.oracle.com/cloud/networking/network-firewall/pricing/) of **two** [OCI Network Firewalls](https://www.oracle.com/cloud/networking/network-firewall/)</br></br></br> | **Cost:** includes the [price](https://www.oracle.com/cloud/networking/network-firewall/pricing/) of **one** [OCI Network Firewall](https://www.oracle.com/cloud/networking/network-firewall/)</br></br></br> | **Cost:** free</br> *(cost of third-party Firewalls must be accounted for separately)* | **Cost:** free</br></br></br></br> | 
 | [Overview and Deployment](one_oe_hub_a.md)  | [Overview and Deployment](one_oe_hub_b.md) | [Overview and Deployment](one_oe_hub_c.md) | [Overview and Deployment](one_oe_hub_e.md) |
 
-
 &nbsp; 
 
-Review the [known issues](known_issues.md) for any potential problems, and feel free to contact us.
+### Tags and budgets
 
-See [Tags and budgets](cost-governance.md) for cost-governance requirements and configuration.
+Before deployment, review the [cost-governance configuration](oneoe_governance.json)
+and update the tag values, budget amounts, targets, and notification recipients
+to match your organization.
 
 All six cost-governance tags must use a value from the List of Values (LOV)
-defined for each tag in the [cost-governance configuration](oneoe_governance.json). Free-text values
-are not allowed. Before assigning a new value to a resource, add it to the
-corresponding tag's approved LOV. For more details about tags and budgets, see
-[Cost governance](cost-governance.md).
+defined for each tag. Free-text values are not allowed. Before assigning a new
+value to a resource, add it to the corresponding tag's approved LOV.
+
+Replace `email.address@example.com` in each budget's notification recipients with
+the intended email addresses.
+
+For more details about tags and budgets, see [Cost governance](cost-governance.md).
+
+### Observability notifications
+
+Before deployment, review the observability configuration for the selected CIS
+level: [CIS 1](oneoe_observability_cis1.json) or [CIS 2](oneoe_observability_cis2.json).
+
+Replace `email.address@example.com` in each topic's `EMAIL` subscriptions with the
+email addresses of the teams responsible for receiving its notifications.
+
+### Known issues
+
+Review the [known issues](known_issues.md) for any potential problems, and feel free to contact us.
 
 &nbsp; 
 

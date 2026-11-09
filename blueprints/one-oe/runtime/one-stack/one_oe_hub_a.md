@@ -24,7 +24,7 @@ The diagram provides a comprehensive visual representation of the key OCI resour
 
 One-OE uses six mandatory cost-governance tags: cost center, business unit, owner, platform, environment, and project. These tags support FinOps objectives by enabling consistent cost allocation, clear ownership, and spending analysis across business units, platforms, environments, and projects.
 
-They apply to new resources that support tagging in `cmp-landingzone` and its child compartments. Review the values in the supplied configurations before deployment, and include the same tags when adding workloads or add-ons.
+They apply to new resources that support tagging in `cmp-landingzone` and its child compartments. Include the same tags when adding workloads or add-ons.
 
 See [Cost governance tags](cost-governance.md) for configuration and deployment details.
 
@@ -51,9 +51,9 @@ For details on the Security Zone policies included in each deployment option, se
 
 Before deployment, review and update the configuration files:
 
-1. **Cost-governance tags:** review the tag definitions and allowed values in [oneoe_governance.json](oneoe_governance.json), and update the tag values assigned in the deployment configurations to match your organization. See [Tag values](cost-governance.md#tag-values).
+1. **Cost-governance tags:** update the tag values in the deployment configurations to match your organization. Use only values from each tag’s approved List of Values (LOV); free-text values are not allowed. See [Tag values](cost-governance.md#tag-values).
 2. **Budget notifications:** replace `email.address@example.com` in each budget's `alert_rule.recipients` in [oneoe_governance.json](oneoe_governance.json) with the intended recipients. Review the budget amounts and targets as described in [Monthly budgets](cost-governance.md#monthly-budgets).
-3. **Observability notifications:** replace `email.address@example.com` in the `EMAIL` subscriptions with your notification recipients. Use the complete file for the selected CIS level: [CIS 1](oneoe_observability_cis1.json) or [CIS 2](oneoe_observability_cis2.json). Each file includes VCN and subnet Flow Logs for the initial deployment.
+3. **Observability notifications:** replace `email.address@example.com` in each topic's `EMAIL` subscriptions with the email addresses of the teams responsible for receiving its notifications. Use the complete file for the selected CIS level: [CIS 1](oneoe_observability_cis1.json) or [CIS 2](oneoe_observability_cis2.json). Each file includes VCN and subnet Flow Logs for the initial deployment.
 
 Use the reviewed configuration files when creating or updating the ORM stack.
 
