@@ -48,6 +48,8 @@ describe('observability fields', () => {
       <FoundationStep name="Recovery" onNameChange={() => {}} onNameBlur={() => {}} />
     </WizardProvider></MemoryRouter>);
     expect(html).toContain('Environments sync automatically from');
+    expect(html).toContain('Home Region environments');
+    expect(html).toContain('These environments are expected to be deployed in the Home Region.');
     expect(html).toContain('Primary design');
     expect(html).toContain('Environments synced from Home Region');
     expect(html).not.toContain('New environment name');
@@ -95,7 +97,9 @@ describe('observability fields', () => {
     model.foundation.stackScope = 'regional';
     model.foundation.notifications!.useSingleRecipient = false;
     const html = render(model);
-    expect(html).toContain('Environments to recover');
+    expect(html).toContain('Home Region environments');
+    expect(html).toContain('aria-label="About Home Region environments"');
+    expect(html).toContain('These environments are expected to be deployed in the Home Region.');
     expect(html).toContain('Use the same environment names as your Home Region deployment.');
     expect(html).toMatch(/<details[^>]*><summary[^>]*>How DR uses these environments<\/summary>/);
     expect(html).not.toMatch(/<details[^>]*\bopen/);
@@ -108,7 +112,7 @@ describe('observability fields', () => {
     expect(html).toContain('Home Region');
     expect(html).not.toContain('Home stack owns matching compartments');
     model.environments = [];
-    expect(render(model)).toContain('No recovery environments. Hub and shared services only.');
+    expect(render(model)).toContain('No Home Region environments. Hub and shared services only.');
     expect(html).not.toContain('id="lz-observability-cloudguard"');
     expect(html).not.toContain('id="lz-observability-iam"');
     expect(html).toContain('id="lz-observability-network"');

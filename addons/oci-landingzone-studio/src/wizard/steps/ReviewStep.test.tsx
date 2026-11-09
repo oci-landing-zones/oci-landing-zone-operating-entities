@@ -1,12 +1,46 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { emptyLzModel } from '../../model/defaults';
 import { WizardProvider } from '../wizardContext';
 import { emptyHybridConnectivity, newVpn } from '../../services/hybridConnectivity';
 import ReviewStep from './ReviewStep';
+import { serializeConfig } from '../../services/lzConfig';
+
+const stored = vi.hoisted(() => ({ outputs: {} as Record<string, { config: string; files: Record<string, string> }> }));
+vi.mock('react-router-dom', async (original) => ({ ...await original<typeof import('react-router-dom')>(), useParams: () => ({ id: 'dr' }) }));
+vi.mock('../../services/lzStore', async (original) => ({ ...await original<typeof import('../../services/lzStore')>(), getOutputs: (id: string) => stored.outputs[id] ?? null }));
+beforeEach(() => { stored.outputs = {}; });
 
 describe('Resource Manager deployment link', () => {
+  it('uses current factory files instead of cached files while retaining Hub C backend selection', () => {
+    const model = emptyLzModel();
+    model.foundation.stackScope = 'regional';
+    model.network.hubKind = 'hub_c';
+    stored.outputs.dr = { config: serializeConfig(model), files: { 'network_backends.json': '{}', 'obsolete_workload.json': '{}' } };
+    const files = ['network.json', 'network_backends.json', 'security_cis2_pre.json', 'security_cis2.json', 'future_workload.json'];
+    const markup = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="DR" generatedFiles={files} /></WizardProvider></MemoryRouter>);
+    const first = markup.slice(markup.indexOf('2. Create and apply phase 1'), markup.indexOf('3. Update and apply phase 2'));
+    const second = markup.slice(markup.indexOf('3. Update and apply phase 2'));
+    expect(first).toContain('network.json');
+    expect(first).toContain('security_cis2_pre.json');
+    expect(first).not.toContain('future_workload.json');
+    expect(second).toContain('network_backends.json');
+    expect(second).toContain('future_workload.json');
+    expect(second).not.toContain('security_cis2_pre.json');
+    expect(markup).not.toContain('obsolete_workload.json');
+  });
+
+  it('links to Home Review under the hosted app basename within the common deployment sequence', () => {
+    const home = emptyLzModel();
+    const dr = structuredClone(home);
+    Object.assign(dr.foundation, { stackScope: 'regional', homeRegion: home.foundation.region, region: 'eu-amsterdam-1', regionShortName: 'ams' });
+    const markup = renderToStaticMarkup(<MemoryRouter basename="/studio" initialEntries={['/studio/lz/dr']}><WizardProvider initialModel={dr} homeSource={{ id: 'home', model: home }}><ReviewStep designName="DR" /></WizardProvider></MemoryRouter>);
+    expect(markup).toContain('href="/studio/lz/home?step=review"');
+    expect(markup.indexOf('Open Home Region Review')).toBeGreaterThan(markup.indexOf('1. Prepare the files'));
+    expect(markup.indexOf('Open Home Region Review')).toBeLessThan(markup.indexOf('2. Create and apply phase 1'));
+  });
+
   it('blocks generation when a custom region short name is invalid', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = 'long';
@@ -119,12 +153,28 @@ it('shows each phase input list before its apply action and keeps unrelated alte
   expect(html).not.toContain('README.txt');
 });
 
-it('highlights CLI commands, variables and filenames using the deployment code style', () => {
+it('distinguishes deployment filenames from settings and omits design-source explanations', () => {
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={emptyLzModel()}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
   const cli = html.split('Terraform CLI or CI/CD alternative')[1];
-  for (const text of ['rms-facade', 'deployment.tfvars', 'local_config_file_paths', 'tenancy_ocid', 'region', 'terraform init',
-    'terraform plan -var-file=deployment.tfvars -out=deployment.tfplan', 'terraform apply deployment.tfplan']) {
-    expect(cli).toContain(`<code class="required-setting">${text}</code>`);
+  for (const text of ['local_config_file_paths', 'tenancy_ocid', 'region']) {
+    expect(cli).toContain(`<span class="required-setting-name">${text}</span>`);
   }
+  for (const text of ['rms-facade', 'terraform init',
+    'terraform plan -var-file=deployment.tfvars -out=deployment.tfplan', 'terraform apply deployment.tfplan']) {
+    expect(cli).toContain(`<code class="deployment-code">${text}</code>`);
+  }
+  expect(cli).toContain('<span class="required-setting-value">&quot;file&quot;</span>');
+  expect(cli).toContain('<code class="deployment-file">deployment.tfvars</code>');
+  expect(html).toContain('<code class="deployment-file">network.json</code>');
+  expect(html).toContain('<ul class="deployment-files" aria-label="Phase 1 files"><li><code class="deployment-file">');
+  expect(html).toContain('<ul class="deployment-files" aria-label="Phase 2 files"><li><code class="deployment-file">');
+  expect(html).not.toContain('config.jsonnet');
   expect(cli).not.toContain('`');
+});
+
+it('renders boolean settings consistently in the deployment instructions', () => {
+  const model = emptyLzModel();
+  model.foundation.drRegion = 'eu-amsterdam-1';
+  const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
+  expect(html).toContain('<span class="required-setting-name">save_output</span><span class="required-setting-equals"> = </span><span class="required-setting-value">true</span>');
 });
