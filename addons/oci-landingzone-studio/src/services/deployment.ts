@@ -1,4 +1,4 @@
-import { CONFIG_FILENAME, deploymentStages } from '../generator/outputNames';
+import { deploymentStages } from '../generator/outputNames';
 import type { LzConfig } from './lzConfig';
 
 export const ORCHESTRATOR_VERSION = 'v2.4.1';
@@ -126,7 +126,7 @@ export function deploymentReadme(config: LzConfig, files: string[]): string {
     '1. Prepare the files',
     ...deploymentPrerequisites(config),
     PRIVATE_SOURCE_STEP,
-    `${CONFIG_FILENAME} is the design source. README.txt and diagram exports are review artifacts. Upload only the generated deployment JSON files; do not mix them with published blueprint files.`,
+    'Upload only the generated deployment JSON files; do not mix them with published blueprint files.',
     '',
     '2. Create and apply phase 1',
     `Open ${DEPLOY_TO_OCI_URL} and select rms-facade as the working directory.`,

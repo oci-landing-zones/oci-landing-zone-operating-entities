@@ -17,7 +17,7 @@ beforeEach(() => {
   const model = emptyLzModel();
   vi.mocked(getLZ).mockReturnValue({ id: 'test', name: 'Preserved design', createdAt: '', updatedAt: '', model });
   vi.mocked(useDiagramPreview).mockImplementation((current) => ({
-    snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] } } },
+    snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] } },
     pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
   }));
 });
@@ -27,7 +27,7 @@ describe('diagram layout error recovery', () => {
     const previous = emptyLzModel();
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
     vi.mocked(useDiagramPreview).mockReturnValue({
-      snapshot: { model: previous, preview: { tables: [], inventory: { compartments: [], groups: [] } } },
+      snapshot: { model: previous, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] } },
       pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'error',
       error: 'RUNTIME ERROR: Remote networks are required.\n  at generator.libsonnet:1', retry: vi.fn(),
     });
@@ -46,6 +46,20 @@ describe('diagram layout error recovery', () => {
     expect(html).not.toContain('generator.libsonnet');
     expect(html).not.toMatch(/out.of.sync/i);
     expect(html).not.toContain('Diagram unavailable');
+  });
+
+  it('opens a Home Review deep link and supplies current factory filenames without downloading', () => {
+    vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
+    vi.mocked(useDiagramPreview).mockImplementation((current) => ({
+      snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json', 'new_extension.json'] } },
+      pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
+    }));
+    const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test?step=review']}>
+      <Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes>
+    </MemoryRouter>);
+    expect(html).toContain('Review your landing zone');
+    expect(html).toContain('new_extension.json');
+    expect(html).not.toContain('id="lz-region-short-name"');
   });
 
   it.each([
