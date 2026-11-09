@@ -1,7 +1,7 @@
 import { deploymentStages } from '../generator/outputNames';
 import type { LzConfig } from './lzConfig';
 
-export const ORCHESTRATOR_VERSION = 'v2.2.0';
+export const ORCHESTRATOR_VERSION = 'v2.4.1';
 export const ORCHESTRATOR_URL = 'https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator';
 export const ORCHESTRATOR_RELEASE_URL = `${ORCHESTRATOR_URL}/releases/tag/${ORCHESTRATOR_VERSION}`;
 export const RESOURCE_MANAGER_STACKS_URL = 'https://cloud.oracle.com/resourcemanager/stacks';
@@ -27,7 +27,7 @@ export function expectedDeploymentFiles(config: LzConfig): string[] {
     `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
     `observability_cis${cis}_pre.json`, `observability_cis${cis}.json`,
     ...(config.hub.kind === 'hub_c' ? ['network_backends.json'] : []),
-    ...(hasOke ? ['oke_clusters.json', 'oke_workers.json'] : []),
+    ...(hasOke ? ['oke.json'] : []),
   ];
 }
 

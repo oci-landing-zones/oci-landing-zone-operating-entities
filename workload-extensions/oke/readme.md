@@ -10,6 +10,10 @@ The OKE Landing Zone Extension is a secure cloud environment, designed with the 
 
 Use the [**Simple OKE deployment**](./simple) to deploy one OKE cluster in a production environment from the published configuration, or use config-driven generation to add the environments and OKE platforms required by your design.
 
+The supported contract requires Orchestrator **v2.4.1** with CIS OKE **v0.3.0**. Published and Blueprint Factory packages use one `oke.json`, mapping cluster keys to cluster configuration and managed worker pools. See the [OKE generation guide](simple/oke-blueprint-factory.md#10-generated-output-contract).
+
+> **Migration warning:** Existing deployments require Terraform state and input migration. Do not simply apply the new generated files to existing state.
+
 &nbsp;
 
 ## License <!-- omit from toc -->

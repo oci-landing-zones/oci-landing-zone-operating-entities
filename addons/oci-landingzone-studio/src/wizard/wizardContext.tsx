@@ -19,6 +19,7 @@ import React, {
   useRef,
 } from 'react';
 import type { LzModel } from '../model/types';
+import { splitOkePlacements } from '../services/okePlacements';
 import { emptyLzModel } from '../model/defaults';
 import { reconcileExadata } from '../services/exadata';
 import { createRegionalModel } from '../services/regionalDeployment';
@@ -56,7 +57,7 @@ function setNested<T>(obj: T, path: string, value: unknown): T {
   return clone as T;
 }
 
-function reducer(state: WizardState, action: WizardAction): WizardState {
+function reduceState(state: WizardState, action: WizardAction): WizardState {
   switch (action.type) {
     case 'SET_FIELD':
       return { ...state, model: action.home
@@ -72,6 +73,12 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
     default:
       return state;
   }
+}
+
+function reducer(state: WizardState, action: WizardAction): WizardState {
+  const next = reduceState(state, action);
+  const model = splitOkePlacements(next.model);
+  return model === next.model ? next : { ...next, model };
 }
 
 interface WizardContextValue {
@@ -90,8 +97,8 @@ export function WizardProvider({
   onChange,
   children,
 }: React.PropsWithChildren<{ initialModel: LzModel; homeSource?: HomeRegionSource; onChange?: (model: LzModel) => void }>) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: homeSource?.model
-    ? syncDrEnvironments(reconcileExadata(initialModel), homeSource.model) : reconcileExadata(initialModel) }));
+  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: splitOkePlacements(homeSource?.model
+    ? syncDrEnvironments(reconcileExadata(initialModel), homeSource.model) : reconcileExadata(initialModel)) }));
   useEffect(() => {
     if (homeSource?.model) dispatch({ type: 'SYNC_HOME', home: homeSource.model });
   }, [homeSource?.model]);

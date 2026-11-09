@@ -18,7 +18,7 @@ beforeEach(() => {
   vi.mocked(getLZ).mockReturnValue({ id: 'test', name: 'Preserved design', createdAt: '', updatedAt: '', model });
   vi.mocked(useDiagramPreview).mockImplementation((current) => ({
     snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] } },
-    pending: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
+    pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
   }));
 });
 
@@ -28,7 +28,7 @@ describe('diagram layout error recovery', () => {
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
     vi.mocked(useDiagramPreview).mockReturnValue({
       snapshot: { model: previous, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] } },
-      pending: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'error',
+      pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'error',
       error: 'RUNTIME ERROR: Remote networks are required.\n  at generator.libsonnet:1', retry: vi.fn(),
     });
     const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test']}>
@@ -52,7 +52,7 @@ describe('diagram layout error recovery', () => {
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
     vi.mocked(useDiagramPreview).mockImplementation((current) => ({
       snapshot: { model: current, preview: { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json', 'new_extension.json'] } },
-      pending: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
+      pending: false, deferred: false, tables: [], inventory: { compartments: [], groups: [] }, status: 'ready', error: undefined, retry: vi.fn(),
     }));
     const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test?step=review']}>
       <Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes>

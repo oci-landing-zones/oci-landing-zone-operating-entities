@@ -156,12 +156,13 @@ export function CidrCalculator({ vcnCidr, subnets }: { vcnCidr: string; subnets:
  * subnet re-basing, the subnet table, the add-subnet suggestions, and the live
  * CIDR calculator. Used by the hub VCN and by every environment VCN.
  */
-export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conflicts = [] }: {
+export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conflicts = [], readOnlySubnets = false }: {
   idPrefix: string;
   vcnCidr: string;
   subnets: Subnet[];
   emptyNote: string;
   conflicts?: string[];
+  readOnlySubnets?: boolean;
   onApply: (patch: { vcnCidr?: string; subnets?: Subnet[] }) => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -267,6 +268,17 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
       </div>
 
       <div style={{ marginTop: 18 }}>
+        {readOnlySubnets ? (
+          <table style={s.calcTable} aria-label="Network profile subnet allocation">
+            <thead><tr><th style={s.calcTh}>Subnet</th><th style={s.calcTh}>CIDR</th></tr></thead>
+            <tbody>{subnets.map((subnet) => (
+              <tr key={subnet.name}>
+                <td style={s.calcTd}>{subnet.name.replaceAll('-', ' ')}</td>
+                <td style={s.calcTd}>{subnet.cidr}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        ) : <>
         <div style={s.tableHead} className="network-subnet-grid network-subnet-heading">
           <span>Subnet</span>
           <span>CIDR</span>
@@ -372,6 +384,7 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
             </button>
           </div>
         </div>
+        </>}
 
         <CidrCalculator vcnCidr={vcnCidr} subnets={resolvedSubnets} />
       </div>

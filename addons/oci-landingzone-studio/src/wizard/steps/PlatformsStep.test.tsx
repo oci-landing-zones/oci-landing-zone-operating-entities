@@ -6,6 +6,8 @@ import { buildConfig } from '../../services/lzConfig';
 import { platformReadiness } from '../../services/platformReadiness';
 import { WizardProvider } from '../wizardContext';
 import PlatformsStep from './PlatformsStep';
+import { createOkeEntries } from '../../services/okePlacements';
+import { PlatformCard } from './PlatformTemplatesStep';
 import type { LzModel } from '../../model/types';
 
 function render(model: LzModel) {
@@ -13,6 +15,14 @@ function render(model: LzModel) {
 }
 
 describe('platform selection and readiness', () => {
+  it('offers environment choices before creating OKE clusters', () => {
+    const html = render(emptyLzModel());
+    expect(html).toContain('aria-label="OKE environments"');
+    const labels = [...html.matchAll(/<button[^>]*aria-pressed="(?:true|false)"[^>]*>(.*?)<\/button>/g)]
+      .map(([, content]) => content.replace(/<[^>]*>/g, ''));
+    expect(labels).toEqual(['All', 'prod', 'preprod']);
+  });
+
   it('offers separate type dropdowns for shared and environment platforms', () => {
     const markup = render(emptyLzModel());
     const shared = markup.match(/<select id="new-shared-platform-type"[^>]*>(.*?)<\/select>/)?.[1];
@@ -129,4 +139,24 @@ describe('platform selection and readiness', () => {
       expect(platformReadiness(model, type).errors).toContain('Duplicate environment platform config key: oke.');
     }
   });
+});
+
+
+it('shows an environment label instead of placement controls for each OKE card', () => {
+  const model = emptyLzModel();
+  model.platforms = createOkeEntries(model, []);
+  const platform = model.platforms[1];
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><PlatformCard platform={platform}
+    environments={model.environments} open onToggle={() => {}} onPlatform={() => {}} onDelete={() => {}} /></WizardProvider>);
+  expect(html).toContain('aria-label="OKE environment"');
+  expect(html).toContain('preprod');
+  expect(html).not.toContain('aria-label="Platform placement"');
+  expect(html).not.toContain('all envs');
+  expect(html).toContain('VCN CIDR');
+  expect(html).not.toContain('aria-disabled="true"');
+  const custom = newPlatform('custom', model.platforms, model.environments);
+  const customHtml = renderToStaticMarkup(<WizardProvider initialModel={{ ...model, platforms: [...model.platforms, custom] }}><PlatformCard platform={custom}
+    environments={model.environments} open onToggle={() => {}} onPlatform={() => {}} onDelete={() => {}} /></WizardProvider>);
+  expect(customHtml).toContain('aria-label="Platform placement"');
+  expect(customHtml).toContain('>All</span></button>');
 });

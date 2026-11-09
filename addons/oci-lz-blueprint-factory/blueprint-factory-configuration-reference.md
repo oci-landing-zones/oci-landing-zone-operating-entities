@@ -288,7 +288,7 @@ Extensions are nested below a platform. The platform name is a configuration key
 ```jsonnet
 platforms: {
   oke: {
-    network: { vcn: '10.0.96.0/21' },
+    network: { vcn: '10.0.96.0/20' },
     extension: {
       type: 'oke_simple',
       params: {

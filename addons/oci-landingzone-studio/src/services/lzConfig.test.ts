@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildConfig, serializeConfig } from './lzConfig';
+import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
@@ -189,8 +189,8 @@ describe('serializeConfig', () => {
     expect(c.environments.prod.platforms.oke.extension).toEqual({
       type: 'oke_simple',
       params: {
-        kubernetes_version: 'v1.35.2', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
-        worker_image: '9\\.[0-9]+', worker_boot_volume_size: 60, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
+        kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.3.0/24'],
+        create_node_pools: false, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
       },
     });
   });
@@ -254,8 +254,8 @@ describe('serializeConfig', () => {
     expect(step4).toContain('        oke: {');
     expect(step4).toContain("            vcn: '10.0.80.0/20',");
     expect(step4).toContain("          extension: { type: 'oke_simple', params: {");
-    expect(step4).toContain("            kubernetes_version: 'v1.35.2', services_cidr: '10.96.0.0/16',");
-    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.1.0/24'], worker_image: '9\\\\.[0-9]+',");
+    expect(step4).toContain("            kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16',");
+    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.3.0/24'], create_node_pools: false,");
     expect(step4).toContain("  shared_platforms: {");
     expect(step4).toContain("    core: { network: { vcn: '10.0.32.0/21', subnets: { core: '10.0.32.0/24' } } },");
   });
@@ -270,4 +270,10 @@ describe('serializeConfig', () => {
     expect(out).toContain('security_targets: [],');
     expect(out).toContain('subnets: {},');
   });
+});
+
+
+it.each(['1.40.2', 'v1.40.2'])('exports manually entered Kubernetes version %s in OCI format', (kubernetesVersion) => {
+  const params = newPlatform('oke_simple', []).okeParams!;
+  expect(okeExtension({ ...params, kubernetesVersion }).params!.kubernetes_version).toBe('v1.40.2');
 });

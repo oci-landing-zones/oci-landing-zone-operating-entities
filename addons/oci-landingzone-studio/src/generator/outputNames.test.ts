@@ -10,7 +10,7 @@ describe('deploymentStages', () => {
     const persistent = regional ? [] : ['iam.json', 'governance.json'];
     const pre = [`security_cis${cis}_pre.json`, `observability_cis${cis}_pre.json`];
     const final = [`security_cis${cis}.json`, `observability_cis${cis}.json`];
-    const workloads = oke ? ['oke_clusters.json', 'oke_workers.json'] : [];
+    const workloads = oke ? ['oke.json'] : [];
     const files = [...persistent, 'network.json', ...pre, ...final, ...workloads,
       ...(backends ? ['network_backends.json'] : [])];
     const stages = deploymentStages(files);
@@ -29,7 +29,7 @@ describe('deploymentStages', () => {
     const persistent = regional ? [] : ['iam.json', 'governance.json'];
     const pre = [`security_cis${cis}_pre.json`, `observability_cis${cis}_pre.json`];
     const final = [`security_cis${cis}.json`, `observability_cis${cis}.json`];
-    const workloads = oke ? ['oke_clusters.json', 'oke_workers.json'] : [];
+    const workloads = oke ? ['oke.json'] : [];
     const stages = deploymentStages([...persistent, 'network.json', 'network_backends.json', ...pre, ...final, ...workloads], 'network_backends.json');
     expect(stages[0].files).toEqual([...persistent, 'network.json', ...pre]);
     expect(stages[1].files).toEqual([...persistent, 'network_backends.json', ...final, ...workloads]);
@@ -45,6 +45,8 @@ describe('isCurrentOutputSet', () => {
   it('accepts current outputs and requires regeneration after design or network-format changes', () => {
     const saved = { config: '{ cis_level: 2 }', files: { 'network.json': '{}' } };
     expect(isCurrentOutputSet(saved, saved.config)).toBe(true);
+    expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, 'oke_clusters.json': '{}' } }, saved.config)).toBe(false);
+    expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, 'oke_workers.json': '{}' } }, saved.config)).toBe(false);
     expect(isCurrentOutputSet(saved, '{ cis_level: 1 }')).toBe(false);
     expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, 'network_pre.json': '{}' } }, saved.config)).toBe(false);
   });

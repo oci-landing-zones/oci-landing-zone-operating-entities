@@ -50,8 +50,8 @@ describe('three-environment OKE with FastConnect and VPN backup', () => {
     const model = complexHybridModel();
     const outputs = await generateOutputs(model);
     const clusters = Object.values(outputs.files).flatMap((file) => {
-      const body = JSON.parse(file) as { oke_clusters_configuration?: { clusters?: Record<string, unknown> } };
-      return Object.keys(body.oke_clusters_configuration?.clusters ?? {});
+      const body = JSON.parse(file) as { oke_configuration?: Record<string, unknown> };
+      return Object.keys(body.oke_configuration ?? {});
     });
     expect(clusters).toHaveLength(3);
     expect(containsInlineSecrets(model)).toBe(false);

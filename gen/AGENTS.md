@@ -349,7 +349,7 @@ Contract phases:
   - `iam`: merged into IAM output
   - `security_cis1`, `security_cis2`: merged into both pre and final security outputs so extension prerequisites exist before extension resources are deployed
   - `observability_cis1`, `observability_cis2`: merged into observability outputs
-  - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
+  - Any other generic key (e.g. `oke`): collected into `result.extra`
 
 Network contributions require a networked platform; aggregate network contributions require at least one networked instance. Extra outputs cannot use core pre-file names or `network_backends`.
 
