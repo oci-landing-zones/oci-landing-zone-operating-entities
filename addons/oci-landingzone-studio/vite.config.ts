@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     environment: 'node',
+    // Network integration tests render Jsonnet/WASM under shared CI CPU load.
+    testTimeout: 30_000,
     include: ['src/**/*.test.{ts,tsx}'],
     passWithNoTests: true,
   },
