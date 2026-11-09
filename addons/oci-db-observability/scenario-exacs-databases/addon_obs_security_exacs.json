@@ -1,46 +1,49 @@
 {
     "vaults_configuration": {
-        "default_compartment_id"   : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+        },
 
         "keys": {
             "KEY-LZ-MON-KEY": {
-                "name"             : "key-lz-mon-bkt",
-                "group_grantees"   : ["grp-lz-platform-mon-admin"],
-                "protection_mode"  : "SOFTWARE",
-                "service_grantees" : ["objectstorage-eu-frankfurt-1"],
-                "vault_key"        : "VLT-LZ-SHARED-MON-KEY",
-                "versions"         : ["1", "2"],
-                "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                "name"                                             : "key-lz-mon-bkt",
+                "group_grantees"                                   : ["grp-lz-platform-mon-admin"],
+                "protection_mode"                                  : "SOFTWARE",
+                "service_grantees"                                 : ["objectstorage-eu-frankfurt-1"],
+                "vault_key"                                        : "VLT-LZ-SHARED-MON-KEY",
+                "versions"                                         : ["1", "2"],
+
+                "defined_tags": {
                     "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform": "security",
-                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             }
         },
 
         "vaults": {
             "VLT-LZ-SHARED-MON-KEY": {
-                "name"             : "vlt-lz-shared-mon-security",
-                "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                "name"                                             : "vlt-lz-shared-mon-security",
+
+                "defined_tags": {
                     "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform": "security",
-                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             }
-        },
-        "default_defined_tags" : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-platform": "security",
-            "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         }
     }
 }

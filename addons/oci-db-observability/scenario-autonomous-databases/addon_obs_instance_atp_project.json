@@ -1,160 +1,163 @@
 {
     "instances_configuration": {
-        "default_compartment_id"                           : "CMP-LZ-PROD-PROJ1-KEY",
-        "default_ssh_public_key_path"                      : null,
+        "default_compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
+        "default_ssh_public_key_path"                              : null,
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+        },
 
         "instances": {
             "VM-FRA-LZ-PREPROD-PROJ1-MON-AGENT-KEY": {
-                "name"                                     : "vm-fra-lz-preprod-proj1-mon-agent",
-                "compartment_id"                           : "CMP-LZ-PREPROD-PROJ1-KEY",
-                "shape"                                    : "VM.Standard.E5.Flex",
+                "name"                                             : "vm-fra-lz-preprod-proj1-mon-agent",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-KEY",
+                "shape"                                            : "VM.Standard.E5.Flex",
 
                 "boot_volume": {
-                    "preserve_on_instance_deletion"        : false,
-                    "size"                                 : 60
+                    "preserve_on_instance_deletion"                : false,
+                    "size"                                         : 60
                 },
 
                 "cloud_agent": {
-                    "disable_management"                   : false,
-                    "disable_monitoring"                   : false,
+                    "disable_management"                           : false,
+                    "disable_monitoring"                           : false,
 
                     "plugins": [
                         {
-                            "name"                         : "Management Agent",
-                            "enabled"                      : true
+                            "name"                                 : "Management Agent",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Custom Logs Monitoring",
-                            "enabled"                      : true
+                            "name"                                 : "Custom Logs Monitoring",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Compute Instance Monitoring",
-                            "enabled"                      : true
+                            "name"                                 : "Compute Instance Monitoring",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Vulnerability Scanning",
-                            "enabled"                      : true
+                            "name"                                 : "Vulnerability Scanning",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "OS Management Service Agent",
-                            "enabled"                      : true
+                            "name"                                 : "OS Management Service Agent",
+                            "enabled"                              : true
                         }
                     ]
                 },
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                },
+
                 "encryption": {
-                    "encrypt_in_transit_on_instance_create": null,
-                    "encrypt_in_transit_on_instance_update": null
+                    "encrypt_in_transit_on_instance_create"        : null,
+                    "encrypt_in_transit_on_instance_update"        : null
                 },
 
                 "flex_shape_settings": {
-                    "memory"                               : 8,
-                    "ocpus"                                : 2
+                    "memory"                                       : 8,
+                    "ocpus"                                        : 2
                 },
 
                 "networking": {
-                    "assign_public_ip"                     : false,
-                    "hostname"                             : "vm-fra-lz-preprod-proj1-mon-agent",
-                    "subnet_id"                            : "SN-FRA-LZ-PREPROD-APP-KEY"
+                    "assign_public_ip"                             : false,
+                    "hostname"                                     : "vm-fra-lz-preprod-proj1-mon-agent",
+                    "subnet_id"                                    : "SN-FRA-LZ-PREPROD-APP-KEY"
                 },
 
                 "placement": {
-                    "availability_domain"                  : 1,
-                    "fault_domain"                         : 1
+                    "availability_domain"                          : 1,
+                    "fault_domain"                                 : 1
                 },
 
                 "platform_image": {
-                    "ocid"                                 : "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
-                },
-                "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform": "observability",
-                    "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
+                    "ocid"                                         : "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
                 }
             },
 
             "VM-FRA-LZ-PROD-PROJ1-MON-AGENT-KEY": {
-                "name"                                     : "vm-fra-lz-prod-proj1-mon-agent",
-                "compartment_id"                           : "CMP-LZ-PROD-PROJ1-KEY",
-                "shape"                                    : "VM.Standard.E5.Flex",
+                "name"                                             : "vm-fra-lz-prod-proj1-mon-agent",
+                "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
+                "shape"                                            : "VM.Standard.E5.Flex",
 
                 "boot_volume": {
-                    "preserve_on_instance_deletion"        : false,
-                    "size"                                 : 60
+                    "preserve_on_instance_deletion"                : false,
+                    "size"                                         : 60
                 },
 
                 "cloud_agent": {
-                    "disable_management"                   : false,
-                    "disable_monitoring"                   : false,
+                    "disable_management"                           : false,
+                    "disable_monitoring"                           : false,
 
                     "plugins": [
                         {
-                            "name"                         : "Management Agent",
-                            "enabled"                      : true
+                            "name"                                 : "Management Agent",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Custom Logs Monitoring",
-                            "enabled"                      : true
+                            "name"                                 : "Custom Logs Monitoring",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Compute Instance Monitoring",
-                            "enabled"                      : true
+                            "name"                                 : "Compute Instance Monitoring",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "Vulnerability Scanning",
-                            "enabled"                      : true
+                            "name"                                 : "Vulnerability Scanning",
+                            "enabled"                              : true
                         },
                         {
-                            "name"                         : "OS Management Service Agent",
-                            "enabled"                      : true
+                            "name"                                 : "OS Management Service Agent",
+                            "enabled"                              : true
                         }
                     ]
                 },
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                },
+
                 "encryption": {
-                    "encrypt_in_transit_on_instance_create": null,
-                    "encrypt_in_transit_on_instance_update": null
+                    "encrypt_in_transit_on_instance_create"        : null,
+                    "encrypt_in_transit_on_instance_update"        : null
                 },
 
                 "flex_shape_settings": {
-                    "memory"                               : 8,
-                    "ocpus"                                : 2
+                    "memory"                                       : 8,
+                    "ocpus"                                        : 2
                 },
 
                 "networking": {
-                    "assign_public_ip"                     : false,
-                    "hostname"                             : "vm-fra-lz-prod-proj1-mon-agent",
-                    "subnet_id"                            : "SN-FRA-LZ-PROD-APP-KEY"
+                    "assign_public_ip"                             : false,
+                    "hostname"                                     : "vm-fra-lz-prod-proj1-mon-agent",
+                    "subnet_id"                                    : "SN-FRA-LZ-PROD-APP-KEY"
                 },
 
                 "placement": {
-                    "availability_domain"                  : 1,
-                    "fault_domain"                         : 1
+                    "availability_domain"                          : 1,
+                    "fault_domain"                                 : 1
                 },
 
                 "platform_image": {
-                    "ocid"                                 : "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
-                },
-                "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-                    "tagns-lz-cost-governance.tag-lz-platform": "observability",
-                    "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
+                    "ocid"                                         : "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
                 }
             }
-        },
-        "default_defined_tags" : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
-            "tagns-lz-cost-governance.tag-lz-platform": "observability",
-            "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         }
     }
 }
