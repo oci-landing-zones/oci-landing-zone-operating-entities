@@ -310,8 +310,6 @@ platforms: {
 
 `params` is required whenever `extension` is present. Extension-specific validation applies after the general configuration is normalized. Do not add unregistered extension types or use a network where the extension contract forbids one.
 
-OKE emits one `oke.json` with an `oke_configuration` map keyed by cluster; each entry contains `cluster_configuration` and `workers_configuration.worker_pools`. Only Orchestrator v2.4.1 with CIS OKE v0.3.0 is supported for OKE. Existing OKE deployments require state and input migration; do not simply apply new generated files. Source `cni_type` remains `native` or `overlay`, paired with `cni: 'vcn_native'` or `cni: 'flannel'`. Native mode rejects `pods_cidr`; overlay defaults it to `10.244.0.0/16`. Source `worker_image` defaults to `'9'` and accepts OL8/OL9 major or minor versions or an image OCID; see the OKE guide for deprecated family-selector compatibility and the consolidated worker fields.
-
 Generate into a separate directory and review every emitted file before deployment:
 
 ```bash
