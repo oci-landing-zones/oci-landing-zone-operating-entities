@@ -18,11 +18,11 @@ The diagram provides a comprehensive visual representation of the key OCI resour
 
 &nbsp;
 
-### Mandatory cost-governance tags
+### Cost-governance tags
 
-One-OE uses six mandatory cost-governance tags: cost center, business unit, owner, platform, environment, and project. These tags support FinOps objectives by enabling consistent cost allocation, clear ownership, and spending analysis across business units, platforms, environments, and projects.
+One-OE includes six cost-governance tags: cost center, business unit, owner, platform, environment, and project. These tags support FinOps objectives by enabling consistent cost allocation, clear ownership, and spending analysis across business units, platforms, environments, and projects.
 
-They apply to new resources that support tagging in `cmp-landingzone` and its child compartments. Include the same tags when adding workloads or add-ons.
+All six Tag Defaults use `is_user_required: false` by default. They automatically apply default values to new taggable resources in `cmp-landingzone` and its child compartments. To require users to supply all six values, change `is_user_required` to `true` in each of the six `tag_defaults` entries in your deployment copy of [oneoe_governance.json](oneoe_governance.json) before deploying. This flag controls whether values are user-required; it does not enable or disable the tags. Include the same tags when adding workloads or add-ons.
 
 See [Cost governance tags](cost-governance.md) for configuration and deployment details.
 
@@ -49,7 +49,7 @@ For details on the Security Zone policies included in each deployment option, se
 
 Before deployment, review and update the configuration files:
 
-1. **Cost-governance tags:** update the tag values in the deployment configurations to match your organization. Use only values from each tag’s approved List of Values (LOV); free-text values are not allowed. See [Tag values](cost-governance.md#tag-values).
+1. **Cost-governance tags:** update the tag values in the deployment configurations to match your organization. Tag Defaults use `is_user_required: false` by default. If you want users to supply all six values, set it to `true` in all six `tag_defaults` entries in your deployment copy of `oneoe_governance.json` before deploying. Use only values from each tag’s approved List of Values (LOV); free-text values are not allowed. See [Tag values](cost-governance.md#tag-values).
 2. **Budget notifications:** replace `email.address@example.com` in each budget's `alert_rule.recipients` in [oneoe_governance.json](oneoe_governance.json) with the intended recipients. Review the budget amounts and targets as described in [Monthly budgets](cost-governance.md#monthly-budgets).
 3. **Observability notifications:** replace `email.address@example.com` in each topic's `EMAIL` subscriptions with the email addresses of the teams responsible for receiving its notifications. Use the complete file for the selected CIS level: [CIS 1](oneoe_observability_cis1.json) or [CIS 2](oneoe_observability_cis2.json). Each file includes VCN and subnet Flow Logs for the initial deployment.
 
@@ -62,7 +62,7 @@ Use the reviewed configuration files when creating or updating the ORM stack.
 | JSON configurations | Configuration-defined components | 
 |:-|:-|
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
-| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six required cost-governance Tag Defaults </br> • Eight monthly budgets with 80% alerts |
+| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six automatic cost-governance Tag Defaults (user-required values optional) </br> • Eight monthly budgets with 80% alerts |
 | **Network configuration**: [oneoe_network_hub_c.json](oneoe_network_hub_c.json) or [oneoe_network_hub_c_backends.json](oneoe_network_hub_c_backends.json) | • [Hub C](/addons/oci-hub-models/hub_c/readme.md) VCN with associated subnets </br> • Private Network Load Balancers (trust and untrust) </br> • Internet and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs). For detailed configuration information, see [Security Lists and Network Security Groups](./one_oe_hub_c_sl_nsg.md) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
 | **Security configuration** for </br> **Step 1**: [oneoe_security_cis1_pre.json](oneoe_security_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis1.json](oneoe_security_cis1.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 1)](./sz_recipes_cis1.md)</br> • Vulnerability Scanning |
 | **Observability configuration**</br> [oneoe_observability_cis1.json](oneoe_observability_cis1.json) | • Events</br> • Alarms</br> • Logging, including VCN and subnet Flow Logs</br> • Notifications |
@@ -111,7 +111,7 @@ Once all required updates are applied, rerun the ORM stack.
 | JSON configurations | Configuration-defined components | 
 |:-|:-|
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
-| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six required cost-governance Tag Defaults </br> • Eight monthly budgets with 80% alerts |
+| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six automatic cost-governance Tag Defaults (user-required values optional) </br> • Eight monthly budgets with 80% alerts |
 | **Network configuration**: [oneoe_network_hub_c.json](oneoe_network_hub_c.json) or [oneoe_network_hub_c_backends.json](oneoe_network_hub_c_backends.json) | • [Hub C](/addons/oci-hub-models/hub_c/readme.md) VCN with associated subnets </br> • Private Network Load Balancers (trust and untrust) </br> • Internet and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs). For detailed configuration information, see [Security Lists and Network Security Groups](./one_oe_hub_c_sl_nsg.md) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
 | **Security configuration** for </br> **Step 1**: [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis2.json](oneoe_security_cis2.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 2)](./sz_recipes_cis2.md)</br> • Vulnerability Scanning</br> • Vault and Software Key |
 | **Observability configuration**</br> [oneoe_observability_cis2.json](oneoe_observability_cis2.json) | • Events</br> • Alarms</br> • Logging, including VCN and subnet Flow Logs</br> • Notifications |

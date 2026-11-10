@@ -85,7 +85,7 @@ local defaultGovernance(governance) =
                 [key + '-REQUIRED']: {
                   compartment_ids: ['CMP-LANDINGZONE-KEY'],
                   default_value: if key == 'TAG-LZ-PROJECT-KEY' then 'notapplicable' else 'tobedefined',
-                  is_user_required: true,
+                  is_user_required: false,
                 },
               },
             }

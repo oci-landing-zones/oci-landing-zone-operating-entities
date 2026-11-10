@@ -53,6 +53,11 @@ The destroy operation will keep failing until you reach the key deletion date. I
 
 ## Required tags on implicitly created resources
 
+This issue applies when you opt in to required tagging by changing all six
+`is_user_required` values to `true` in your deployment copy of
+`oneoe_governance.json`. The published configuration defaults to `false`, which
+automatically fills missing tag values.
+
 Tags present in a JSON input do not prove that every resource created internally
 by its Terraform module receives them. Review the complete plan before using an
 extension with required Tag Defaults. In particular:

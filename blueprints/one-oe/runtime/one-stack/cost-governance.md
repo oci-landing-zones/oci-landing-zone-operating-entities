@@ -11,9 +11,10 @@ across the landing zone. They help teams identify ownership, allocate costs,
 analyze spending by business and technical scope, and monitor budgets using
 shared reporting criteria.
 
-The blueprint assigns these tags to supported resources and requires them on new
-taggable resources created within the landing-zone hierarchy. This promotes
-consistent cost data as teams add workloads and expand the environment.
+The blueprint assigns these tags to supported resources and automatically applies
+default values to new taggable resources within the landing-zone hierarchy.
+Customers can require users to supply tag values during resource creation by
+enabling required tagging at deployment time.
 
 ![One-OE FinOps tags](../../design/images/FinOps_tags.png)
 
@@ -32,8 +33,9 @@ assignments together to use those approved values.
 `tobedefined` is an accepted placeholder. Replace it with an approved value before
 relying on cost-allocation reports.
 
-The supplied configurations assign tag values explicitly. Required Tag Defaults
-do not automatically fill missing tags.
+The supplied configurations assign tag values explicitly. By default, Tag Defaults
+automatically fill missing tags. When required tagging is enabled, users must
+supply the values instead.
 
 | Tag | Default value in One-OE | Examples of allowed values |
 |---|---|---|
@@ -58,32 +60,34 @@ The One-OE blueprint assigns tags according to each resource's purpose and scope
 Existing access-control tags are preserved. Components that do not support
 tagging, such as listeners, backends, and NSG rules, do not receive separate tags.
 
-### 1.3. Required tagging
+### 1.3. Tag Defaults and optional required tagging
 
-The blueprint requires all six cost-governance tags on new taggable resources
-created within the landing-zone compartment hierarchy. Values must match the
-configured allowed lists; missing tags are not filled automatically. These
-requirements are inherited by child compartments and also apply to new taggable
-resources created there by add-ons and workload extensions. Existing resources
-are not tagged retroactively. Review the supplied tag values and the
-[known issues](known_issues.md#required-tags-on-implicitly-created-resources)
-before deploying add-ons or workload extensions, and preserve their existing
-access-control tags.
+By default, all six Tag Defaults use `is_user_required: false` in
+`oneoe_governance.json`. They automatically apply the configured default values
+to new taggable resources in the landing-zone compartment and its child
+compartments, including resources created by add-ons and workload extensions.
+Existing resources are not tagged retroactively. Allowed-value validators
+remain active.
 
-By default, all six Tag Defaults use `is_user_required: true`.
+If you want users to explicitly supply all six cost-governance tag values,
+change `is_user_required` to `true` in each of the six `tag_defaults` entries in
+your deployment copy of `oneoe_governance.json` before deploying the landing
+zone. Use that reviewed configuration when creating or updating the deployment
+stack. With `true`, missing tags are not filled automatically and resource
+creation fails if required values are omitted. Values must match the configured
+allowed lists.
 
-To allow resource creation without users explicitly supplying all six values,
-set `is_user_required` to `false` in each of the six `tag_defaults` entries in
-your deployment configuration. This changes tagging to
-automatic defaults; it does not disable the tags or their allowed-value
-validators. Review the default values with your cost-management team before
-using this option. See [OCI Tag Defaults](https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm).
+Setting this flag to `true` makes tag values user-required; it is not necessary
+just to use the tags. Review the default values with your cost-management team,
+and review the [known issues](known_issues.md#required-tags-on-implicitly-created-resources)
+before enabling required tagging for add-ons or workload extensions. Preserve
+existing access-control tags. See [OCI Tag Defaults](https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm).
 
 For deployment prerequisites and sequencing, follow the selected hub guide
 linked from the [One-OE deployment overview](readme.md).
 
 [Orchestrator v2.4.1](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/releases/tag/v2.4.1)
-is the minimum version required to deploy this blueprint's required tagging
+is the minimum version required to deploy this blueprint's Tag Default
 configuration.
 
 <a id="monthly-budgets"></a>
