@@ -28,6 +28,8 @@ describe('DR file generation', () => {
     const { home, dr } = buildDrFileConfigs(model, draft);
     expect(home).toMatchObject({ stack_scope: 'complete', dr_region: 'eu-amsterdam-1', region: 'eu-frankfurt-1' });
     expect(dr).toMatchObject({ stack_scope: 'regional', region: 'eu-amsterdam-1', region_short_name: 'ams', notification_emails: { default: ['dr@example.com'] } });
+    expect(home).toHaveProperty('cost_governance');
+    expect(dr).not.toHaveProperty('cost_governance');
     expect(Object.keys(dr.environments)).toEqual(['prod']);
     expect(dr.environments.prod.project_network?.network.vcn).toBe('10.0.200.0/21');
     expect(home.environments.prod.project_network?.network.vcn).toBe('10.0.64.0/21');

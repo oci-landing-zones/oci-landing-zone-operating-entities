@@ -56,7 +56,7 @@ export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home
   if (emails.length) throw new Error(emails.join('\n'));
   const home: RegionalFileConfig = { ...structuredClone(buildConfig(model)), stack_scope: 'complete', dr_region: region.id };
   const dr: RegionalFileConfig = {
-    ...structuredClone(buildConfig({ ...model, foundation: { ...model.foundation, notifications: draft.notifications ?? model.foundation.notifications } })),
+    ...structuredClone(buildConfig({ ...model, foundation: { ...model.foundation, stackScope: 'regional', notifications: draft.notifications ?? model.foundation.notifications } })),
     stack_scope: 'regional', region: region.id, region_short_name: region.shortName,
     hub: { kind: draft.hubKind, network: { vcn: draft.hubNetwork.hubVcnCidr.trim(), subnets: Object.fromEntries(draft.hubNetwork.subnets.map((subnet) => [subnet.name, subnet.cidr.trim()])) } },
     environments: {}, shared_platforms: {}, security_targets: [],
