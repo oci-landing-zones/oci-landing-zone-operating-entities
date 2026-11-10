@@ -1,6 +1,6 @@
 # Use OCI Bastion from Windows
 
-Use PowerShell with the Windows OpenSSH **Client** for the tunnel, a dedicated Firefox profile for database web access, and PuTTY for a Linux VM connection through SOCKS5. Review the [session prerequisites](./oci-bastion-dynamic-port-forwarding-session.md#before-connecting) and [cross-VCN service boundary](./README.md#hub-placement-and-service-boundary) first.
+Use PowerShell with the Windows OpenSSH **Client** for the tunnel, a dedicated Firefox profile for database web access, and PuTTY for a Linux VM connection through SOCKS5. Review the [session prerequisites](./oci-bastion-dynamic-port-forwarding-session.md#before-connecting) and [target access requirements](./README.md#prepare-target-access) first.
 
 ## 1. Prepare the client and create a session
 

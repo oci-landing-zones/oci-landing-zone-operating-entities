@@ -1,6 +1,6 @@
 # Use OCI Bastion from macOS
 
-Use Terminal's OpenSSH client for the tunnel and a dedicated Firefox profile for web access. Review the [session prerequisites](./oci-bastion-dynamic-port-forwarding-session.md#before-connecting), especially the actual Bastion source IP and the [cross-VCN service boundary](./README.md#hub-placement-and-service-boundary), first.
+Use Terminal's OpenSSH client for the tunnel and a dedicated Firefox profile for web access. Review the [session prerequisites](./oci-bastion-dynamic-port-forwarding-session.md#before-connecting), especially the actual Bastion source IP and the [target access requirements](./README.md#prepare-target-access), first.
 
 ## 1. Create a dynamic session
 

@@ -13,7 +13,7 @@ Regular clones, submodules, and linked Git worktrees are supported. Hook paths a
 - [`AGENTS.md`](AGENTS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
 - [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
 - [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
-- [OCI Bastion integration](../addons/oci-bastion/landing-zone-integration.md): optional hub Bastion configuration, IAM and operator prerequisites.
+- [OCI Bastion setup](../addons/oci-bastion/README.md#setup): optional hub Bastion configuration and operator prerequisites.
 
 ## Generator Workflow
 

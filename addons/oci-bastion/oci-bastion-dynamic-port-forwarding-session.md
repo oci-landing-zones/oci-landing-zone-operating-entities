@@ -1,6 +1,6 @@
 # OCI Bastion dynamic port forwarding sessions
 
-Configure the [Landing Zone integration](./landing-zone-integration.md) before creating a session. Use the [macOS](./macos.md) or [Windows](./windows.md) guide for workstation commands.
+Complete the [Bastion setup](./README.md#setup) before creating a session. Use the [macOS](./macos.md) or [Windows](./windows.md) guide for workstation commands.
 
 ## Before connecting
 
