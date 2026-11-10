@@ -32,7 +32,7 @@ const css = {
 
 export default function ViewModeToggle({ mode, onChange }: { mode: ViewMode; onChange: (m: ViewMode) => void }) {
   return (
-    <div style={css.group} role="group" aria-label="View mode">
+    <div style={css.group} className="studio-view-mode" role="group" aria-label="View mode">
       {OPTIONS.map((o) => {
         const active = o.mode === mode;
         return (
@@ -46,7 +46,7 @@ export default function ViewModeToggle({ mode, onChange }: { mode: ViewMode; onC
             onClick={() => onChange(o.mode)}
           >
             {o.icon}
-            <span>{o.shortLabel}</span>
+            <span className="studio-view-mode-label">{o.shortLabel}</span>
           </button>
         );
       })}

@@ -1,7 +1,6 @@
-// Published X-RPC fragments preserve role, routing, IAM, and firewall-policy boundaries when rendered from the current generator.
+// Published X-RPC outputs preserve role, routing, IAM, and firewall-policy boundaries.
 // contains: "failures": []
 local profiles = import 'gen/addons/oci-x-rpc/profiles.libsonnet';
-local published = import 'gen/addons/oci-x-rpc/published.libsonnet';
 local lz = import 'gen/landing_zone.libsonnet';
 
 local acceptor = lz(profiles.cross_tenancy_acceptor);
@@ -11,18 +10,15 @@ local acceptor_without_rpc = lz({
   for key in std.objectFields(profiles.cross_tenancy_acceptor)
   if key != 'remote_peering_connections'
 });
-local acceptor_network = published.network_fragment(profiles.cross_tenancy_acceptor);
-local requestor_network = published.network_fragment(profiles.cross_tenancy_requestor);
-local acceptor_iam = published.iam_fragment(profiles.cross_tenancy_acceptor);
-local requestor_iam = published.iam_fragment(profiles.cross_tenancy_requestor);
-local same_acceptor_iam = published.iam_fragment(profiles.same_tenancy_acceptor);
-local same_requestor_iam = published.iam_fragment(profiles.same_tenancy_requestor);
-local acceptor_reference_network = published.network(profiles.cross_tenancy_acceptor);
-local requestor_reference_network = published.network(profiles.cross_tenancy_requestor);
-local acceptor_reference_iam = published.iam(profiles.cross_tenancy_acceptor);
-local acceptor_reference_governance = published.governance(
-  profiles.cross_tenancy_acceptor
-);
+local acceptor_reference_network = acceptor.network;
+local requestor_reference_network = requestor.network;
+local acceptor_reference_iam = acceptor.iam;
+local requestor_reference_iam = requestor.iam;
+local same_acceptor = lz(profiles.same_tenancy_acceptor);
+local same_requestor = lz(profiles.same_tenancy_requestor);
+local same_acceptor_iam = same_acceptor.iam;
+local same_requestor_iam = same_requestor.iam;
+local acceptor_reference_governance = acceptor.governance;
 
 local shared(result) =
   result.network.network_configuration.network_configuration_categories['0-shared'];
@@ -35,11 +31,11 @@ local acceptor_rpc =
 local requestor_rpc =
   requestor_drg.remote_peering_connections['RPC-AMS-LZ-HUB-TENANCY1-KEY'];
 local acceptor_statements =
-  acceptor_iam.policies_configuration.supplied_policies[
+  acceptor_reference_iam.policies_configuration.supplied_policies[
     'PCY-FRA-LZ-HUB-RPC-TENANCY2-KEY'
   ].statements;
 local requestor_statements =
-  requestor_iam.policies_configuration.supplied_policies[
+  requestor_reference_iam.policies_configuration.supplied_policies[
     'PCY-AMS-LZ-HUB-RPC-TENANCY1-KEY'
   ].statements;
 local expected_acceptor_statements = [
@@ -52,12 +48,6 @@ local expected_requestor_statements = [
   "Allow group 'id_lz_common'/'grp-lz-network-admin' to manage remote-peering-from in compartment cmp-landingzone:cmp-lz-network",
   "Endorse group 'id_lz_common'/'grp-lz-network-admin' to manage remote-peering-to in tenancy Acceptor",
 ];
-local network_fragment_has_only_delta(fragment) =
-  std.objectFields(fragment) == ['network_configuration']
-  && std.objectHas(
-    fragment.network_configuration,
-    'network_configuration_categories'
-  );
 local reference_categories(network) =
   network.network_configuration.network_configuration_categories;
 local complete_network_has_standard_categories(network) =
@@ -106,20 +96,17 @@ local complete_network_has_standard_categories(network) =
       },
       {
         name: 'same-tenancy acceptor emitted an IAM policy',
-        ok: std.objectFields(
-          same_acceptor_iam.policies_configuration.supplied_policies
-        ) == [],
+        ok: !std.objectHas(
+          same_acceptor_iam.policies_configuration.supplied_policies,
+          'PCY-FRA-LZ-HUB-RPC-TENANCY2-KEY'
+        ),
       },
       {
         name: 'same-tenancy requestor emitted an IAM policy',
-        ok: std.objectFields(
-          same_requestor_iam.policies_configuration.supplied_policies
-        ) == [],
-      },
-      {
-        name: 'published output is not an RPC-only network delta',
-        ok: network_fragment_has_only_delta(acceptor_network)
-            && network_fragment_has_only_delta(requestor_network),
+        ok: !std.objectHas(
+          same_requestor_iam.policies_configuration.supplied_policies,
+          'PCY-AMS-LZ-HUB-RPC-TENANCY1-KEY'
+        ),
       },
       {
         name: 'reference network output is not a complete prod/preprod One-OE surface',
@@ -137,10 +124,8 @@ local complete_network_has_standard_categories(network) =
       },
       {
         name: 'same-tenancy and cross-tenancy network profiles diverge',
-        ok: published.network(profiles.same_tenancy_acceptor)
-            == acceptor_reference_network
-            && published.network(profiles.same_tenancy_requestor)
-               == requestor_reference_network,
+        ok: same_acceptor.network == acceptor_reference_network
+            && same_requestor.network == requestor_reference_network,
       },
       {
         name: 'RPC changed the standard customer Network Firewall policy',

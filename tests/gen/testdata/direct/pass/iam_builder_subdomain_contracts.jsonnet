@@ -4,6 +4,10 @@
 // contains: "project_admin_first_statement": "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read all-resources in compartment cmp-lz-prod-proj1"
 // contains: "network_admin_uses_tbac": true
 // contains: "security_admin_uses_tbac": true
+// contains: "network_admin_manages_nsgs_across_lz": true
+// contains: "project_nsg_scope_failures": []
+// contains: "security_admin_reads_all_lz_resources": true
+// contains: "tenancy_security_admin_uses_tag_namespaces": true
 local one = import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_iam.jsonnet';
 
 local root_children = one.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].children;
@@ -28,4 +32,24 @@ local security_policy_text = std.manifestJsonEx(policies['PCY-LZ-SECURITY-ADMIN-
     std.length(std.findSubstr('sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role', network_policy_text)) > 0,
   security_admin_uses_tbac:
     std.length(std.findSubstr('sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role', security_policy_text)) > 0,
+  network_admin_manages_nsgs_across_lz:
+    std.member(policies['PCY-LZ-NETWORK-ADMIN-KEY'].statements,
+      "allow group 'id_lz_common'/'grp-lz-network-admin' to manage network-security-groups in compartment cmp-landingzone"),
+  project_nsg_scope_failures: [
+    env
+    for env in ['prod', 'preprod']
+    if !std.member(policies['PCY-LZ-%s-PROJ1-ADMIN-KEY' % std.asciiUpper(env)].statements,
+      "allow group 'id_lz_common'/'grp-lz-%s-proj1-admin' to manage network-security-groups in compartment cmp-lz-%s-proj1" % [env, env]) ||
+      std.length([
+        statement
+        for statement in policies['PCY-LZ-%s-PROJ1-ADMIN-NET-KEY' % std.asciiUpper(env)].statements
+        if std.length(std.findSubstr('to manage network-security-groups', statement)) > 0
+      ]) > 0
+  ],
+  security_admin_reads_all_lz_resources:
+    std.member(policies['PCY-LZ-SECURITY-ADMIN-KEY'].statements,
+      "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone"),
+  tenancy_security_admin_uses_tag_namespaces:
+    std.member(policies['PCY-SECURITY-ADMIN-KEY'].statements,
+      "allow group 'id_lz_common'/'grp-security-admin' to use tag-namespaces in tenancy"),
 }

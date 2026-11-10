@@ -1,5 +1,5 @@
 /**
- * WizardStepper — the five-step navigation across the top of the wizard.
+ * WizardStepper — navigation across the five-step wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */

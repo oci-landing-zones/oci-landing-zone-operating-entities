@@ -10,10 +10,10 @@ function(params)
   local n = params.naming;
   local hub = params.hub;
   local all_vcn_entries = params.all_vcn_entries;
-  local remote_peering =
-    if std.objectHas(params, 'remote_peering') then params.remote_peering
+  local remote_routing =
+    if std.objectHas(params, 'remote_routing') then params.remote_routing
     else { route_entries: [], network_overlay: {} };
-  local all_routed_cidr_entries = all_vcn_entries + remote_peering.route_entries;
+  local all_routed_cidr_entries = all_vcn_entries + remote_routing.route_entries;
 
   local drg_key = n.key('DRG', ['HUB']);
 
@@ -172,7 +172,7 @@ function(params)
         },
       },
     },
-  } + remote_peering.network_overlay;
+  } + remote_routing.network_overlay;
 
   local post =
     if has_post_route_entity

@@ -57,7 +57,7 @@ function(ctx)
           '%s to read audit-events in compartment %s' % [grp, proj_cmp],
           '%s to read work-requests in compartment %s' % [grp, proj_cmp],
           '%s to read instance-agent-plugins in compartment %s' % [grp, proj_cmp],
-          '%s to use network-security-groups in compartment %s' % [grp, proj_cmp],
+          '%s to manage network-security-groups in compartment %s' % [grp, proj_cmp],
           '%s to use load-balancers in compartment %s' % [grp, proj_cmp],
           '%s to use vnics in compartment %s' % [grp, proj_cmp],
           '%s to use key-delegate in compartment %s' % [grp, proj_cmp],

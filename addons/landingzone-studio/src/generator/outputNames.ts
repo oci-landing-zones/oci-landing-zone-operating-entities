@@ -20,7 +20,9 @@ export function isCurrentOutputSet(output: { config: string; files: Record<strin
   return output !== null
     && output.config === config
     && Object.hasOwn(output.files, 'network.json')
-    && !Object.hasOwn(output.files, 'network_pre.json');
+    && !Object.hasOwn(output.files, 'network_pre.json')
+    && !Object.hasOwn(output.files, 'oke_clusters.json')
+    && !Object.hasOwn(output.files, 'oke_workers.json');
 }
 
 export interface DeploymentStage {
@@ -35,15 +37,18 @@ const persistent = ['iam.json', 'governance.json'];
  * Builds the rms-facade input sets without ever placing pre and final variants
  * of the same root configuration family in one operation.
  */
-export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
-  const available = new Set(availableFiles.filter((file) => file !== 'network_pre.json'));
+export function deploymentStages(availableFiles: string[], completionNetwork: 'network.json' | 'network_backends.json' = 'network.json'): DeploymentStage[] {
+  const deployable = availableFiles.filter((file) => file.endsWith('.json')
+    && !file.endsWith('_output.json') && !file.includes('/') && file !== 'network_pre.json');
+  const available = new Set(deployable);
+  if (!available.has(completionNetwork)) throw new Error(`Generate ${completionNetwork} before selecting it for deployment.`);
   const keep = (files: string[]) => [...new Set(files.filter((file) => available.has(file)))];
   const pre = [...available].filter((file) => file.endsWith('_pre.json'));
-  const finalCore = availableFiles.filter((file) =>
-    (file === 'network.json' || file.startsWith('security_cis') || file.startsWith('observability_cis'))
+  const finalCore = deployable.filter((file) =>
+    (file.startsWith('security_cis') || file.startsWith('observability_cis'))
     && !file.endsWith('_pre.json'),
   );
-  const extensionFiles = availableFiles.filter((file) =>
+  const extensionFiles = deployable.filter((file) =>
     !persistent.includes(file)
     && file !== 'network.json'
     && file !== 'network_pre.json'
@@ -61,7 +66,7 @@ export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
     {
       title: '2. Complete controls and workloads',
       description: 'Update the same stack: retain the network file, replace each security and observability _pre file with its final counterpart, and add workload files. Plan and apply again.',
-      files: keep([...persistent, ...finalCore, ...extensionFiles]),
+      files: keep([...persistent, completionNetwork, ...finalCore, ...extensionFiles]),
     },
   ];
 }

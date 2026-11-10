@@ -4,6 +4,35 @@ import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
 
 describe('validatePlatformContracts', () => {
+  it('rejects unsupported types in runtime records instead of treating them as Custom', () => {
+    const model = emptyLzModel();
+    model.platforms = [{ ...newPlatform('custom', []), type: 'ocvs' } as unknown as typeof model.platforms[number]];
+    model.sharedPlatforms = [{ ...newSharedPlatform('custom', []), type: 'ocvs' } as unknown as typeof model.sharedPlatforms[number]];
+    expect(validatePlatformContracts(model)).toEqual(expect.arrayContaining([
+      'Unsupported platform type: ocvs.', 'Unsupported shared platform type: ocvs.',
+    ]));
+  });
+  it.each(['hub', 'environment', 'shared', 'platform'])('rejects a %s subnet outside its VCN before generation', (scope) => {
+    const model = emptyLzModel();
+    const subnet = { name: 'outside', cidr: '192.168.50.0/24' };
+    if (scope === 'hub') model.network.subnets[0] = subnet;
+    if (scope === 'environment') model.environments[0].network.subnets[0] = subnet;
+    if (scope === 'shared') model.sharedPlatforms = [{ ...newSharedPlatform('custom', []), subnets: [subnet] }];
+    if (scope === 'platform') model.platforms = [{ ...newPlatform('custom', []), subnets: [subnet], overrides: undefined }];
+    expect(validatePlatformContracts(model).some((error) => error.includes('Outside the VCN'))).toBe(true);
+  });
+  it('accepts the same platform and project keys in disjoint environments', () => {
+    const model = emptyLzModel();
+    const first = newPlatform('custom', [], model.environments);
+    model.platforms = [
+      { ...first, environments: [model.environments[0].id] },
+      { ...newPlatform('custom', [first], model.environments), key: first.key, environments: [model.environments[1].id] },
+    ];
+    model.projects = model.environments.map((env, index) => ({ id: `project-${index}`, name: 'app', environments: [env.id] }));
+    expect(validatePlatformContracts(model)).toEqual([]);
+    model.platforms[1].environments = 'all';
+    expect(validatePlatformContracts(model)).toContain(`Duplicate environment platform config key: ${first.key}.`);
+  });
   it('accepts independent environment and shared platform ranges', () => {
     const base = emptyLzModel();
     const shared = newSharedPlatform('custom', []);

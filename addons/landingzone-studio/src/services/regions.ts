@@ -19,8 +19,8 @@ export interface Realm {
 }
 
 export const REALM_OPTIONS: Realm[] = [
-  { id: 'oc1', label: 'OC1 — Commercial' },
-  { id: 'oc19', label: 'OC19 — EU Sovereign' },
+  { id: 'oc1', label: 'OC1 - Commercial' },
+  { id: 'oc19', label: 'OC19 - EU Sovereign' },
 ];
 
 const SUPPORTED_REALMS = new Set(REALM_OPTIONS.map(({ id }) => id));
@@ -94,4 +94,8 @@ export function getDefaultRegionForRealm(realm: string): Region | null {
 
 export function findRegion(realm: string, regionId: string): Region | null {
   return getRegionsForRealm(realm).find((region) => region.id === regionId) || null;
+}
+
+export function regionShortNameError(value: string): string | null {
+  return value.length > 3 ? 'Use 3 characters or fewer for the region short name.' : null;
 }

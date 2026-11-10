@@ -1,6 +1,8 @@
 # **[OCI Landing Zone Studio](#)**
 ## **An OCI Open LZ [Addon](#) for visual Landing Zone design**
 
+**[Open OCI Landing Zone Studio](https://oci-landing-zones.github.io/oci-landing-zone-operating-entities/)** in your browser. No installation or server is required. All design data and generated files remain stored locally in your browser profile.
+
 &nbsp;
 
 **Table of Contents**
@@ -31,13 +33,61 @@ Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/RE
 
 Studio keeps one canonical Landing Zone model while you work. The wizard, JSON configuration, live network diagram, packet-flow trace, downloadable Draw.io diagram, and generated deployment files all derive from that same model.
 
-1. **Start a design**: choose a design name, OCI region and realm, and the CIS baseline.
+1. **Start a design**: choose a design name, OCI region and realm, deployment type, the CIS baseline, and One-OE notification recipients. Configure Cloud Guard, IAM, Network, and Security separately, or select one email list for all applicable topics. Regional DR uses Network and Security topics. The Network recipient also covers ExaCS network notifications.
 1. **Design the hub network**: select a Hub A, B, C, or E layout and review the VCN, subnets, gateways, DRG, and attachments.
-1. **Add environments and projects**: define environment networks and the projects that need to be represented in each environment.
-1. **Add platforms**: add supported OKE, OCVS, or custom platforms. Shared custom and OCVS platforms can also be included.
-1. **Review and export**: download one ZIP containing `config.jsonnet` and the generated deployment files. Export the structural diagram as a `.drawio` file when you need to continue diagramming outside Studio.
+   Subnet CIDRs must fit inside their VCN and must not overlap. Invalid subnet rows offer an available replacement CIDR; applying it changes that subnet only. Review blocks downloads until the network ranges are valid. The same editor is used for hub, environment and custom-platform networks.
+1. **Add environments and projects**: define environment networks and projects when needed. Environments are optional for hub and shared-services designs; an environment may also use platform networks without a Projects VCN.
+1. **Add platforms**: use the separate Shared Platforms and Environment Platforms panels. Both type dropdowns include Custom, EXACC, and EXACS; OKE is also available for environment platforms. Shared Exadata infrastructure is fixed to shared placement; its VMC dropdown selects shared or dedicated-per-environment placement. Choosing dedicated VMCs automatically shows a linked card in Environment Platforms. The shared infrastructure card controls placement and shared notification recipients; VMC/AVMC services, environment selection, networks, project tiers, and per-environment recipients are configured in the linked environment card. Exadata added directly in Environment Platforms has infrastructure and VMC placement fixed to dedicated per environment, shown as plain text. A linked environment card names Shared Platforms as its infrastructure source. Use the trash icon in an Exadata card header to remove the platform, including its linked card. Settings are retained when re-added, and a type cannot be added twice. OKE validation also runs before generation in Review.
+   **Exadata options**: EXACC and EXACS start disabled. Studio identifies the resulting UC1 shared, UC2 hybrid, or UC3 dedicated scenario from the platform panel and VMC placement. VMC and AVMC both start unchecked in each extension; select either or both to continue. Autonomous project tiers appear only when AVMC is selected. Configure separate infrastructure and DBA recipients for each topic in the selected use case. Autonomous project recipients appear only when a project tier is selected. Use one email for all notifications is selected by default for new Exadata platforms. In a hybrid design this option and the common email are managed in Shared Platforms; the linked environment card displays that email as text. Clear it to configure recipients by topic in the card that owns them. Existing saved choices are retained. Add CIDRs for ExaCS VMC/AVMC networks as needed. The diagram shows generated platform child compartments and selected Autonomous project DB compartments.
+1. **Review and export**: download one ZIP containing `config.jsonnet` and deployment files regenerated from the current Blueprint Factory. Export the diagram as a `.drawio` file when you need to continue diagramming outside Studio. The Review export always includes the complete design and every routing table. It excludes example endpoint VMs, packet-flow paths and active-rule highlighting, independently of the layers selected while editing.
+
+To continue a previously exported design, select **Import** next to **New Landing Zone** on the dashboard. The import window explains which file to choose: extract the ZIP downloaded in Review and select its **`config.jsonnet`** file (up to 1 MB). Studio validates it locally, shows a summary, and lets you name the new design before importing it. Existing saved designs are kept; generated deployment outputs must be regenerated in Review.
+
+Import supports standalone configuration files exported by Studio. Files with unsupported settings or external imports are rejected rather than silently dropping values. Exadata exports do not record the VMC/AVMC service selection: review those choices in Platforms after import. Autonomous project tiers restore the required AVMC selection; where no tiers establish a service choice, the service selection remains empty until you choose it.
+
+**New Landing Zone** opens Foundation directly with the default Frankfurt region, prod and preprod environments, and proj1 project. Environments are optional: remove them all for a hub and shared-services design. Set **Deployment type**, above the region controls, to **Complete** or **DR** (Disaster Recovery). Region short name is filled from the selected region and can be edited beside it, with a maximum of three characters. Choose **Create DR** on a complete design's saved card to retain its inputs in a linked DR design. Its environment names and membership sync automatically from Home and are read-only in DR; regional networks remain editable. **Open Home Region** opens the source design in a new tab. The link applies to designs saved in this browser; imported or newly created standalone DR designs keep editable environments. Both deployment types use the standard Foundation, Hub Network, Projects, Platforms and Review flow. Review retained platform settings and CIDRs for the target region.
+
+Regional DR reuses the Home stack's compartments, IAM and governance. In Foundation, choose Home and DR regions in the same realm; linked DR designs take their Home Region and realm from the source. Review's deployment steps explain the Home prerequisites: select the DR region in the complete Home design to grant DR Object Storage access to Home encryption keys, deploy Home first, then supply its dependency outputs to a separate DR stack/state. Regional downloads exclude IAM, governance, Cloud Guard and Security Zones and retain regional security and observability resources. Saved regional designs are labelled **DR**. Diagram export is available only in **Review**.
+
+For linked DR designs, the `.drawio` download contains separate **DR** and **Home Region** pages. Both pages use the full static routing view, independently of live diagram layer choices, with newly generated Home resources and routes. The Home design must still be available in browser storage. Standalone DR designs export only their DR diagram.
+
+Review uses the shared regional deployment sequence, including Home dependencies and applicable connectivity prerequisites. Linked DR designs link directly to Home Region Review. Phase file lists use the current Blueprint Factory preview, including extension files, before a ZIP download; prior-model previews are not used. Hub C retains its backend network alternative for phase 2.
+
+Configure **Remote peering connection (RPC)** in Hub Network. Each connection needs a unique name, peer region and reviewed remote VCN CIDRs. Requesters also need the acceptor RPC OCID or an Orchestrator network dependency key. Deploy acceptors first and review routes and firewall policies on both sides. Regional DR supports same-tenancy peering. Complete deployments also support cross-tenancy peering: acceptors require the foreign requester tenancy and network-administrator group OCIDs; requesters require the acceptor tenancy OCID.
+
+Import restores regional scope and RPC connections when present in a supported standalone configuration. Choose the Home region after importing a regional design and follow Review's deployment steps. Older combined Home + DR designs open in the standard regional editor when their settings can be represented; the original combined source is retained when edits are saved. Designs with unrepresentable legacy settings are kept intact and display a review message.
+
+Studio's initial One-OE address plan uses the following reservations. These are suggestions for new networks; operators can edit CIDRs and saved designs retain their existing values.
+
+| Environment | Projects VCN | ExaCS reservation |
+|---|---|---|
+| Prod | `10.0.64.0/21` | `10.0.104.0/21` |
+| Preprod | `10.0.128.0/21` | `10.0.168.0/21` |
+| DR | `10.0.200.0/21` | `10.0.240.0/22` |
+| Dev | `10.1.64.0/21` | `10.1.104.0/21` |
+| UAT | `10.1.128.0/21` | `10.1.168.0/21` |
+
+Names are matched without case sensitivity. Shared ExaCS starts at `10.0.24.0/21`. Optional shared Custom networks use free `/21` blocks from `10.0.32.0/19`. Custom environment networks use that environment's optional slots. The catalog also retains EBS, AI, and OKE reservations without creating those resources.
+
+Other environment names share the `10.1.192.0/18` pool. Each new Projects, Custom, or environment ExaCS VCN consumes a separate free `/21` block from its eight available blocks. `10.1.0.0/18` remains unallocated by these defaults. An exhausted pool leaves the CIDR empty and requires a manual allocation before generation.
+
+The first OKE platform starts at `10.0.80.0/20` for the `small` profile. Changing an OKE network profile checks every selected environment against configured VCNs and allocates free, aligned blocks within the same private address range when needed. Each allocation is saved per environment. If no block is available, its CIDR remains empty for correction instead of overlapping another network. Review the resulting address plan, including networks outside Studio; reservations alone do not guarantee a deployable combination.
+
+Choose **All** or individual environments before adding OKE; Studio creates one cluster per selected environment. Sample node pools and spoke connectivity default to off; internet access defaults to on. Peering uses explicit CIDRs. A DRG internet default can still allow outbound spoke traffic when spoke connectivity is off. See the [OKE guide](../../workload-extensions/oke/simple/oke-blueprint-factory.md) for configuration and deployment details.
 
 The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
+
+The [diagram design rules](DIAGRAM-DESIGN.md) define composition, readable sizing, colors, resource ownership and routing consistency. Studio's test suite checks those rules across representative configurations and visible layers.
+
+Events, vaults, vulnerability scanning recipes, notifications, VCN flow log groups and Security Zone recipes are listed inside their owning compartments. Their names and compartment references come from the selected final Blueprint Factory outputs, including CIS and DR filtering. Adding or renaming resources in those generated collections updates the diagram automatically. The website and Draw.io export use the same measured resource blocks, icons and line wrapping.
+
+Route tables and their subnet, gateway, VCN-ingress and DRG-attachment associations come from the evaluated Blueprint Factory network configuration. DRG import distributions provide expected route advertisements; remote prefixes come from the supplied peer CIDRs. These are configuration previews, not live learned routes. Designs without Projects VCNs can use **Show routing tables** without selecting a packet flow.
+
+VCN tables also show OCI's automatic local routes as shaded, italic **Implicit** rows. Routes use longest-prefix matching; a configured static route wins over an implicit local route with the same prefix. **(fully superseded)** means preferred routes cover the entire destination in the preview. A route with only partial coverage remains active for the remaining addresses. Traffic within the same subnet is forwarded directly and does not use these route lookups. See [VCN routing and precedence](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingroutetables.htm).
+
+Packets follow the same connection geometry as the structural diagram, including repeated attachment visits. Each numbered hop uses one processing anchor on that path for its marker, packet pause and effective-rule highlight. Routing anchors come from the table's resource association; component entry and exit remain on the path. Manual stepping holds the same anchor, and reduced-motion mode uses static steps. Draw.io downloads retain the same table inventory, processing anchors and connection geometry as a static diagram, without an animation phase.
+
+Hub E shows direct DRG routing without firewall inspection, local spoke NAT gateways for internet egress, and local service gateways for OCI Services. Its DRG preview derives dynamic routes from configured subnets, matching the default [VCN attachment route advertisement](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-create-attachment.htm). When an OKE extension suppresses the example hub load balancer in the generator, Studio omits that load balancer and its ingress flow choices. Flow traces describe routing paths; they do not verify deployed backends or security policy reachability.
 
 &nbsp;
 
@@ -50,8 +100,12 @@ Studio currently provides a guided interface for the following repository-suppor
 | Landing Zone baseline | One-OE config-driven generation |
 | Hub network | Hub A, Hub B, Hub C, and Hub E |
 | Environments | Environment networks, optional OCI Security Zones, and projects |
-| Platforms | Environment OKE (`oke_simple`), OCVS, and custom platforms; shared OCVS and custom platforms |
+| Platforms | Environment OKE (`oke_simple`), Custom, EXACC, and EXACS platforms; shared Custom, EXACC, and EXACS platforms. Choose a type from each panel's dropdown. |
+| Exadata fields | Shared, hybrid, and dedicated EXACC/EXACS selections map to UC1, UC2, and UC3; EXACC stays networkless, while EXACS creates networks where AVMC/VMCs are placed. |
+| Hybrid connectivity | BGP/static VPNs with two tunnels, private provider FastConnect circuits, custom attachment routing, and inline VPN/BGP keys |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
+| Deployment scope | Complete or regional DR using the standard wizard |
+| Remote peering | Multiple RPC acceptor/requester connections; same tenancy for regional DR, same or cross tenancy for complete deployments |
 
 Hub A, B, and C use the final `network.json`; managed firewall and NLB route targets resolve by resource key. The package retains the security and observability pre/final files. Hub C still requires real third-party firewall backend targets in place of the generated external placeholders; see the [Hub C backend contract](../oci-hub-models/hub_c/readme.md#backend-targets).
 
@@ -61,7 +115,7 @@ Studio intentionally does not replace the Landing Zone framework contract. A res
 
 ## 4. Review and deployment
 
-The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration and the complete set of generated JSON artifacts for that snapshot. Review it in your normal architecture, network, security, and change-management processes.
+The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration, generated JSON artifacts and a `README.txt` with the matching deployment file lists. Review it in your normal architecture, network, security, and change-management processes. The design source `config.jsonnet`, README and diagram exports are not Terraform deployment inputs.
 
 Before deployment:
 
@@ -71,9 +125,18 @@ Before deployment:
 - Resolve every generated placeholder and follow the security and observability pre/final workflow.
 - Store source configuration and generated artifacts in a private, organization-controlled location.
 
-Use Terraform locally or from customer-controlled CI/CD where possible. If you use OCI Resource Manager, stage the artifacts in a private Object Storage bucket or approved private source repository controlled by your organization.
+Use OCI Resource Manager with the generated files in a private Object Storage bucket controlled by your organization. Terraform CLI and customer-controlled CI/CD remain alternatives over the same deployment phases.
 
-Studio's **Deploy to OCI** link opens the Create Stack page with the latest released Orchestrator and the private Object Storage configuration source prefilled. Set the working directory to `rms-facade`, provide the bucket and current phase's file values, and review the plan before applying.
+Review and the ZIP README follow the same execution order:
+
+1. **Prepare the files.** Unzip, review placeholders and upload the generated JSON files to your private bucket. Complete any Home or RPC acceptor prerequisites first.
+2. **Create and apply phase 1.** Studio's **Deploy to OCI** link opens Create Stack with Orchestrator **v2.4.1** and `configuration_source = "ocibucket"` prefilled. Select `rms-facade` as the working directory and enter `oci_configuration_bucket`. Set `oci_configuration_objects` to the listed phase 1 files: network and selected CIS security/observability `_pre` files, plus IAM and governance for Home. Set any applicable runtime dependency/output variables before creating the stack. Create without applying, then plan, review and apply.
+3. **Update and apply phase 2.** After phase 1 succeeds, edit the same stack's variables. Replace `oci_configuration_objects` with the listed phase 2 files, which replace `_pre` controls with final controls and add generated workload files. For Hub C, prepare the third-party firewalls first and upload the edited `network_backends.json`; use it instead of `network.json` for phase 2 and subsequent updates. Save the variables, then plan, review and apply in the same stack/state.
+4. **Complete external setup, when applicable.** Finish the selected router/provider or platform work described in the guide. Instructions appear only for options in that design.
+
+For DR, complete Home first with matching compartments and IAM, and set `save_output = true` on Home. Copy **both** `compartments_output.json` and `network_output.json` from its successful deployment to the private DR bucket and list both in `oci_dependency_objects` on the separate DR stack. Keep these runtime dependencies separate from configuration inputs; they are not included in the Studio ZIP. For CIS2, select the DR region in Home to prepare its Object Storage key grant.
+
+The CLI alternative uses the same pinned `rms-facade`: set `configuration_source = "file"` and supply absolute paths in `local_config_file_paths`, with runtime dependencies in `local_dependency_file_paths` when required. Supply the tenancy and region, initialize, save and review a plan, then apply that plan. Retain the same state when moving to phase 2. Review and the ZIP README include this sequence for customer-controlled CI/CD as well.
 
 For deployment details, use the [Terraform deployment guide](../../commons/content/terraform.md) or [OCI Resource Manager deployment guide](../../commons/content/orm.md).
 
@@ -83,9 +146,11 @@ For deployment details, use the [Terraform deployment guide](../../commons/conte
 
 Studio runs entirely in the browser. It does not request OCI credentials, deploy to OCI, or send Landing Zone models or generated files to a service. Designs and the latest generated ZIP snapshot are retained only in the active browser profile using local storage.
 
-Use a browser profile controlled by the intended operator, and do not enter secrets into Studio. A downloaded ZIP remains usable if browser storage is unavailable, but the design may not be retained locally. Treat exported files as sensitive deployment artifacts and store them accordingly.
+Use a browser profile controlled by the intended operator. Connectivity keys entered in masked inputs remain in memory for the current session; saved designs retain the authentication mode and require key re-entry after reload. Secret-bearing generated outputs are not cached in browser storage. Explicit downloads contain the keys in `config.jsonnet` and generated network files. Keep those files, Terraform state and raw outputs private. Studio does not automatically copy keys into the landing zone Vault.
 
-The first visit displays a disclaimer that must be accepted before using the tool. This does not replace your organization's architecture, security, compliance, or deployment approvals.
+Configure [VPN and FastConnect](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#9-vpn-and-fastconnect) in the separate optional sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. These connections use the same deployment workflow above. Provider service OCIDs and existing VPN secrets must be available before the connectivity apply; router configuration and carrier activation remain external work.
+
+Studio displays a UPL license notice at the bottom of the dashboard. Your organization's architecture, security, compliance, and deployment approvals still apply.
 
 &nbsp;
 

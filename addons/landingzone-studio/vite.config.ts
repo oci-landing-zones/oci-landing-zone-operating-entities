@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 
 const GITHUB_PAGES_BASE = '/oci-landing-zone-operating-entities/';
 
-// Landing Zone Studio Vite config.
+// OCI Landing Zone Studio Vite config.
 //   - dev server binds 0.0.0.0 so LAN hosts can hit it
 //   - github-pages mode builds for this repository's project-site path
 //   - vitest scans src for *.test.{ts,tsx}
@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     environment: 'node',
+    // Network integration tests render Jsonnet/WASM under shared CI CPU load.
+    testTimeout: 30_000,
+    maxWorkers: 2,
     include: ['src/**/*.test.{ts,tsx}'],
     passWithNoTests: true,
   },

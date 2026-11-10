@@ -7,7 +7,7 @@
  * in here as the wizard grows.
  */
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   ReactFlow,
   Background,
@@ -16,35 +16,55 @@ import {
   Handle,
   Position,
   BaseEdge,
+  MarkerType,
   ViewportPortal,
-  getSmoothStepPath,
   getViewportForBounds,
   useReactFlow,
   useStore,
-  useInternalNode,
+  useKeyPress,
   type Edge,
   type Node,
   type NodeProps,
   type NodeTypes,
   type EdgeProps,
   type EdgeTypes,
-  type InternalNode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { SHIELD_SVG } from './shieldSvg';
+import FlowOverlay, { type FlowFocus } from './FlowOverlay';
+import type { ActiveRouteRule } from './flowPlayback';
 import { ROUTE_TABLE_SVG } from './routeTableSvg';
-import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from './icons';
+import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, NLB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from './icons';
 
-const ICONS: Record<string, string> = { igw: IGW_SVG, natgw: NATGW_SVG, sgw: SGW_SVG, firewall: FIREWALL_SVG, lb: LB_SVG };
+const ICONS: Record<string, string> = { igw: IGW_SVG, natgw: NATGW_SVG, sgw: SGW_SVG, firewall: FIREWALL_SVG, lb: LB_SVG, nlb: NLB_SVG };
 
 /** Invisible connection point — floating edges compute their own endpoints. */
 const hiddenHandle: React.CSSProperties = { opacity: 0, width: 1, height: 1, minWidth: 0, minHeight: 0, border: 'none', background: 'transparent', pointerEvents: 'none' };
 
 /** Lets nested node components open/close route tables without prop-drilling. */
 const RtContext = createContext<(ids: string[]) => void>(() => {});
+const ActiveRulesContext = createContext<ActiveRouteRule[]>([]);
 const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
-import type { DiagramEdge, DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
+import type { DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
 import { oracle } from '../theme';
+import { attachCooperativeGestures, type DiagramGestureHint } from './cooperativeGestures';
+import { absoluteNodeRects, diagramBounds } from './flowGeometry';
+import { resourceGroupSvg } from './resourceGroups';
+import { compartmentStyle } from './compartmentStyle';
+import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
+import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBackends';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from './layoutPolicy';
+import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
+import { hybridTopologySvg } from './hybridTopology';
+
+const COOPERATIVE_QUERY = '(max-width: 1100px)';
+const ZOOM_KEYS = ['Meta', 'Control'];
+function subscribeToLayout(onChange: () => void) {
+  const media = window.matchMedia(COOPERATIVE_QUERY);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+const stackedLayout = () => window.matchMedia(COOPERATIVE_QUERY).matches;
 
 function nodeStyle(node: DiagramNode): React.CSSProperties {
   // OCI architecture conventions:
@@ -59,13 +79,10 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
       return { background: 'transparent', border: `2px dashed ${oracle.ink}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
     case 'landingzone':
       return { background: '#ffffff', border: `2px dotted ${oracle.red}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
-    case 'compartment':
-      if (node.tone === 'gray')
-        // Gray compartments are solid; compartment boundaries are always square.
-        return { background: oracle.compGrayFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 };
-      return node.tone === 'green'
-        ? { background: oracle.compGreenFill, border: `1.5px dotted ${oracle.compGreenBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 }
-        : { background: oracle.compYellowFill, border: `1.5px dotted ${oracle.compYellowBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 };
+    case 'compartment': {
+      const palette = compartmentStyle(node);
+      return { background: palette.fill, border: `1.5px ${palette.dotted ? 'dotted' : 'solid'} ${palette.stroke}`, borderRadius: 0, color: palette.text, fontWeight: 600 };
+    }
     case 'vcn':
       return { background: '#ffffff', border: `2px dashed ${oracle.vcnBorder}`, borderRadius: 0, color: oracle.vcnBorder, fontWeight: 700 };
     case 'subnet':
@@ -77,18 +94,24 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
       return { background: '#ffffff', border: '1.5px solid #6b7a99', borderRadius: 5, color: '#1f3a63', fontWeight: 800 };
     case 'project':
       // Project nodes represent generated project compartments.
-      return { background: '#ffffff', border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
+      return { background: oracle.compProjectFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'routetable':
     case 'rtdot':
+    case 'resourcegroup':
+    case 'vpn':
+    case 'premises':
+    case 'vpntunnel':
+    case 'fastconnect':
+    case 'customerrouter':
       return { background: 'transparent', border: 'none', borderRadius: 0 };
   }
 }
 
 /** Compartment node: left-aligned label + a Security Zone shield (top-right) when secure. */
 function CompartmentNode({ data }: NodeProps) {
-  const d = data as { label?: string; secure?: boolean; container?: boolean };
+  const d = data as { label?: string; secure?: boolean; container?: boolean; tone?: DiagramNode['tone']; compartmentScope?: DiagramNode['compartmentScope'] };
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', paddingTop: d.container ? 7 : 0, paddingLeft: 10, paddingRight: 22, boxSizing: 'border-box', fontSize: 12, fontWeight: 600, color: '#3f4750', whiteSpace: 'pre-line' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', paddingTop: d.container ? 7 : 0, paddingLeft: 10, paddingRight: 22, boxSizing: 'border-box', fontSize: 12, fontWeight: 600, color: compartmentStyle(d).text, whiteSpace: 'pre-line' }}>
       {d.label}
       {d.secure && (
         <span
@@ -114,8 +137,8 @@ function SubnetNode({ data }: NodeProps) {
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
       {/* Public (IGW-routed) subnet badge — the LB / DMZ front-ends face the internet. */}
       {d.publicSubnet && (
-        <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: oracle.cidrBlue, borderRadius: 8, lineHeight: 1.5 }}>
-          PUBLIC
+        <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: CAPTION_COLORS.green, borderRadius: 8, lineHeight: 1.5 }}>
+          Public
         </span>
       )}
       <span style={{ color: d.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName, fontWeight: 700 }}>{name}</span>
@@ -152,11 +175,9 @@ function GatewayNode({ data }: NodeProps) {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
       {iconSvg && (
-        <span style={{ width: 34, height: 34, lineHeight: 0, background: '#ffffff', borderRadius: '50%' }} dangerouslySetInnerHTML={{ __html: iconSvg.replace('width="48" height="48"', 'width="34" height="34"') }} />
+        <span style={{ width: 34, height: 34, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: iconSvg.replace('width="48" height="48"', 'width="34" height="34"') }} />
       )}
-      {/* Narrow enough that two-word names (incl. "NAT Gateway") wrap to two lines
-          instead of bleeding past the gateway into the neighbouring subnet. */}
-      <span style={{ width: 112, fontSize: 9.5, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.25 }}>{d.label}</span>
+      <span style={{ width: '100%', fontSize: 10, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'pre-line', lineHeight: 1.25 }}>{d.label}</span>
     </div>
   );
 }
@@ -167,14 +188,14 @@ function GatewayNode({ data }: NodeProps) {
  * the bottom-right corner. Hidden handles let the routing edges attach.
  */
 function VcnNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; width?: number; firewallBackendBridgeY?: number; firewallBackendUpperArm?: number; firewallBackendLowerArm?: number };
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', padding: '7px 10px', boxSizing: 'border-box', fontSize: 13, fontWeight: 700, color: oracle.vcnBorder, whiteSpace: 'pre-line', lineHeight: 1.3 }}>
       {d.label}
       <span
         title="Oracle Services Network"
-        style={{ position: 'absolute', right: -13, bottom: -13, width: 26, height: 26, lineHeight: 0 }}
-        dangerouslySetInnerHTML={{ __html: OSN_SVG }}
+        style={{ position: 'absolute', right: -OSN_ICON_SIZE / 2, bottom: -OSN_ICON_SIZE / 2, width: OSN_ICON_SIZE, height: OSN_ICON_SIZE, lineHeight: 0 }}
+        dangerouslySetInnerHTML={{ __html: OSN_SVG.replace('width="44" height="44"', 'width="100%" height="100%"') }}
       />
       <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
@@ -183,7 +204,7 @@ function VcnNode({ data }: NodeProps) {
 }
 
 /**
- * DRG node: the teal glyph fills the (icon-sized) box so links meet its centre;
+ * DRG node: the rounded square frame fills the box so links meet its edges;
  * the "DRG" name is an overlay below that doesn't enlarge the connection box.
  */
 function DrgNode({ data }: NodeProps) {
@@ -191,19 +212,19 @@ function DrgNode({ data }: NodeProps) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <span style={{ position: 'absolute', inset: 0, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: DRG_SVG.replace('width="40" height="40"', 'width="100%" height="100%"') }} />
-      <span style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: 2, fontSize: 11, fontWeight: 800, color: oracle.ink, whiteSpace: 'nowrap' }}>{d.label}</span>
+      <span style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: DRG_CAPTION.gap, fontFamily: DRG_CAPTION.fontFamily, fontSize: DRG_CAPTION.fontSize, fontWeight: DRG_CAPTION.fontWeight, lineHeight: DRG_CAPTION.lineHeight, color: oracle.ink, whiteSpace: 'nowrap' }}>{d.label}</span>
       <Handle type="target" position={Position.Top} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Top} style={hiddenHandle} isConnectable={false} />
     </div>
   );
 }
 
-/** VCN attachment node: a small pill labelled vcn-<env>-attach, wired VCN → attach → DRG. */
+/** Attachment labels reserve terminal clearance on both sides. */
 function AttachmentNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; attachmentVertical?: boolean };
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: '0 8px', fontSize: 11.5, fontWeight: 800, color: '#1f3a63', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-      {d.label}
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', padding: d.attachmentVertical ? `${ATTACHMENT_LABEL.sidePadding}px 0` : `0 ${ATTACHMENT_LABEL.sidePadding}px`, fontFamily: ATTACHMENT_LABEL.fontFamily, fontSize: ATTACHMENT_LABEL.fontSize, fontWeight: ATTACHMENT_LABEL.fontWeight, lineHeight: 1.2, color: '#1f3a63', whiteSpace: 'pre' }}>
+      <span style={d.attachmentVertical ? { writingMode: 'vertical-rl', textOrientation: 'mixed' } : undefined}>{d.label}</span>
       <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
     </div>
@@ -212,46 +233,56 @@ function AttachmentNode({ data }: NodeProps) {
 
 /** Project compartment: a square white box with its full generated name. */
 function ProjectNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; container?: boolean };
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', justifyContent: 'center', padding: d.container ? '7px 8px' : '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
       {d.label}
     </div>
   );
 }
 
-const RT_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spoke: '#3A8A4E' } as const;
-type RtRow = { destination: string; targetType: string; target: string; routeType: string };
-const RT_COLS = {
-  vcn: { grid: '1fr 1.2fr 1.3fr 0.7fr', headers: ['Destination', 'Target Type', 'Target', 'Route Type'], cells: (r: RtRow) => [r.destination, r.targetType, r.target, r.routeType] },
-  drg: { grid: '1fr 1.1fr 1.5fr', headers: ['Dest CIDR', 'Next Hop Type', 'Next Hop Name'], cells: (r: RtRow) => [r.destination, r.targetType, r.target] },
+const RT_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spoke: '#2E6E3F' } as const;
+type RtRow = NonNullable<DiagramNode['rtRows']>[number];
+const RT_CELLS = {
+  vcn: (r: RtRow) => [r.destination, r.targetType, r.target, r.routeType],
+  drg: (r: RtRow) => [r.destination, r.targetType, r.target],
 } as const;
 
 /** Route-table box: coloured header (with close ×) + ONTV columns; flow-matched rows highlight. */
 function RouteTableNode({ id, data }: NodeProps) {
-  const d = data as { label?: string; rtRows?: RtRow[]; rtColumns?: keyof typeof RT_COLS; rtNote?: string; rtTone?: keyof typeof RT_COLORS; rtHighlight?: number[] };
-  const color = RT_COLORS[d.rtTone ?? 'hub'];
-  const cfg = RT_COLS[d.rtColumns ?? 'vcn'];
-  const hl = new Set(d.rtHighlight ?? []);
+  const d = data as { label?: string; width?: number; rtRows?: RtRow[]; rtColumns?: keyof typeof RT_CELLS; rtNote?: string; rtTone?: keyof typeof RT_COLORS; rtHighlight?: number[]; rtLocked?: boolean };
+  const color = RT_COLORS[d.rtTone ?? 'hub'], m = ROUTE_TABLE_METRICS;
+  const cellsOf = RT_CELLS[d.rtColumns ?? 'vcn'];
+  const layout = routeTableLayout({ label: d.label ?? '', columns: d.rtColumns, rowCount: d.rtRows?.length ?? 0, rows: d.rtRows, note: d.rtNote, width: d.width ?? 310 });
+  const gridTemplateColumns = layout.columnWidths.map((width) => `${width}px`).join(' ');
+  const section: React.CSSProperties = { boxSizing: 'border-box', flexShrink: 0 };
+  const activeRules = useContext(ActiveRulesContext);
+  const hl = new Set(activeRules.filter((rule) => rule.tableId === id).map((rule) => rule.ruleId));
   const toggleRt = useContext(RtContext);
-  const cellColor = (j: number) => (j === 0 ? '#3f4750' : j === cfg.headers.length - 1 ? '#8a857f' : j === 2 ? color : '#6b6660');
+  const cellColor = (j: number) => (j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660');
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#fff', border: `1px solid ${color}`, boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div className={`route-table-card${hl.size ? ' route-table-card--active' : ''}`} style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#fff', border: `${m.border}px solid ${color}`, boxSizing: 'border-box', fontFamily: m.fontFamily, overflow: 'visible' }}>
       <Handle type="target" position={Position.Right} style={hiddenHandle} isConnectable={false} />
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
-      <div style={{ background: color, color: '#fff', fontWeight: 800, fontSize: 10, padding: '3px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-        <span title={d.label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.label}</span>
-        <span title="Close" onClick={(e) => { e.stopPropagation(); toggleRt([id]); }} style={{ cursor: 'pointer', fontWeight: 700, lineHeight: 1, padding: '0 2px', flexShrink: 0 }}>✕</span>
+      <div style={{ ...section, height: layout.titleHeight, background: color, color: '#fff', fontWeight: 800, fontSize: m.titleSize, lineHeight: `${m.titleLine}px`, padding: `${m.titlePadding}px ${m.paddingX}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        <span title={d.label} style={{ whiteSpace: 'pre' }}>{layout.titleLines.join('\n')}</span>
+        {!d.rtLocked && <button type="button" aria-label={`Close ${d.label}`} onClick={(e) => { e.stopPropagation(); toggleRt([id]); }} style={{ cursor: 'pointer', color: 'inherit', background: 'transparent', border: 0, fontSize: m.titleSize, fontWeight: 700, lineHeight: 1, width: 14, height: 14, minWidth: 14, minHeight: 14, padding: 0, flexShrink: 0 }}>✕</button>}
       </div>
-      {d.rtNote && <div style={{ fontSize: 8, color: '#B23A48', fontWeight: 700, padding: '2px 7px', background: '#fdecea' }}>{d.rtNote}</div>}
-      <div style={{ display: 'grid', gridTemplateColumns: cfg.grid, gap: 4, fontSize: 7.5, fontWeight: 700, color: '#8a857f', textTransform: 'uppercase', letterSpacing: 0.2, padding: '2px 7px', borderBottom: '1px solid #eceae8' }}>
-        {cfg.headers.map((h) => <span key={h}>{h}</span>)}
+      {layout.noteHeight > 0 && <div style={{ ...section, height: layout.noteHeight, fontSize: m.noteSize, lineHeight: `${m.noteLine}px`, color: '#B23A48', fontWeight: 700, padding: `${m.notePadding}px ${m.paddingX}px`, background: '#fdecea', whiteSpace: 'pre' }}>{layout.noteLines.join('\n')}</div>}
+      <div style={{ ...section, height: layout.columnHeight, display: 'grid', gridTemplateColumns, gap: m.gap, fontSize: m.columnSize, lineHeight: `${m.columnLine}px`, fontWeight: 700, color: oracle.textMuted, letterSpacing: m.letterSpacing, padding: `${m.columnPadding}px ${m.paddingX}px`, borderBottom: `${m.border}px solid #eceae8` }}>
+        {layout.headerLines.map((lines, i) => <span key={i} style={{ whiteSpace: 'pre' }}>{lines.join('\n')}</span>)}
       </div>
       {(d.rtRows ?? []).map((row, i) => (
-        <div key={i} style={{ display: 'grid', gridTemplateColumns: cfg.grid, gap: 4, fontSize: 8.5, lineHeight: 1.25, padding: '2px 7px', background: hl.has(i) ? '#fff3c4' : 'transparent' }}>
-          {cfg.cells(row).map((c, j) => (
-            <span key={j} title={c} style={{ color: cellColor(j), fontWeight: j === 2 ? 700 : 500, fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
-          ))}
+        <div key={row.id ?? i} className={`route-table-rule${row.id && hl.has(row.id) ? ' route-table-rule--active' : ''}`} style={{ ...section, height: layout.rowHeights[i], fontSize: m.rowSize, lineHeight: `${m.rowLine}px`, padding: `${m.rowPadding}px ${m.paddingX}px`, background: row.id && hl.has(row.id) ? '#e8f4db' : row.routeType === 'Implicit' ? '#f5f4f2' : '#fff', fontStyle: row.routeType === 'Implicit' ? 'italic' : undefined }}>
+          <div style={{ display: 'grid', gridTemplateColumns, gap: m.gap }}>
+            {cellsOf(row).map((c, j) => (
+              <span key={j} title={c} style={{ color: row.superseded ? oracle.textMuted : cellColor(j), fontWeight: j === 2 ? 700 : 500, fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c}</span>
+            ))}
+          </div>
+          {layout.rowNotes[i] && <div style={{ color: oracle.textMuted }}>{layout.rowNotes[i]}</div>}
+          <div className="route-table-rule-magnifier" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${cellsOf(row).length}, max-content)` }}>
+            {cellsOf(row).map((cell, j) => <span key={j} style={{ fontFamily: j === 0 ? 'ui-monospace, Menlo, monospace' : undefined }}>{cell}</span>)}
+          </div>
         </div>
       ))}
     </div>
@@ -259,13 +290,36 @@ function RouteTableNode({ id, data }: NodeProps) {
 }
 
 /** Route-table dot (ONTV-style): click to open/close its table; a line runs to the open box. */
+function ResourceGroupNode({ data }: NodeProps) {
+  const d = data as unknown as DiagramNode;
+  if (!d.resourceKind) return null;
+  return <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
+    dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />;
+}
+
+function ConnectivityNode({ data }: NodeProps) {
+  const node = data as unknown as DiagramNode;
+  let label = node.label;
+  if (node.premises) label += `: On-Premises, ${node.premises.cidrs.join(', ')}, ${node.premises.equipmentLabel} ${node.premises.equipmentAddress ?? node.premises.equipmentName}`;
+  if (node.vpnTunnel?.customerAddress) label += `, CPE interface ${node.vpnTunnel.customerAddress}`;
+  if (node.vpnTunnel?.oracleAddress) label += `, Oracle interface ${node.vpnTunnel.oracleAddress}`;
+  if (node.fastConnect) label += `, ${node.fastConnect.provider}, ${node.fastConnect.bandwidth ?? ''}, ${node.fastConnect.mappings.map((mapping) => `${mapping.name}: customer ${mapping.customerAddress ?? ''}, Oracle ${mapping.oracleAddress ?? ''}`).join('; ')}`;
+  return <div role="img" aria-label={label}
+    style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div dangerouslySetInnerHTML={{ __html: hybridTopologySvg(node) }} />
+    <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
+    <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+  </div>;
+}
+
 function RtDotNode({ data }: NodeProps) {
-  const d = data as { rtDotOpen?: boolean; rtDotConfigured?: boolean; rtDotTone?: keyof typeof RT_COLORS };
+  const d = data as { rtDotOpen?: boolean; rtDotConfigured?: boolean; rtDotTone?: keyof typeof RT_COLORS; rtLocked?: boolean };
   const color = d.rtDotConfigured ? RT_COLORS[d.rtDotTone ?? 'hub'] : '#b0aca8';
   return (
     <div
-      title={d.rtDotOpen ? 'Hide route table' : 'Show route table'}
-      style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', background: color, cursor: 'pointer', boxSizing: 'border-box', border: '1.5px solid #fff', boxShadow: d.rtDotOpen ? `0 0 0 3px ${color}66` : '0 0 1px rgba(0,0,0,0.4)' }}
+      className={d.rtLocked ? undefined : 'route-table-dot-clickable'}
+      title={d.rtLocked ? 'Route table shown in flow mode' : d.rtDotOpen ? 'Hide route table' : 'Show route table'}
+      style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', background: color, color, cursor: d.rtLocked ? 'default' : 'pointer', boxSizing: 'border-box', border: '1.5px solid #fff', boxShadow: d.rtDotOpen ? `0 0 0 3px ${color}66` : '0 0 1px rgba(0,0,0,0.4)' }}
     >
       <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
       <Handle type="target" position={Position.Right} style={hiddenHandle} isConnectable={false} />
@@ -273,233 +327,19 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
 
-/** Border-intersection point of `node` on the line toward `other` (floating-edge geometry). */
-function intersect(node: InternalNode, other: InternalNode): { x: number; y: number } {
-  const w = (node.measured.width ?? 0) / 2;
-  const h = (node.measured.height ?? 0) / 2;
-  const x2 = node.internals.positionAbsolute.x + w;
-  const y2 = node.internals.positionAbsolute.y + h;
-  const x1 = other.internals.positionAbsolute.x + (other.measured.width ?? 0) / 2;
-  const y1 = other.internals.positionAbsolute.y + (other.measured.height ?? 0) / 2;
-  const xx1 = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
-  const yy1 = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
-  const a = 1 / (Math.abs(xx1) + Math.abs(yy1) || 1);
-  const xx3 = a * xx1;
-  const yy3 = a * yy1;
-  return { x: w * (xx3 + yy3) + x2, y: h * (-xx3 + yy3) + y2 };
-}
-
-/** Which side of `node` the intersection point sits on — picks the step-edge exit direction. */
-function sideOf(node: InternalNode, p: { x: number; y: number }): Position {
-  const nx = node.internals.positionAbsolute.x;
-  const ny = node.internals.positionAbsolute.y;
-  const w = node.measured.width ?? 0;
-  if (p.x <= nx + 1) return Position.Left;
-  if (p.x >= nx + w - 1) return Position.Right;
-  if (p.y <= ny + 1) return Position.Top;
-  return Position.Bottom;
-}
-
-/** Centre of a named border of `node` — used when an edge pins a fixed connection side. */
-function sidePoint(node: InternalNode, side: string, port = 0.5): { x: number; y: number; pos: Position } {
-  const nx = node.internals.positionAbsolute.x;
-  const ny = node.internals.positionAbsolute.y;
-  const w = node.measured.width ?? 0;
-  const h = node.measured.height ?? 0;
-  switch (side) {
-    case 'left': return { x: nx, y: ny + h * port, pos: Position.Left };
-    case 'right': return { x: nx + w, y: ny + h * port, pos: Position.Right };
-    case 'top': return { x: nx + w * port, y: ny, pos: Position.Top };
-    default: return { x: nx + w * port, y: ny + h, pos: Position.Bottom };
-  }
-}
-
-/**
- * Floating edge with orthogonal (right-angle) routing. When the edge pins fixed
- * connection sides it anchors to those border centres; otherwise it falls back
- * to nearest-border geometry. Endpoints always land exactly on the node border.
- */
-function FloatingEdge({ id, source, target, markerEnd, style, data }: EdgeProps) {
-  const s = useInternalNode(source);
-  const t = useInternalNode(target);
-  if (!s || !t) return null;
-  const d = data as { sourceSide?: string; targetSide?: string; sourcePort?: number; targetPort?: number; channel?: number; centerX?: number } | undefined;
-  const sp = d?.sourceSide ? sidePoint(s, d.sourceSide, d.sourcePort) : { ...intersect(s, t), pos: undefined as Position | undefined };
-  const tp = d?.targetSide ? sidePoint(t, d.targetSide, d.targetPort) : { ...intersect(t, s), pos: undefined as Position | undefined };
-  // A pinned centerX holds the vertical bend in a fixed channel; otherwise it
-  // floats at the endpoints' midpoint. `channel` staggers parallel links either way.
-  const centerX = d?.centerX != null
-    ? d.centerX + (d.channel ?? 0)
-    : d?.channel != null ? (sp.x + tp.x) / 2 + d.channel : undefined;
-  const [path] = getSmoothStepPath({
-    sourceX: sp.x, sourceY: sp.y, sourcePosition: sp.pos ?? sideOf(s, sp),
-    targetX: tp.x, targetY: tp.y, targetPosition: tp.pos ?? sideOf(t, tp),
-    borderRadius: 5, offset: 12,
-    ...(centerX != null ? { centerX } : {}),
-  });
-  return <BaseEdge id={id} path={path} markerEnd={markerEnd} style={style} />;
+/** Nodes stay fixed; screen and export consume the same model-derived connector. */
+function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
+  return <BaseEdge id={id} path={(data as { path: string }).path} markerStart={markerStart} markerEnd={markerEnd} style={style} />;
 }
 
 const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 
-/** Rounded orthogonal polyline through precomputed (already right-angled) vertices.
- * buildGraph routes the flow through clean channels; here we just draw it with
- * softened corners so the packet animates smoothly along one continuous path. */
-function roundedPolyline(pts: { x: number; y: number }[], r = 7): string {
-  if (pts.length < 2) return '';
-  let d = `M${pts[0].x},${pts[0].y}`;
-  for (let i = 1; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1], p1 = pts[i], p2 = pts[i + 1];
-    const l1 = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
-    const l2 = Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1;
-    const rr = Math.min(r, l1 / 2, l2 / 2);
-    const a = { x: p1.x - ((p1.x - p0.x) / l1) * rr, y: p1.y - ((p1.y - p0.y) / l1) * rr };
-    const b = { x: p1.x + ((p2.x - p1.x) / l2) * rr, y: p1.y + ((p2.y - p1.y) / l2) * rr };
-    d += ` L${a.x},${a.y} Q${p1.x},${p1.y} ${b.x},${b.y}`;
-  }
-  const last = pts[pts.length - 1];
-  d += ` L${last.x},${last.y}`;
-  return d;
-}
-
-/**
- * Moving packet for one flow path: a labelled source→dest pill. In auto mode it
- * loops along the path (SMIL animateMotion). In step mode it glides ALONG the
- * path between hops (getPointAtLength on a hidden path ref) — so it follows the
- * route instead of teleporting straight between nodes.
- */
-function FlowPacket({ path, color, label, step, frac, dur }: {
-  path: string;
-  color: string;
-  label: string;
-  step: number | null | undefined;
-  frac: number;
-  dur: string;
-}) {
-  const ref = useRef<SVGPathElement>(null);
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-  const from = useRef(0);
-  const raf = useRef(0);
-  useEffect(() => {
-    if (step == null) { setPos(null); return; }
-    const el = ref.current;
-    if (!el) return;
-    const total = el.getTotalLength() || 1;
-    const target = Math.max(0, Math.min(1, frac)) * total;
-    const start = from.current;
-    let t0 = 0;
-    cancelAnimationFrame(raf.current);
-    const tick = (t: number) => {
-      if (!t0) t0 = t;
-      const k = Math.min(1, (t - t0) / 500);
-      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // ease-in-out
-      const p = el.getPointAtLength(start + (target - start) * e);
-      setPos({ x: p.x, y: p.y });
-      if (k < 1) raf.current = requestAnimationFrame(tick);
-      else from.current = target;
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [step, frac, path]);
-
-  const pillW = Math.max(30, label.length * 6.1 + 16);
-  const pill = (
-    <g>
-      <rect x={-pillW / 2} y={-10} width={pillW} height={20} rx={10} fill={color} stroke="#fff" strokeWidth={1.5} />
-      <text textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight={800} fill="#fff">{label}</text>
-    </g>
-  );
-  return (
-    <>
-      <path ref={ref} d={path} fill="none" stroke="none" />
-      {step == null ? (
-        <g>
-          <animateMotion dur={dur} repeatCount="indefinite" path={path} />
-          {pill}
-        </g>
-      ) : pos ? (
-        <g transform={`translate(${pos.x},${pos.y})`}>{pill}</g>
-      ) : null}
-    </>
-  );
-}
-
-/**
- * Flow overlay — an SVG layer drawn inside the viewport (so it pans/zooms with
- * the diagram). For each active flow it draws a continuous coloured path through
- * every hop node, numbered hop badges, and a packet that either auto-loops along
- * the path or, when the user drives it, sits on the current step's node.
- * `steps[flowId]`: null/undefined = auto-play; a number = that 0-based hop.
- */
-function FlowOverlay({ flowEdges, steps, width, height }: {
-  flowEdges: DiagramEdge[];
-  steps: Record<string, number | null | undefined>;
-  width: number;
-  height: number;
-}) {
-  return (
-    <svg width={Math.max(1, width)} height={Math.max(1, height)} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 2500 }}>
-      {flowEdges.map((e) => {
-        const pts = e.points ?? [];
-        if (pts.length < 2) return null;
-        const path = roundedPolyline(pts);
-        const color = e.color ?? '#2196F3';
-        const flowId = e.id.replace(/^flow-/, '');
-        // All endpoints of one flow kind share the same step state, keyed by the
-        // `<scope>:<kind>` group (works for both all-endpoint and single-endpoint picks).
-        const gp = flowId.split('#')[0].split(':');
-        const groupId = `${gp[0]}:${gp[1]}`;
-        const mId = `fa-${flowId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
-        const badges = e.badges ?? [];
-        const step = steps[groupId];
-        const dur = `${Math.max(6, pts.length * 1.4).toFixed(1)}s`;
-        // Path-length fraction of each vertex, so a badge maps to a point ALONG the
-        // path (lets the stepped packet follow the route rather than teleport).
-        const cum = [0];
-        for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
-        const total = cum[cum.length - 1] || 1;
-        const fracOf = (p: { x: number; y: number }) => {
-          let bi = 0, bd = Infinity;
-          for (let i = 0; i < pts.length; i++) { const d = Math.hypot(pts[i].x - p.x, pts[i].y - p.y); if (d < bd) { bd = d; bi = i; } }
-          return cum[bi] / total;
-        };
-        const frac = step != null && badges[step] ? fracOf(badges[step]) : 0;
-        const seen = new Map<string, number>();
-        return (
-          <g key={e.id}>
-            <defs>
-              <marker id={mId} markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
-                <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
-              </marker>
-            </defs>
-            <path d={path} fill="none" stroke={color} strokeOpacity={0.14} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={path} fill="none" stroke={color} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" markerEnd={`url(#${mId})`} />
-            {/* every endpoint carries its own labelled source→dest pill */}
-            <FlowPacket path={path} color={color} label={e.label ?? ''} step={step} frac={frac} dur={dur} />
-            {badges.length > 0 && badges.map((b, i) => {
-              const k = seen.get(b.node) ?? 0;
-              seen.set(b.node, k + 1);
-              const active = step === i;
-              return (
-                <g key={`${b.node}-${i}`} transform={`translate(${b.x},${b.y - 18 - k * 24})`}>
-                  <circle r={active ? 11 : 9} fill={active ? '#fff' : color} stroke={color} strokeWidth={active ? 3 : 1.6} />
-                  <text textAnchor="middle" dominantBaseline="central" fontSize={active ? 11.5 : 10.5} fontWeight={800} fill={active ? color : '#fff'}>{b.seq}</text>
-                </g>
-              );
-            })}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
+function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker: string): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
-    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot';
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
     return {
     id: n.id,
     position: { x: n.x, y: n.y },
@@ -507,8 +347,8 @@ function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
     // Dimensions on the node (not just style) so the MiniMap can size its rects.
     width: n.width,
     height: n.height,
-    ...(n.parentId ? { parentId: n.parentId, extent: 'parent' as const } : {}),
-    data: { label: n.label, kind: n.kind, tone: n.tone, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone },
+    ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
+    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -532,17 +372,23 @@ function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
 
   // Flow edges (waypoint chains) are drawn by the SVG FlowOverlay, not as React
   // Flow edges — keep only the structural routing links here.
+  const rects = absoluteNodeRects(diagram.nodes);
+  const associations = associationDisplaySegments(diagram.nodes, diagram.edges);
   const edges: Edge[] = diagram.edges.filter((e) => !e.waypoints).map((e) => ({
     id: e.id,
     source: e.source,
     target: e.target,
     type: 'floating',
     label: e.label,
-    data: { sourceSide: e.sourceSide, targetSide: e.targetSide, sourcePort: e.sourcePort, targetPort: e.targetPort, channel: e.channel, centerX: e.centerX },
+    data: { path: (associations.get(e.id) ?? [structuralEdgePoints(e, rects)]).map(polylinePath).join(' ') },
+    ...(['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(e.source)?.node.kind ?? '') || rects.get(e.target)?.node.kind === 'attachment'
+      ? { markerStart: rects.get(e.source)?.node.kind === 'attachment' ? undefined : attachmentMarker,
+          markerEnd: rects.get(e.target)?.node.kind === 'attachment' ? undefined : attachmentMarker }
+      : rects.get(e.target)?.node.kind !== 'routetable' ? { markerEnd: { type: MarkerType.ArrowClosed, color: '#6b6660', width: 15, height: 15 } } : {}),
     // Lift links above the opaque compartment fills. Dot→table connectors ride
     // just under the table (above the dots) so the whole line stays visible.
-    zIndex: e.target.startsWith('rt-') ? 1900 : 1000,
-    style: e.target.startsWith('rt-') ? { stroke: '#6b6660', strokeWidth: 1.8 } : { stroke: '#6b6660', strokeWidth: 1.4 },
+    zIndex: rects.get(e.target)?.node.kind === 'routetable' ? 1900 : 1000,
+    style: rects.get(e.target)?.node.kind === 'routetable' ? { stroke: '#6b6660', strokeWidth: 1.2, strokeDasharray: '5 4' } : { stroke: '#6b6660', strokeWidth: 1.4 },
     labelStyle: { fill: oracle.ink, fontSize: 11, fontWeight: 600 },
     labelBgStyle: { fill: oracle.surface },
   }));
@@ -551,10 +397,10 @@ function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
 }
 
 function miniMapNodeColor(node: Node): string {
-  const data = node.data as { kind?: string; tone?: string };
+  const data = node.data as { kind?: string; tone?: DiagramNode['tone']; compartmentScope?: DiagramNode['compartmentScope'] };
   switch (data.kind) {
-    case 'compartment': return data.tone === 'gray' ? oracle.compGrayFill : data.tone === 'green' ? oracle.compGreenFill : oracle.compYellowFill;
-    case 'project':     return '#ffffff';
+    case 'compartment': return compartmentStyle(data).fill;
+    case 'project':     return oracle.compProjectFill;
     case 'landingzone': return '#f6dcd8';
     case 'tenancy':     return '#e4e1de';
     case 'vcn':         return oracle.vcnBorder;
@@ -568,26 +414,8 @@ function miniMapNodeColor(node: Node): string {
   }
 }
 
-const ZOOM_PRESETS = [0.5, 1, 1.5, 2, 3];
-
-const bar: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: 1, padding: 3,
-  background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 7,
-  boxShadow: '0 1px 4px rgba(32,31,28,0.12)',
-};
-const iconBtn: React.CSSProperties = {
-  width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  fontSize: 13, fontWeight: 800, color: oracle.text, background: 'transparent', border: 'none',
-  borderRadius: 4, cursor: 'pointer', lineHeight: 1,
-};
-const presetBtn: React.CSSProperties = {
-  padding: '3px 5px', fontSize: 10.5, fontWeight: 700, color: oracle.text,
-  background: 'transparent', border: 'none', borderRadius: 4, cursor: 'pointer',
-};
-const pct: React.CSSProperties = {
-  minWidth: 36, textAlign: 'center', fontSize: 10.5, fontWeight: 700, color: oracle.textMuted,
-};
-const sep: React.CSSProperties = { width: 1, height: 15, background: oracle.border, margin: '0 3px' };
+const ZOOM_PRESETS = [50, 100, 150, 200, 300];
+const FIT_PADDING = 0.08;
 
 /** Layer toggle button (top-right): show/hide route tables, endpoints, flows. */
 const layerBtn: React.CSSProperties = {
@@ -596,63 +424,87 @@ const layerBtn: React.CSSProperties = {
   boxShadow: '0 1px 4px rgba(32,31,28,0.12)', cursor: 'pointer',
 };
 const layerBtnActive: React.CSSProperties = { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' };
+const hintBtn: React.CSSProperties = { ...layerBtn, display: 'flex', alignItems: 'center', gap: 10, border: `1px dashed ${oracle.borderStrong}` };
 
-/** Unified zoom/navigation bar: +  −  [live %] | presets | fit  reset. */
-function ZoomBar() {
-  const { zoomIn, zoomOut, zoomTo, fitView, setViewport } = useReactFlow();
-  const zoom = useStore((s) => s.transform[2]);
+export function DiagramZoomControls({ disabled = false }: { disabled?: boolean }) {
+  const { zoomIn, zoomOut, zoomTo, fitView, setViewport, viewportInitialized } = useReactFlow();
+  const percent = useStore((s) => Math.round(s.transform[2] * 100));
 
   return (
-    <div style={bar}>
-      <button type="button" style={iconBtn} title="Zoom in" onClick={() => zoomIn({ duration: 150 })}>+</button>
-      <button type="button" style={iconBtn} title="Zoom out" onClick={() => zoomOut({ duration: 150 })}>−</button>
-      <span style={pct}>{Math.round(zoom * 100)}%</span>
-      <span style={sep} />
-      {ZOOM_PRESETS.map((z) => (
-        <button key={z} type="button" style={presetBtn} onClick={() => zoomTo(z, { duration: 200 })}>
-          {z * 100}%
-        </button>
-      ))}
-      <span style={sep} />
-      <button type="button" style={iconBtn} title="Fit all objects" onClick={() => fitView({ padding: 0.2, duration: 250 })}>⤢</button>
-      <button type="button" style={iconBtn} title="Reset view (100%)" onClick={() => setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 200 })}>↺</button>
-    </div>
+    <fieldset className="diagram-zoom-controls" aria-label="Diagram zoom" disabled={disabled || !viewportInitialized}>
+      <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => zoomOut({ duration: 150 })}>−</button>
+      <select aria-label="Diagram zoom percentage" value={percent} onChange={(event) => zoomTo(Number(event.target.value) / 100, { duration: 200 })}>
+        {!ZOOM_PRESETS.includes(percent) && <option value={percent}>{percent}%</option>}
+        {ZOOM_PRESETS.map((value) => <option key={value} value={value}>{value}%</option>)}
+      </select>
+      <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => zoomIn({ duration: 150 })}>+</button>
+      <button type="button" aria-label="Fit all objects" title="Fit all objects" onClick={() => fitView({ padding: FIT_PADDING, maxZoom: 1, duration: 250 })}>⤢</button>
+      <button type="button" aria-label="Reset view (100%)" title="Reset view (100%)" onClick={() => setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 200 })}>↺</button>
+    </fieldset>
   );
 }
 
-export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true }: {
+export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.05 }: {
   diagram: DiagramModel;
+  minZoom?: number;
   options?: DiagramOptions;
   onOptionsChange?: (next: DiagramOptions) => void;
   /** Per-flow packet step: null/absent = auto-play, a number = that 0-based hop. */
   flowSteps?: Record<string, number | null>;
   /** Whether the selected hub topology has a packet-flow adapter. */
   showFlowControl?: boolean;
+  /** Flow or hop hovered in the flow picker: fades the other flows. */
+  flowFocus?: FlowFocus | null;
+  /** Click a flow path to select it (again, or on empty canvas, to clear). */
+  onFlowSelect?: (group: string | null) => void;
+  onFlowHover?: (group: string | null) => void;
+  /** Shown instead of the layer buttons before endpoints exist: where to find them. */
+  flowHint?: { label: string; action: string; onClick: () => void };
 }) {
-  const { nodes, edges } = useMemo(() => toReactFlow(diagram), [diagram]);
-  const { fitView, setViewport } = useReactFlow();
+  const rtLocked = !!(options?.showFlows || options?.allFlows || options?.activeFlows?.length);
+  const [activeRules, setActiveRules] = useState<ActiveRouteRule[]>([]);
+  const attachmentMarker = React.useId();
+  const { nodes, edges } = useMemo(() => toReactFlow(diagram, rtLocked, attachmentMarker), [diagram, rtLocked, attachmentMarker]);
+  const backendBridges = useMemo(() => [...absoluteNodeRects(diagram.nodes).values()]
+    .filter((rect) => rect.node.kind === 'vcn' && rect.node.firewallBackendBridgeY != null), [diagram.nodes]);
+  const { setViewport, getViewport, viewportInitialized } = useReactFlow();
+  const [framed, setFramed] = useState(false);
+  const container = useRef<HTMLDivElement>(null);
+  const cooperative = useSyncExternalStore(subscribeToLayout, stackedLayout, () => false);
+  const modifierPressed = useKeyPress(ZOOM_KEYS);
+  const [gestureHint, setGestureHint] = useState<DiagramGestureHint>(null);
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const showGestureHint = useCallback((hint: DiagramGestureHint) => {
+    clearTimeout(hintTimer.current);
+    setGestureHint(hint);
+    if (hint) hintTimer.current = setTimeout(() => setGestureHint(null), 1500);
+  }, []);
+  useEffect(() => {
+    if (!cooperative || !container.current) return;
+    return attachCooperativeGestures(container.current, { getViewport, setViewport, onHint: showGestureHint, minZoom, maxZoom: 4 });
+  }, [cooperative, getViewport, setViewport, showGestureHint, minZoom]);
+  useEffect(() => () => clearTimeout(hintTimer.current), []);
   // Flow overlay inputs: the waypoint edges + the diagram's outer bounds.
   const flowEdges = useMemo(() => diagram.edges.filter((e) => !!e.waypoints), [diagram]);
-  const region = diagram.nodes.find((n) => n.kind === 'region');
+  const modelBounds = useMemo(() => diagramBounds(diagram.nodes), [diagram.nodes]);
   // Pane width — so switching view modes (or resizing the window) re-centres the
   // diagram instead of leaving it pinned to its previous-layout position.
   const paneWidth = useStore((s) => s.width);
   const paneHeight = useStore((s) => s.height);
 
   const toggleTables = useCallback((ids: string[]) => {
-    if (!onOptionsChange || ids.length === 0) return;
+    if (!onOptionsChange || rtLocked || ids.length === 0) return;
     const cur = options?.openTables ?? [];
     const allOpen = ids.every((id) => cur.includes(id));
     const next = allOpen ? cur.filter((id) => !ids.includes(id)) : [...new Set([...cur, ...ids])];
     onOptionsChange({ ...options, openTables: next });
-  }, [onOptionsChange, options]);
+  }, [onOptionsChange, options, rtLocked]);
   const onNodeClick = useCallback((_e: React.MouseEvent, node: Node) => {
     const d = node.data as { kind?: string; rtDotTableId?: string };
     if (d.kind === 'rtdot' && d.rtDotTableId) toggleTables([d.rtDotTableId]);
   }, [toggleTables]);
 
-  // When a flow is active, frame the path rather than the whole diagram. Include
-  // any consulted route table the user opened from an attachment dot.
+  // Frame flows together with the complete visible routing configuration.
   const flowNodeIds = useMemo(() => {
     const ids = new Set<string>();
     diagram.edges.forEach((e) => {
@@ -663,11 +515,12 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       // appear to jump across an unrelated part of the graph.
       (e.waypoints ?? [e.source, e.target]).forEach((id) => ids.add(id));
     });
-    diagram.nodes.forEach((n) => { if (n.kind === 'routetable' && n.rtHighlight?.length) ids.add(n.id); });
+    diagram.nodes.forEach((n) => { if (n.kind === 'routetable') ids.add(n.id); });
     return [...ids];
   }, [diagram]);
   const flowKey = flowNodeIds.join(',');
   const flowBounds = useMemo(() => {
+    if (!flowEdges.length && !options?.showFlows && !options?.allFlows) return null;
     const points = flowEdges.flatMap((edge) => edge.points ?? []);
     const byId = new Map(diagram.nodes.map((node) => [node.id, node]));
     const absolutePosition = (node: DiagramNode) => {
@@ -684,7 +537,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       return { x, y };
     };
     diagram.nodes
-      .filter((node) => node.kind === 'routetable' && node.rtHighlight?.length)
+      .filter((node) => node.kind === 'routetable' || !node.parentId && node.kind !== 'region')
       .forEach((node) => {
         const position = absolutePosition(node);
         points.push(position, { x: position.x + node.width, y: position.y + node.height });
@@ -698,16 +551,19 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
     const maxX = Math.max(...xs) + margin;
     const maxY = Math.max(...ys) + margin;
     return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
-  }, [diagram.nodes, flowEdges]);
+  }, [diagram.nodes, flowEdges, options?.showFlows, options?.allFlows]);
   const flowBoundsKey = flowBounds
     ? [flowBounds.x, flowBounds.y, flowBounds.width, flowBounds.height].map(Math.round).join(':')
     : '';
 
   // Re-fit on STRUCTURAL change (environments/subnets/hubs) or a pane resize —
-  // but NOT on adding/removing projects or route tables, so the user keeps their
-  // zoom/pan while editing those. When a flow is active, frame the flow instead.
+  // or external resource bounds, while preserving zoom/pan for project and table
+  // edits. When a flow is active, frame the flow instead.
   const layoutKey = useMemo(
-    () => `${diagram.nodes.filter((n) => n.kind !== 'routetable' && n.kind !== 'rtdot' && n.kind !== 'project').length}:${Math.round(paneWidth)}`,
+    () => {
+      const external = diagramBounds(diagram.nodes.filter((node) => !node.parentId && node.kind !== 'region'));
+      return `${diagram.nodes.filter((n) => n.kind !== 'routetable' && n.kind !== 'rtdot' && n.kind !== 'project').length}:${Math.round(paneWidth)}:${external.x}:${external.y}:${external.width}:${external.height}`;
+    },
     [diagram, paneWidth],
   );
   // Re-fit ONLY when the structural layout key or the active-flow set actually
@@ -716,58 +572,68 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   // can re-fire the effect; the ref guard makes the fitView itself idempotent so
   // an unchanged key is a no-op and the user keeps their zoom/pan.
   const lastFitKey = useRef('');
-  useEffect(() => {
-    if (paneWidth <= 0 || paneHeight <= 0) return;
-    const key = `${layoutKey}|${flowKey}|${flowBoundsKey}`;
-    if (key === lastFitKey.current) return;
+  useLayoutEffect(() => {
+    if (paneWidth <= 0 || paneHeight <= 0 || !viewportInitialized || !modelBounds.width || !modelBounds.height) return;
+    const key = `${layoutKey}|${Math.round(paneHeight)}|${flowKey}|${flowBoundsKey}`;
+    if (framed && key === lastFitKey.current) return;
     lastFitKey.current = key;
-    // Controlled React Flow nodes are measured just after they enter the store.
-    // A short deferred fit avoids racing that measurement when the flow sidebar
-    // opens and changes the pane width in the same render.
-    const timer = window.setTimeout(() => {
-      if (flowBounds) {
-        const viewport = getViewportForBounds(flowBounds, paneWidth, paneHeight, 0.2, 1, 0.16);
-        setViewport(viewport, { duration: 350 });
-      }
-      else fitView({ padding: 0.28, duration: 250 });
-    }, 60);
-    return () => window.clearTimeout(timer);
-  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, setViewport, fitView]);
+    // Model bounds are already final; fit them before revealing the first frame.
+    const bounds = flowBounds ?? modelBounds;
+    const viewport = getViewportForBounds(bounds, paneWidth, paneHeight, minZoom, 1, FIT_PADDING);
+    let cancelled = false;
+    void setViewport(viewport, { duration: framed ? (flowBounds ? 350 : 250) : 0 })
+      .then(() => { if (!cancelled && !framed) setFramed(true); });
+    return () => { cancelled = true; };
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, viewportInitialized, framed, modelBounds, setViewport, minZoom]);
 
   return (
     <RtContext.Provider value={toggleTables}>
+    <ActiveRulesContext.Provider value={flowEdges.length ? activeRules : []}>
+    <div ref={container} data-diagram-framed={framed} style={{ visibility: framed ? 'visible' : 'hidden' }} className={`studio-diagram${cooperative ? ' studio-diagram--cooperative' : ''}`}>
+    <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
+      <defs><marker id={attachmentMarker} markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" markerUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="3" fill="#6b6660" /></marker></defs>
+    </svg>
     <ReactFlow
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
+      onPaneClick={() => { if (options?.focusFlow) onFlowSelect?.(null); }}
       nodesDraggable={false}
       nodesConnectable={false}
-      minZoom={0.2}
+      zoomOnScroll={!cooperative}
+      preventScrolling={!cooperative || modifierPressed}
+      zoomActivationKeyCode={cooperative ? ZOOM_KEYS : undefined}
+      zoomOnDoubleClick={!cooperative}
+      minZoom={minZoom}
       maxZoom={4}
       proOptions={{ hideAttribution: true }}
     >
       <Background />
+      {backendBridges.length > 0 && <ViewportPortal>
+        {backendBridges.map((rect) => <div key={`${rect.id}-firewall-backends`} aria-label="Illustrative NLB firewall backends"
+          style={{ position: 'absolute', left: rect.x, top: rect.y + rect.node.firewallBackendBridgeY! - (rect.node.firewallBackendUpperArm ?? 0), width: rect.width,
+            height: FIREWALL_BACKEND_GAP + (rect.node.firewallBackendUpperArm ?? 0) + (rect.node.firewallBackendLowerArm ?? 0), pointerEvents: 'none', zIndex: 1200, lineHeight: 0 }}
+          dangerouslySetInnerHTML={{ __html: firewallBackendBridgeSvg(rect.width, rect.node.firewallBackendUpperArm, rect.node.firewallBackendLowerArm) }} />)}
+      </ViewportPortal>}
       {flowEdges.length > 0 && (
         <ViewportPortal>
-          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={region?.width ?? 2000} height={region?.height ?? 2000} />
+          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={modelBounds.width} height={modelBounds.height} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}
+            onSelect={onFlowSelect} onHover={onFlowHover} onRulesChange={setActiveRules} />
         </ViewportPortal>
       )}
       <MiniMap
         nodeColor={miniMapNodeColor}
         nodeStrokeColor={oracle.ink}
         nodeStrokeWidth={2}
-        pannable
-        zoomable
-        style={{ width: 140, height: 96, border: `1px solid ${oracle.border}`, borderRadius: 6 }}
+        pannable={!cooperative}
+        zoomable={!cooperative}
+        style={{ width: 140, height: 96, border: `1px solid ${oracle.border}`, borderRadius: 6, pointerEvents: cooperative ? 'none' : undefined }}
       />
-      <Panel position="top-left">
-        <ZoomBar />
-      </Panel>
       {onOptionsChange && (
-        <Panel position="top-right">
-          <div style={{ display: 'flex', gap: 8 }}>
+        <Panel position="top-right" className="diagram-layer-controls">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100vw - 64px)' }}>
             {showFlowControl && <button
               type="button"
               style={{ ...layerBtn, ...(options?.showEndpoints ? layerBtnActive : null) }}
@@ -784,15 +650,32 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
               type="button"
               style={{ ...layerBtn, ...(options?.showFlows ? layerBtnActive : null) }}
               aria-pressed={options?.showFlows ?? false}
-              title="Show/hide the flow picker — select traffic flows to trace per environment"
+              title={showFlowControl ? 'Show routing tables and select traffic flows to trace per environment' : 'Show routing tables for this network'}
               onClick={() => onOptionsChange({ ...options, showFlows: !options?.showFlows })}
             >
-              {options?.showFlows ? 'Hide flows' : 'Show flows'}
+              {showFlowControl
+                ? options?.showFlows ? 'Hide flows' : 'Show flows'
+                : options?.showFlows ? 'Hide routing tables' : 'Show routing tables'}
             </button>
           </div>
         </Panel>
       )}
+      {!onOptionsChange && flowHint && (
+        <Panel position="top-right">
+          <button type="button" style={hintBtn} onClick={flowHint.onClick} title={flowHint.label}>
+            <span style={{ fontWeight: 600, color: oracle.textMuted }}>{flowHint.label}</span>
+            <span style={{ color: oracle.redDark }}>{flowHint.action}</span>
+          </button>
+        </Panel>
+      )}
     </ReactFlow>
+    {cooperative && gestureHint && <div className="diagram-gesture-hint" role="status">
+      {gestureHint === 'touch'
+        ? 'Use two fingers to move the diagram. Pinch to zoom.'
+        : `Hold ${navigator.userAgent.includes('Mac') ? '⌘' : 'Ctrl'} and scroll to zoom the diagram.`}
+    </div>}
+    </div>
+    </ActiveRulesContext.Provider>
     </RtContext.Provider>
   );
 }

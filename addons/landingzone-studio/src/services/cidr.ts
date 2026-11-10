@@ -246,9 +246,12 @@ export function firstFreeBlock(vcnCidr: string, subnetCidrs: string[], prefix: n
  * Suggested CIDRs for a new subnet: "continue counting" — first free block at
  * the most recently used subnet prefix, then a few smaller standard sizes.
  */
-export function suggestSubnetCidrs(vcnCidr: string, subnetCidrs: string[]): string[] {
+export function suggestSubnetCidrs(vcnCidr: string, subnetCidrs: string[], preferredPrefix?: number): string[] {
   const lastPrefix = [...subnetCidrs].reverse().map(parseCidr).find((p) => p !== null)?.prefix ?? 24;
-  const prefixes = [...new Set([lastPrefix, 24, 25, 26, 27])].filter((p) => p >= (parseCidr(vcnCidr)?.prefix ?? 16) && p <= 30);
+  const vcnPrefix = parseCidr(vcnCidr)?.prefix ?? 16;
+  const candidates = preferredPrefix === undefined ? [lastPrefix, 24, 25, 26, 27]
+    : [preferredPrefix, Math.max(24, vcnPrefix), 25, 26, 27, 28, 29, 30];
+  const prefixes = [...new Set(candidates)].filter((p) => p >= vcnPrefix && p <= 30);
   const out: string[] = [];
   for (const prefix of prefixes) {
     const block = firstFreeBlock(vcnCidr, subnetCidrs, prefix);

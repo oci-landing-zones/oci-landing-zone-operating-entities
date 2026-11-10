@@ -19,8 +19,8 @@
         "default_compartment_id"               : "CMP-LZ-SECURITY-KEY",
 
         "host_recipes": {
-            "VSS-RCPH-LZ-KEY": {
-                "name"                         : "vss-rcph-lz",
+            "VSS-RCPH-FRA-LZ-KEY": {
+                "name"                         : "vss-rcph-fra-lz",
                 "port_scan_level"              : "STANDARD",
 
                 "agent_settings": {
@@ -44,9 +44,9 @@
         },
 
         "host_targets": {
-            "VSS-TGTH-LZ-KEY": {
-                "name"                         : "vss-tgth-lz",
-                "host_recipe_id"               : "VSS-RCPH-LZ-KEY",
+            "VSS-TGTH-FRA-LZ-KEY": {
+                "name"                         : "vss-tgth-fra-lz",
+                "host_recipe_id"               : "VSS-RCPH-FRA-LZ-KEY",
                 "target_compartment_id"        : "CMP-LANDINGZONE-KEY"
             }
         }

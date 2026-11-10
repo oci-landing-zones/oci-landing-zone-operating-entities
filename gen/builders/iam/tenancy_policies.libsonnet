@@ -36,7 +36,10 @@ function(ctx)
 
   // Service policy: realm-aware FSS and Object Storage service identifiers.
   local fss_service = ctx.realm_constants.service_identifiers.fss;
-  local obj_service = ctx.realm_constants.service_identifiers.objectstorage(config.region);
+  local key_services = ['blockstorage', 'oke', 'streaming', fss_service] + [
+    ctx.realm_constants.service_identifiers.objectstorage(region)
+    for region in [config.region] + (if config.dr_region != null then [config.dr_region] else [])
+  ];
   local usage_report_tenancy_ocid =
     if std.objectHas(ctx.realm_constants, 'usage_report_tenancy_ocid') then
       ctx.realm_constants.usage_report_tenancy_ocid
@@ -164,6 +167,7 @@ function(ctx)
           tbac_allow(grp_network, 'use', 'bastion-session', cmp_lz, tag_security),
           tbac_allow(grp_network, 'use', 'vaults', cmp_lz, tag_security),
           tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
+          'allow group %s to manage network-security-groups in compartment %s' % [domain_grp(grp_network), cmp_lz],
         ],
       },
     } + project_policies(ctx) + remote_peering_policies(ctx) + {
@@ -184,7 +188,7 @@ function(ctx)
           tbac_allow(grp_security_lz, 'read', 'app-catalog-listing', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'read', 'instance-images', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'inspect', 'buckets', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'all-resources', cmp_lz, tag_security),
+          'allow group %s to read all-resources in compartment %s' % [domain_grp(grp_security_lz), cmp_lz],
           tbac_allow(grp_security_lz, 'manage', 'instance-family', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'manage', 'volume-family', cmp_lz, tag_security, vol_deny),
           tbac_allow(grp_security_lz, 'manage', 'object-family', cmp_lz, tag_security, obj_deny),
@@ -229,6 +233,7 @@ function(ctx)
           tenancy_allow(grp_security_tenancy, 'manage', 'cloudevents-rules'),
           tenancy_allow(grp_security_tenancy, 'manage', 'cloud-guard-family'),
           tenancy_allow(grp_security_tenancy, 'read', 'tenancies'),
+          tenancy_allow(grp_security_tenancy, 'use', 'tag-namespaces'),
         ],
       },
 
@@ -249,7 +254,7 @@ function(ctx)
           'allow service vulnerability-scanning-service to read vnics in tenancy',
           'allow service vulnerability-scanning-service to read vnic-attachments in tenancy',
           'allow service osmh to read instances in tenancy',
-          'allow service blockstorage, oke, streaming, %s, %s to use keys in tenancy' % [fss_service, obj_service],
+          'allow service %s to use keys in tenancy' % std.join(', ', key_services),
         ],
       },
     },

@@ -1,35 +1,18 @@
-/**
- * flowTrace — the packet-flow engine. Given the canonical model and a flow spec,
- * it WALKS the route tables (buildRouteTables) hop by hop: at each node it
- * longest-prefix-matches the destination against the governing route table,
- * follows the matched rule's nextHop to the next node, and resolves which table
- * governs there. The route tables are the single source of truth, so editing a
- * CIDR or a rule re-routes the trace automatically.
- *
- * OCI routing semantics encoded in the walk:
- *   - A spoke subnet's table (rt-ssn-*) routes egress; default → DRG, OSN → SGW.
- *   - Leaving a VCN toward the DRG, the packet enters via that VCN's attachment
- *     and the shared DRG table (rt-drg-spokes/rt-drg-hub) decides the next hop.
- *   - Entering the hub VCN FROM the DRG, the hub attachment's ingress table
- *     (rt-hub-ingress) decides the next hop — typically the internal firewall.
- *     This table is consulted ONLY on ingress-to-VCN, never on the way back out.
- *   - A firewall re-injects into its OWN subnet, so after inspection the next hop
- *     comes from that subnet's table (rt-hub-internal / rt-hub-dmz).
- *   - Ingress from the internet (IGW → DMZ FW → LB → INT FW → DRG → spoke) DNATs
- *     at the load balancer: the destination is rewritten to the backend VM there.
- *
- * Output mirrors the ONTV flow feature: an ordered hop list (step-by-step), the
- * animated path segments (node-id pairs), and the route-table rows to highlight.
- */
-
+import { flowGroup } from '../diagram/flowOverlayGeometry';
+import { flowDestinationSubnet, flowNetworks, flowPeerTargets, flowRoleAllowed } from './flowNetworks';
 import type { LzModel } from '../model/types';
-import { buildRouteTables, type RouteRule } from './routeTables';
+import type { RouteRule, RouteTable } from './routeTables';
+import { routePriority } from './routeTables';
+import { hasHubLoadBalancer } from './hubKinds';
 import { contains, hostIpInSubnet, parseCidr } from './cidr';
 
-export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services';
+import { hybridRoutes, vpnCpeNodeId } from './hybridConnectivity';
+
+export type FlowKind = 'egress' | 'ingress' | 'east-west' | 'services' | 'api' | 'lb' | 'lb-return' | 'hybrid-in' | 'hybrid-out';
 
 /** A resolved flow to trace. Subnet indices default to 0 (web). */
 export interface FlowSpec {
+  hybridId?: string;
   id: string;
   kind: FlowKind;
   color: string;
@@ -42,8 +25,13 @@ export interface FlowSpec {
 export interface FlowHop {
   seq: number;
   node: string;
+  /** Occurrence in the ordered resource visits, including attachment hairpins. */
+  visitIndex: number;
   tableId?: string;
+  /** Generated association owner; VCN ingress is applied at its attachment. */
+  tableOwner?: string;
   rowIndex?: number;
+  ruleId?: string;
   inspected?: boolean;
   label: string;
 }
@@ -61,339 +49,353 @@ export interface FlowTrace {
   highlights: { tableId: string; rows: number[] }[];
 }
 
-/** Distinct per-flow colours, assigned in activation order. */
-export const FLOW_COLORS = ['#2196F3', '#FF9800', '#4CAF50', '#E91E63', '#9C27B0', '#00BCD4', '#8BC34A', '#FF5722'] as const;
+/**
+ * Per-flow colours, assigned in activation order and never cycled: blue, aqua,
+ * violet, magenta. The hues stay clear of the diagram's own red, amber and green,
+ * and the set was checked for colour-blind and normal-vision separation across
+ * every pair. Four is also the readable limit for paths on one diagram, so the
+ * picker caps active flows at this length.
+ */
+export const FLOW_COLORS = ['#2a78d6', '#1baf7a', '#4a3aa7', '#d03f86'] as const;
+
+/**
+ * "Show all flows" draws too many paths for one colour each, so colour encodes
+ * the traffic type instead.
+ */
+export const FLOW_KIND_COLORS: Record<FlowKind, string> = {
+  egress: '#2a78d6',
+  api: '#ad6500',
+  lb: '#d03f86',
+  'lb-return': '#2a78d6',
+  services: '#1baf7a',
+  'east-west': '#4a3aa7',
+  ingress: '#d03f86',
+  'hybrid-in': '#d03f86',
+  'hybrid-out': '#2a78d6',
+};
+
+export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
+  egress: 'Spoke → Internet',
+  ingress: 'Internet → Spoke',
+  'east-west': 'Spoke → spoke',
+  api: 'Kubernetes API Server',
+  lb: 'Hub public LB → OKE',
+  'lb-return': 'OKE → Hub public LB (response)',
+  services: 'Spoke → OCI Services',
+  'hybrid-in': 'External network → Spoke',
+  'hybrid-out': 'Spoke → External network',
+};
+
+/**
+ * Every flow in the landing zone, traced from each environment's first endpoint:
+ * egress, ingress, east-west to every other environment, and OCI services.
+ */
+export function allFlowIds(model: LzModel): string[] {
+  const networks = flowNetworks(model).filter((network) => network.available);
+  return networks.flatMap((source) => {
+    const picks = (kind: FlowKind, destination?: typeof source) => {
+      const roles = source.subnets.filter((sn) => flowRoleAllowed(source, sn.role, kind, destination));
+      if (!roles.length) return [];
+      const sourceScope = source.scope ?? source.name;
+      const scope = destination ? `${sourceScope}>${destination.scope ?? destination.name}` : sourceScope;
+      return (source.oke ? roles : roles.slice(0, 1)).flatMap((sn) => {
+        const peers = kind === 'east-west' && destination ? flowPeerTargets(source, sn.role, destination) : [];
+        return peers.length ? peers.map((peer) => `${scope}:${kind}:${sn.role}:${peer.role}`) : [`${scope}:${kind}:${sn.role}`];
+      });
+    };
+    return [...picks('lb'), ...picks('lb-return'), ...picks('egress'), ...(hasHubLoadBalancer(model) ? picks('ingress') : []),
+      ...networks.filter((other) => other !== source).flatMap((other) => picks('east-west', other)), ...picks('services'), ...hybridRoutes(model).flatMap((connection) => [...picks(`hybrid-in@${connection.id}` as FlowKind), ...picks(`hybrid-out@${connection.id}` as FlowKind)]), ...networks.filter((other) => other.apiEndpoint).flatMap((other) => picks('api', other))];
+  });
+}
 
 const fwIp = (cidr: string) => hostIpInSubnet(cidr, 10);
 const host32 = (cidr: string) => `${hostIpInSubnet(cidr, 10)}/32`;
 
-/** Topology index derived from the model + generated route tables. */
-function buildTopo(model: LzModel) {
-  const tables = buildRouteTables(model);
-  const tableById = new Map(tables.map((t) => [t.id, t]));
-
+/** Resource identity comes from the model; routing policy comes only from generated tables. */
+function buildTopo(model: LzModel, tables: RouteTable[]) {
+  const connections = hybridRoutes(model);
+  const externalEndpoints = new Map(connections.map((connection) => [connection.id, connection.type === 'VPN'
+    ? vpnCpeNodeId(model.hybridConnectivity!.ipsecs[connection.name]) : connection.id + ':router']));
+  const tablesFor = (node: string, kind: RouteTable['associations'][number]['kind']) =>
+    tables.filter((table) => table.associations.some((binding) => binding.nodeId === node && binding.kind === kind));
+  const tableFor = (node: string, kind: RouteTable['associations'][number]['kind']) => {
+    const matches = tablesFor(node, kind);
+    return matches.length === 1 ? matches[0] : undefined;
+  };
   const hubSub = (suffix: string) => {
     const key = suffix.replace(/^-/, '');
     const i = model.network.subnets.findIndex((sn) => sn.name === key || sn.name.endsWith(suffix));
     return i >= 0 ? { node: `hub-vcn-sn-${i}`, cidr: model.network.subnets[i].cidr } : null;
   };
-  const fwInt = hubSub('-fw-int');
-  const fwDmz = hubSub('-fw-dmz');
-  const fwHub = hubSub('-fw');
+  const fwNodes = ['-fw-int', '-fw-dmz', '-fw'].flatMap((suffix) => {
+    const subnet = hubSub(suffix);
+    return subnet ? [subnet] : [];
+  });
   const trust = hubSub('-trust');
   const untrust = hubSub('-untrust');
-  const lb = hubSub('-lb');
-  const intIp = fwInt ? fwIp(fwInt.cidr) : '';
-  const dmzIp = fwDmz ? fwIp(fwDmz.cidr) : '';
-
-  const envs = model.environments.map((e, i) => ({
-    idx: i,
-    name: e.name.trim() || `env${i + 1}`,
-    attach: `attach-cmp-env-${i}`,
-    drgTable: 'rt-drg-spokes',
-    subnets: e.network.subnets.map((sn, j) => ({ cidr: sn.cidr, node: `cmp-env-${i}-vcn-sn-${j}`, role: sn.name.split('-').pop() || `sn${j}` })),
-    sgw: `cmp-env-${i}-sgw`,
-  }));
-
-  // Map a firewall private IP back to its subnet node + governing table.
-  const fwByIp = (ip: string): { node: string; table: string } | null => {
-    if (fwInt && ip === intIp) return { node: fwInt.node, table: 'rt-hub-internal' };
-    if (fwDmz && ip === dmzIp) return { node: fwDmz.node, table: 'rt-hub-dmz' };
-    if (fwHub && ip === hostIpInSubnet(fwHub.cidr, 10)) return { node: fwHub.node, table: 'rt-hub-fw' };
-    return null;
+  const lb = hasHubLoadBalancer(model) ? hubSub('-lb') : null;
+  const envs = flowNetworks(model);
+  const human = (node: string) => {
+    const hybrid = connections.find((connection) => connection.id === node);
+    if (hybrid) return `${hybrid.type} ${hybrid.name}`;
+    const vpn = connections.find((connection) => connection.type === 'VPN'
+      && (node === connection.id + ':tunnel-1' || node === connection.id + ':tunnel-2'));
+    if (vpn) return `VPN ${vpn.name} Tunnel ${node.endsWith('-1') ? '1' : '2'}`;
+    const cpe = Object.keys(model.hybridConnectivity?.customer_premises_equipments ?? {}).find((name) => node === `hybrid-cpe-${name}`);
+    if (cpe) return `CPE ${cpe}`;
+    if (node.startsWith('hybrid-cpe-existing:')) return 'Existing CPE';
+    const router = connections.find((connection) => connection.type === 'FastConnect' && node === connection.id + ':router');
+    if (router) return `FastConnect ${router.name} customer router`;
+    if (node === 'drg') return 'DRG';
+    const gateway = node.match(/(?:^|-)(igw|natgw|sgw)(?:-\d+)?$/)?.[1];
+    if (gateway === 'igw') return 'Internet gateway';
+    if (gateway === 'natgw') return 'NAT gateway';
+    if (gateway === 'sgw') return 'Service gateway';
+    if (node === 'attach-hub') return 'Hub attachment';
+    const network = envs.find((env) => env.attachment === node);
+    if (network) return `${network.name} attachment`;
+    const endpoint = envs.flatMap((env) => [...env.subnets, ...(env.apiEndpoint ? [env.apiEndpoint] : [])].map((sn) => ({ ...sn, name: env.name }))).find((sn) => sn.node === node);
+    if (endpoint) return `${endpoint.name} ${endpoint.role}`;
+    const attachment = node.match(/^attach-cmp-env-(\d+)$/);
+    if (attachment) return `${envs[+attachment[1]]?.name ?? ''} attachment`;
+    const subnet = node.match(/^cmp-env-(\d+)-vcn-sn-(\d+)$/);
+    if (subnet) return `${envs[+subnet[1]]?.name ?? ''} ${envs[+subnet[1]]?.subnets[+subnet[2]]?.role ?? ''}`.trim();
+    const hub = node.match(/^hub-vcn-sn-(\d+)$/);
+    return hub ? model.network.subnets[+hub[1]]?.name ?? node : node;
   };
-
-  // Short human names for the step-by-step labels.
-  const human = (id: string): string => {
-    if (id === 'gw-igw') return 'IGW';
-    if (id === 'gw-natgw') return 'NAT GW';
-    if (id === 'gw-sgw') return 'Hub SGW';
-    if (id === 'drg') return 'DRG';
-    if (id === 'attach-hub') return 'Hub attach';
-    if (fwInt && id === fwInt.node) return 'INT FW';
-    if (fwDmz && id === fwDmz.node) return 'DMZ FW';
-    if (fwHub && id === fwHub.node) return 'NFW';
-    if (trust && id === trust.node) return 'Trust NLB + firewall';
-    if (untrust && id === untrust.node) return 'Untrust NLB + firewall';
-    if (lb && id === lb.node) return 'LB';
-    const at = id.match(/^attach-cmp-env-(\d+)$/);
-    if (at) return `${envs[+at[1]]?.name ?? at[1]} attach`;
-    const sg = id.match(/^cmp-env-(\d+)-sgw$/);
-    if (sg) return `${envs[+sg[1]]?.name ?? sg[1]} SGW`;
-    const ng = id.match(/^cmp-env-(\d+)-natgw$/);
-    if (ng) return `${envs[+ng[1]]?.name ?? ng[1]} NAT GW`;
-    const sub = id.match(/^cmp-env-(\d+)-vcn-sn-(\d+)$/);
-    if (sub) return `VM ${envs[+sub[1]]?.subnets[+sub[2]]?.role ?? ''}`.trim();
-    const hub = id.match(/^hub-vcn-sn-(\d+)$/);
-    if (hub) return model.network.subnets[+hub[1]]?.name.split('-').pop() ?? id;
-    return id;
-  };
-
-  return { tableById, fwInt, fwDmz, fwHub, trust, untrust, lb, intIp, dmzIp, envs, fwByIp, human };
+  return { hubCidr: model.network.hubVcnCidr, tableFor, hasConflictingBinding: (node: string, kind: RouteTable['associations'][number]['kind']) => tablesFor(node, kind).length > 1, fwNodes, trust, untrust, lb, envs, human, externalEndpoints };
 }
 type Topo = ReturnType<typeof buildTopo>;
 
-/** Longest-prefix-match a destination against a table's rules. dest = "ip/32", "0.0.0.0/0", or "OSN". */
-function matchRule(rules: RouteRule[], dest: string): { rule: RouteRule; i: number } | null {
-  if (dest === 'OSN') {
-    const i = rules.findIndex((r) => r.nextHopKind === 'sgw' || r.destination === 'OSN Services');
-    return i >= 0 ? { rule: rules[i], i } : null;
-  }
-  let best = -1;
-  let bestPrefix = -1;
-  rules.forEach((r, i) => {
-    if (!r.matchCidr || !contains(r.matchCidr, dest)) return;
-    const p = parseCidr(r.matchCidr)?.prefix ?? -1;
-    if (p > bestPrefix) { bestPrefix = p; best = i; }
-  });
-  return best >= 0 ? { rule: rules[best], i: best } : null;
+/** OCI longest-prefix match, then static over implicit local or imported routes. */
+export function matchRule(rules: RouteRule[], dest: string): { rule: RouteRule; i: number } | null {
+  const candidates = rules.flatMap((rule, i) => {
+    if (dest === 'OSN') return rule.destination === 'OSN Services' ? [{ rule, i, prefix: 0 }] : [];
+    const prefix = rule.matchCidr && contains(rule.matchCidr, dest) ? parseCidr(rule.matchCidr)?.prefix : undefined;
+    return prefix == null ? [] : [{ rule, i, prefix }];
+  }).sort((a, b) => b.prefix - a.prefix
+    || routePriority(a.rule) - routePriority(b.rule));
+  const best = candidates[0];
+  if (!best) return null;
+  const tied = candidates.filter((candidate) => candidate.prefix === best.prefix && candidate.rule.routeType === best.rule.routeType);
+  // Multiple equal paths cannot be presented as a single deterministic effective route.
+  const target = (rule: RouteRule) => rule.targetKey ?? rule.targetNodeId ?? rule.flowTarget;
+  if (tied.some(({ rule }) => rule.nextHopKind !== best.rule.nextHopKind || target(rule) !== target(best.rule))) return null;
+  return { rule: best.rule, i: best.i };
 }
 
-/** Mutable accumulator threaded through the walk. */
 interface Acc {
   hops: FlowHop[];
   visual: string[];
   highlights: Map<string, Set<number>>;
   ok: boolean;
 }
-
 function pushVisual(acc: Acc, node: string) {
-  if (acc.visual[acc.visual.length - 1] !== node) acc.visual.push(node);
+  if (acc.visual.at(-1) !== node) acc.visual.push(node);
 }
-function highlight(acc: Acc, tableId: string, row: number) {
-  const set = acc.highlights.get(tableId) ?? new Set<number>();
-  set.add(row);
-  acc.highlights.set(tableId, set);
+function hop(acc: Acc, node: string, label: string, table?: RouteTable, match?: { rule: RouteRule; i: number }, inspected = false, tableOwner = node) {
+  const visitIndex = acc.visual.lastIndexOf(node);
+  if (visitIndex < 0) { acc.ok = false; return; }
+  acc.hops.push({ seq: acc.hops.length + 1, node, visitIndex, label, inspected,
+    ...(table && match ? { tableId: table.id, tableOwner, ruleId: match.rule.id, rowIndex: match.i } : {}) });
+  if (table && match) {
+    const rows = acc.highlights.get(table.id) ?? new Set<number>();
+    rows.add(match.i);
+    acc.highlights.set(table.id, rows);
+  }
+}
+function ruleHop(topo: Topo, acc: Acc, node: string, table: RouteTable, match: { rule: RouteRule; i: number }, owner = node) {
+  const inspected = topo.fwNodes.some((fw) => fw.node === node) || node === topo.trust?.node || node === topo.untrust?.node;
+  hop(acc, node, `${topo.human(node)}: ${match.rule.destination} → ${match.rule.target}${inspected ? ' (inspect)' : ''}`, table, match, inspected, owner);
 }
 
-/**
- * Walk the route tables from an initial state until the packet reaches a terminal
- * (internet gateway, service gateway, or delivery into the destination spoke).
- * `zone` is the env index the packet currently sits in, or 'hub'.
- */
-function walk(
-  topo: Topo,
-  acc: Acc,
-  start: { table: string; dest: string; zone: number | 'hub'; node?: string },
-  dstNode: string | null,
-) {
-  let tableId = start.table;
-  const dest = start.dest;
+function deliverLocal(topo: Topo, acc: Acc, rule: RouteRule, destination: string | null) {
+  if (!destination || !rule.targetNodeId || !destination.startsWith(rule.targetNodeId + '-sn-')) { acc.ok = false; return; }
+  pushVisual(acc, destination);
+  hop(acc, destination, `→ ${topo.human(destination)} (local)`);
+}
+
+/** Route bindings distinguish VCN→DRG and DRG→VCN; they are never interchangeable. */
+function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: number | 'hub'; kind?: RouteTable['associations'][number]['kind'] }, dstNode: string | null) {
+  let node = start.node;
   let zone = start.zone;
-
-  for (let guard = 0; guard < 16; guard++) {
-    const table = topo.tableById.get(tableId);
-    if (!table) { acc.ok = false; return; }
-    const m = matchRule(table.rules, dest);
-    if (!m) { acc.ok = false; return; }
-    highlight(acc, tableId, m.i);
-    const inspected = tableId === 'rt-hub-internal' || tableId === 'rt-hub-dmz' || tableId === 'rt-hub-fw';
-    const governingNode = guard === 0 && start.node ? start.node : table.attachTo;
-    acc.hops.push({
-      seq: acc.hops.length + 1, node: governingNode, tableId, rowIndex: m.i, inspected,
-      label: `${topo.human(governingNode)}: ${m.rule.destination} → ${m.rule.target}${inspected ? ' (inspect)' : ''}`,
-    });
-
-    const rule = m.rule;
+  let kind: RouteTable['associations'][number]['kind'] = start.kind ?? 'subnet';
+  for (let guard = 0; guard < 24; guard++) {
+    if (zone === 'hub' && dstNode?.startsWith('hub-vcn-sn-') && contains(topo.hubCidr, start.dest)) {
+      const inspected = topo.fwNodes.some((fw) => fw.node === node) || node === topo.trust?.node;
+      hop(acc, node, `${topo.human(node)}: ${inspected ? 'inspect → ' : ''}local delivery to ${topo.human(dstNode)}`, undefined, undefined, inspected);
+      pushVisual(acc, dstNode);
+      hop(acc, dstNode, `→ ${topo.human(dstNode)}`);
+      return;
+    }
+    const table = topo.tableFor(node, kind);
+    const match = table ? matchRule(table.rules, start.dest) : null;
+    if (!table || !match) { acc.ok = false; return; }
+    ruleHop(topo, acc, node, table, match);
+    const rule = match.rule;
     switch (rule.nextHopKind) {
+      case 'local': deliverLocal(topo, acc, rule, dstNode); return;
       case 'drg': {
-        const attach = zone === 'hub' ? 'attach-hub' : `attach-cmp-env-${zone}`;
-        pushVisual(acc, attach);
+        node = zone === 'hub' ? 'attach-hub' : topo.envs[zone]?.attachment;
+        pushVisual(acc, node);
         pushVisual(acc, 'drg');
-        tableId = zone === 'hub' ? 'rt-drg-hub' : topo.envs[zone].drgTable;
+        kind = 'drg-attachment';
         break;
       }
       case 'attachment': {
-        const target = rule.flowTarget ?? '';
-        pushVisual(acc, target);
-        if (target === 'attach-hub') {
-          tableId = 'rt-hub-ingress';
-          zone = 'hub';
-        } else {
-          // Delivered into a spoke VCN → local delivery to the destination VM.
-          const e = target.match(/^attach-cmp-env-(\d+)$/);
-          const deliver = dstNode ?? (e ? `cmp-env-${e[1]}-vcn-sn-0` : '');
-          if (deliver) {
-            pushVisual(acc, deliver);
-            acc.hops.push({ seq: acc.hops.length + 1, node: deliver, label: `→ ${topo.human(deliver)}` });
-          }
-          return;
-        }
-        break;
-      }
-      case 'firewall': {
-        const fw = topo.fwByIp(rule.flowTarget ?? '');
-        if (!fw) { acc.ok = false; return; }
-        pushVisual(acc, fw.node);
-        tableId = fw.table;
-        zone = 'hub';
-        break;
-      }
-      case 'nlb': {
-        const target = rule.flowTarget ?? '';
-        if (!target) { acc.ok = false; return; }
-        pushVisual(acc, target);
-        // A Trust NLB routes a firewall-returned spoke destination via the DRG.
-        // Internet egress crosses the Untrust NLB before the IGW. The third-party
-        // backend OCIDs themselves stay in generator-owned network_backends.json.
-        if (target === topo.trust?.node) {
-          if (dest === '0.0.0.0/0') {
+        node = rule.targetNodeId ?? rule.flowTarget ?? '';
+        if (!node) { acc.ok = false; return; }
+        pushVisual(acc, node);
+        const destinationIndex = topo.envs.findIndex((env) => env.attachment === node);
+        const destination = destinationIndex >= 0 ? topo.envs[destinationIndex] : undefined;
+        const vcn = node === 'attach-hub' ? 'hub-vcn' : destination?.vcnNode ?? '';
+        if (!vcn) { acc.ok = false; return; }
+        zone = node === 'attach-hub' ? 'hub' : destinationIndex;
+        if (topo.hasConflictingBinding(vcn, 'vcn-ingress')) { acc.ok = false; return; }
+        const ingress = topo.tableFor(vcn, 'vcn-ingress');
+        if (ingress) {
+          // The ingress route is applied at the attachment, but bound to the VCN.
+          const entry = matchRule(ingress.rules, start.dest);
+          if (!entry) { acc.ok = false; return; }
+          ruleHop(topo, acc, node, ingress, entry, vcn);
+          if (entry.rule.nextHopKind === 'local') { deliverLocal(topo, acc, entry.rule, dstNode); return; }
+          const target = entry.rule.targetNodeId ?? topo.fwNodes.find((fw) => fwIp(fw.cidr) === entry.rule.flowTarget)?.node;
+          if (entry.rule.nextHopKind !== 'firewall' && entry.rule.nextHopKind !== 'nlb' || !target) { acc.ok = false; return; }
+          node = target;
+          pushVisual(acc, node);
+          if (entry.rule.nextHopKind === 'nlb' && node === topo.trust?.node && start.dest === '0.0.0.0/0') {
             if (!topo.untrust) { acc.ok = false; return; }
-            pushVisual(acc, topo.untrust.node);
-            tableId = 'rt-hub-untrust';
-          } else {
-            tableId = 'rt-hub-trust';
+            hop(acc, node, `${topo.human(node)}: inspect → untrust interface`, undefined, undefined, true);
+            node = topo.untrust.node;
+            pushVisual(acc, node);
           }
-          zone = 'hub';
+          kind = 'subnet';
           break;
         }
-        if (target === topo.untrust?.node) {
-          tableId = 'rt-hub-untrust';
-          zone = 'hub';
-          break;
-        }
-        acc.ok = false;
+        if (!dstNode || !destination || ![...destination.subnets, ...(destination.apiEndpoint ? [destination.apiEndpoint] : [])].some((sn) => sn.node === dstNode)) { acc.ok = false; return; }
+        pushVisual(acc, dstNode);
+        hop(acc, dstNode, `→ ${topo.human(dstNode)}`);
         return;
+      }
+      case 'firewall':
+      case 'nlb': {
+        const target = rule.targetNodeId ?? (rule.nextHopKind === 'firewall'
+          ? topo.fwNodes.find((fw) => fwIp(fw.cidr) === rule.flowTarget)?.node : rule.flowTarget);
+        if (!target) { acc.ok = false; return; }
+        node = target;
+        pushVisual(acc, node);
+        // The third-party firewall's internet-facing interface is not an OCI route rule.
+        if (rule.nextHopKind === 'nlb' && node === topo.trust?.node && start.dest === '0.0.0.0/0') {
+          if (!topo.untrust) { acc.ok = false; return; }
+          hop(acc, node, `${topo.human(node)}: inspect → untrust interface`, undefined, undefined, true);
+          node = topo.untrust.node;
+          pushVisual(acc, node);
+        }
+        zone = 'hub';
+        kind = 'subnet';
+        break;
       }
       case 'natgw':
-      case 'igw': {
-        const gw = rule.flowTarget ?? (rule.nextHopKind === 'natgw' ? 'gw-natgw' : 'gw-igw');
-        pushVisual(acc, gw);
-        acc.hops.push({ seq: acc.hops.length + 1, node: gw, label: `${topo.human(gw)} → Internet` });
-        return;
-      }
+      case 'igw':
       case 'sgw': {
-        const gw = rule.flowTarget ?? 'gw-sgw';
-        pushVisual(acc, gw);
-        acc.hops.push({ seq: acc.hops.length + 1, node: gw, label: `${topo.human(gw)} → OSN` });
+        const gateway = rule.targetNodeId ?? rule.flowTarget;
+        if (!gateway) { acc.ok = false; return; }
+        pushVisual(acc, gateway);
+        hop(acc, gateway, `${topo.human(gateway)} → ${rule.nextHopKind === 'sgw' ? 'OCI Services' : 'Internet'}`);
         return;
       }
-      default:
-        acc.ok = false;
+      case 'external': {
+        const target = rule.targetNodeId ?? rule.flowTarget;
+        if (!target) { acc.ok = false; return; }
+        if (target.startsWith('hybrid-vpn-')) pushVisual(acc, target + ':tunnel-1');
+        else pushVisual(acc, target);
+        const endpoint = topo.externalEndpoints.get(target) ?? target;
+        pushVisual(acc, endpoint);
+        hop(acc, endpoint, `→ ${topo.human(endpoint)} (expected path; deployed routes are unavailable)`);
         return;
+      }
+      default: acc.ok = false; return;
     }
   }
   acc.ok = false;
 }
 
-/** Trace one resolved flow spec into hops + animated segments + table highlights. */
-export function traceFlow(model: LzModel, spec: FlowSpec): FlowTrace {
-  const topo = buildTopo(model);
+export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] = []): FlowTrace {
+  const topo = buildTopo(model, tables);
   const acc: Acc = { hops: [], visual: [], highlights: new Map(), ok: true };
-
-  const srcEnv = topo.envs[spec.srcEnv];
-  const srcSub = srcEnv?.subnets[spec.srcSubnet ?? 0];
-  const dstEnv = spec.dstEnv != null ? topo.envs[spec.dstEnv] : undefined;
-  const dstSub = dstEnv?.subnets[spec.dstSubnet ?? 0];
-
-  // Source → destination label for the moving packet pill.
-  const srcTag = `${srcEnv?.name ?? ''} ${srcSub?.role ?? 'vm'}`.trim();
-  const dstTag = `${dstEnv?.name ?? srcEnv?.name ?? ''} ${dstSub?.role ?? srcSub?.role ?? ''}`.trim();
-  const label = spec.kind === 'egress' ? `${srcTag} → INET`
-    : spec.kind === 'services' ? `${srcTag} → OSN`
-    : spec.kind === 'ingress' ? `INET → ${dstTag}`
-    : `${srcTag} → ${dstTag}`;
-
-  if (spec.kind === 'ingress') {
-    if (model.network.hubKind === 'hub_c') {
-      // Hub C receives public traffic through the Untrust NLB/firewall pair,
-      // then locally delivers it to the public L7 load balancer.
-      const backend = dstSub ?? srcSub;
-      const dstNode = backend?.node ?? null;
-      if (topo.lb && topo.untrust && backend) {
-        pushVisual(acc, 'gw-igw');
-        const igw = topo.tableById.get('rt-hub-igw');
-        const match = igw ? matchRule(igw.rules, host32(topo.lb.cidr)) : null;
-        if (!match) { acc.ok = false; return finish(spec, acc, label); }
-        highlight(acc, 'rt-hub-igw', match.i);
-        acc.hops.push({ seq: 1, node: 'gw-igw', tableId: 'rt-hub-igw', rowIndex: match.i, label: `IGW: ${match.rule.destination} → ${match.rule.target}` });
-        pushVisual(acc, topo.untrust.node);
-        acc.hops.push({ seq: 2, node: topo.untrust.node, inspected: true, label: 'Untrust NLB + firewall: inspect ingress → LB (local)' });
-        pushVisual(acc, topo.lb.node);
-        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
-      } else {
-        acc.ok = false;
-      }
-      return finish(spec, acc, label);
-    }
-    if (model.network.hubKind === 'hub_b') {
-      // Hub B's public LB is directly IGW-routed; the final LB route table then
-      // steers the backend path through its single OCI Network Firewall.
-      const backend = dstSub ?? srcSub;
-      const dstNode = backend?.node ?? null;
-      if (topo.lb && backend) {
-        pushVisual(acc, 'gw-igw');
-        acc.hops.push({ seq: 1, node: 'gw-igw', label: 'IGW → public LB' });
-        pushVisual(acc, topo.lb.node);
-        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
-      } else {
-        acc.ok = false;
-      }
-      return finish(spec, acc, label);
-    }
-    if (model.network.hubKind === 'hub_e') {
-      // Hub E has no DMZ firewall: the public LB forwards directly to the DRG.
-      const backend = dstSub ?? srcSub;
-      const dstNode = backend?.node ?? null;
-      if (topo.lb && backend) {
-        pushVisual(acc, 'gw-igw');
-        acc.hops.push({ seq: 1, node: 'gw-igw', label: 'IGW → public LB' });
-        pushVisual(acc, topo.lb.node);
-        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
-      } else {
-        acc.ok = false;
-      }
-      return finish(spec, acc, label);
-    }
-    // Internet → IGW → DMZ FW → LB → (DNAT) → INT FW → DRG → spoke VM.
-    const backend = dstSub ?? srcSub;
-    const dstNode = backend?.node ?? null;
-    if (topo.lb && backend) {
-      pushVisual(acc, 'gw-igw');
-      // IGW ingress: matches the LB subnet prefix → DMZ FW.
-      const igw = topo.tableById.get('rt-hub-igw');
-      const mIgw = igw ? matchRule(igw.rules, host32(topo.lb.cidr)) : null;
-      if (igw && mIgw && topo.fwDmz) {
-        highlight(acc, 'rt-hub-igw', mIgw.i);
-        acc.hops.push({ seq: 1, node: 'gw-igw', tableId: 'rt-hub-igw', rowIndex: mIgw.i, label: `IGW: ${mIgw.rule.destination} → ${mIgw.rule.target}` });
-        pushVisual(acc, topo.fwDmz.node);
-        // DMZ FW inspects, then local-delivers to the LB (intra-VCN, no routed hop).
-        acc.hops.push({ seq: 2, node: topo.fwDmz.node, tableId: 'rt-hub-dmz', inspected: true, label: 'DMZ FW: inspect ingress → LB (local)' });
-        pushVisual(acc, topo.lb.node);
-        // From the LB the destination is the DNATed backend VM.
-        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
-      } else {
-        acc.ok = false;
-      }
+  const source = topo.envs[spec.srcEnv];
+  const srcSub = source?.subnets[spec.srcSubnet ?? 0];
+  const destination = spec.dstEnv != null ? topo.envs[spec.dstEnv] : undefined;
+  const dstSub = spec.kind === 'api' ? destination?.apiEndpoint : destination?.subnets[spec.dstSubnet ?? 0];
+  const srcTag = `${source?.name ?? ''} ${srcSub?.role ?? 'vm'}`.trim();
+  const backend = dstSub ?? srcSub;
+  const dstTag = `${destination?.name ?? source?.name ?? ''} ${backend?.role ?? ''}`.trim();
+  if (spec.kind === 'hybrid-in' || spec.kind === 'hybrid-out') {
+    const connection = hybridRoutes(model).find((entry) => entry.id === spec.hybridId);
+    const local = spec.kind === 'hybrid-in' ? backend : srcSub;
+    const label = spec.kind === 'hybrid-in' ? `${connection?.name} → ${dstTag}` : `${srcTag} → ${connection?.name}`;
+    if (!connection || !local || !connection.cidrs[0] || !parseCidr(connection.cidrs[0])
+      || !flowRoleAllowed(source, local.role, `${spec.kind}@${connection.id}`)) return finish(spec, { ...acc, ok: false }, label);
+    if (spec.kind === 'hybrid-in') {
+      pushVisual(acc, topo.externalEndpoints.get(connection.id)!);
+      const ingress = connection.type === 'VPN' ? connection.id + ':tunnel-1' : connection.id;
+      pushVisual(acc, ingress);
+      pushVisual(acc, 'drg');
+      walk(topo, acc, { node: ingress, kind: 'drg-attachment', dest: host32(local.cidr), zone: 'hub' }, local.node);
     } else {
-      acc.ok = false;
+      pushVisual(acc, local.node);
+      walk(topo, acc, { node: local.node, dest: host32(connection.cidrs[0]), zone: spec.srcEnv }, null);
     }
     return finish(spec, acc, label);
   }
-
-  if (!srcSub) return finish(spec, { ...acc, ok: false }, label);
-  pushVisual(acc, srcSub.node);
-
-  if (spec.kind === 'services') {
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: 'OSN', zone: spec.srcEnv, node: srcSub.node }, null);
-  } else if (spec.kind === 'egress') {
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: '0.0.0.0/0', zone: spec.srcEnv, node: srcSub.node }, null);
+  const label = spec.kind === 'egress' ? `${srcTag} → INET` : spec.kind === 'services' ? `${srcTag} → OSN`
+    : spec.kind === 'ingress' ? `INET → ${dstTag}` : `${srcTag} → ${dstTag}`;
+  if (spec.kind === 'lb' || spec.kind === 'lb-return') {
+    const lb = source?.hubLb;
+    const response = spec.kind === 'lb-return';
+    const lbLabel = response ? `${srcTag} → Hub public LB (response)` : `Hub public LB → ${srcTag}`;
+    if (!srcSub || !lb || !tables.length || !flowRoleAllowed(source, srcSub.role, spec.kind)) return finish(spec, { ...acc, ok: false }, lbLabel);
+    pushVisual(acc, response ? srcSub.node : lb.node);
+    walk(topo, acc, { node: response ? srcSub.node : lb.node, dest: host32(response ? lb.cidr : srcSub.cidr), zone: response ? spec.srcEnv : 'hub' }, response ? lb.node : srcSub.node);
+    return finish(spec, acc, lbLabel);
+  }
+  if (spec.kind === 'ingress') {
+    if (source?.oke || !topo.lb || !backend || !tables.length) return finish(spec, { ...acc, ok: false }, label);
+    pushVisual(acc, 'gw-igw');
+    if (topo.hasConflictingBinding('gw-igw', 'gateway')) return finish(spec, { ...acc, ok: false }, label);
+    const ingress = topo.tableFor('gw-igw', 'gateway');
+    if (ingress) {
+      const match = matchRule(ingress.rules, host32(topo.lb.cidr));
+      if (!match) return finish(spec, { ...acc, ok: false }, label);
+      ruleHop(topo, acc, 'gw-igw', ingress, match);
+      const target = match.rule.targetNodeId ?? (match.rule.nextHopKind === 'firewall'
+        ? topo.fwNodes.find((fw) => fwIp(fw.cidr) === match.rule.flowTarget)?.node : match.rule.flowTarget);
+      if (!target || !['firewall', 'nlb'].includes(match.rule.nextHopKind)) return finish(spec, { ...acc, ok: false }, label);
+      pushVisual(acc, target);
+      hop(acc, target, `${topo.human(target)}: inspect → load balancer (local)`, undefined, undefined, true);
+    } else hop(acc, 'gw-igw', 'Internet gateway → public load balancer');
+    pushVisual(acc, topo.lb.node);
+    walk(topo, acc, { node: topo.lb.node, dest: host32(backend.cidr), zone: 'hub' }, backend.node);
   } else {
-    // east-west: destination is a host in the dest spoke subnet.
-    if (!dstSub) return finish(spec, { ...acc, ok: false }, label);
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: host32(dstSub.cidr), zone: spec.srcEnv, node: srcSub.node }, dstSub.node);
+    if (!srcSub || !tables.length) return finish(spec, { ...acc, ok: false }, label);
+    if (!flowRoleAllowed(source, srcSub.role, spec.kind, destination, dstSub?.role)) return finish(spec, { ...acc, ok: false }, label);
+    pushVisual(acc, srcSub.node);
+    if ((spec.kind === 'east-west' || spec.kind === 'api') && !dstSub) return finish(spec, { ...acc, ok: false }, label);
+    const dest = spec.kind === 'services' ? 'OSN' : spec.kind === 'egress' ? '0.0.0.0/0' : host32(dstSub!.cidr);
+    if (spec.kind === 'api' && destination?.vcnNode === source.vcnNode) {
+      if (!topo.tableFor(srcSub.node, 'subnet')) return finish(spec, { ...acc, ok: false }, label);
+      hop(acc, srcSub.node, `${srcTag}: local VCN routing → Kubernetes API Server (TCP 6443)`);
+      pushVisual(acc, dstSub!.node);
+      hop(acc, dstSub!.node, '→ Kubernetes API Server (TCP 6443)');
+    } else walk(topo, acc, { node: srcSub.node, dest, zone: source.apiOnly ? 'hub' : spec.srcEnv }, spec.kind === 'east-west' || spec.kind === 'api' ? dstSub!.node : null);
   }
   return finish(spec, acc, label);
 }
 
 function finish(spec: FlowSpec, acc: Acc, label: string): FlowTrace {
-  const segments: FlowSegment[] = [];
-  for (let i = 1; i < acc.visual.length; i++) segments.push({ from: acc.visual[i - 1], to: acc.visual[i] });
-  return {
-    id: spec.id, kind: spec.kind, color: spec.color, label, ok: acc.ok,
-    hops: acc.hops, segments,
-    highlights: [...acc.highlights].map(([tableId, rows]) => ({ tableId, rows: [...rows].sort((a, b) => a - b) })),
-  };
+  return { id: spec.id, kind: spec.kind, color: spec.color, label, ok: acc.ok, hops: acc.hops,
+    segments: acc.visual.slice(1).map((node, i) => ({ from: acc.visual[i], to: node })),
+    highlights: [...acc.highlights].map(([tableId, rows]) => ({ tableId, rows: [...rows].sort((a, b) => a - b) })) };
 }
 
 /**
@@ -402,20 +404,31 @@ function finish(spec: FlowSpec, acc: Acc, label: string): FlowTrace {
  * to the first other environment.
  */
 export function specFromId(model: LzModel, id: string, color: string): FlowSpec | null {
-  const [scope, kind] = id.split(':');
-  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services'].includes(kind)) return null;
-  const envIdx = (name: string) => model.environments.findIndex((e) => (e.name.trim() || '') === name);
+  const [scope, kindPart, role, targetRole] = id.split(':');
+  const [kind, hybridId] = (kindPart ?? '').split('@');
+  if (!scope || !kind || !['egress', 'ingress', 'east-west', 'services', 'api', 'lb', 'lb-return', 'hybrid-in', 'hybrid-out'].includes(kind)) return null;
+  if (kind === 'ingress' && !hasHubLoadBalancer(model)) return null;
+  const networks = flowNetworks(model);
+  const available = (index: number) => index >= 0 && networks[index].available && networks[index].subnets.length > 0;
+  const envIdx = (name: string) => networks.findIndex((e, index) => (e.scope ?? e.name) === name && available(index));
+  const hasRole = (index: number, destination?: number) => networks[index].subnets.some((subnet) =>
+    (!role || subnet.role === role) && flowRoleAllowed(networks[index], subnet.role, kindPart, destination === undefined ? undefined : networks[destination], targetRole),
+  );
 
-  if (kind === 'east-west') {
+  if (kind === 'east-west' || kind === 'api') {
     const [src, dst] = scope.split('>');
     const srcEnv = envIdx(src);
     if (srcEnv < 0) return null;
-    let dstEnv = dst ? envIdx(dst) : model.environments.findIndex((_, i) => i !== srcEnv);
-    if (dstEnv < 0) dstEnv = srcEnv;
-    return { id, kind, color, srcEnv, dstEnv };
+    const dstEnv = dst ? envIdx(dst) : networks.findIndex((_, i) => i !== srcEnv && available(i));
+    if (dstEnv < 0 || (dstEnv === srcEnv && kind !== 'api') || !hasRole(srcEnv, dstEnv)) return null;
+    return { id, kind, color, srcEnv, dstEnv, ...(targetRole ? { dstSubnet: networks[dstEnv].subnets.findIndex((sn) => sn.role === targetRole) } : {}) };
   }
   const srcEnv = envIdx(scope);
-  if (srcEnv < 0) return null;
+  if (srcEnv < 0 || !hasRole(srcEnv)) return null;
+  if (kind === 'hybrid-in' || kind === 'hybrid-out') {
+    if (!hybridRoutes(model).some((connection) => connection.id === hybridId)) return null;
+    return { id, kind, color, srcEnv, dstEnv: srcEnv, hybridId };
+  }
   // Ingress backend defaults to the same env's web subnet.
   return { id, kind: kind as FlowKind, color, srcEnv, dstEnv: kind === 'ingress' ? srcEnv : undefined };
 }
@@ -426,31 +439,43 @@ export function specFromId(model: LzModel, id: string, color: string): FlowSpec 
  * web/app/db/infra together — with sub-trace ids `<baseId>#<subnetIdx>` that all
  * share the base flow's colour. A distinct colour is assigned per base flow.
  */
-export function buildFlowTraces(model: LzModel, activeIds: string[]): FlowTrace[] {
+export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'flow' | 'kind' = 'flow', tables: RouteTable[] = []): FlowTrace[] {
   const out: FlowTrace[] = [];
   // `<env>:<kind>` = all endpoints; `<env>:<kind>:<role>` = a single endpoint.
   const allPicks = new Set(activeIds.filter((id) => id.split(':').length === 2));
-  activeIds.forEach((id, i) => {
-    const color = FLOW_COLORS[i % FLOW_COLORS.length];
+  // One colour per flow, shared by every endpoint picked for it.
+  const groups = [...new Set(activeIds.map(flowGroup))];
+  activeIds.forEach((id) => {
     const parts = id.split(':');
+    // Past the cap there is no distinguishable colour left; older saved selections are not drawn.
+    const color = colorBy === 'kind'
+      ? FLOW_KIND_COLORS[parts[1].split('@')[0] as FlowKind]
+      : FLOW_COLORS[groups.indexOf(flowGroup(id))];
+    if (!color) return;
     const role = parts.length >= 3 ? parts[2] : undefined;
     // Skip a specific-endpoint pick that's already covered by its all-endpoints pick.
     if (role && allPicks.has(`${parts[0]}:${parts[1]}`)) return;
-    const base = specFromId(model, `${parts[0]}:${parts[1]}`, color);
+    const base = specFromId(model, id, color);
     if (!base) return;
-    const env = model.environments[base.srcEnv];
-    const roleIdx = (r: string) => env ? env.network.subnets.findIndex((sn) => (sn.name.split('-').pop() || '') === r) : -1;
-    const idxs = role ? [roleIdx(role)].filter((k) => k >= 0) : (env ? env.network.subnets.map((_, k) => k) : [0]);
+    const env = flowNetworks(model)[base.srcEnv];
+    const roleIdx = (r: string) => env ? env.subnets.findIndex((sn) => sn.role === r) : -1;
+    const idxs = role ? [roleIdx(role)].filter((k) => k >= 0) : (env ? env.subnets.map((_, k) => k) : [0]);
     for (const k of idxs) {
+      let dstSubnet = base.kind === 'ingress' ? k : base.dstSubnet;
+      if (base.kind === 'east-west' && base.dstSubnet === undefined) {
+        const sourceRole = env.subnets[k].role;
+        const destination = flowNetworks(model)[base.dstEnv!];
+        dstSubnet = destination.subnets.indexOf(flowDestinationSubnet(env, sourceRole, destination));
+      }
       const spec: FlowSpec = {
         ...base,
         id: `${id}#${k}`,
-        // egress/services/east-west vary the SOURCE endpoint; ingress/east-west
-        // vary the destination (backend) endpoint.
+        // East-west pairs matching roles, falling back to the first destination
+        // subnet when the two environments have different endpoint sets.
         srcSubnet: base.kind === 'ingress' ? base.srcSubnet : k,
-        dstSubnet: base.kind === 'ingress' || base.kind === 'east-west' ? k : base.dstSubnet,
+        dstSubnet: base.kind === 'hybrid-in' ? k : dstSubnet,
       };
-      const trace = traceFlow(model, spec);
+      const trace = traceFlow(model, spec, tables);
       if (trace.hops.length > 0) out.push(trace);
     }
   });

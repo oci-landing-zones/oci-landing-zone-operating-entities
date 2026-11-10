@@ -4,7 +4,7 @@ local exadb_project_db = import './project_db.libsonnet';
 local notification_emails = import '../../lib/notification_emails.libsonnet';
 
 {
-  local supported_notification_keys = ['default', 'db_workloads', 'infra_workloads', 'projects'],
+  local supported_notification_keys = ['default', 'db_workloads', 'infra_workloads', 'projects', 'projects_by_environment', 'environment_infra', 'environment_db', 'split_environment_topics'],
   local tag_key = 'tagns-lz-role.tag-lz-role',
 
   contributions(inputs)::

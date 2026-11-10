@@ -100,7 +100,7 @@ function(params)
       priority: priority,
       action: 'ACCEPT',
       match_criteria: {
-        match_type: 'DRG_ATTACHMENT_TYPE',
+        match_type: 'DRG_ATTACHMENT_ID',
         attachment_type: 'REMOTE_PEERING_CONNECTION',
         drg_attachment_key: entry.drg_att_key,
       },

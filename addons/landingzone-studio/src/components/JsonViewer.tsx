@@ -61,7 +61,7 @@ const css = {
   floatPanel: { position: 'fixed', zIndex: 90, display: 'flex', flexDirection: 'column', minWidth: 360, minHeight: 200, width: 760, height: 460, border: `1px solid ${night.border}`, borderRadius: 8, overflow: 'hidden', resize: 'both', boxShadow: '0 18px 50px rgba(0,0,0,0.5)', background: night.bg } as React.CSSProperties,
 };
 
-export default function JsonViewer({ title, value }: { title: string; value: string }) {
+export default function JsonViewer({ title, value, onClose }: { title: string; value: string; onClose: () => void }) {
   const [mode, setMode] = useState<Mode>('docked');
   const [collapsed, setCollapsed] = useState(true); // collapsed by default
   const [pos, setPos] = useState({ x: 120, y: 90 });
@@ -116,14 +116,16 @@ export default function JsonViewer({ title, value }: { title: string; value: str
         {context === 'fullscreen'
           ? <button type="button" style={css.btn} onClick={() => setMode('docked')}>Exit ⤢</button>
           : <button type="button" style={css.btn} onClick={() => setMode('fullscreen')}>Fullscreen ⤢</button>}
+        <button type="button" style={css.btn} aria-label="Exit debug mode" title="Exit debug mode" onClick={onClose}>Exit debug</button>
       </>
     );
   }
 
   if (mode === 'undocked') {
     return (
-      <div style={{ ...css.floatPanel, left: pos.x, top: pos.y }}>
+      <div className="studio-debug-floating" style={{ ...css.floatPanel, left: pos.x, top: pos.y }}>
         <div
+          className="studio-debug-toolbar"
           style={{ ...css.bar, ...css.barDrag, borderBottom: `1px solid ${night.border}` }}
           onPointerDown={onDragStart}
           onPointerMove={onDragMove}
@@ -143,7 +145,7 @@ export default function JsonViewer({ title, value }: { title: string; value: str
       <>
         <div style={css.overlay} onClick={() => setMode('docked')} />
         <div style={css.fullPanel}>
-          <div style={{ ...css.bar, borderBottom: `1px solid ${night.border}` }}>
+          <div className="studio-debug-toolbar" style={{ ...css.bar, borderBottom: `1px solid ${night.border}` }}>
             <span style={css.dot} />
             <span style={css.title}>{title}</span>
             <Controls context="fullscreen" />
@@ -157,7 +159,7 @@ export default function JsonViewer({ title, value }: { title: string; value: str
   // Docked: full-width console pinned to the bottom, expanding upward.
   return (
     <div style={css.drawer}>
-      <div style={{ ...css.bar, borderBottom: collapsed ? 'none' : `1px solid ${night.border}` }}>
+      <div className="studio-debug-toolbar" style={{ ...css.bar, borderBottom: collapsed ? 'none' : `1px solid ${night.border}` }}>
         <span style={css.dot} />
         <span style={css.title}>{title}</span>
         <Controls context="docked" />

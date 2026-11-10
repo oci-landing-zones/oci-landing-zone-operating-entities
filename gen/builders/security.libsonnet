@@ -64,8 +64,8 @@ function(config, n, realm_constants, topo)
       default_compartment_id: n.key_global('CMP', ['SECURITY']),
 
       host_recipes: {
-        [n.key_global('VSS-RCPH', [])]: {
-          name: n.display_global('vss-rcph', []),
+        [n.key('VSS-RCPH', [])]: {
+          name: n.display('vss-rcph', []),
           port_scan_level: 'STANDARD',
 
           agent_settings: {
@@ -89,9 +89,9 @@ function(config, n, realm_constants, topo)
       },
 
       host_targets: {
-        [n.key_global('VSS-TGTH', [])]: {
-          name: n.display_global('vss-tgth', []),
-          host_recipe_id: n.key_global('VSS-RCPH', []),
+        [n.key('VSS-TGTH', [])]: {
+          name: n.display('vss-tgth', []),
+          host_recipe_id: n.key('VSS-RCPH', []),
           target_compartment_id: 'CMP-LANDINGZONE-KEY',
         },
       },

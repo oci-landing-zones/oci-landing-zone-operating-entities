@@ -29,25 +29,40 @@
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
+import { exadataEntries } from './exadata';
+import { hybridConfig, stripInlineSecrets } from './hybridConnectivity';
+import type { HybridConnectivity } from '../model/hybridConnectivity';
 
 /** One platform in the config — a network and, where supported, an extension. */
 export interface PlatformConfigEntry {
-  network: { vcn: string; subnets?: Record<string, string> };
+  network?: { vcn: string; subnets?: Record<string, string> };
+  publication_components?: { infrastructure: boolean; database: boolean };
   extension?: { type: string; params?: Record<string, unknown> };
 }
 
 /** One environment in the config — its spoke network, projects, and platforms. */
 export interface EnvConfigEntry {
-  project_network: { network: { vcn: string; subnets: Record<string, string> } };
+  project_network?: { network: { vcn: string; subnets: Record<string, string> } };
   projects: Record<string, Record<string, never>>;
   platforms: Record<string, PlatformConfigEntry>;
 }
 
 export interface LzConfig {
+  stack_scope?: 'complete' | 'regional';
+  dr_region?: string;
+  remote_peering_connections?: Record<string, {
+    remote_cidrs: string[];
+    peer_region_name: string;
+    peer_id?: string;
+    peer_tenancy_ocid?: string;
+    requestor_group_ocid?: string;
+  }>;
+  hybrid_connectivity?: HybridConnectivity;
   realm: string;
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
+  notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
     kind: HubKind;
     network: {
@@ -69,23 +84,27 @@ function projectsForEnv(model: LzModel, envId: string): string[] {
     .filter(Boolean);
 }
 
-function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
+export function okeExtension(p: NonNullable<PlatformConfig['okeParams']>): NonNullable<PlatformConfigEntry['extension']> {
   return {
-    type: 'ocvs',
+    type: 'oke_simple',
     params: {
-      ssh_authorized_keys: p.sshAuthorizedKeys,
-      cluster: {
-        sddc_display_name: p.sddcDisplayName,
-        cluster_display_name: p.clusterDisplayName,
-        vmware_software_version: p.vmwareSoftwareVersion,
-        is_hcx_enabled: false,
-        compute_availability_domain: p.computeAvailabilityDomain,
-        esxi_hosts_count: p.esxiHostsCount,
-        vsphere_type: p.vsphereType,
-        initial_host_ocpu_count: p.initialHostOcpuCount,
-        initial_host_shape_name: p.initialHostShapeName,
-        workload_network_cidr: p.workloadNetworkCidr,
-      },
+      kubernetes_version: p.kubernetesVersion.startsWith('v') ? p.kubernetesVersion : `v${p.kubernetesVersion}`,
+      services_cidr: p.servicesCidr,
+      api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
+      ...(p.createNodePools === false ? { create_node_pools: false } : {
+        worker_image: p.workerImage === '8\\.[0-9]+' ? '8' : p.workerImage === '9\\.[0-9]+' ? '9' : p.workerImage,
+        worker_boot_volume_size: p.workerBootVolumeSize,
+      }),
+      cni_type: p.cniType,
+      ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
+      ...(p.cniType === 'overlay' && p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
+      create_fss: p.createFss,
+      public_load_balancer: p.publicLoadBalancer,
+      ...(p.peerVcnCidrs?.length ? { peer_vcn_cidrs: p.peerVcnCidrs } : {}),
+      ...(p.workerSpokeAccess === true ? { worker_spoke_access: true } : {}),
+      ...(p.cniType === 'native' && p.podSpokeAccess === true ? { pod_spoke_access: true } : {}),
+      ...(p.workerInternetAccess === false ? { worker_internet_access: false } : {}),
+      ...(p.cniType === 'native' && p.podInternetAccess === false ? { pod_internet_access: false } : {}),
     },
   };
 }
@@ -98,7 +117,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     if (!k) continue;
     subnets[k] = sn.cidr.trim();
   }
-  const profileOwnedSubnets = (platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize) || platform.type === 'ocvs';
+  const profileOwnedSubnets = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
   const network = {
     vcn: platformVcnForEnv(platform, envId, index).trim(),
     ...(profileOwnedSubnets ? {} : { subnets }),
@@ -107,27 +126,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     const p = platform.okeParams;
     return {
       network,
-      extension: {
-        type: 'oke_simple',
-        params: {
-          kubernetes_version: p.kubernetesVersion,
-          services_cidr: p.servicesCidr,
-          api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
-          worker_image: p.workerImage,
-          worker_boot_volume_size: p.workerBootVolumeSize,
-          cni_type: p.cniType,
-          ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
-          ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
-          create_fss: p.createFss,
-          public_load_balancer: p.publicLoadBalancer,
-        },
-      },
-    };
-  }
-  if (platform.type === 'ocvs' && platform.ocvsParams) {
-    return {
-      network,
-      extension: ocvsExtension(platform.ocvsParams),
+      extension: okeExtension(p),
     };
   }
   // `custom` is a UI label for a plain platform network, not a registered
@@ -136,8 +135,15 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
   return { network, extension: { type: platform.type } };
 }
 
-export function buildConfig(model: LzModel): LzConfig {
+export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   const f = model.foundation;
+  const notification_emails: NonNullable<LzConfig['notification_emails']> = {};
+  const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
+  for (const topic of (singleRecipient ? ['default'] : ['cloudguard', 'iam', 'network', 'security']) as Array<keyof NonNullable<LzConfig['notification_emails']>>) {
+    const recipients = (f.notifications?.[topic] ?? '').split(/[,;\n]/).map((value) => value.trim()).filter(Boolean);
+    if (recipients.length) notification_emails[topic] = recipients;
+  }
+  const exadata = includeExadata ? exadataEntries(model) : { shared: {}, environments: {} };
 
   const environments: Record<string, EnvConfigEntry> = {};
   const security_targets: string[] = [];
@@ -163,12 +169,14 @@ export function buildConfig(model: LzModel): LzConfig {
       if (!inEnv || !key) continue;
       platforms[key] = platformEntryFor(p, env.id, i);
     }
+    Object.assign(platforms, exadata.environments[env.id] ?? {});
 
     environments[name] = {
       project_network: { network: { vcn: net.vcnCidr.trim(), subnets: envSubnets } },
       projects,
       platforms,
     };
+    if (env.projectNetworkEnabled === false) delete environments[name].project_network;
   });
 
   const shared_platforms: LzConfig['shared_platforms'] = {};
@@ -181,12 +189,10 @@ export function buildConfig(model: LzModel): LzConfig {
       const k = sn.name.trim();
       if (k) sharedSubnets[k] = sn.cidr.trim();
     }
-    if (platform.type === 'ocvs' && platform.ocvsParams) {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn }, extension: ocvsExtension(platform.ocvsParams) };
-    } else {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
-    }
+    shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets },
+      ...(platform.type !== undefined && platform.type !== 'custom' ? { extension: { type: platform.type } } : {}) };
   }
+  Object.assign(shared_platforms, exadata.shared);
 
   const subnets: Record<string, string> = {};
   for (const sn of model.network.subnets) {
@@ -196,10 +202,20 @@ export function buildConfig(model: LzModel): LzConfig {
   }
 
   return {
+    ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
+    ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
+      remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
+      peer_region_name: connection.peerRegionName,
+      ...(connection.role === 'requester' ? { peer_id: connection.peerId?.trim() } : {}),
+      ...(connection.peerTenancyOcid?.trim() ? { peer_tenancy_ocid: connection.peerTenancyOcid.trim() } : {}),
+      ...(connection.role === 'acceptor' && connection.requestorGroupOcid?.trim() ? { requestor_group_ocid: connection.requestorGroupOcid.trim() } : {}),
+    }])) } : {}),
     realm: f.realm,
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,
       network: {
@@ -210,6 +226,7 @@ export function buildConfig(model: LzModel): LzConfig {
     environments,
     shared_platforms,
     security_targets,
+    ...(hybridConfig(model) ? { hybrid_connectivity: hybridConfig(model) } : {}),
   };
 }
 
@@ -219,7 +236,7 @@ function key(name: string): string {
 }
 
 function quote(value: string): string {
-  return `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+  return `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')}'`;
 }
 
 /** Render key:value entries two-per-line at the given indent (e.g. subnet maps). */
@@ -231,8 +248,8 @@ function pairLines(entries: string[], indent: string): string[] {
 
 /** Lines for one platform inside an environment's `platforms` block (8-space key indent). */
 function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] {
-  const hasSubnets = entry.network.subnets !== undefined;
-  const subEntries = Object.entries(entry.network.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const hasSubnets = entry.network?.subnets !== undefined;
+  const subEntries = Object.entries(entry.network?.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = !hasSubnets
     ? []
     : subEntries.length === 0
@@ -250,10 +267,13 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
       : [`          extension: { type: ${quote(ext.type)} },`];
   return [
     `        ${key(name)}: {`,
-    '          network: {',
-    `            vcn: ${quote(entry.network.vcn)},`,
-    ...subnetLines,
-    '          },',
+    ...(entry.publication_components ? [`          publication_components: ${jsonnetValue(entry.publication_components)},`] : []),
+    ...(entry.network ? [
+      '          network: {',
+      `            vcn: ${quote(entry.network.vcn)},`,
+      ...subnetLines,
+      '          },',
+    ] : []),
     ...extLines,
     '        },',
   ];
@@ -263,7 +283,7 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
 function jsonnetValue(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map((x) => quote(String(x))).join(', ')}]`;
   if (typeof v === 'object' && v !== null) {
-    return `{ ${Object.entries(v).map(([k, value]) => `${key(k)}: ${jsonnetValue(value)}`).join(', ')} }`;
+    return `{ ${Object.entries(v).filter(([, value]) => value !== undefined).map(([k, value]) => `${key(k)}: ${jsonnetValue(value)}`).join(', ')} }`;
   }
   if (typeof v === 'string') return quote(v);
   return String(v);
@@ -271,8 +291,8 @@ function jsonnetValue(v: unknown): string {
 
 /** Lines for one environment entry (step 3): its spoke network + projects (+ platforms at step 4). */
 function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: boolean): string[] {
-  const net = entry.project_network.network;
-  const subEntries = Object.entries(net.subnets).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const net = entry.project_network?.network;
+  const subEntries = Object.entries(net?.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = subEntries.length === 0
     ? ['          subnets: {},']
     : ['          subnets: {', ...pairLines(subEntries, '            '), '          },'];
@@ -286,12 +306,12 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
       : ['      platforms: {', ...platformKeys.flatMap((p) => platformEntryLines(p, entry.platforms[p])), '      },'];
   return [
     `    ${key(name)}: {`,
-    '      project_network: {',
+    ...(net ? ['      project_network: {',
     '        network: {',
-    `          vcn: ${quote(net.vcn)},`,
+    `          vcn: ${quote(net!.vcn)},`,
     ...subnetLines,
     '        },',
-    '      },',
+    '      },'] : []),
     projectsLine,
     ...platformsLines,
     '    },',
@@ -303,8 +323,9 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
  * `upToStep` limits the output to the blocks the wizard has reached — on
  * step 1 the hub block is left out, so the JSON tracks where you are.
  */
-export function serializeConfig(model: LzModel, upToStep = Infinity): string {
-  const c = buildConfig(model);
+export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecrets = false): string {
+  if (redactSecrets) model = stripInlineSecrets(model, '[redacted]');
+  const c = buildConfig(model, upToStep >= 4);
 
   const envNames = Object.keys(c.environments);
   // Steps 1–2: environments are just named, empty compartments. Step 3 fills in
@@ -329,13 +350,16 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
         '  shared_platforms: {',
         ...sharedKeys.map((k) => {
           const entry = c.shared_platforms[k];
-          const sn = Object.entries(entry.network.subnets ?? {})
+          const sn = Object.entries(entry.network?.subnets ?? {})
             .map(([n, cidr]) => `${key(n)}: ${quote(cidr)}`).join(', ');
-          const subnets = entry.network.subnets ? `, subnets: { ${sn} }` : '';
+          const subnets = entry.network?.subnets ? `, subnets: { ${sn} }` : '';
+          const network = entry.network ? `network: { vcn: ${quote(entry.network.vcn)}${subnets} }` : '';
           const extension = entry.extension
-            ? `, extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
+            ? `${network ? ', ' : ''}extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
             : '';
-          return `    ${key(k)}: { network: { vcn: ${quote(entry.network.vcn)}${subnets} }${extension} },`;
+          const components = entry.publication_components
+            ? `${network || extension ? ', ' : ''}publication_components: ${jsonnetValue(entry.publication_components)}` : '';
+          return `    ${key(k)}: { ${network}${extension}${components} },`;
         }),
         '  },',
       ];
@@ -369,9 +393,14 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
+    ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
+    ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),
     ...hubBlock,
+    ...(c.remote_peering_connections ? [`  remote_peering_connections: ${jsonnetValue(c.remote_peering_connections)},`] : []),
     ...environmentsBlock,
     ...sharedPlatformsBlock,
+    ...(upToStep >= 2 && c.hybrid_connectivity ? [`  hybrid_connectivity: ${jsonnetValue(c.hybrid_connectivity)},`] : []),
     `  security_targets: ${securityTargets},`,
     '}',
     '',

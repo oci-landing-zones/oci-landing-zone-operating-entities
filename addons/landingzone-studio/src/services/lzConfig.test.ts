@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildConfig, serializeConfig } from './lzConfig';
+import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from './platforms';
+import { validatePlatformContracts } from './platformValidation';
 import type { Environment, LzModel, PlatformConfig } from '../model/types';
 
 function model(over: Partial<LzModel> = {}): LzModel {
@@ -13,6 +14,28 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('keeps the local design description out of deployable configuration', () => {
+    const original = emptyLzModel();
+    const described = structuredClone(original);
+    described.foundation.description = 'Production baseline with the finance workloads';
+    expect(serializeConfig(described)).toBe(serializeConfig(original));
+  });
+  it('maps One-OE notification recipients to a default and topic overrides', () => {
+    const base = emptyLzModel();
+    const configured = model({
+      foundation: { ...base.foundation, notifications: { useSingleRecipient: false,
+        default: 'ops@example.com, noc@example.com', cloudguard: 'security@example.com',
+        iam: '', network: 'network@example.com', security: '',
+      } },
+    });
+    expect(buildConfig(configured).notification_emails).toEqual({
+      cloudguard: ['security@example.com'], network: ['network@example.com'],
+    });
+    expect(serializeConfig(configured, 1)).toContain("notification_emails: { cloudguard: ['security@example.com'], network: ['network@example.com'] },");
+    configured.foundation.notifications!.useSingleRecipient = true;
+    expect(buildConfig(configured).notification_emails).toEqual({ default: ['ops@example.com', 'noc@example.com'] });
+    expect(buildConfig(model()).notification_emails).toBeUndefined();
+  });
   it('maps foundation fields and keys environments by name', () => {
     const c = buildConfig(model({
       foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra', cisLevel: 2 },
@@ -122,7 +145,7 @@ describe('serializeConfig', () => {
     expect(prodBlock).toContain('projects: { alpha: {}, beta: {} },');
     const preprodBlock = out.slice(out.indexOf('preprod: {'));
     expect(preprodBlock).toContain('projects: { alpha: {} },');
-    expect(base.version).toBe('0.18.0');
+    expect(base.version).toBe('0.20.0');
   });
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
@@ -157,17 +180,17 @@ describe('serializeConfig', () => {
       platforms: [oke],
     }));
     // prod = base block; preprod/dev derive by index shift
-    expect(c.environments.prod.platforms.oke.network.vcn).toBe('10.0.80.0/20');
-    expect(c.environments.preprod.platforms.oke.network.vcn).toBe('10.0.96.0/20');
-    expect(c.environments.dev.platforms.oke.network.vcn).toBe('10.0.112.0/20');
+    expect(c.environments.prod.platforms.oke.network?.vcn).toBe('10.0.80.0/20');
+    expect(c.environments.preprod.platforms.oke.network?.vcn).toBe('10.0.96.0/20');
+    expect(c.environments.dev.platforms.oke.network?.vcn).toBe('10.0.112.0/20');
     // The selected generator-owned profile intentionally omits a manual map.
-    expect(c.environments.prod.platforms.oke.network.subnets).toBeUndefined();
+    expect(c.environments.prod.platforms.oke.network?.subnets).toBeUndefined();
     // extension type + params
     expect(c.environments.prod.platforms.oke.extension).toEqual({
       type: 'oke_simple',
       params: {
-        kubernetes_version: 'v1.35.2', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
-        worker_image: '9\\.[0-9]+', worker_boot_volume_size: 60, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
+        kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.3.0/24'],
+        create_node_pools: false, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
       },
     });
   });
@@ -194,22 +217,13 @@ describe('serializeConfig', () => {
     expect(c.environments.production.platforms.oke).toBeDefined();
   });
 
-  it('serialises OCVS as a generator-owned provisioning network in environment and shared scopes', () => {
-    const ocvs = newPlatform('ocvs', []);
-    const settings = { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' };
-    const m = model({
-      environments: [env('prod', true, 0)],
-      platforms: [{ ...ocvs, ocvsParams: settings }],
-      sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: settings }],
-    });
-    const c = buildConfig(m);
-    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.environments.prod.platforms.ocv.network.subnets).toBeUndefined();
-    expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.shared_platforms.ocv.network.subnets).toBeUndefined();
-    const text = serializeConfig(m, 4);
-    expect(text).toContain("extension: { type: 'ocvs'");
-    expect(text).not.toContain("provisioning: '10.0.80.0/25'");
+
+  it('retains unsupported shared runtime types so they cannot silently become Custom', () => {
+    const shared = newSharedPlatform('custom', []);
+    const m = model({ sharedPlatforms: [JSON.parse(JSON.stringify({ ...shared, type: 'unsupported' }))] });
+    expect(buildConfig(m).shared_platforms[shared.key].extension).toEqual({ type: 'unsupported' });
+    expect(serializeConfig(m)).toContain("extension: { type: 'unsupported', params:");
+    expect(validatePlatformContracts(m)).toContain('Unsupported shared platform type: unsupported.');
   });
 
   it('serialises Custom as a valid network-only platform without an extension', () => {
@@ -221,8 +235,8 @@ describe('serializeConfig', () => {
     const entry = buildConfig(m).environments.prod.platforms.cus;
     expect(entry).toEqual({
       network: {
-        vcn: '10.0.80.0/21',
-        subnets: { core: '10.0.80.0/24' },
+        vcn: '10.0.112.0/21',
+        subnets: { core: '10.0.112.0/24' },
       },
     });
 
@@ -240,10 +254,10 @@ describe('serializeConfig', () => {
     expect(step4).toContain('        oke: {');
     expect(step4).toContain("            vcn: '10.0.80.0/20',");
     expect(step4).toContain("          extension: { type: 'oke_simple', params: {");
-    expect(step4).toContain("            kubernetes_version: 'v1.35.2', services_cidr: '10.96.0.0/16',");
-    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.1.0/24'], worker_image: '9\\\\.[0-9]+',");
+    expect(step4).toContain("            kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16',");
+    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.3.0/24'], create_node_pools: false,");
     expect(step4).toContain("  shared_platforms: {");
-    expect(step4).toContain("    core: { network: { vcn: '10.170.0.0/21', subnets: { core: '10.170.0.0/24' } } },");
+    expect(step4).toContain("    core: { network: { vcn: '10.0.32.0/21', subnets: { core: '10.0.32.0/24' } } },");
   });
 
   it('emits empty collections when there are no environments or subnets', () => {
@@ -256,4 +270,10 @@ describe('serializeConfig', () => {
     expect(out).toContain('security_targets: [],');
     expect(out).toContain('subnets: {},');
   });
+});
+
+
+it.each(['1.40.2', 'v1.40.2'])('exports manually entered Kubernetes version %s in OCI format', (kubernetesVersion) => {
+  const params = newPlatform('oke_simple', []).okeParams!;
+  expect(okeExtension({ ...params, kubernetesVersion }).params!.kubernetes_version).toBe('v1.40.2');
 });

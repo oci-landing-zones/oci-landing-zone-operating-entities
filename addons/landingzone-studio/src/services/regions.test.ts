@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { emptyLzModel, normalizeModel } from '../model/defaults';
-import { getRegionsForRealm, isSupportedRealm, REALM_OPTIONS } from './regions';
+import { getRegionsForRealm, isSupportedRealm, REALM_OPTIONS, regionShortNameError } from './regions';
+
+describe('region short names', () => {
+  it.each(['', ' ', 'fra', 'fr2', 'FRA', 'a-b', ' a ', 'é!?'])('accepts any value up to three characters: %j', (value) => {
+    expect(regionShortNameError(value)).toBeNull();
+  });
+
+  it.each(['abcd', ' fra', 'fra ', 'custom'])('rejects values over three characters: %j', (value) => {
+    expect(regionShortNameError(value)).toBe('Use 3 characters or fewer for the region short name.');
+  });
+});
 
 describe('generator-supported realms', () => {
   it('offers only the realms defined by gen/constants.libsonnet', () => {

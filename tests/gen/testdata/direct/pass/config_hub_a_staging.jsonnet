@@ -48,21 +48,27 @@ local statements =
   categories['0-shared'].non_vcn_specific_gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY']
     .drg_route_distributions['DRGRD-FRA-LZ-HUB-KEY'].statements;
 local hub_vcn = categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
-local clusters = outputs['oke_clusters.json'].oke_clusters_configuration.clusters;
-local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
+local deployments = outputs['oke.json'].oke_configuration;
 {
   final_categories: std.sort(std.objectFields(network.network_configuration.network_configuration_categories)),
   cluster_compartment_ids: {
-    prod: clusters['CLR-FRA-LZ-PROD-OKE-KEY'].compartment_id,
-    preprod: clusters['CLR-FRA-LZ-PREPROD-OKE-KEY'].compartment_id,
+    prod: deployments['CLR-FRA-LZ-PROD-OKE-KEY'].cluster_configuration.compartment_id,
+    preprod: deployments['CLR-FRA-LZ-PREPROD-OKE-KEY'].cluster_configuration.compartment_id,
   },
   hub_l7_load_balancers_present:
     std.objectHas(categories['0-shared'].non_vcn_specific_gateways, 'l7_load_balancers'),
   hub_lb_subnet_present: std.objectHas(hub_vcn.subnets, 'SN-FRA-LZ-HUB-LB-KEY'),
   hub_lb_nsg_present: std.objectHas(hub_vcn.network_security_groups, 'NSG-FRA-LZ-HUB-LB-KEY'),
-  node_pool_compartment_ids: {
-    prod: node_pools['NDP-FRA-LZ-PROD-OKE-KEY'].compartment_id,
-    preprod: node_pools['NDP-FRA-LZ-PREPROD-OKE-KEY'].compartment_id,
+  worker_inherited_field_failures: [
+    { deployment: key, worker: pool_key, field: field }
+    for key in std.objectFields(deployments)
+    for pool_key in std.objectFields(deployments[key].workers_configuration.worker_pools)
+    for field in ['compartment_id', 'cluster_id', 'cis_level']
+    if std.objectHas(deployments[key].workers_configuration.worker_pools[pool_key], field)
+  ],
+  worker_pool_keys: {
+    [key]: std.objectFields(deployments[key].workers_configuration.worker_pools)
+    for key in std.objectFields(deployments)
   },
   route_statement_priorities: {
     prod: statements['ROUTE-TO-VCN-PROD-KEY'].priority,

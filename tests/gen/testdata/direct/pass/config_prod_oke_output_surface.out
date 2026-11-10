@@ -2,29 +2,18 @@
   "api_endpoint_nsg_ids": [
     "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"
   ],
-  "api_endpoint_public": false,
+  "api_endpoint_public_flag_present": false,
   "api_endpoint_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
   "cluster_cni_type": "native",
   "cluster_key": "CLR-FRA-LZ-PROD-OKE-KEY",
   "cluster_name": "clr-fra-lz-prod-oke",
+  "cluster_type": "enhanced",
   "kubernetes_network_config": {
-    "pods_cidr": "10.244.0.0/16",
     "services_cidr": "10.96.0.0/16"
   },
-  "node_pool_cluster_id": "CLR-FRA-LZ-PROD-OKE-KEY",
   "node_pool_cluster_tag": "clr-fra-lz-prod-oke",
   "node_pool_key": "NDP-FRA-LZ-PROD-OKE-KEY",
   "node_pool_name": "ndp-fra-lz-prod-oke",
-  "node_pool_networking": {
-    "pods_nsg_ids": [
-      "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"
-    ],
-    "pods_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-    "workers_nsg_ids": [
-      "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
-    ],
-    "workers_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
-  },
   "oke_subnet_keys": [
     "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
     "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
@@ -37,18 +26,30 @@
     "network.json",
     "observability_cis2.json",
     "observability_cis2_pre.json",
-    "oke_clusters.json",
-    "oke_workers.json",
+    "oke.json",
     "security_cis2.json",
     "security_cis2_pre.json"
   ],
-  "services_subnet_id": [
+  "service_lb_subnet_ids": [
     "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY"
   ],
   "unexpected_split_output_files_present": [],
-  "worker_boot_volume_encryption": {
-    "enable_encrypt_in_transit": true,
-    "kms_key_id": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
-  },
-  "worker_image": "9\\.[0-9]+"
+  "worker_boot_volume_size": 60,
+  "worker_inherited_fields_present": [],
+  "worker_memory": 8,
+  "worker_nsg_ids": [
+    "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+  ],
+  "worker_ocpus": 1,
+  "worker_os": "Oracle Linux",
+  "worker_os_version": "9",
+  "worker_pod_nsg_ids": [
+    "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"
+  ],
+  "worker_pod_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+  "worker_pv_transit_encryption": true,
+  "worker_shape": "VM.Standard.E5.Flex",
+  "worker_size": 1,
+  "worker_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+  "worker_volume_kms_key_id": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
 }

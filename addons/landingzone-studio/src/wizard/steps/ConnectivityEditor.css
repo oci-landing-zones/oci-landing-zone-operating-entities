@@ -1,0 +1,191 @@
+.connectivity-editor {
+  container-type: inline-size;
+}
+
+.connectivity-setup {
+  border-bottom: 1px solid var(--oracle-border);
+  padding-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.connectivity-setup p,
+.connectivity-setup ol {
+  max-width: 72ch;
+  margin: 0 0 12px;
+}
+
+.connectivity-setup ol {
+  padding-left: 22px;
+}
+
+.connectivity-setup li + li {
+  margin-top: 8px;
+}
+
+.connectivity-resource-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 16px;
+}
+
+.connectivity-resource-body {
+  padding: 16px;
+}
+
+.connectivity-resource-header > button:last-child,
+.connectivity-item-header > button {
+  flex-shrink: 0;
+}
+
+.connectivity-resource-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 12px 8px;
+  margin-left: -8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.connectivity-resource-toggle:hover,
+.connectivity-disclosure > summary:hover {
+  background: var(--oracle-bg);
+}
+
+.connectivity-chevron {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.connectivity-select {
+  display: block;
+  position: relative;
+}
+
+.connectivity-select > .connectivity-chevron {
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.connectivity-service-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.connectivity-service-toggle[aria-expanded="false"] .connectivity-chevron,
+.connectivity-resource-toggle[aria-expanded="false"] > .connectivity-chevron,
+.connectivity-disclosure:not([open]) > summary > .connectivity-chevron {
+  transform: rotate(-90deg);
+}
+
+.connectivity-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 8px;
+  margin: 0 -8px;
+  border-radius: 4px;
+  list-style: none;
+}
+
+.connectivity-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.connectivity-add {
+  border-top: 1px solid var(--oracle-border);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.connectivity-resource + .connectivity-add {
+  margin-top: 0;
+}
+
+.connectivity-grid > div > .connectivity-add {
+  margin-top: 0;
+}
+
+.connectivity-mapping-add > .connectivity-add {
+  border-top: 0;
+  padding-top: 12px;
+}
+
+.connectivity-add-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.connectivity-add-action {
+  justify-self: start;
+  padding-top: 28px;
+}
+
+.connectivity-settings,
+.connectivity-tunnel-body {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.connectivity-settings,
+.connectivity-tunnels {
+  grid-column: 1 / -1;
+}
+
+.connectivity-tunnel-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.connectivity-tunnel-body {
+  padding: 8px 0 20px;
+}
+
+.connectivity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+
+.connectivity-phases {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.connectivity-grid > * {
+  min-width: 0;
+}
+
+@container (max-width: 480px) {
+  .connectivity-grid,
+  .connectivity-add-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .connectivity-add-action {
+    padding-top: 0;
+  }
+}

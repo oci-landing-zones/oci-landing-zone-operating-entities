@@ -83,29 +83,45 @@ local remote_routes(result, region, remote_cidr) = std.flattenArrays([
 local firewall_hub_checks(result, region, remote_cidr) =
   local hub_drg = drg(result, region);
   local routes = remote_routes(result, region, remote_cidr);
-  local rpc_route_table = hub_drg.drg_route_tables[
-    'DRGRT-%s-LZ-RPC-PEER-KEY' % region
+  local rpc_attachments = [
+    { key: key, value: hub_drg.drg_attachments[key] }
+    for key in std.objectFields(hub_drg.drg_attachments)
+    if hub_drg.drg_attachments[key].network_details.type ==
+       'REMOTE_PEERING_CONNECTION'
   ];
-  local rpc_import = hub_drg.drg_route_distributions[
-    'DRGRD-%s-LZ-HUB-KEY' % region
-  ].statements['ROUTE-TO-RPC-LZ-PEER-KEY'];
+  local rpc_attachment =
+    assert std.length(rpc_attachments) == 1;
+    rpc_attachments[0];
+  local rpc_route_table = hub_drg.drg_route_tables[
+    rpc_attachment.value.drg_route_table_key
+  ];
+  local rpc_route_rules = std.objectValues(rpc_route_table.route_rules);
+  local rpc_imports = std.flattenArrays([
+    [
+      statement
+      for statement in std.objectValues(distribution.statements)
+      if statement.match_criteria.attachment_type ==
+         'REMOTE_PEERING_CONNECTION'
+    ]
+    for distribution in std.objectValues(hub_drg.drg_route_distributions)
+  ]);
   [
     {
-      name: '%s RPC route table does not use the common firewall-hub path' % region,
-      ok: rpc_route_table.route_rules[
-        'DRGRT-%s-LZ-RPC-PEER-STATIC-ROUTE' % region
-      ] == {
+      name: '%s RPC route table does not send all destinations through the hub' % region,
+      ok: rpc_route_rules == [{
         destination: '0.0.0.0/0',
         destination_type: 'CIDR_BLOCK',
         next_hop_drg_attachment_key: 'DRGATT-%s-LZ-HUB-VCN-KEY' % region,
-      },
+      }],
     },
     {
       name: '%s RPC attachment is not imported into the hub distribution' % region,
-      ok: rpc_import.match_criteria.attachment_type
-          == 'REMOTE_PEERING_CONNECTION'
-          && rpc_import.match_criteria.drg_attachment_key
-             == 'DRGATT-%s-LZ-HUB-RPC-PEER-KEY' % region,
+      ok: std.length(rpc_imports) > 0 && std.length([
+        statement
+        for statement in rpc_imports
+        if statement.match_criteria.match_type == 'DRG_ATTACHMENT_ID' &&
+           statement.match_criteria.drg_attachment_key == rpc_attachment.key
+      ]) == std.length(rpc_imports),
     },
     {
       name: '%s hub has no RPC route through its DRG' % region,

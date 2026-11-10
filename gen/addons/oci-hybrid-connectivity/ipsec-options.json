@@ -1,0 +1,46 @@
+{
+    "phase_one_details": {
+        "custom_authentication_algorithm": [
+            "SHA2_384",
+            "SHA2_256",
+            "SHA1_96"
+        ],
+
+        "custom_dh_group": [
+            "GROUP2",
+            "GROUP5",
+            "GROUP14",
+            "GROUP19",
+            "GROUP20",
+            "GROUP24"
+        ],
+
+        "custom_encryption_algorithm": [
+            "AES_256_CBC",
+            "AES_192_CBC",
+            "AES_128_CBC"
+        ]
+    },
+
+    "phase_two_details": {
+        "custom_authentication_algorithm": ["HMAC_SHA2_256_128", "HMAC_SHA1_128"],
+
+        "custom_encryption_algorithm": [
+            "AES_256_GCM",
+            "AES_192_GCM",
+            "AES_128_GCM",
+            "AES_256_CBC",
+            "AES_192_CBC",
+            "AES_128_CBC"
+        ],
+
+        "dh_group": [
+            "GROUP2",
+            "GROUP5",
+            "GROUP14",
+            "GROUP19",
+            "GROUP20",
+            "GROUP24"
+        ]
+    }
+}
