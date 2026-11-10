@@ -13,6 +13,7 @@ Enable native **OCI Bastion service** and use **dynamic SOCKS5 sessions for priv
   - [Validate access](#validate-access)
 - [Operator access](#operator-access)
   - [Session and workstation guides](#session-and-workstation-guides)
+  - [Access a private OKE API](#access-a-private-oke-api)
   - [How SOCKS5 works](#how-socks5-works)
 - [License](#license)
 
@@ -54,6 +55,7 @@ Bastion session permissions allow operators to use the service. Access to a priv
 | Database Actions, APEX or another private HTTPS interface | `443` | Actual Bastion private endpoint `/32`, or an approved source range covering it. |
 | Linux SSH server | `22` | Same source review. |
 | Windows RDP service | `3389` | Same source review; also enable RDP and its host firewall rule. |
+| OKE private Kubernetes API | `6443` | Same source review; allow the Bastion path in the API endpoint's NSG/security rules. |
 
 If a firewall translates the source, use the source observed at the destination. Review NSGs, security lists and host firewalls together. The public client allowlist controls entry to Bastion; it does not grant access to these target ports. Database listener ports are separate from database web-interface HTTPS access.
 
@@ -75,6 +77,7 @@ Operators create temporary sessions and connect with their own SSH keys. Each ap
 | Private Oracle Database Actions or APEX | Browser using the local SOCKS5 proxy and proxy-side DNS; open the original private HTTPS URL. |
 | Private Linux VM | SSH client using the SOCKS5 proxy, with the VM's own username and key. |
 | Private Windows VM | RDP client using a loopback local forward on the dynamic Bastion session. Validate this path before use. |
+| Private OKE Kubernetes API | `kubectl` using the cluster's kubeconfig proxy setting; see [OKE access](#access-a-private-oke-api). |
 
 ### Session and workstation guides
 
@@ -83,6 +86,24 @@ Operators create temporary sessions and connect with their own SSH keys. Each ap
 - [Windows operator guide](./windows.md): PowerShell, browser, SSH and RDP client configuration.
 
 Use a short session lifetime, restrict the public client allowlist, and bind workstation listeners to loopback. Target credentials remain separate from the Bastion session key. Close the tunnel and delete the session when work ends.
+
+### Access a private OKE API
+
+1. Follow [Oracle's local cluster access setup](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengdownloadkubeconfigfile.htm) to install compatible `kubectl` and configure your own OKE kubeconfig. Select `--kube-endpoint PRIVATE_ENDPOINT` when generating it. Keep the generated server address, CA data and OCI authentication settings.
+2. Start the Bastion SOCKS5 tunnel on `127.0.0.1:1080` using the [macOS](./macos.md#2-start-the-socks5-tunnel) or [Windows](./windows.md#2-start-the-socks5-tunnel) instructions and keep it running.
+3. In the existing OKE `clusters[].cluster` entry in your kubeconfig, add this field alongside `server`:
+
+   ```yaml
+   proxy-url: socks5://127.0.0.1:1080
+   ```
+
+From another terminal, use your OKE context and an authorized namespace:
+
+```sh
+kubectl --context your-oke-context get pods --namespace your-namespace
+```
+
+OCI authentication and Kubernetes permissions still apply. Remove `proxy-url` from that cluster entry when returning to direct access. See the [Kubernetes SOCKS5 guide](https://kubernetes.io/docs/tasks/extend-kubernetes/socks5-proxy-access-api/) for proxy configuration details.
 
 ### How SOCKS5 works
 
