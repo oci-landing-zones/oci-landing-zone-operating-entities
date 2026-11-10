@@ -39,6 +39,11 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     if routing != null && std.objectHas(routing, 'internet_default_target')
     then routing.internet_default_target
     else 'local_natgw';
+  local internet_access(key, default=true) =
+    if std.objectHas(params.config_params, key) then
+      assert std.type(params.config_params[key]) == 'boolean' : 'config_params.%s must be a boolean' % key;
+      params.config_params[key]
+    else default;
   local use_local_natgw = internet_default_target == 'local_natgw';
 	  local category_key = '%s-platform-%s' % [std.asciiLower(scope.qualified_name), std.asciiLower(plat)];
   local services_cidr =
@@ -115,8 +120,11 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
   local cluster_cni_type =
     if cni == 'vcn_native' then 'native'
     else 'flannel';
+  assert is_overlay_network || !std.objectHas(params.config_params, 'pods_cidr') ||
+         params.config_params.pods_cidr == null :
+    'native OKE must omit config_params.pods_cidr; pod addresses come from the OCI pod subnet';
   local optional_cluster_kubernetes_network_config =
-    if is_overlay_network || (std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null) then
+    if is_overlay_network then
       local raw_pods_cidr =
         if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
           params.config_params.pods_cidr
@@ -131,13 +139,37 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
       { pods_cidr: pods_cidr }
     else
       {};
-  local worker_image =
+  local create_node_pools =
+    if std.objectHas(params.config_params, 'create_node_pools') then
+      assert std.type(params.config_params.create_node_pools) == 'boolean' :
+        'config_params.create_node_pools must be a boolean';
+      params.config_params.create_node_pools
+    else true;
+  local raw_worker_image =
     if std.objectHas(params.config_params, 'worker_image') && params.config_params.worker_image != null then
       assert std.type(params.config_params.worker_image) == 'string' :
         'config_params.worker_image must be a string';
       params.config_params.worker_image
     else
-      '9\\.[0-9]+';
+      '9';
+  local worker_image =
+    if raw_worker_image == '8\\.[0-9]+' then '8'
+    else if raw_worker_image == '9\\.[0-9]+' then '9'
+    else raw_worker_image;
+  local image_version_parts = std.split(worker_image, '.');
+  assert std.startsWith(worker_image, 'ocid1.image.') || (
+    std.length(image_version_parts) <= 2 &&
+    std.member(['8', '9'], image_version_parts[0]) &&
+    std.length([
+      part
+      for part in image_version_parts
+      if std.length(part) == 0 || std.length([
+        digit
+        for digit in std.stringChars(part)
+        if !std.member(std.stringChars('0123456789'), digit)
+      ]) > 0
+    ]) == 0
+  ) : 'config_params.worker_image must be an Oracle Linux 8/9 version or image OCID';
   local worker_boot_volume_size =
     if std.objectHas(params.config_params, 'worker_boot_volume_size') &&
        params.config_params.worker_boot_volume_size != null then
@@ -190,6 +222,20 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     create_fss: create_fss,
     platform_tag_value: public_lb.platform_tag_value(scope.qualified_name, plat),
     internet_default_target: internet_default_target,
+    peer_vcn_cidrs:
+      local raw = if std.objectHas(params.config_params, 'peer_vcn_cidrs') then params.config_params.peer_vcn_cidrs else [];
+      assert std.type(raw) == 'array' : 'config_params.peer_vcn_cidrs must be an array';
+      std.set([
+        local cidr = cidrs.validate('config_params.peer_vcn_cidrs[%d]' % i, raw[i]);
+        assert cidr != '0.0.0.0/0' : 'Peering CIDRs must not include 0.0.0.0/0';
+        assert !cidrs.overlaps(cidr, params.network.vcn) : 'Peering CIDRs must not overlap the OKE VCN';
+        cidr
+        for i in std.range(0, std.length(raw) - 1)
+      ]),
+    worker_spoke_access: internet_access('worker_spoke_access', false),
+    pod_spoke_access: internet_access('pod_spoke_access', false),
+    worker_internet_access: internet_access('worker_internet_access'),
+    pod_internet_access: internet_access('pod_internet_access'),
     use_local_natgw: use_local_natgw,
     category_key: category_key,
     services_cidr: services_cidr,
@@ -201,6 +247,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     cluster_cni_type: cluster_cni_type,
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
+    create_node_pools: create_node_pools,
     worker_image: worker_image,
     worker_boot_volume_size: worker_boot_volume_size,
     cis_level: params.cis_level,

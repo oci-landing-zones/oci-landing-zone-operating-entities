@@ -7,8 +7,7 @@
 // contains: "security_policy_keys": []
 // contains: "public_hub_policy_present": false
 // contains: "public_hub_network_rules": []
-// contains: "worker_encryption_present": {
-// contains: false
+// contains: "cis_contract_failures": []
 local lz = import 'gen/landing_zone.libsonnet';
 local result = lz({
   cis_level: 1,
@@ -34,8 +33,7 @@ local result = lz({
     },
   },
 });
-local clusters = result.extra.oke_clusters.oke_clusters_configuration.clusters;
-local workers = result.extra.oke_workers.oke_workers_configuration.node_pools;
+local deployments = result.extra.oke.oke_configuration;
 local policies = result.iam.policies_configuration.supplied_policies;
 local security_policy_keys = [
   key
@@ -59,28 +57,16 @@ local worker_nsg_key = [
 local worker_nsg = prod_vcn.network_security_groups[worker_nsg_key];
 
 {
-  cluster_cis_levels: {
-    [key]: clusters[key].cis_level
-    for key in std.objectFields(clusters)
-  },
-  cluster_encryption_present: {
-    [key]: std.objectHas(clusters[key], 'encryption')
-    for key in std.objectFields(clusters)
-  },
-  worker_cis_levels: {
-    [key]: workers[key].cis_level
-    for key in std.objectFields(workers)
-  },
-  worker_encryption_present: {
-    [key]: std.objectHas(workers[key].node_config_details, 'encryption')
-    for key in std.objectFields(workers)
-  },
-  worker_kms_key_present: {
-    [key]:
-      std.objectHas(workers[key].node_config_details, 'encryption') &&
-      std.objectHas(workers[key].node_config_details.encryption, 'kms_key_id')
-    for key in std.objectFields(workers)
-  },
+  cis_contract_failures: [
+    { deployment: key, worker: pool_key }
+    for key in std.objectFields(deployments)
+    for pool_key in std.objectFields(deployments[key].workers_configuration.worker_pools)
+    for cluster in [deployments[key].cluster_configuration]
+    for worker in [deployments[key].workers_configuration.worker_pools[pool_key]]
+    if cluster.cis_level != '1' || std.objectHas(cluster, 'encryption') ||
+       worker.pv_transit_encryption != false ||
+       std.length([field for field in ['cis_level', 'compartment_id', 'cluster_id', 'volume_kms_key_id', 'cloud_init'] if std.objectHas(worker, field)]) > 0
+  ],
   cis1_vaults_configuration_present:
     std.objectHas(result.security_cis1, 'vaults_configuration'),
   cis2_oke_key_resources: [

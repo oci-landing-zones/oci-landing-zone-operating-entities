@@ -7,7 +7,7 @@ from tests.gen.test_static_cost_tags import REQUIRED, COLLECTIONS, walk
 
 class GeneratedCostTagCoverageTests(unittest.TestCase):
     def test_published_extension_and_addon_resources_have_all_six_tags(self):
-        collections = COLLECTIONS | {'clusters', 'node_pools', 'virtual_node_pools', 'ocvs_clusters', 'streams'}
+        collections = COLLECTIONS | {'clusters', 'node_pools', 'worker_pools', 'virtual_node_pools', 'ocvs_clusters', 'streams'}
         checked = 0
         files = []
         for source_root in ('gen/workload-extensions', 'gen/addons'):
@@ -20,8 +20,10 @@ class GeneratedCostTagCoverageTests(unittest.TestCase):
         for filename in files:
             doc = json.loads(filename.read_text())
             for path, resource in walk(doc):
-                if len(path) > 1 and path[-2] in collections or path and path[-1] == 'default_security_list':
+                if len(path) > 1 and path[-2] in collections or path and path[-1] in ('default_security_list', 'cluster_configuration'):
                     location = str(filename.relative_to(REPO_ROOT)) + '/' + '/'.join(path)
                     self.assertTrue(REQUIRED.issubset(resource.get('defined_tags', {})), location)
+                    if len(path) > 1 and path[-2] == 'worker_pools':
+                        self.assertTrue(REQUIRED.issubset(resource.get('node_defined_tags', {})), location + '/node_defined_tags')
                     checked += 1
         self.assertGreater(checked, 100)

@@ -3,6 +3,17 @@ import { withFlowFocus } from '../diagram/flowFocus';
 import type { DiagramModel, DiagramOptions, LzModel } from '../model/types';
 import type { DiagramPreview } from '../services/diagramPreview.worker';
 
+/** Review exports the full static routing design independently of live view choices. */
+export const REVIEW_DIAGRAM_OPTIONS: DiagramOptions = {
+  showDots: true,
+  showFlows: true,
+  showEndpoints: false,
+  openTables: [],
+  activeFlows: [],
+  allFlows: false,
+  focusFlow: undefined,
+};
+
 /** Keep the overview and chosen layers together for this exact generated snapshot. */
 export function createDiagramGraph(model: LzModel, preview: DiagramPreview) {
   const graphs = new Map<string, DiagramModel>();

@@ -4,7 +4,7 @@ import type { DiagramPreview } from '../services/diagramPreview.worker';
 import { diagramPreviewView } from './useDiagramPreview';
 
 function preview(id: string): DiagramPreview {
-  return { tables: [], inventory: { compartments: [{ key: id, name: id }], groups: [] } };
+  return { tables: [], inventory: { compartments: [{ key: id, name: id }], groups: [] }, files: ['network.json'] };
 }
 
 describe('atomic diagram preview state', () => {
@@ -51,18 +51,27 @@ describe('atomic diagram preview state', () => {
     expect(settled.inventory).toBe(thirdPreview.inventory);
   });
 
-  it('clears the exposed snapshot and inventory on a current error', () => {
+  it('retains the previous diagram model, tables and inventory on a current error', () => {
     const model = emptyLzModel();
     const edited = { ...model, foundation: { ...model.foundation, regionShortName: 'next' } };
     const state = { snapshot: { model, preview: preview('previous') }, outcome: { model: edited, attempt: 0, error: 'Invalid owner.' } };
     const failed = diagramPreviewView(state, edited, 0);
-    expect(failed).toMatchObject({ status: 'error', pending: false, error: 'Invalid owner.', snapshot: undefined, tables: [], inventory: undefined });
+    expect(failed).toMatchObject({ status: 'error', pending: false, error: 'Invalid owner.' });
+    expect(failed.snapshot).toBe(state.snapshot);
+    expect(failed.tables).toBe(state.snapshot.preview.tables);
+    expect(failed.inventory).toBe(state.snapshot.preview.inventory);
     const retry = diagramPreviewView(state, edited, 1);
     expect(retry.status).toBe('loading');
     expect(retry.pending).toBe(true);
     expect(retry.error).toBeUndefined();
     expect(retry.snapshot?.model).toBe(model);
-    expect(diagramPreviewView({ ...state, outcome: { model: edited, attempt: 0, error: '' } }, edited, 0).snapshot).toBeUndefined();
+    expect(diagramPreviewView({ ...state, outcome: { model: edited, attempt: 0, error: '' } }, edited, 0).snapshot).toBe(state.snapshot);
+  });
+
+  it('has no diagram to show if generation fails before the first successful preview', () => {
+    const model = emptyLzModel();
+    expect(diagramPreviewView({ outcome: { model, attempt: 0, error: 'Invalid input.' } }, model, 0))
+      .toMatchObject({ status: 'error', pending: false, error: 'Invalid input.', snapshot: undefined, tables: [], inventory: undefined });
   });
 
   it('does not present outcomes from a previous model or retry attempt as current', () => {
@@ -74,4 +83,21 @@ describe('atomic diagram preview state', () => {
     const previousFailure = { snapshot, outcome: { model, attempt: 0, error: 'Old failure.' } };
     expect(diagramPreviewView(previousFailure, edited, 0)).toMatchObject({ status: 'loading', pending: true, snapshot, error: undefined });
   });
+});
+
+
+it('retains the last valid snapshot while editing, then resumes with the completed model', () => {
+  const original = emptyLzModel();
+  const generated = preview('last-valid');
+  const snapshot = { model: original, preview: generated };
+  const state = { snapshot, outcome: { model: original, attempt: 0 } };
+  const partial = { ...original, network: { ...original.network, hubVcnCidr: '10.' } };
+  const paused = diagramPreviewView(state, partial, 0, true);
+  expect(paused).toMatchObject({ status: 'editing', pending: true, deferred: true, error: undefined });
+  expect(paused.snapshot).toBe(snapshot);
+  expect(paused.inventory).toBe(generated.inventory);
+  const completed = { ...original, network: { ...original.network, hubVcnCidr: '10.8.0.0/21' } };
+  expect(diagramPreviewView(state, completed, 0)).toMatchObject({ status: 'loading', pending: true, snapshot });
+  const next = { snapshot: { model: completed, preview: preview('next') }, outcome: { model: completed, attempt: 0 } };
+  expect(diagramPreviewView(next, completed, 0)).toMatchObject({ status: 'ready', pending: false, deferred: false });
 });

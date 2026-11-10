@@ -48,6 +48,11 @@ describe('DR file generation', () => {
     expect(files['DR/security_cis2.json']).not.toContain('cloud_guard_configuration');
     expect(files['DR/observability_cis2.json']).toContain('dr@example.com');
     expect(files['README.txt']).toContain('Home');
+    expect(files['Home/README.txt']).toContain('Home Region deployment');
+    expect(files['Home/README.txt']).toContain('save_output = true');
+    expect(files['DR/README.txt']).toContain('DR deployment');
+    expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
+    expect(files['DR/README.txt']).toContain('oci_dependency_objects');
   }, 30000);
 
   it('includes selected EXACS networks, edited subnets and matched RPC peer keys', async () => {
@@ -82,7 +87,7 @@ describe('DR file generation', () => {
     model.platforms = [platform];
     const id = `platform:${platform.id}:${model.environments[0].id}`;
     draft.platformIds = [id];
-    draft.platformOkeParams = { [id]: { ...platform.okeParams!, clusterSize: undefined, servicesCidr: '172.30.0.0/16', workerBootVolumeSize: 80 } };
+    draft.platformOkeParams = { [id]: { ...platform.okeParams!, createNodePools: true, clusterSize: undefined, servicesCidr: '172.30.0.0/16', workerBootVolumeSize: 80 } };
     const { home, dr } = buildDrFileConfigs(model, draft);
     const entry = dr.environments.prod.platforms[platform.key];
     expect(entry.network?.vcn).toBe('10.0.216.0/21');

@@ -5,6 +5,8 @@ describe('flowGroup', () => {
   it('reduces every trace id form to its flow', () => {
     expect(flowGroup('prod:egress#0')).toBe('prod:egress');
     expect(flowGroup('prod:egress:web#0')).toBe('prod:egress');
+  expect(flowGroup('Hub>prod/oke:api:mgmt#0')).toBe('Hub>prod/oke:api');
+  expect(flowGroup('preprod>prod/oke:api:web#0')).toBe('preprod>prod/oke:api');
     expect(flowGroup('prod>preprod:east-west:db#2')).toBe('prod>preprod:east-west');
   });
 });
@@ -30,4 +32,12 @@ describe('labelAnchor', () => {
     expect(labelAnchor([{ x: 0, y: 0 }, { x: 0, y: 200 }, { x: 30, y: 200 }], 100)).toEqual({ x: 0, y: 100 });
     expect(labelAnchor([{ x: 5, y: 5 }, { x: 20, y: 5 }], 100)).toEqual({ x: 5, y: 5 });
   });
+});
+
+it('keeps OKE worker and pod animation controls separate while grouping Projects endpoints', () => {
+  expect(flowGroup('prod/oke:egress:workers#1')).toBe('prod/oke:egress:workers');
+  expect(flowGroup('prod/oke:egress:pods#0')).toBe('prod/oke:egress:pods');
+  expect(flowGroup('prod:egress:web#0')).toBe('prod:egress');
+  expect(flowGroup('Hub>prod/oke:api:mgmt#0')).toBe('Hub>prod/oke:api');
+  expect(flowGroup('preprod>prod/oke:api:web#0')).toBe('preprod>prod/oke:api');
 });

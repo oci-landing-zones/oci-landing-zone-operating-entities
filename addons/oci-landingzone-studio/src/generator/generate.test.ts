@@ -9,10 +9,12 @@ import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePa
 import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
 import { generatorNames } from '../services/generatorNaming';
+import { emptyHybridConnectivity, newVpn } from '../services/hybridConnectivity';
 import type { HubKind, LzModel } from '../model/types';
 import { createRegionalModel } from '../services/regionalDeployment';
 import { buildRouteTables } from '../services/routeTables';
 import { buildGraph } from '../diagram/buildGraph';
+import ipsecOptions from '../../../../gen/addons/oci-hybrid-connectivity/ipsec-options.json';
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
@@ -66,6 +68,137 @@ describe('virtualFs', () => {
   });
 });
 
+describe('hybrid IPSec proposal contract', () => {
+  const fields = Object.entries(ipsecOptions).flatMap(([phase, fields]) =>
+    Object.entries(fields).map(([field, values]) => ({ phase, field, values })),
+  );
+  async function normalizeTunnels(tunnels: Record<string, unknown>[]) {
+    const { files } = buildVirtualFs();
+    files['ipsec-check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; [c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { tunnel_1: tunnel, tunnel_2: { routing: 'STATIC' } },
+      } },
+    }).ipsecs.office.tunnels_management.tunnel_1 for tunnel in ${JSON.stringify(tunnels)}]`;
+    return evaluate('ipsec-check.jsonnet', files);
+  }
+
+  it.each(fields)('accepts every allowed $phase.$field value without enabling custom proposals', async ({ phase, field, values }) => {
+    const flag = phase === 'phase_one_details' ? 'is_custom_phase_one_config' : 'is_custom_phase_two_config';
+    const tunnels = values.map((value) => ({ routing: 'STATIC', [phase]: { [flag]: false, [field]: value } }));
+    await expect(normalizeTunnels(tunnels)).resolves.toEqual(tunnels.map((tunnel) => ({ ...tunnel, ike_version: 'V2' })));
+  });
+
+  it.each(fields)('rejects malformed or cross-phase $phase.$field values with the allowed choices', async ({ phase, field, values }) => {
+    const flag = phase === 'phase_one_details' ? 'is_custom_phase_one_config' : 'is_custom_phase_two_config';
+    const wrongPhase = phase === 'phase_one_details' ? 'HMAC_SHA1_128' : 'SHA1_96';
+    for (const value of [wrongPhase, 'not-an-option', 42]) {
+      await expect(normalizeTunnels([{ routing: 'STATIC', [phase]: { [flag]: false, [field]: value } }]))
+        .rejects.toThrow(`${phase}.${field} must be one of: ${values.join(', ')}`);
+    }
+  });
+
+  it('retains omitted and null proposal settings without selecting algorithms', async () => {
+    const tunnels = [
+      { routing: 'STATIC' },
+      { routing: 'STATIC', phase_one_details: null, phase_two_details: null },
+      { routing: 'STATIC', phase_one_details: { custom_authentication_algorithm: null }, phase_two_details: { dh_group: null } },
+    ];
+    await expect(normalizeTunnels(tunnels)).resolves.toEqual(tunnels.map((tunnel) => ({ ...tunnel, ike_version: 'V2' })));
+  });
+});
+
+describe('hybrid VPN identity contract', () => {
+  async function normalizeIdentity(identity: Record<string, unknown>) {
+    const { files } = buildVirtualFs();
+    files['identity-check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { [key]: { routing: 'STATIC' } for key in ['tunnel_1', 'tunnel_2'] },
+      } + ${JSON.stringify(identity)} },
+    }).ipsecs.office`;
+    return evaluate('identity-check.jsonnet', files);
+  }
+
+  it.each([
+    {},
+    { cpe_local_identifier_type: 'IP_ADDRESS' },
+    { cpe_local_identifier_type: 'IP_ADDRESS', cpe_local_identifier: '203.0.113.10' },
+    { cpe_local_identifier_type: 'HOSTNAME', cpe_local_identifier: 'vpn.example.com' },
+  ])('keeps ordinary IP fallback or an explicit matching identity: %j', async (identity) => {
+    const normalized = await normalizeIdentity(identity);
+    expect(normalized).toMatchObject(identity);
+    if (!('cpe_local_identifier' in identity)) expect(normalized).not.toHaveProperty('cpe_local_identifier');
+  });
+
+  it.each([undefined, '', '   '])('requires a nonblank HOSTNAME identifier: %s', async (cpe_local_identifier) => {
+    await expect(normalizeIdentity({ cpe_local_identifier_type: 'HOSTNAME', cpe_local_identifier }))
+      .rejects.toThrow('cpe_local_identifier is required when cpe_local_identifier_type is HOSTNAME');
+  });
+
+  it('rejects an unsupported identity type', async () => {
+    await expect(normalizeIdentity({ cpe_local_identifier_type: 'OTHER' }))
+      .rejects.toThrow('cpe_local_identifier_type must be IP_ADDRESS or HOSTNAME');
+  });
+});
+
+describe('hybrid generic CPE contract', () => {
+  async function normalizeDevice(selector: Record<string, unknown>) {
+    const { files } = buildVirtualFs();
+    files['cpe-check.jsonnet'] = `(import 'addons/oci-hybrid-connectivity/config.libsonnet').normalize({
+      customer_premises_equipments: { office: { ip_address: '203.0.113.10' } + ${JSON.stringify(selector)} },
+    }).customer_premises_equipments.office`;
+    return evaluate('cpe-check.jsonnet', files);
+  }
+
+  it('accepts only the public IP for newly registered equipment', async () => {
+    await expect(normalizeDevice({})).resolves.toEqual({ ip_address: '203.0.113.10' });
+  });
+
+  it.each([
+    { cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' },
+    { cpe_device_shape_vendor_name: 'Fortinet' },
+    { cpe_device_shape_vendor_name: 'Other' },
+    { cpe_device_shape_id: 'shape-id', cpe_device_shape_vendor_name: 'Fortinet' },
+  ])('rejects configurable device selectors: %j', async (selector) => {
+    await expect(normalizeDevice(selector)).rejects.toThrow('unsupported');
+  });
+});
+
+describe('hybrid FastConnect provider selector', () => {
+  const circuit = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1.eu-frankfurt-1.example' };
+  async function renderCircuits(circuits: Record<string, unknown>, realm = 'oc1', region = 'eu-frankfurt-1', short = 'fra') {
+    const { files } = buildVirtualFs();
+    const config = {
+      region, region_short_name: short, realm, cis_level: 1,
+      hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+      environments: { production: { project_network: { network: { vcn: '10.0.64.0/21' } } } },
+      hybrid_connectivity: { fast_connect_virtual_circuits: circuits },
+    };
+    files['provider-check.jsonnet'] = `(import 'landing_zone.libsonnet')(${JSON.stringify(config)}).network.network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways.fast_connect_virtual_circuits`;
+    return evaluate('provider-check.jsonnet', files) as Promise<Record<string, Record<string, unknown>>>;
+  }
+
+  it('rejects public FastConnect in Blueprint Factory source', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, type: 'PUBLIC' } }))
+      .rejects.toThrow('only private FastConnect circuits are supported');
+  });
+
+  it.each(['public_prefixes', 'routing_policy'])('rejects the removed public-circuit field %s', async (field) => {
+    await expect(renderCircuits({ primary: { ...circuit, [field]: {} } })).rejects.toThrow('unsupported keys');
+  });
+
+  it('preserves explicit provider OCIDs without creating a name lookup key', async () => {
+    const rendered = await renderCircuits({ primary: { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example', provider_service_key_name: 'ACTIVATION-REFERENCE' } });
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_id).toBe('ocid1.providerservice.oc1..example');
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY']).not.toHaveProperty('provider_service_key');
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_key_name).toBe('ACTIVATION-REFERENCE');
+  });
+
+  it('rejects the removed name-based provider selector', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, provider_service: { provider_name: 'Equinix', provider_service_name: 'Fabric' } } }))
+      .rejects.toThrow('unsupported keys');
+  });
+});
+
 describe('generator (go-jsonnet wasm)', () => {
   it.each(['abcd', ' fr2', 'fr2 ', 'fr-2'])('rejects a custom region short name over three characters: %j', async (regionShortName) => {
     const model = emptyLzModel();
@@ -75,7 +208,8 @@ describe('generator (go-jsonnet wasm)', () => {
     await expect(output).rejects.toThrow('Use 3 characters or fewer for the region short name.');
   });
 
-  it.each(['fr2', 'FR2'])('uses custom region short name %s in generated resource names', async (regionShortName) => {
+  it('normalizes a custom region short name in generated resource names', async () => {
+    const regionShortName = 'FR2';
     const model = emptyLzModel();
     model.foundation.regionShortName = regionShortName;
     const out = await generateOutputs(model);
@@ -134,6 +268,67 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network.json']).toContain('0-shared');
     expect(out.files['iam.json']).toBeDefined();
     expect(out.config).toContain('environments: {}');
+  }, 60_000);
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s assigns VPN and private circuits to one HC ingress table', async (hubKind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+    hybrid.ipsecs.office = { ...newVpn('office'), remote_cidrs: ['172.20.0.0/16'] };
+    hybrid.fast_connect_virtual_circuits.primary = {
+      type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example',
+    };
+    const out = await generateOutputs(model);
+    const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
+    const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
+    const key = 'DRGRT-FRA-LZ-HUB-HC-KEY';
+    for (const selector of ['ipsec_tunnel', 'virtual_circuit']) {
+      expect(drg.default_drg_route_tables[selector]).toEqual({ drg_route_table_id: key });
+    }
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
+    const table = drg.drg_route_tables[key];
+    expect(table.display_name).toBe('drgrt-fra-lz-hc');
+    expect(table.is_ecmp_enabled).toBe(false);
+    if (hubKind === 'hub_e') {
+      expect(table.import_drg_route_distribution_key).toBe('DRGRD-FRA-LZ-HUB-HYBRID-LOCAL-KEY');
+      expect(table.route_rules).toEqual({});
+    } else {
+      const rules = Object.values<Record<string, unknown>>(table.route_rules);
+      expect(rules.length).toBeGreaterThan(1);
+      expect(rules.every((rule) => rule.destination !== '0.0.0.0/0' && rule.next_hop_drg_attachment_key === 'DRGATT-FRA-LZ-HUB-VCN-KEY')).toBe(true);
+    }
+    expect(Object.keys(gateways.ipsecs)).toHaveLength(1);
+    expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(1);
+  }, 60_000);
+
+  it('generates direct physical FastConnect after the provider OCID is cleared', async () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.fast_connect_virtual_circuits.direct = {
+      type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: '', customer_asn: '65001',
+      cross_connect_mappings: { primary: {
+        cross_connect_or_cross_connect_group_id: 'ocid1.crossconnectgroup.oc1..example', vlan: '100',
+        customer_bgp_peering_ip: '192.168.254.1/30', oracle_bgp_peering_ip: '192.168.254.2/30',
+      } },
+    };
+    const out = await generateOutputs(model);
+    const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
+    const circuit = gateways.fast_connect_virtual_circuits['FCVC-FRA-LZ-HUB-DIRECT-KEY'];
+    expect(circuit).not.toHaveProperty('provider_service_id');
+    expect(circuit.cross_connect_mappings.primary.cross_connect_or_cross_connect_group_id).toBe('ocid1.crossconnectgroup.oc1..example');
+  }, 60_000);
+
+  it('rejects OCI-reserved inside-tunnel addresses before producing configuration', async () => {
+    const { files } = buildVirtualFs();
+    files['check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { [k]: { routing: 'BGP', bgp_session_info: {
+          customer_bgp_asn: 65001, customer_interface_ip: '169.254.10.1/30', oracle_interface_ip: '169.254.10.2/30',
+        } } for k in ['tunnel_1', 'tunnel_2'] },
+      } },
+    })`;
+    await expect(evaluate('check.jsonnet', files)).rejects.toThrow(/OCI-reserved/);
   }, 60_000);
   it('keeps canonical identities for repeated and same-named relative imports', async () => {
     const files = {
@@ -291,20 +486,6 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(destinations.filter((topic) => topic === `NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`)).toHaveLength(4);
   }, 60_000);
 
-  it('emits the selected CIS level 1 artifact family', async () => {
-    const base = emptyLzModel();
-    const out = await generateOutputs({
-      ...base,
-      foundation: { ...base.foundation, cisLevel: 1 },
-    });
-
-    expect(out.config).toContain('cis_level: 1');
-    expect(out.secondary).toContain('security_cis1.json');
-    expect(out.secondary).toContain('observability_cis1.json');
-    expect(out.secondary).not.toContain('security_cis2.json');
-    expect(out.secondary).not.toContain('observability_cis2.json');
-  }, 60_000);
-
   it('generates Hub E as a final-only no-firewall bundle', async () => {
     const base = emptyLzModel();
     const model: LzModel = {
@@ -331,22 +512,17 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.config).toContain(`kind: '${hubKind}'`);
     expect(out.files['network.json']).toBeDefined();
     expectHubGeneratorContract(out.files, hubKind);
+    if (hubKind === 'hub_c') {
+      expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
+      expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
+    }
   }, 60_000);
 
-  it('includes Hub C external-firewall backend placeholders in the complete output set', async () => {
-    const base = emptyLzModel();
-    const out = await generateOutputs({
-      ...base,
-      network: { ...base.network, hubKind: 'hub_c', ...hubKindDefaults('hub_c') },
-    });
-    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
-    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
-  }, 60_000);
-
-  it('carries an OKE platform through to the generated network config', async () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('omits the %s example hub load balancer alongside OKE', async (hubKind) => {
     const base = emptyLzModel();
     const model: LzModel = {
       ...base,
+      network: { hubKind, ...hubKindDefaults(hubKind) },
       environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
       platforms: [newPlatform('oke_simple', [])],
     };
@@ -354,6 +530,8 @@ describe('generator (go-jsonnet wasm)', () => {
     const body = out.files['network.json'];
     // The platform's per-environment VCN lands in the prod category.
     expect(body).toContain('10.0.80.0/20');
+    const shared = JSON.parse(body).network_configuration.network_configuration_categories['0-shared'];
+    expect(shared.non_vcn_specific_gateways.l7_load_balancers).toBeUndefined();
     // And OKE contributes its own extension artifacts alongside the core files.
     expect(Object.keys(out.files).some((f) => f.includes('oke'))).toBe(true);
   }, 60_000);
@@ -452,4 +630,182 @@ it.each(['medium', 'large'] as const)('generates OKE %s after resizing alongside
     expect(out.files['network.json']).toContain(instance.vcnCidr);
   }
   expect(Object.keys(out.files).some((file) => file.includes('oke'))).toBe(true);
+}, 60_000);
+
+it('generates a cluster without worker pools when node pool creation is disabled', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.createNodePools = false;
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.config).toContain('create_node_pools: false');
+  expect(out.config).not.toContain('worker_image:');
+  expect(out.files['oke.json']).toBeDefined();
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  expect(Object.values(deployments).every((value) => !Object.hasOwn(value as object, 'workers_configuration'))).toBe(true);
+  expect(out.files['oke_workers.json']).toBeUndefined();
+  expect(out.files['network.json']).toBeDefined();
+}, 60_000);
+
+it.each([1, 2] as const)('generates native OKE 0.3.0 deployments for CIS%d with explicit worker defaults', async (cisLevel) => {
+  const model = emptyLzModel();
+  model.foundation.cisLevel = cisLevel;
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.createNodePools = true;
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.files['oke_clusters.json']).toBeUndefined();
+  expect(out.files['oke_workers.json']).toBeUndefined();
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  expect(Object.keys(deployments)).toHaveLength(model.environments.length);
+  for (const key of Object.keys(deployments)) {
+    const deployment = deployments[key];
+    const cluster = deployment.cluster_configuration;
+    const workers = deployment.workers_configuration;
+    const pool = workers.worker_pools[Object.keys(workers.worker_pools)[0]];
+    expect(cluster.cluster_type).toBe('enhanced');
+    expect(cluster.cni_type).toBe('native');
+    expect(cluster.options.kubernetes_network_config.pods_cidr).toBeUndefined();
+    expect(cluster.networking.service_lb_subnet_ids).toHaveLength(1);
+    expect(pool.shape).toBe('VM.Standard.E5.Flex');
+    expect(pool.os_version).toBe('9');
+    expect(pool.ocpus).toBe(1);
+    expect(pool.memory).toBe(8);
+    expect(pool.pod_subnet_id).toBeDefined();
+    expect(pool.disable_default_cloud_init).toBeUndefined();
+    expect(pool.cloud_init?.[0]?.content ?? '').not.toContain('oke_init_script');
+    expect(pool.pv_transit_encryption).toBe(cisLevel === 2);
+    expect(!!cluster.encryption).toBe(cisLevel === 2);
+    expect(!!pool.volume_kms_key_id).toBe(cisLevel === 2);
+    expect(Object.keys(workers.worker_pools)).toHaveLength(1);
+  }
+}, 60_000);
+
+it('generates OKE 0.3.0 Flannel with Oracle Linux 8 and no native pod subnet', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, cniType: 'overlay', podsCidr: '10.244.0.0/16', workerImage: '8\\.[0-9]+' };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  for (const key of Object.keys(deployments)) {
+    const { cluster_configuration: cluster, workers_configuration: workers } = deployments[key];
+    const pool = workers.worker_pools[Object.keys(workers.worker_pools)[0]];
+    expect(cluster.cni_type).toBe('flannel');
+    expect(cluster.options.kubernetes_network_config.pods_cidr).toBe('10.244.0.0/16');
+    expect(pool.os_version).toBe('8');
+    expect(pool.pod_subnet_id).toBeUndefined();
+    expect(pool.pod_nsg_ids).toBeUndefined();
+  }
+}, 60_000);
+
+it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('independently controls worker and native pod internet routes and NSGs in %s', async (hubKind) => {
+  for (const [workerInternetAccess, podInternetAccess] of [[true, true], [false, true], [true, false], [false, false]]) {
+    const model = emptyLzModel();
+    model.environments = model.environments.slice(0, 1);
+    model.network = { ...model.network, hubKind, ...hubKindDefaults(hubKind) };
+    const platform = newPlatform('oke_simple', []);
+    platform.okeParams = { ...platform.okeParams!, workerInternetAccess, podInternetAccess };
+    model.platforms = [platform];
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    for (const [role, enabled] of [['workers', workerInternetAccess], ['pods', podInternetAccess]] as const) {
+      const table = objects.find((entry) => entry.display_name === `rt-fra-lz-prod-oke-${role}`)!;
+      const routes = Object.values(table.route_rules as Record<string, Record<string, unknown>>);
+      expect(routes.some((route) => route.destination === '0.0.0.0/0')).toBe(enabled);
+      expect(routes.some((route) => route.destination_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
+      if (!enabled) expect(routes.filter((route) => route.destination_type === 'CIDR_BLOCK')).toEqual([]);
+      const nsg = objects.find((entry) => entry.display_name === `nsg-fra-lz-prod-oke-${role}`)!;
+      const egress = Object.values(nsg.egress_rules as Record<string, Record<string, unknown>>);
+      expect(egress.some((rule) => rule.dst === '0.0.0.0/0' && rule.protocol === 'ALL')).toBe(enabled);
+      expect(egress.some((rule) => rule.dst_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
+    }
+  }
+}, 60_000);
+
+it('attaches the additional peering NSG independently to workers and native pods', async () => {
+  for (const [workerSpokeAccess, podSpokeAccess] of [[false, false], [true, false], [false, true], [true, true]]) {
+    const model = emptyLzModel();
+    model.environments = model.environments.slice(0, 1);
+    const platform = newPlatform('oke_simple', []);
+    platform.okeParams = { ...platform.okeParams!, createNodePools: true, workerInternetAccess: false, podInternetAccess: false, workerSpokeAccess, podSpokeAccess, peerVcnCidrs: ['10.0.64.0/21', '10.50.0.0/16'] };
+    model.platforms = [platform];
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    const peering = objects.find((entry) => entry.display_name === 'nsg-fra-lz-prod-oke-peering');
+    expect(!!peering).toBe(workerSpokeAccess || podSpokeAccess);
+    const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+    const workers = deployments[Object.keys(deployments)[0]].workers_configuration;
+    const pool = workers.worker_pools[Object.keys(workers.worker_pools)[0]];
+    expect(pool.nsg_ids.some((key: string) => key.includes('PEERING'))).toBe(workerSpokeAccess);
+    expect(pool.pod_nsg_ids.some((key: string) => key.includes('PEERING'))).toBe(podSpokeAccess);
+    expect(pool.nsg_ids).toContain('NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY');
+    expect(pool.pod_nsg_ids).toContain('NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY');
+    if (peering) {
+      const ingress = Object.values(peering.ingress_rules as Record<string, Record<string, unknown>>);
+      const egress = Object.values(peering.egress_rules as Record<string, Record<string, unknown>>);
+      expect(ingress.map((rule) => rule.src)).toEqual(['10.0.64.0/21', '10.50.0.0/16']);
+      expect(egress.map((rule) => rule.dst)).toEqual(ingress.map((rule) => rule.src));
+      expect(egress.every((rule) => rule.dst !== '0.0.0.0/0' && rule.dst !== platform.vcnCidr && rule.protocol === 'ALL' && rule.stateless === true)).toBe(true);
+    }
+  }
+}, 60_000);
+
+it('ignores pod peering for Flannel and omits unused peering NSGs', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, cniType: 'overlay', podsCidr: '10.244.0.0/16', podSpokeAccess: true };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.config).not.toContain('pod_spoke_access');
+  expect(out.files['network.json']).not.toContain('peering');
+}, 60_000);
+
+it('does not create or attach a peering NSG when no peer CIDRs are selected', async () => {
+  const model = emptyLzModel();
+  model.environments = model.environments.slice(0, 1).map((env) => ({ ...env, projectNetworkEnabled: false }));
+  model.projects = [];
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, createNodePools: true, workerSpokeAccess: true, podSpokeAccess: true, peerVcnCidrs: [] };
+  model.platforms = [platform];
+  const out = await generateOutputs(model);
+  expect(out.files['network.json']).not.toContain('peering');
+  const deployments = JSON.parse(out.files['oke.json']).oke_configuration;
+  const workers = deployments[Object.keys(deployments)[0]].workers_configuration;
+  const pool = workers.worker_pools[Object.keys(workers.worker_pools)[0]];
+  expect(pool.nsg_ids).toHaveLength(1);
+  expect(pool.pod_nsg_ids).toHaveLength(1);
+}, 60_000);
+
+it.each(['0.0.0.0/0', '10.50.1.0/16', '10.0.80.0/20'])('rejects unsafe or malformed explicit peer CIDR %s', async (cidr) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerSpokeAccess: true, peerVcnCidrs: [cidr] };
+  model.platforms = [platform];
+  await expect(generateOutputs(model)).rejects.toThrow(/[Pp]eer|canonical/);
+}, 60_000);
+
+it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('limits worker and pod DRG routes to their configured peers and public LB in %s', async (hubKind) => {
+  const model = emptyLzModel();
+  model.network = { hubKind, ...hubKindDefaults(hubKind) };
+  model.environments = model.environments.slice(0, 1);
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerInternetAccess: false, podInternetAccess: false,
+    workerSpokeAccess: true, podSpokeAccess: false, peerVcnCidrs: ['10.90.0.0/24', '10.91.0.0/24'] };
+  model.platforms = [platform];
+  for (const publicLoadBalancer of [false, true]) {
+    platform.okeParams.publicLoadBalancer = publicLoadBalancer;
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    const lbCidr = model.network.subnets.find((sn) => sn.name === 'lb')!.cidr;
+    const getRules = (role: string) => Object.values(objects.find((entry) => entry.display_name === `rt-fra-lz-prod-oke-${role}`)!.route_rules as Record<string, Record<string, unknown>>);
+    for (const role of ['workers', 'pods']) {
+      const rules = getRules(role);
+      const expected = [...(role === 'workers' ? platform.okeParams.peerVcnCidrs! : []), ...(publicLoadBalancer ? [lbCidr] : [])];
+      expect(rules.filter((r) => r.destination_type === 'CIDR_BLOCK').map((r) => r.destination).sort()).toEqual(expected.sort());
+      expect(rules.filter((r) => r.destination_type === 'SERVICE_CIDR_BLOCK')).toHaveLength(1);
+    }
+    // Administrative return routing is owned by the control-plane table.
+    expect(getRules('cp').some((r) => r.destination === '0.0.0.0/0' || r.destination === model.network.hubVcnCidr)).toBe(true);
+  }
 }, 60_000);

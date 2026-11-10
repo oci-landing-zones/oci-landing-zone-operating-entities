@@ -32,8 +32,7 @@ local result = lz({
     preprod: { platforms: { oke: oke('10.0.96.0/20', '10.97.0.0/16') } },
   },
 });
-local clusters = result.extra.oke_clusters.oke_clusters_configuration.clusters;
-local workers = result.extra.oke_workers.oke_workers_configuration.node_pools;
+local deployments = result.extra.oke.oke_configuration;
 local vaults = result.security_cis2.vaults_configuration;
 local policies = result.iam.policies_configuration.supplied_policies;
 local expected = {
@@ -75,13 +74,13 @@ local all_kms_statements = [
     for env in std.objectFields(expected)
     if vaults.keys[expected[env].key].compartment_id != expected[env].compartment ||
        vaults.keys[expected[env].key].vault_key != 'VLT-LZ-SHARED-SECURITY-KEY' ||
-       clusters[expected[env].cluster].encryption.kube_secret_kms_key_id != expected[env].key ||
-       workers[expected[env].worker].node_config_details.encryption.kms_key_id != expected[env].key
+       deployments[expected[env].cluster].cluster_configuration.encryption.kube_secret_kms_key_id != expected[env].key ||
+       deployments[expected[env].cluster].workers_configuration.worker_pools[expected[env].worker].volume_kms_key_id != expected[env].key
   ],
   worker_encrypt_in_transit_failures: [
     env
     for env in std.objectFields(expected)
-    if workers[expected[env].worker].node_config_details.encryption.enable_encrypt_in_transit != true
+    if deployments[expected[env].cluster].workers_configuration.worker_pools[expected[env].worker].pv_transit_encryption != true
   ],
   platform_kms_statement_counts: {
     [expected[env].policy]: std.length(kms_statements(env))

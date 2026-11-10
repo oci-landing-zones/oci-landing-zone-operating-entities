@@ -44,17 +44,48 @@ describe('flowChoices', () => {
 
   it('makes every east-west destination explicit', () => {
     expect(flowChoices(environments, 0)).toEqual([
-      { id: 'prod:egress', label: 'Spoke → Internet', sub: 'egress' },
-      { id: 'prod:ingress', label: 'Internet → Spoke', sub: 'ingress' },
-      { id: 'prod>preprod:east-west', label: 'Spoke → preprod', sub: 'east-west' },
-      { id: 'prod>dev:east-west', label: 'Spoke → dev', sub: 'east-west' },
-      { id: 'prod:services', label: 'Spoke → OCI Services', sub: 'Service Gateway' },
+      { id: 'prod:egress', label: 'prod → Internet', sub: 'egress' },
+      { id: 'prod:ingress', label: 'Internet → prod', sub: 'ingress' },
+      { id: 'prod>preprod:east-west', label: 'prod → preprod', sub: 'east-west' },
+      { id: 'prod>dev:east-west', label: 'prod → dev', sub: 'east-west' },
+      { id: 'prod:services', label: 'prod → OCI Services', sub: 'Service Gateway' },
     ]);
+  });
+
+  it('uses the selected environment name for ingress, egress and hybrid flows', () => {
+    const choices = flowChoices(environments, 1, true, [{ id: 'fc', name: 'Datacenter', type: 'FastConnect' }]);
+    expect(choices.map((choice) => choice.label)).toEqual([
+      'preprod → Internet', 'Internet → preprod', 'preprod → prod', 'preprod → dev',
+      'preprod → OCI Services', 'preprod → Datacenter', 'Datacenter → preprod',
+    ]);
+    expect(choices[0].id).toBe('preprod:egress');
   });
 
   it('omits east-west choices when there is no destination environment', () => {
     expect(flowChoices([{ name: 'prod' }], 0).map((choice) => choice.id)).toEqual([
       'prod:egress', 'prod:ingress', 'prod:services',
     ]);
+  });
+});
+
+describe('OKE flow choices', () => {
+  it('shows a pod internet case without advertising worker internet when only pods are allowed', () => {
+    const env = { name: 'prod/oke', oke: true, rolesFor: (kind: string) => kind === 'egress' ? ['pods'] : kind === 'services' ? ['workers', 'pods'] : [] };
+    expect(flowChoices([env], 0).map(({ id, label }) => ({ id, label }))).toEqual([
+      { id: 'prod/oke:egress:pods', label: 'Pods → Internet' },
+      { id: 'prod/oke:services:workers', label: 'Workers → OCI Services' },
+      { id: 'prod/oke:services:pods', label: 'Pods → OCI Services' },
+    ]);
+  });
+
+  it('offers worker and pod cases independently without duplicating endpoint selection', () => {
+    const env = { name: 'prod/oke', oke: true, rolesFor: (kind: string) => kind === 'ingress' ? [] : ['workers', 'pods'] };
+    const choices = flowChoices([env, { name: 'preprod' }], 0);
+    expect(choices.filter((choice) => choice.id.includes(':egress:')).map((choice) => choice.label)).toEqual(['Workers → Internet', 'Pods → Internet']);
+    expect(choices.filter((choice) => choice.id.includes(':east-west:')).map((choice) => choice.label)).toEqual(['Workers → preprod', 'Pods → preprod']);
+    const first = toggleFlow([], 'prod/oke:egress:pods', []);
+    const both = toggleFlow(first, 'prod/oke:egress:workers', []);
+    expect(both).toEqual(['prod/oke:egress:pods', 'prod/oke:egress:workers']);
+    expect(toggleFlow(both, 'prod/oke:egress:workers', [])).toEqual(first);
   });
 });

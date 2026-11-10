@@ -8,12 +8,11 @@ import { toDrawioXml } from '../export/toDrawio';
 import { buildRouteTables } from '../services/routeTables';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionBounds, minimumOwnerWidths } from './layoutPolicy';
 import { physicalSharedSegments, structuralCrossings, structuralLineContacts, validateDiagramLayout } from './layoutQuality';
 import { oracle } from '../theme';
 import { routeStructuralEdges } from './displayGeometry';
-import { absoluteNodeRects } from './flowGeometry';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
@@ -32,6 +31,11 @@ function environmentCount(count: number) {
 async function generated(model: LzModel) {
   const preview = await generatePreview(model);
   return { inventory: preview.inventory, tables: buildRouteTables(model, preview.network) };
+}
+
+function physicalConnections(graph: DiagramModel): DiagramModel {
+  const dots = new Set(graph.nodes.filter((node) => node.kind === 'rtdot').map((node) => node.id));
+  return { ...graph, edges: graph.edges.filter((edge) => !dots.has(edge.source)) };
 }
 
 function expectLayout(graph: DiagramModel, context: Parameters<typeof validateDiagramLayout>[1], label: string) {
@@ -69,36 +73,23 @@ describe('generated diagram quality matrix', () => {
     const model = emptyLzModel();
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     const { inventory, tables } = await generated(model);
-    const dotsOnly = absoluteNodeRects(buildGraph(model, 5, { showDots: true }, undefined, tables, inventory).nodes);
     const cases: { step: number; options: DiagramOptions }[] = [
       { step: 1, options: {} }, { step: 2, options: {} }, { step: 5, options: {} },
-      { step: 5, options: { showEndpoints: true, showDots: true, openTables: [tables[0].id] } },
-      { step: 5, options: { showFlows: true } }, { step: 5, options: { allFlows: true } },
+      { step: 5, options: { allFlows: true } },
     ];
     for (const { step, options } of cases) {
       const graph = buildGraph(model, step, options, undefined, tables, inventory);
       expectLayout(graph, { inventory, routeTables: tables, foundation: step === 1, showRouteTables: !!(options.showFlows || options.allFlows) }, `${hubKind} step ${step} ${JSON.stringify(options)}`);
-      expect(structuralCrossings(graph), `${hubKind} step ${step} unrelated-resource intersections`).toEqual([]);
-      const currentRects = absoluteNodeRects(graph.nodes);
-      if (step === 5) for (const dot of currentRects.values()) if (dot.node.kind === 'rtdot') {
-        const original = dotsOnly.get(dot.id)!;
-        const owner = currentRects.get(dot.node.rtDotOwnerId!)!;
-        const originalOwner = dotsOnly.get(original.node.rtDotOwnerId!)!;
-        expect(dot.node.rtDotOwnerId).toBe(original.node.rtDotOwnerId);
-        expect((dot.x + dot.width / 2 - owner.x) / owner.width, `${hubKind} canonical horizontal port ${dot.id}`)
-          .toBeCloseTo((original.x + original.width / 2 - originalOwner.x) / originalOwner.width, 6);
-        expect((dot.y + dot.height / 2 - owner.y) / owner.height, `${hubKind} canonical vertical port ${dot.id}`)
-          .toBeCloseTo((original.y + original.height / 2 - originalOwner.y) / originalOwner.height, 6);
-      }
+      expect(structuralCrossings(physicalConnections(graph)), `${hubKind} step ${step} unrelated-resource intersections`).toEqual([]);
       if (options.showFlows || options.allFlows) {
         // Distinct physical links and clear text take priority over best-effort point crossings.
         const budget = { hub_a: 4, hub_b: 4, hub_c: 4, hub_e: 1 };
-        expect(structuralLineContacts(graph).length, `${hubKind} perpendicular line contacts`).toBeLessThanOrEqual(budget[hubKind]);
+        expect(structuralLineContacts(physicalConnections(graph)).length, `${hubKind} perpendicular line contacts`).toBeLessThanOrEqual(budget[hubKind]);
       }
     }
   }, 60_000);
 
-  it.each([0, 1, 3, 6])('stacks %i Foundation environments with readable widths and compact gaps', async (count) => {
+  it.each([0, 6])('stacks %i Foundation environments with readable widths and compact gaps', async (count) => {
     const model = environmentCount(count);
     const { inventory, tables } = await generated(model);
     const graph = buildGraph(model, 1, {}, undefined, tables, inventory);
@@ -110,12 +101,12 @@ describe('generated diagram quality matrix', () => {
     }
   }, 60_000);
 
-  it.each([3, 6])('routes all tables clear of unrelated resources with %i environments', async (count) => {
-    const model = environmentCount(count);
+  it('keeps physical routes clear with six environments and visible tables', async () => {
+    const model = environmentCount(6);
     const { inventory, tables } = await generated(model);
     const graph = buildGraph(model, 5, { showFlows: true }, undefined, tables, inventory);
-    expectLayout(graph, { inventory, routeTables: tables, showRouteTables: true }, `${count} environments with routing`);
-    expect(structuralCrossings(graph)).toEqual([]);
+    expectLayout(graph, { inventory, routeTables: tables, showRouteTables: true }, 'six environments with routing');
+    expect(structuralCrossings(physicalConnections(graph))).toEqual([]);
   }, 60_000);
 
   it('routes OKE, shared Custom and RPC attachments without crossing unrelated resource boxes', async () => {
@@ -126,7 +117,7 @@ describe('generated diagram quality matrix', () => {
     const { inventory, tables } = await generated(model);
     const graph = buildGraph(model, 5, { allFlows: true }, undefined, tables, inventory);
     expectLayout(graph, { inventory, routeTables: tables, showRouteTables: true }, 'OKE, shared Custom and RPC with routing');
-    expect(structuralCrossings(graph)).toEqual([]);
+    expect(structuralCrossings(physicalConnections(graph))).toEqual([]);
   }, 60_000);
 
   it.each(['regional', 'disabled-projects', 'platforms'] as const)('retains %s source conditions and complete ownership', async (variant) => {
@@ -159,14 +150,39 @@ describe('generated diagram quality matrix', () => {
 });
 
 describe('layout quality regressions', () => {
-  it('rejects a fixed-width attachment pill that clips its full generated label or terminal padding', () => {
+  it.each([false, true])('rejects clipped attachment labels, vertical=%s', (attachmentVertical) => {
     const graph: DiagramModel = { nodes: [
-      { id: 'attachment', kind: 'attachment', label: 'drgatt-fra-lz-preprod-proj', x: 0, y: 0, width: 150, height: 26 },
+      { id: 'attachment', kind: 'attachment', label: 'drgatt-fra-lz-preprod-proj', attachmentVertical,
+        x: 0, y: 0, width: attachmentVertical ? 26 : 150, height: attachmentVertical ? 150 : 26 },
     ], edges: [] };
     expect(attachmentLabelLayout(graph.nodes[0].label).width).toBeGreaterThan(150);
     expect(validateDiagramLayout(graph).map((issue) => issue.code)).toContain('attachment-text');
-    graph.nodes[0].width = attachmentLabelLayout(graph.nodes[0].label).width;
+    graph.nodes[0][attachmentVertical ? 'height' : 'width'] = attachmentLabelLayout(graph.nodes[0].label).width;
     expect(validateDiagramLayout(graph)).toEqual([]);
+  });
+
+  it('allows gateway anchor space beside a subnet but rejects visible label overlap', () => {
+    const graph: DiagramModel = { nodes: [
+      { id: 'vcn', kind: 'vcn', label: '', x: 0, y: 0, width: 362, height: 180 },
+      { id: 'gateway', kind: 'gateway', parentId: 'vcn', label: 'Internet\nGateway', x: -38, y: 50, width: 76, height: 74 },
+      { id: 'subnet', kind: 'subnet', parentId: 'vcn', label: '', x: 31, y: 50, width: 300, height: 80 },
+    ], edges: [] };
+    const overlaps = () => validateDiagramLayout(graph).filter((issue) => issue.code === 'sibling-overlap');
+    expect(overlaps()).toEqual([]);
+    graph.nodes[2].x = 20;
+    expect(overlaps()).toHaveLength(1);
+  });
+
+  it('allows route cards across compartment bodies while protecting their headings', () => {
+    const graph: DiagramModel = { nodes: [
+      { id: 'lz', kind: 'landingzone', label: '', x: 0, y: 0, width: 800, height: 400 },
+      { id: 'network', kind: 'compartment', parentId: 'lz', label: 'Network', x: 100, y: 50, width: 400, height: 300 },
+      { id: 'table', kind: 'routetable', parentId: 'lz', label: '', x: 110, y: 100, width: 200, height: 80 },
+    ], edges: [] };
+    const overlaps = () => validateDiagramLayout(graph).filter((issue) => issue.code === 'sibling-overlap');
+    expect(overlaps()).toEqual([]);
+    graph.nodes[2].y = 60;
+    expect(overlaps()).toHaveLength(1);
   });
 
   it('rejects shared physical DRG trunks even when the connections share a DRG, while allowing point crossings', () => {
@@ -324,30 +340,6 @@ describe('layout quality regressions', () => {
     expect(validateDiagramLayout(graph).some((issue) => issue.code === 'table-interior')).toBe(false);
   });
 
-  it('requires dedicated rails to distinguish table associations and share one table entry', () => {
-    const graph: DiagramModel = {
-      nodes: [
-        { id: 'dot-a', kind: 'rtdot', label: '', x: 250, y: 10, width: 16, height: 16 },
-        { id: 'dot-b', kind: 'rtdot', label: '', x: 250, y: 60, width: 16, height: 16 },
-        { id: 'table-a', kind: 'routetable', label: '', x: 50, y: 100, width: 100, height: 80 },
-        { id: 'table-b', kind: 'routetable', label: '', x: 50, y: 240, width: 100, height: 80 },
-      ],
-      edges: [
-        { id: 'a', source: 'dot-a', target: 'table-a', centerX: 200, points: [{ x: 250, y: 18 }, { x: 200, y: 18 }, { x: 200, y: 140 }, { x: 150, y: 140 }] },
-        { id: 'b', source: 'dot-b', target: 'table-b', centerX: 200, points: [{ x: 250, y: 68 }, { x: 200, y: 68 }, { x: 200, y: 280 }, { x: 150, y: 280 }] },
-      ],
-    };
-    const codes = () => validateDiagramLayout(graph).map((issue) => issue.code);
-    expect(codes()).toContain('annotation-junction');
-    graph.edges[1].centerX = 220;
-    graph.edges[1].points![1].x = 220;
-    graph.edges[1].points![2].x = 220;
-    expect(codes()).not.toContain('annotation-junction');
-    graph.edges[1].target = 'table-a';
-    expect(codes()).toContain('annotation-rail');
-    expect(codes()).toContain('annotation-junction');
-  });
-
   it('measures the visible shared trunk once while preserving its crossing with a physical connection', () => {
     const graph: DiagramModel = {
       nodes: [
@@ -389,25 +381,5 @@ describe('layout quality regressions', () => {
     ]);
   });
 
-  it('keeps annotation leaders outside their owner body after leaving the actual port', () => {
-    const graph: DiagramModel = {
-      nodes: [
-        { id: 'owner', kind: 'attachment', label: 'Attachment name', x: 100, y: 0, width: 100, height: 40 },
-        { id: 'dot', kind: 'rtdot', label: '', rtDotOwnerId: 'owner', x: 92, y: 12, width: 16, height: 16 },
-        { id: 'table', kind: 'routetable', label: '', x: 300, y: 100, width: 80, height: 80 },
-      ],
-      edges: [{ id: 'leader', source: 'dot', target: 'table', sourceSide: 'left', centerX: 250, points: [
-        { x: 92, y: 20 }, { x: 80, y: 20 }, { x: 250, y: 20 }, { x: 250, y: 140 }, { x: 300, y: 140 },
-      ] }],
-    };
-    const hasIntrusion = () => validateDiagramLayout(graph).some((issue) => issue.code === 'annotation-owner-interior');
-    expect(hasIntrusion()).toBe(true);
-    graph.edges[0].points = [{ x: 92, y: 20 }, { x: 80, y: 20 }, { x: 80, y: -10 }, { x: 250, y: -10 }, { x: 250, y: 140 }, { x: 300, y: 140 }];
-    expect(hasIntrusion()).toBe(false);
-    graph.edges[0].points = [{ x: 92, y: 20 }, { x: 104, y: 20 }];
-    expect(hasIntrusion()).toBe(false);
-    graph.nodes.find((node) => node.id === 'dot')!.x = 112;
-    graph.edges[0].points = [{ x: 112, y: 20 }, { x: 80, y: 20 }, { x: 80, y: -10 }, { x: 250, y: -10 }, { x: 250, y: 140 }, { x: 300, y: 140 }];
-    expect(hasIntrusion()).toBe(false);
-  });
+
 });

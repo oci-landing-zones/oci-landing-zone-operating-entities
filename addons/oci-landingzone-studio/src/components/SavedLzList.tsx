@@ -11,7 +11,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
 import { createDrLZ, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
-import { serializeConfig } from '../services/lzConfig';
+import { buildConfig, serializeConfig } from '../services/lzConfig';
+import { deploymentReadme } from '../services/deployment';
 import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
 import { drRegionOptions } from '../services/disasterRecoveryDesign';
@@ -152,9 +153,10 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
       }
       const persisted = saveOutputs(id, { config, files });
       const downloadable = scope ? Object.fromEntries(Object.entries(files)
-        .filter(([path]) => path.startsWith(`${scope}/`) || path === 'README.txt')
+        .filter(([path]) => path.startsWith(`${scope}/`) || (path === 'README.txt' && !Object.hasOwn(files, `${scope}/README.txt`)))
         .map(([path, body]) => [path.replace(`${scope}/`, ''), body]))
-        : { [CONFIG_FILENAME]: config, ...files };
+        : { [CONFIG_FILENAME]: config, ...files,
+          'README.txt': deploymentReadme(buildConfig(record.model), Object.keys(files)) };
       downloadBlob(bundleFilename(`${record.name}${scope ? `-${scope.toLowerCase()}` : ''}`), zipTextFiles(downloadable));
       setStorageError(persisted.ok ? null : persisted.message ?? 'The configuration was downloaded, but its files could not be retained in browser storage.');
       reload();

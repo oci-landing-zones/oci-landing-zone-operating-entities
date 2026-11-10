@@ -11,6 +11,8 @@ import type { ResourceKind } from '../services/generatedResources';
  * exercise the whole pipeline (two nodes + one edge → live diagram → drawio).
  */
 
+import type { HybridConnectivity } from './hybridConnectivity';
+
 export interface FoundationConfig {
   stackScope?: 'complete' | 'regional';
   /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
@@ -82,6 +84,13 @@ export type PlatformType = 'oke_simple' | 'custom';
 
 /** OKE settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
+  /** Defaults to true for previously saved designs. */
+  createNodePools?: boolean;
+  workerInternetAccess?: boolean;
+  podInternetAccess?: boolean;
+  workerSpokeAccess?: boolean;
+  podSpokeAccess?: boolean;
+  peerVcnCidrs?: string[];
   kubernetesVersion: string;   // e.g. v1.35.2
   servicesCidr: string;        // e.g. 10.96.0.0/16
   apiAllowedCidrs: string[];   // e.g. ['10.0.1.0/24']
@@ -114,9 +123,11 @@ export interface PlatformConfig {
   /** Key in environments.<env>.platforms. */
   key: string;
   type: PlatformType;
+  /** OKE card owns a fixed network in one environment; older placements are expanded on load. */
+  environmentScoped?: boolean;
   /** 'all' applies it to every environment; otherwise the listed environment IDs. */
   environments: 'all' | string[];
-  /** Base VCN CIDR (env-0); other envs derive from it. */
+  /** Fixed CIDR for scoped OKE cards; base CIDR for shared placements. */
   vcnCidr: string;
   /** Default (locked) + custom subnets, relative to the base VCN. */
   subnets: Subnet[];
@@ -207,6 +218,7 @@ export interface ExadataDesign {
 
 export interface LzModel {
   remotePeeringConnections?: RemotePeeringConnection[];
+  hybridConnectivity?: HybridConnectivity;
   /** Schema version of this canonical object. */
   version: string;
   foundation: FoundationConfig;
@@ -242,7 +254,7 @@ export interface RemotePeeringConnection {
 export interface DiagramNode {
   id: string;
   /** Semantic kind — drives styling in each renderer. */
-  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup';
+  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'premises' | 'vpn' | 'vpntunnel' | 'customerrouter' | 'fastconnect' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup';
   label: string;
   /** Compartment fill: yellow (shared), green (environment) or gray (projects). */
   tone?: 'yellow' | 'green' | 'gray' | 'platform' | 'projects';
@@ -253,7 +265,11 @@ export interface DiagramNode {
   /** Compartment that holds nested children — label renders top-left. */
   container?: boolean;
   /** Icon glyph: gateways use it as the node body, subnets show it centred. */
-  icon?: 'igw' | 'natgw' | 'sgw' | 'firewall' | 'lb';
+  icon?: 'igw' | 'natgw' | 'sgw' | 'firewall' | 'lb' | 'nlb';
+  /** Illustrative Hub C backend bridge, positioned in the VCN subnet gap. */
+  firewallBackendBridgeY?: number;
+  firewallBackendUpperArm?: number;
+  firewallBackendLowerArm?: number;
   /** Caption under a subnet icon (e.g. nfw-<region>-hub-dmz). */
   caption?: string;
   /** Caption colour. */
@@ -268,9 +284,26 @@ export interface DiagramNode {
   /** Resource names and grouping come from the generated deployment artifacts. */
   resourceKind?: ResourceKind;
   resourceItems?: { key: string; name: string }[];
+  /** Public connectivity topology only; authentication material never enters the diagram. */
+  premises?: {
+    equipmentLabel: string;
+    equipmentName: string;
+    equipmentAddress?: string;
+    cidrs: string[];
+    connectionCount?: number;
+  };
+  vpnTunnel?: { customerAddress?: string; oracleAddress?: string };
+  fastConnect?: {
+    provider: string;
+    bandwidth?: string;
+    mappings: { name: string; customerAddress?: string; oracleAddress?: string; vlan?: string }[];
+  };
   /** Route-table box payload (kind === 'routetable'). */
-  rtRows?: { id?: string; destination: string; targetType: string; target: string; routeType: string }[];
+  rtRows?: { id?: string; destination: string; targetType: string; target: string; routeType: string; superseded?: boolean }[];
   rtColumns?: 'vcn' | 'drg';
+  rtKeepLeft?: boolean;
+  rtColumnPreference?: 'right' | 'initial';
+  rtLayoutRole?: 'hub-ingress' | 'hub-drg' | 'spoke' | 'spoke-drg' | 'hub-subnet';
   rtNote?: string;
   rtTone?: 'hub' | 'gateway' | 'drg' | 'spoke';
   /** Rows (by index) to highlight when a flow traverses this table. */
@@ -278,6 +311,9 @@ export interface DiagramNode {
   /** Route-table dot (kind === 'rtdot'): the table it opens, its state, its colour. */
   rtDotTableId?: string;
   rtDotOwnerId?: string;
+  /** Visible attachment endpoint when the table binding belongs to a separate resource. */
+  rtDotPhysicalOwnerId?: string;
+  attachmentVertical?: boolean;
   rtDotOpen?: boolean;
   rtDotConfigured?: boolean;
   rtDotTone?: 'hub' | 'gateway' | 'drg' | 'spoke';
@@ -303,7 +339,7 @@ export interface DiagramEdge {
   /** Flow overlay: ordered node ids the packet visits (used by the .drawio export
    * + auto-fit). The on-screen path uses the precomputed `points` below. */
   waypoints?: string[];
-  /** Canonical absolute orthogonal path for connections, table associations and
+  /** Canonical absolute path for connections, table associations and
    * packet flows. Renderers only deduplicate shared same-table annotation runs. */
   points?: { x: number; y: number }[];
   /** Ordered processing anchors retain exact path positions and repeated occurrences. */
@@ -328,6 +364,7 @@ export interface DiagramEdge {
 }
 
 export interface DiagramModel {
+  tableColumns?: readonly [number, number, number];
   display?: { allFlows?: boolean; focusFlow?: string };
   flowErrors?: string[];
   nodes: DiagramNode[];

@@ -1,5 +1,9 @@
 # OKE Workload Extension - Single-Stack Deployment <!-- omit from toc -->
 
+Supported releases: Orchestrator **v2.4.1** with CIS OKE **v0.3.0** only.
+
+> **Migration warning:** Existing deployments require Terraform state and input migration from the legacy split OKE contract. Do not simply apply the new generated files to existing state; back up state and review the migration and plan first.
+
 - [**1. Summary**](#1-summary)
 - [**2. Architecture Overview**](#2-architecture-overview)
 - [**3. Architecture Components**](#3-architecture-components)
@@ -54,8 +58,8 @@ The quickstart creates one production OKE platform.
 - **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/20)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **Encryption**: The included OKE cluster and worker files use CIS1 with OCI-managed encryption. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
-- **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 cluster and worker files contain no KMS key reference; keep unrelated keys out of the OKE platform compartment.
+- **Encryption**: The included `oke.json` uses CIS1 with OCI-managed encryption and explicit worker `pv_transit_encryption: false`. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
+- **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 `oke.json` contains no KMS key reference; keep unrelated keys out of the OKE platform compartment.
 - **OKE Network Mode**: The committed JSON uses VCN-native networking
 - **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet.
 
@@ -130,15 +134,14 @@ Before granting Kubernetes Service permissions, review the shared [operational a
 
 ## **4. Configuration Files**
 
-The initial deployment uses the five core JSON files, the `_pre` security file, and the complete observability file for the selected CIS profile. After the initial apply creates the Landing Zone compartments and dependencies, replace only the security input with its full version and apply the stack again.
+The initial deployment uses the four core JSON files, the `_pre` security file, and the complete observability file for the selected CIS profile. After the initial apply creates the Landing Zone compartments and dependencies, replace only the security input with its full version and apply the stack again.
 
 | File | Purpose  |
 | --- | --- |
 | `oke_identity.json` | OneOE IAM + OKE-specific groups/policies, rendered from CIS2 |
 | `oke_network.json` | OneOE + Hub E + OKE network |
 | `oke_governance.json` | Tag namespaces and governance definitions |
-| `oke_clusters.json` | OKE cluster configuration |
-| `oke_workers.json` | OKE Node pool configuration |
+| `oke.json` | Consolidated OKE clusters and managed worker pools |
 | `oke_security_cis1_pre.json` or `oke_security_cis2_pre.json` | Initial CIS-aligned security configuration |
 | `oke_observability_cis1.json` or `oke_observability_cis2.json` | Initial CIS-aligned observability configuration |
 
@@ -175,10 +178,10 @@ Select the same CIS level for security and observability. Only security uses a s
 
 1. **Create ORM Stack**
 
-   Use the Orchestrator tag selected by the deployment workflow and set the working directory to `rms-facade`.
+   Use Orchestrator `v2.4.1` with CIS OKE `v0.3.0` and set the working directory to `rms-facade`. Prefer ORM with configuration files staged in a customer-controlled private OCI Object Storage bucket.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, `oke_workers.json`, the `_pre` security file, and the complete observability file matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke.json`, the `_pre` security file, and the complete observability file matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
 
 3. **Review Configuration** (Optional Customization)
 
@@ -356,58 +359,18 @@ Edit the JSON file to modify CIDR blocks:
 
 ### 7.2 Scale Worker Nodes
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_workers.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke.json`
+
+Partial configuration showing the worker-pool nesting:
 
 ```json
 {
-  "oke_workers_configuration": {
-    "node_pools": {
-      "NDP-FRA-LZ-PROD-OKE-KEY": {
-        "size": 3,  // Changed from 1 to 3 nodes
-        ...
-      }
-    }
-  }
-}
-```
-
-### 7.3 Change Instance Shape
-
-**File**: `workload-extensions/oke/simple/single-stack/oke_workers.json`
-
-```json
-{
-  "oke_workers_configuration": {
-    "node_pools": {
-      "NDP-FRA-LZ-PROD-OKE-KEY": {
-        "node_config_details": {
-          "image": "9\\.[0-9]+",
-          "node_shape": "VM.Standard.E5.Flex",
-          "flex_shape_settings": {
-            "ocpus": 2,        // Changed from 1 to 2
-            "memory": 16       // Changed from 8 to 16 GB
-          }
-        },
-        ...
-      }
-    }
-  }
-}
-```
-
-### 7.4 Upgrade Kubernetes Version
-
-**File**: `workload-extensions/oke/simple/single-stack/oke_clusters.json`
-
-```json
-{
-  "oke_clusters_configuration": {
-    "clusters": {
-      "CLR-FRA-LZ-PROD-OKE-KEY": {
-        "kubernetes_version": "v1.35.2",  // Updated version
-        "options": {
-          "kubernetes_network_config": {
-            "services_cidr": "10.96.0.0/16"
+  "oke_configuration": {
+    "CLR-FRA-LZ-PROD-OKE-KEY": {
+      "workers_configuration": {
+        "worker_pools": {
+          "NDP-FRA-LZ-PROD-OKE-KEY": {
+            "size": 3
           }
         }
       }
@@ -416,7 +379,53 @@ Edit the JSON file to modify CIDR blocks:
 }
 ```
 
-**Note**: Keep `options.kubernetes_network_config.services_cidr` aligned with your Kubernetes service network plan. It remains required for the committed native OKE payload even though `pods_cidr` is no longer part of the standard single-stack example.
+### 7.3 Change Instance Shape
+
+**File**: `workload-extensions/oke/simple/single-stack/oke.json`
+
+Partial configuration; worker properties are flat:
+
+```json
+{
+  "oke_configuration": {
+    "CLR-FRA-LZ-PROD-OKE-KEY": {
+      "workers_configuration": {
+        "worker_pools": {
+          "NDP-FRA-LZ-PROD-OKE-KEY": {
+            "os_version": "9",
+            "shape": "VM.Standard.E5.Flex",
+            "ocpus": 2,
+            "memory": 16,
+            "boot_volume_size": 60
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### 7.4 Upgrade Kubernetes Version
+
+**File**: `workload-extensions/oke/simple/single-stack/oke.json`
+
+Partial cluster configuration:
+
+```json
+{
+  "oke_configuration": {
+    "CLR-FRA-LZ-PROD-OKE-KEY": {
+      "cluster_configuration": {
+        "kubernetes_version": "v1.35.2"
+      }
+    }
+  }
+}
+```
+
+**Note**: Keep source `services_cidr` aligned with your Kubernetes service network plan. Native mode rejects `pods_cidr`; pod addresses come from the OCI pod subnet. Clusters are implicitly enhanced with private API endpoints. Service load-balancer placement uses `cluster_configuration.networking.service_lb_subnet_ids`, a list of subnet references.
+
+Worker pools inherit compartment and CIS settings from their cluster. Flat worker networking fields are `subnet_id`, `nsg_ids`, and native-only `pod_subnet_id` and `pod_nsg_ids`. Source `worker_image` defaults to `'9'` and emits `os_version`, or `image_id` for an image OCID. CIS1 emits no custom cloud-init; upstream cloud-init remains enabled for growfs and bootstrap. CIS2 adds only FSS package installation and `volume_kms_key_id`. See the shared [generated output contract](../oke-blueprint-factory.md#10-generated-output-contract) for image compatibility and encryption details.
 
 **Important**: [Check Supported Images, Shapes for Worker Nodes](https://docs.oracle.com/en-us/iaas/Content/ContEng/Reference/contengimagesshapes.htm) and [OKE supported versions](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutk8sversions.htm) before upgrading.
 
@@ -561,7 +570,7 @@ OKE VCN Route:
    ```
    PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY
    ```
-3. If using overlay, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker node pool does not include `pods_subnet_id` or `pods_nsg_ids`
+3. If using overlay, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker pool does not include `pod_subnet_id` or `pod_nsg_ids`
 4. Verify subnet CIDRs don't overlap
 5. Check NSG rules allow required traffic
 
@@ -584,10 +593,7 @@ OKE VCN Route:
 1. Use a bastion host in Hub VCN
 2. Configure VPN/FastConnect to Hub VCN
 3. Use OCI Cloud Shell with VCN access configured
-4. Or change cluster to public endpoint (not recommended for production):
-   ```json
-   "is_api_endpoint_public": true
-   ```
+The generated contract supports private API endpoints only; public-endpoint flags are not supported.
 
 ### Issue: Pods Cannot Pull Images <!-- omit from toc -->
 

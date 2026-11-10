@@ -15,6 +15,5 @@ function(profile) {
   oke_security_cis1_pre: cis1.security_cis1_pre,
   oke_security_cis2: cis1.security_cis2,
   oke_security_cis2_pre: cis1.security_cis2_pre,
-  oke_clusters: cis1.extra.oke_clusters,
-  oke_workers: cis1.extra.oke_workers,
+  oke: cis1.extra.oke,
 }

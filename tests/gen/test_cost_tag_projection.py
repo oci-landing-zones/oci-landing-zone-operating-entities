@@ -26,6 +26,16 @@ tags.apply({
     options: { service_lb_config: { defined_tags: { 'tagns-lz-oke.platform': 'sandbox.kubernetes' } } },
   } } },
   oke_workers_configuration: { node_pools: { 'POOL-SANDBOX-KUBERNETES-KEY': { node_config_details: { image: 'unchanged' } } } },
+  oke_configuration: { 'OKE-SANDBOX-KUBERNETES-KEY': {
+    cluster_configuration: {
+      defined_tags: { 'role.keep': 'cluster' },
+      options: { service_lb_config: { defined_tags: { 'tagns-lz-oke.platform': 'sandbox.kubernetes' } } },
+    },
+    workers_configuration: { worker_pools: { 'POOL-SANDBOX-KUBERNETES-KEY': {
+      defined_tags: { 'role.keep': 'pool' },
+      node_defined_tags: { 'role.keep': 'node' },
+    } } },
+  } },
   notifications_configuration: { topics: { 'TOPIC-SANDBOX-KEY': { subscriptions: [{ protocol: 'EMAIL' }] } } },
   cloud_guard_configuration: { targets: { 'CG-TARGET-KEY': {} } },
   ocvs_configuration: { ocvs_clusters: { 'SDDC-SANDBOX-KEY': { networking: { route_tables: { uplink: 'RT-EXISTING-KEY' } } } } },
@@ -69,6 +79,28 @@ tags.apply({
     def test_network_identifier_maps_are_references(self):
         networking = self.doc['ocvs_configuration']['ocvs_clusters']['SDDC-SANDBOX-KEY']['networking']
         self.assertEqual({'uplink': 'RT-EXISTING-KEY'}, networking['route_tables'])
+
+    def test_consolidated_oke_tags_clusters_pools_and_implicit_resources(self):
+        entry = self.doc['oke_configuration']['OKE-SANDBOX-KUBERNETES-KEY']
+        cluster = entry['cluster_configuration']
+        required = {'tagns-lz-cost-governance.tag-lz-' + name for name in
+                    ('cost-center', 'business-unit', 'owner', 'platform', 'environment', 'project')}
+        self.assertTrue(required.issubset(cluster.get('defined_tags', {})))
+        self.assertEqual('oke', self.value(cluster, 'platform'))
+        self.assertEqual('sandbox', self.value(cluster, 'environment'))
+        self.assertEqual('cluster', cluster['defined_tags']['role.keep'])
+        opts = cluster['options']
+        self.assertEqual('oke', self.value(opts['persistent_volume_config'], 'platform'))
+        self.assertEqual('network', self.value(opts['service_lb_config'], 'platform'))
+        self.assertEqual('sandbox.kubernetes', opts['service_lb_config']['defined_tags']['tagns-lz-oke.platform'])
+        pool = entry['workers_configuration']['worker_pools']['POOL-SANDBOX-KUBERNETES-KEY']
+        self.assertTrue(required.issubset(pool.get('defined_tags', {})))
+        self.assertTrue(required.issubset(pool.get('node_defined_tags', {})))
+        self.assertEqual('pool', pool['defined_tags']['role.keep'])
+        self.assertEqual('node', pool['node_defined_tags']['role.keep'])
+        self.assertEqual('sandbox', pool['node_defined_tags']['tagns-lz-cost-governance.tag-lz-environment'])
+        self.assertNotIn('defined_tags', entry)
+        self.assertNotIn('default_defined_tags', self.doc['oke_configuration'])
 
     def test_compartment_classification_and_module_defaults(self):
         cmps = self.doc['compartments_configuration']['compartments']

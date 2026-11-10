@@ -43,6 +43,7 @@ local collections = [
   'keys',
   'clusters',
   'node_pools',
+  'worker_pools',
   'virtual_node_pools',
   'ocvs_clusters',
 ];
@@ -71,6 +72,7 @@ local sections = {
   zpr_configuration: 'security',
   oke_clusters_configuration: 'oke',
   oke_workers_configuration: 'oke',
+  oke_configuration: 'oke',
   ocvs_configuration: 'ocvs',
 };
 local defaults_sections = [
@@ -152,7 +154,7 @@ local token(text, word) =
       if std.type(obj) != 'object' then obj else
         local tagged = walk(obj, path=path, platform=platform);
         tagged { defined_tags: values(path, platform, obj) + tags(obj) } +
-        (if std.member(path, 'clusters') && platform == 'oke' then {
+        (if (std.member(path, 'clusters') || std.member(path, 'cluster_configuration')) && platform == 'oke' then {
            options+: {
              persistent_volume_config+: {
                defined_tags: values(path, 'oke', obj) + tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'persistent_volume_config') then obj.options.persistent_volume_config else {}),
@@ -164,6 +166,9 @@ local token(text, word) =
          } else {}) +
         (if std.member(path, 'node_pools') && std.objectHas(obj, 'node_config_details') then {
            node_config_details+: { defined_tags: values(path, 'oke', obj) + tags(obj.node_config_details) },
+         } else {}) +
+        (if std.member(path, 'worker_pools') && platform == 'oke' then {
+           node_defined_tags: values(path, 'oke', obj) + tags(obj, field='node_defined_tags'),
          } else {}),
           walk(obj, path=[], platform='tobedefined') =
       if std.type(obj) == 'array' then [walk(v, path=path, platform=platform) for v in obj]
@@ -182,7 +187,7 @@ local token(text, word) =
             [name]: resource(value[name], child_path + [name], platform)
             for name in std.objectFields(value)
           }
-          else if key == 'default_security_list' && std.type(value) == 'object' then resource(value, child_path, platform)
+          else if (key == 'default_security_list' || (key == 'cluster_configuration' && platform == 'oke')) && std.type(value) == 'object' then resource(value, child_path, platform)
           else walk(value, path=child_path, platform=platform)
         for key in std.objectFields(obj)
       };

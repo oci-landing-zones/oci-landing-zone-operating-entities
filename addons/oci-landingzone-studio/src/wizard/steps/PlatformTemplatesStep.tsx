@@ -3,7 +3,8 @@
  *   1. Optional shared platforms — repeatable, removable Custom or Exadata entries.
  *   2. Environment platforms — VCN-bearing compartments dropped into one/all/a
  *      subset of the environments. Pick a supported type (OKE, Custom, or
- *      Exadata), name it, choose placement. OKE defaults to the generator-owned
+ *      Exadata), name it, choose placement for Custom or Exadata. OKE creates
+ *      one independent card per selected environment and defaults to the generator-owned
  *      small profile and exposes its cluster settings; Custom starts empty. Each
  *      platform shows a generated per-environment table (its VCN per env) with a
  *      per-env override.
@@ -12,6 +13,7 @@
  * the diagram and JSON derive from it.
  */
 
+import { createOkeEntries } from '../../services/okePlacements';
 import { useState, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import { oracle } from '../../theme';
@@ -20,7 +22,7 @@ import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
 import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, placementsOverlap, platformEnvInstances, platformInEnv, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
@@ -41,34 +43,21 @@ function isExadataType(type: AddPlatformType): type is ExadataType {
 }
 
 const local: Record<string, CSSProperties> = {
-  chip:       { padding: '5px 12px', fontSize: 12.5, fontWeight: 700, border: `1px solid ${oracle.borderStrong}`, borderRadius: 999, background: oracle.surface, color: oracle.text, cursor: 'pointer' },
-  chipActive: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.red },
   pillWrap:   { display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' },
+  chipButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: 0, border: 0, borderRadius: 999, background: 'transparent', cursor: 'pointer', flex: '0 0 auto' },
+  chip:       { display: 'inline-block', padding: '5px 12px', fontSize: 12.5, fontWeight: 700, lineHeight: 'normal', border: `1px solid ${oracle.borderStrong}`, borderRadius: 999, background: oracle.surface, color: oracle.text },
+  chipActive: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.redDark },
   typeBadge:  { display: 'inline-block', padding: '2px 9px', fontSize: 11, fontWeight: 800, color: '#fff', background: oracle.cidrBlue, borderRadius: 999, letterSpacing: 0.2 },
   card:       { border: `1px solid ${oracle.border}`, borderRadius: 8, overflow: 'hidden', marginBottom: 12 },
   cardHead:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', background: oracle.surfaceAlt, cursor: 'pointer', border: 'none', width: '100%', textAlign: 'left', fontFamily: 'inherit' },
   cardName:   { fontSize: 15, fontWeight: 800, color: oracle.ink },
   cardBody:   { padding: '4px 16px 18px' },
   note:       s.intro,
-  okeGrid:    { display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 8, alignItems: 'start' },
-  settingsFields: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px 24px' },
-  group:      { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 16, background: oracle.surface, minWidth: 0 },
-  groupTitle: { fontSize: 12, fontWeight: 800, color: oracle.ink, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 },
-  switchRow:  { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, padding: '14px 0', borderTop: `1px solid ${oracle.border}` },
-  switchCopy: { minWidth: 0, fontSize: 14, lineHeight: 1.35 },
-  featureGrid:{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', columnGap: 24 },
-  subnetGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8, marginTop: 12 },
-  subnetCell: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, padding: '9px 11px', border: `1px solid ${oracle.border}`, borderRadius: 4, background: oracle.surface },
-  subnetName: { fontSize: 11.5, fontWeight: 800, color: oracle.text, textTransform: 'uppercase', letterSpacing: 0.25 },
-  subnetCidr: { fontSize: 12.5, color: oracle.cidrBlue, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', whiteSpace: 'nowrap' },
   genTable:   { width: '100%', borderCollapse: 'collapse', marginTop: 6 },
   genTh:      { textAlign: 'left', fontSize: 11, fontWeight: 700, color: oracle.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, padding: '6px 8px', borderBottom: `1px solid ${oracle.border}` },
   genTd:      { fontSize: 12.5, padding: '7px 8px', borderBottom: `1px solid ${oracle.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: oracle.text },
   linkBtn:    { background: 'none', border: 'none', color: oracle.cidrBlue, fontWeight: 700, fontSize: 12.5, cursor: 'pointer', padding: 0, fontFamily: 'inherit' },
   overrideTag:{ fontSize: 11, fontWeight: 700, color: oracle.red, marginLeft: 6 },
-  prefixWrap: { display: 'flex', alignItems: 'stretch', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, overflow: 'hidden', background: oracle.surface },
-  prefix:     { display: 'flex', alignItems: 'center', padding: '0 10px', background: oracle.surfaceAlt, borderRight: `1px solid ${oracle.border}`, fontSize: 14, fontWeight: 700, color: oracle.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
-  prefixInput:{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontSize: 14, background: 'transparent', color: oracle.text, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
   fieldHint:  { fontSize: 11.5, color: oracle.textMuted, marginTop: 4 },
 };
 
@@ -119,11 +108,12 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
 }
 
 /** All/subset placement chips (mirrors the projects "Apply to" control). */
-function PlacementChips({ id, value, environments, onChange }: {
+function PlacementChips({ id, value, environments, onChange, label = 'Platform placement' }: {
   id: string;
   value: 'all' | string[];
   environments: { id: string; name: string }[];
   onChange: (next: 'all' | string[]) => void;
+  label?: string;
 }) {
   const error = value !== 'all' && (!value.length || value.some((env) => !environments.some((candidate) => candidate.id === env)))
     ? 'Select at least one available environment.' : null;
@@ -131,11 +121,11 @@ function PlacementChips({ id, value, environments, onChange }: {
     onChange(value === 'all' ? [env] : value.includes(env) ? value.filter((x) => x !== env) : [...value, env]);
   }
   return (
-    <div><div style={local.pillWrap} role="group" aria-label="Platform placement" {...fieldErrorProps(`${id}-placement-error`, error)}>
-      <button type="button" style={value === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => onChange('all')}>All</button>
+    <div><div style={local.pillWrap} role="group" aria-label={label} {...fieldErrorProps(`${id}-placement-error`, error)}>
+      <button type="button" aria-pressed={value === 'all'} style={local.chipButton} onClick={() => onChange('all')}><span style={value === 'all' ? { ...local.chip, ...local.chipActive } : local.chip}>All</span></button>
       {environments.map((env) => {
         const active = value !== 'all' && value.includes(env.id);
-        return <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggle(env.id)}>{env.name}</button>;
+        return <button key={env.id} type="button" aria-pressed={active} style={local.chipButton} onClick={() => toggle(env.id)}><span style={active ? { ...local.chip, ...local.chipActive } : local.chip}>{env.name}</span></button>;
       })}
     </div><FieldError id={`${id}-placement-error`} error={error} /></div>
   );
@@ -150,7 +140,6 @@ function PerEnvTable({ platform, environments, onPlatform }: {
   const { model, vcnErrors: conflicts } = useWizard();
   const [editEnv, setEditEnv] = useState<string | null>(null);
   const instances = platformEnvInstances(platform, environments);
-  const profileOwned = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
 
   function setOverride(env: string, patch: { vcnCidr?: string; subnets?: Subnet[] }) {
     const cur = platform.overrides?.[env] ?? {};
@@ -185,20 +174,16 @@ function PerEnvTable({ platform, environments, onPlatform }: {
                 <td style={local.genTd}>
                   {inst.vcnCidr}
                   <FieldError id={`platform-${platform.id}-${inst.id}-conflict`} error={conflicts[`platform:${platform.id}:${inst.id}`]} />
-                  {inst.overridden && !profileOwned && <span style={local.overrideTag}>override</span>}
+                  {inst.overridden && <span style={local.overrideTag}>override</span>}
                 </td>
                 <td style={local.genTd}>{inst.subnets.length === 0 ? 'auto' : `${inst.subnets.length} subnet${inst.subnets.length === 1 ? '' : 's'}`}</td>
                 <td style={{ ...local.genTd, textAlign: 'right' }}>
-                  {profileOwned ? (
-                    <span style={local.fieldHint}>Automatic</span>
-                  ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>
                         {editEnv === inst.id ? 'Close' : 'Edit'}
                       </button>
                       {inst.overridden && <button type="button" style={{ ...local.linkBtn, color: oracle.red, marginLeft: 12 }} onClick={() => resetOverride(inst.id)}>Reset</button>}
                     </>
-                  )}
                 </td>
               </tr>
             ))}
@@ -228,7 +213,7 @@ function PerEnvTable({ platform, environments, onPlatform }: {
 }
 
 /** One platform card: header (name + type + placement + delete) and an expandable body. */
-function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDelete }: {
+export function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDelete }: {
   platform: PlatformConfig;
   environments: { id: string; name: string }[];
   open: boolean;
@@ -242,70 +227,60 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   const keyError = configKeyError(platform.key, peers.map((other) => other.key), 3);
   const baseConflicts = platformEnvInstances(platform, environments).filter((instance) => instance.vcnCidr === platform.vcnCidr).flatMap((instance) => conflicts[`platform:${platform.id}:${instance.id}`] ?? []);
   const isOke = platform.type === 'oke_simple';
-  const oke = platform.okeParams ?? okeDefaultParams();
+  const instance = isOke ? platformEnvInstances(platform, environments)[0] : undefined;
 
   return (
     <div style={local.card}>
-      <button type="button" style={local.cardHead} onClick={onToggle} aria-expanded={open}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 13, color: oracle.ink }}>{open ? '▾' : '▸'}</span>
-          <span style={local.cardName}>{platform.key}</span>
-          <span style={local.typeBadge}>{meta.label}</span>
-        </span>
-        <span style={{ fontSize: 12.5, color: oracle.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
-          {platform.environments === 'all' ? 'all envs' : `${platform.environments.length} env${platform.environments.length === 1 ? '' : 's'}`} · {platform.vcnCidr}
-        </span>
-      </button>
+      <div className="environment-network-header" style={{ background: oracle.surfaceAlt }}>
+        <button type="button" className="environment-network-disclosure" onClick={onToggle} aria-expanded={open}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, transform: open ? 'rotate(90deg)' : undefined }}>
+            <path d="m6 4 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="environment-network-heading">
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={s.envHeadTitle}>{platform.key}</span>
+              <span style={local.typeBadge}>{meta.label}</span>
+            </span>
+            <span className="environment-network-summary">
+              {isOke ? environments.find((env) => platformInEnv(platform, env.id))?.name ?? 'Environment unavailable' : platform.environments === 'all' ? 'all envs' : `${platform.environments.length} env${platform.environments.length === 1 ? '' : 's'}`} · {platform.vcnCidr}
+            </span>
+          </span>
+        </button>
+        <DeleteButton label={`Delete platform ${platform.key}`} style={{ width: 44, height: 44, flexShrink: 0 }} onClick={onDelete} />
+      </div>
 
       {open && (
-        <div style={local.cardBody}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+        <div style={local.cardBody} className="environment-network-body">
+          <div className={isOke ? 'network-vcn-settings' : undefined} style={{ marginTop: 16, marginBottom: 16 }}>
             <div>
-              <label style={s.label}>Placement</label>
-              <PlacementChips id={platform.id} value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />
+              <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
+              <ValidatedInput id={`${platform.id}-key`} error={keyError} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
+              <div style={{ ...s.help, marginTop: 4 }}>Up to 3 characters.</div>
             </div>
-            <DeleteButton label={`Delete platform ${platform.key}`} onClick={onDelete} />
-          </div>
-
-          <div style={{ marginBottom: 16 }}>
-            <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
-            <ValidatedInput id={`${platform.id}-key`} error={keyError} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
-            <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
+            <div style={{ alignSelf: 'start', marginTop: isOke ? 0 : 16 }}>
+              <div style={s.label}>{isOke ? 'Environment' : 'Placement'}</div>
+              {isOke ? <div role="group" aria-label="OKE environment" style={{ fontSize: 14, color: oracle.text }}>{instance?.name ?? 'Environment unavailable'}</div> : <PlacementChips id={platform.id} value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />}
+            </div>
           </div>
 
           {isOke && <OkeSettingsFields platform={platform} onPlatform={onPlatform} />}
 
-          <div style={{ marginTop: 6 }}>
-            <label style={s.label}>Platform VCN &amp; subnets</label>
-            {isOke && oke.clusterSize ? (
-              <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>{oke.clusterSize} network profile · {platform.vcnCidr}</div>
-                <div style={local.fieldHint}>This profile reserves the following subnets. Select Manual subnets only when you need a different address plan.</div>
-                <div style={local.subnetGrid} role="list" aria-label="Network profile subnet allocation">
-                  {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => (
-                    <div key={sn.name} style={local.subnetCell} role="listitem">
-                      <span style={local.subnetName}>{sn.name.replace('-', ' ')}</span>
-                      <code style={local.subnetCidr}>{sn.cidr}</code>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <VcnEditor
-                idPrefix={`plat-${platform.id}`}
-                conflicts={baseConflicts}
-                vcnCidr={platform.vcnCidr}
-                subnets={platform.subnets}
-                emptyNote={isOke ? 'Define the required OKE subnet roles for the selected CNI shape.' : 'No subnets yet — add one below with +.'}
-                onApply={(patch) => onPlatform(patch)}
-              />
-            )}
-          </div>
+          {!isOke && <div style={{ marginTop: 6 }}>
+            <h3 style={s.subHead}>VCN and subnets</h3>
+            <VcnEditor
+              idPrefix={`plat-${platform.id}`}
+              conflicts={baseConflicts}
+              vcnCidr={platform.vcnCidr}
+              subnets={platform.subnets}
+              emptyNote="No subnets yet — add one below with +."
+              onApply={(patch) => onPlatform(patch)}
+            />
+          </div>}
 
-          <div style={{ marginTop: 18 }}>
-            <label style={s.label}>Per-environment settings</label>
+          {!isOke && <div style={{ marginTop: 18 }}>
+            <div style={s.label}>Per-environment settings</div>
             <PerEnvTable platform={platform} environments={environments} onPlatform={onPlatform} />
-          </div>
+          </div>}
         </div>
       )}
     </div>
@@ -322,6 +297,7 @@ export default function PlatformTemplatesStep() {
   const [newSharedType, setNewSharedType] = useState<Exclude<AddPlatformType, 'oke_simple'>>('custom');
   const [newType, setNewType] = useState<AddPlatformType>('oke_simple');
   const [newName, setNewName] = useState('');
+  const [newPlacements, setNewPlacements] = useState<PlatformConfig['environments']>('all');
   const [openExadata, setOpenExadata] = useState<string | null>(null);
   const sharedExadata = EXADATA_TYPES.filter((type) => model.exadata[type].enabled
     && (type === 'exacc' ? model.exadata.exacc.shared : model.exadata.exacs.infrastructure === 'shared'));
@@ -329,7 +305,9 @@ export default function PlatformTemplatesStep() {
     && (!sharedExadata.includes(type) || model.exadata[type].database === 'per_environment'
       || (type === 'exacc' && model.exadata.exacc.database === undefined && model.exadata.exacc.environments.length > 0)));
   const sharedTypeAdded = isExadataType(newSharedType) && model.exadata[newSharedType].enabled;
-  const environmentTypeAdded = isExadataType(newType) && model.exadata[newType].enabled;
+  const okePlacements = newPlacements === 'all' ? 'all' : newPlacements.filter((id) => environments.some((env) => env.id === id));
+  const environmentTypeAdded = (isExadataType(newType) && model.exadata[newType].enabled)
+    || (newType === 'oke_simple' && (environments.length === 0 || (okePlacements !== 'all' && !okePlacements.length)));
 
   function addExadata(type: ExadataType, shared: boolean) {
     setField('exadata', addExadataPlatform(model, type, shared));
@@ -387,11 +365,19 @@ export default function PlatformTemplatesStep() {
   }
   function delPlatform(id: string) { setPlatforms(model.platforms.filter((p) => p.id !== id)); }
   function addPlatform() {
+    if (environmentTypeAdded) return;
     if (isExadataType(newType)) {
       addExadata(newType, false);
       return;
     }
-    const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model));
+    if (newType === 'oke_simple') {
+      const entries = createOkeEntries(model, configuredVcnCidrs(model), newName, okePlacements);
+      setPlatforms([...model.platforms, ...entries]);
+      setOpenId(entries[0]?.id ?? null);
+      setNewName('');
+      return;
+    }
+    const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model), model.network);
     const platform = { ...created, key: newName.trim() || created.key };
     setPlatforms([...model.platforms, platform]);
     setOpenId(platform.id);
@@ -458,7 +444,7 @@ export default function PlatformTemplatesStep() {
           <div className="studio-info-heading"><h2 style={s.title}>Environment platforms</h2>
             <InfoButton title="Environment platforms"><p>Place a workload platform in all environments or select individual environments. Each selected environment gets its own platform resources.</p><p>The placement table shows the resulting networks. Use an environment override when that instance needs a different address range; Reset restores its derived settings.</p></InfoButton>
           </div>
-          <p style={local.note}>Add a workload platform to one or more environments. Each selected environment receives its own platform resources.</p>
+          <p style={local.note}>Add an independent OKE cluster to each selected environment. Custom platforms can span multiple environments.</p>
 
           {model.platforms.length === 0 && environmentExadata.length === 0 && (
             <p style={{ ...s.help, marginBottom: 16 }}>No environment platforms configured.</p>
@@ -479,7 +465,7 @@ export default function PlatformTemplatesStep() {
 
           <div style={s.subCard}>
             <div style={s.subHead}>Add platform</div>
-            <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: isExadataType(newType) ? '1fr auto' : '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
+            <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: isExadataType(newType) ? '1fr auto' : newType === 'oke_simple' ? '1fr 1fr' : '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
                 <label style={s.addLabel} htmlFor="new-platform-type">Type</label>
                 <select id="new-platform-type" value={newType} onChange={(e) => setNewType(e.target.value as AddPlatformType)}>
@@ -503,8 +489,16 @@ export default function PlatformTemplatesStep() {
                   onKeyDown={(e) => { if (e.key === 'Enter') addPlatform(); }}
                 />
               </div>}
-              <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>Add platform</button>
+              {newType !== 'oke_simple' && <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>Add platform</button>}
             </div>
+            {newType === 'oke_simple' && <>
+              <fieldset style={{ border: 0, padding: 0, margin: '16px 0', minWidth: 0 }}>
+                <legend style={s.addLabel}>Environments</legend>
+                <PlacementChips id="new-oke" label="OKE environments" value={okePlacements} environments={environments} onChange={setNewPlacements} />
+                {environments.length === 0 && <p style={{ ...s.help, marginTop: 8 }}>Add an environment in Foundation before adding OKE.</p>}
+              </fieldset>
+              <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>Add OKE clusters</button>
+            </>}
           </div>
         </div>
       </section>

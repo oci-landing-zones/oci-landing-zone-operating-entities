@@ -65,7 +65,7 @@ function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
         if std.length(std.objectFields(frontend_nsg)) == 0 then {}
         else {
           [n.key('VCN', ['HUB'])]: {
-            // Orchestrator v2.1.1 pins networking v0.8.2, whose
+            // Orchestrator v2.4.1 pins networking v0.9.1, whose
             // inject_into_existing_vcns contract resolves this key through
             // network_dependency and creates the supplied NSGs and rules.
             vcn_id: n.key('VCN', ['HUB']),
@@ -138,6 +138,5 @@ function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
   oke_observability_cis1_pre: rendered_lz.observability_cis1_pre,
   oke_observability_cis2: scoped_observability(rendered_lz.observability_cis2),
   oke_observability_cis2_pre: rendered_lz.observability_cis2_pre,
-  oke_clusters: rendered_lz.extra.oke_clusters,
-  oke_workers: rendered_lz.extra.oke_workers,
+  oke: rendered_lz.extra.oke,
 }, profile.cis1_config)

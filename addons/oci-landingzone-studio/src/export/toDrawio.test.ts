@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { toDrawioXml } from './toDrawio';
+import { toDrawioPagesXml, toDrawioXml } from './toDrawio';
 import { buildGraph } from '../diagram/buildGraph';
+import { hubKindDefaults } from '../services/hubKinds';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { DiagramModel, LzModel } from '../model/types';
@@ -8,9 +9,69 @@ import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } f
 import { absoluteNodeRects } from '../diagram/flowGeometry';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups';
-import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('exports Hub C NLB icons and the translucent firewall backend bridge', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_c', ...hubKindDefaults('hub_c') };
+    const xml = toDrawioXml(buildGraph(model, 3));
+    expect(xml).toContain('Untrust NLB');
+    expect(xml).toContain('Trust NLB');
+    expect(xml).not.toContain('NLB + firewall backends');
+    expect(xml).toContain('id="hub-vcn-firewall-backends"');
+    expect(decodeURIComponent(xml)).toContain('<g opacity="0.45">');
+    expect(decodeURIComponent(xml)).toContain('Firewall 1</text>');
+    expect(decodeURIComponent(xml)).toContain('Firewall 2</text>');
+    expect(decodeURIComponent(xml)).not.toContain('>vNIC1</text>');
+    expect(decodeURIComponent(xml)).not.toContain('>vNIC2</text>');
+  });
+
+  it('exports a full-width superseded note and the implicit route styling', () => {
+    const xml = toDrawioXml({ nodes: [{ id: 'rt', kind: 'routetable', label: 'VCN routes',
+      x: 0, y: 0, width: 310, height: 73,
+      rtRows: [{ destination: '10.0.0.0/16', targetType: 'Local', target: 'Local VCN', routeType: 'Implicit', superseded: true }],
+    }], edges: [] });
+    expect(xml).toContain('(fully superseded)');
+    expect(xml.match(/id="rt"[^>]+/)?.[0]).toContain('shadow=1;');
+    expect(xml).toContain('colspan=&quot;4&quot;');
+    expect(xml).toContain('font-style:italic');
+    expect(xml).not.toContain('(partially covered)');
+    expect(valueAttributes(xml).every((value) => !value.includes('<'))).toBe(true);
+  });
+
+  it('includes external root nodes in the export origin without clipping their negative model coordinates', () => {
+    const diagram: DiagramModel = { nodes: [
+      { id: 'region', kind: 'region', label: 'OCI Region', x: 0, y: 0, width: 1000, height: 1000 },
+      { id: 'vpn', kind: 'attachment', label: 'VPN office', x: -300, y: 300, width: 200, height: 60 },
+    ], edges: [] };
+    const xml = toDrawioXml(diagram);
+    const vpn = xml.match(/<mxCell id="vpn"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(vpn).toContain('parent="1"');
+    expect(vpn).toContain('x="20" y="350" width="200" height="60"');
+    const region = xml.match(/<mxCell id="region"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(region).toContain('x="320" y="50"');
+    expect(diagram.nodes[1].x).toBe(-300);
+  });
+
+  it('keeps each region on its own page with the same graph geometry as its single-page export', () => {
+    const home = buildGraph(emptyLzModel(), 5, { showEndpoints: true });
+    const drModel = emptyLzModel();
+    drModel.foundation = { ...drModel.foundation, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams' };
+    const dr = buildGraph(drModel, 5, { showEndpoints: true });
+    const xml = toDrawioPagesXml([{ name: 'DR', diagram: dr }, { name: 'Home Region & source', diagram: home }]);
+    const pages = [...xml.matchAll(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/g)].map((match) => match[0]);
+    expect(xml.match(/<mxfile\b/g)).toHaveLength(1);
+    expect(pages).toHaveLength(2);
+    expect(pages[0]).toBe(toDrawioXml(dr, 'DR').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0]);
+    expect(pages[1]).toBe(toDrawioXml(home, 'Home Region & source').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0].replace('id="lz"', 'id="lz-2"'));
+    expect(pages[1]).toContain('name="Home Region &amp; source"');
+    expect(pages[0]).toContain('eu-amsterdam-1');
+    expect(pages[0]).not.toContain('eu-frankfurt-1');
+    expect(pages[1]).toContain('eu-frankfurt-1');
+    expect(pages[1]).not.toContain('eu-amsterdam-1');
+  });
+
   it('embeds the exact resource block shown on the website at the model position and extent', () => {
     const resourceItems = [{ key: 'added-by-generator', name: 'new-generated-resource<&>' }];
     const width = 180;
@@ -105,6 +166,11 @@ describe('toDrawioXml', () => {
     // one OSN glyph per VCN (1 hub + 2 env)
     const osnCells = xml.match(/id="[^"]*-osn"/g) ?? [];
     expect(osnCells).toHaveLength(3);
+    const graph = buildGraph(emptyLzModel(), 3);
+    for (const vcn of graph.nodes.filter((node) => node.kind === 'vcn')) {
+      const cell = xml.match(new RegExp(`id="${vcn.id}-osn"[\\s\\S]*?</mxCell>`))?.[0] ?? '';
+      expect(cell).toContain(`x="${vcn.width - OSN_ICON_SIZE / 2}" y="${vcn.height - OSN_ICON_SIZE / 2}" width="${OSN_ICON_SIZE}" height="${OSN_ICON_SIZE}"`);
+    }
     // every attachment pill clusters with the DRG inside cmp-network
     expect(xml).toMatch(/id="attach-hub"[^>]*parent="cmp-network"/);
     expect(xml).toMatch(/id="attach-cmp-env-0"[^>]*parent="cmp-network"/);
@@ -117,12 +183,11 @@ describe('toDrawioXml', () => {
     // VCN → attach → DRG connections have endpoint dots and square corners.
     expect(xml).toContain('source="hub-vcn" target="attach-hub"');
     expect(xml).toContain('source="attach-hub" target="drg"');
-    expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.25;');
-    expect(xml.match(/id="e-attach-cmp-env-0-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.5;');
-    expect(xml.match(/id="e-attach-cmp-env-1-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.75;');
-    for (const edge of buildGraph(emptyLzModel(), 3).edges) {
+    for (const edge of graph.edges) {
       const cell = xml.match(new RegExp(`id="${edge.id}"[^>]+`))?.[0] ?? '';
-      expect(cell).toContain('endArrow=oval;startArrow=oval;');
+      const source = graph.nodes.find((node) => node.id === edge.source)!;
+      const target = graph.nodes.find((node) => node.id === edge.target)!;
+      expect(cell).toContain(`endArrow=${target.kind === 'attachment' ? 'none' : 'oval'};startArrow=${source.kind === 'attachment' ? 'none' : 'oval'};`);
       expect(cell).toContain('startFill=1;endFill=1;');
     }
     expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('rounded=0;');
@@ -254,7 +319,10 @@ describe('toDrawioXml', () => {
     const xml = toDrawioXml(graph);
     const cell = xml.match(/id="RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0] ?? '';
     expect(cell).not.toContain('background:#fff3c4');
-    expect(cell.match(/&lt;tr/g)).toHaveLength(table.rtRows!.length + 1);
+    expect(cell.match(/&lt;tr/g)).toHaveLength(table.rtRows!.length + table.rtRows!.filter((row) => row.superseded).length + 1);
+    expect(cell).toContain('Implicit');
+    expect(cell).toContain('font-style:italic');
+    expect(cell).not.toContain('(partially covered)');
     expect(xml.match(/id="e-RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0]).toContain('endArrow=none;');
   });
 

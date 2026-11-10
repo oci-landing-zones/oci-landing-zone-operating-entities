@@ -2,15 +2,17 @@ import type { DiagramModel, DiagramNode } from '../model/types';
 import { oracle } from '../theme';
 import { SHIELD_SVG } from '../diagram/shieldSvg';
 import { ROUTE_TABLE_SVG } from '../diagram/routeTableSvg';
-import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from '../diagram/icons';
-import { absoluteNodeRects } from '../diagram/flowGeometry';
+import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, NLB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from '../diagram/icons';
+import { absoluteNodeRects, diagramBounds } from '../diagram/flowGeometry';
 import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } from '../diagram/displayGeometry';
 import { flowGroup, labelAnchor, marksAlong, type Point } from '../diagram/flowOverlayGeometry';
 import { createFlowPlayback, flowHopMarkers } from '../diagram/flowPlayback';
 import { resourceGroupSvg } from '../diagram/resourceGroups';
 import { compartmentStyle } from '../diagram/compartmentStyle';
-import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
+import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from '../diagram/firewallBackends';
+import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from '../diagram/routeTableLayout';
+import { hybridTopologySvg } from '../diagram/hybridTopology';
 
 const svgUri = (svg: string) => `data:image/svg+xml,${encodeURIComponent(svg)}`;
 const SHIELD_URI = svgUri(SHIELD_SVG);
@@ -24,6 +26,7 @@ const ICON_URIS: Record<string, string> = {
   sgw: svgUri(SGW_SVG),
   firewall: svgUri(FIREWALL_SVG),
   lb: svgUri(LB_SVG),
+  nlb: svgUri(NLB_SVG),
 };
 const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
 
@@ -42,7 +45,7 @@ function osnCell(node: DiagramNode): string {
   const style = `shape=image;imageAspect=0;aspect=fixed;noLabel=1;image=${OSN_URI};`;
   return (
     `        <mxCell id="${node.id}-osn" value="" style="${style}" vertex="1" parent="${node.id}">\n` +
-    `          <mxGeometry x="${node.width - 13}" y="${node.height - 13}" width="26" height="26" as="geometry" />\n` +
+    `          <mxGeometry x="${node.width - OSN_ICON_SIZE / 2}" y="${node.height - OSN_ICON_SIZE / 2}" width="${OSN_ICON_SIZE}" height="${OSN_ICON_SIZE}" as="geometry" />\n` +
     `        </mxCell>`
   );
 }
@@ -181,15 +184,21 @@ function nodeStyle(node: DiagramNode): string {
       return `shape=image;imageAspect=0;aspect=fixed;image=${DRG_URI};` +
         `verticalLabelPosition=bottom;verticalAlign=top;spacingTop=${DRG_CAPTION.gap};fontSize=${DRG_CAPTION.fontSize};fontFamily=${DRG_CAPTION.fontFamily};fontStyle=1;fontColor=${oracle.ink};html=1;`;
     case 'attachment':
-      return `rounded=1;whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
+      return `rounded=1;${node.attachmentVertical ? 'horizontal=0;' : ''}whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
     case 'project':
       return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=${node.container ? 'top' : 'middle'};fillColor=#ECEAE8;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=12;`;
     case 'routetable':
-      return `rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
+      return `rounded=0;shadow=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
     case 'rtdot':
       return `ellipse;html=1;fillColor=${node.rtDotConfigured === false ? '#b0aca8' : RT_TONE_COLORS[node.rtDotTone ?? 'hub']};strokeColor=#ffffff;strokeWidth=1.5;`;
     case 'resourcegroup':
       return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(resourceGroupSvg(node.resourceKind!, node.resourceItems ?? [], node.width))};`;
+    case 'vpn':
+    case 'premises':
+    case 'vpntunnel':
+    case 'fastconnect':
+    case 'customerrouter':
+      return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(hybridTopologySvg(node))};`;
   }
 }
 
@@ -198,19 +207,20 @@ const RT_TONE_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spo
 /** HTML label for a route-table cell: coloured header + ONTV columns. */
 function routeTableValue(node: DiagramNode): string {
   const color = RT_TONE_COLORS[node.rtTone ?? 'hub'], m = ROUTE_TABLE_METRICS;
-  const layout = routeTableLayout({ label: node.label, columns: node.rtColumns, rowCount: node.rtRows?.length ?? 0, note: node.rtNote, width: node.width });
+  const layout = routeTableLayout({ label: node.label, columns: node.rtColumns, rowCount: node.rtRows?.length ?? 0, rows: node.rtRows, note: node.rtNote, width: node.width });
   const cellsOf = (r: NonNullable<DiagramNode['rtRows']>[number]) =>
     node.rtColumns === 'drg' ? [r.destination, r.targetType, r.target] : [r.destination, r.targetType, r.target, r.routeType];
   const columns = layout.columnWidths.map((width, i) => `<col style="width:${width + (i < layout.columnWidths.length - 1 ? m.gap : 0)}px;">`).join('');
   const lines = (values: string[]) => values.map(escapeHtml).join('<br>');
   const cellPadding = (i: number) => i < layout.columnWidths.length - 1 ? m.gap : 0;
   const th = layout.headerLines.map((values, i) => `<td style="height:${layout.columnHeight}px;box-sizing:border-box;vertical-align:top;color:${oracle.textMuted};padding:${m.columnPadding}px ${cellPadding(i)}px ${m.columnPadding}px 0;font-size:${m.columnSize}px;line-height:${m.columnLine}px;font-weight:700;letter-spacing:${m.letterSpacing}px;border-bottom:${m.border}px solid #eceae8;white-space:nowrap;">${lines(values)}</td>`).join('');
-  const rows = (node.rtRows ?? []).map((r) =>
-    `<tr style="height:${layout.rowHeight}px;">${cellsOf(r).map((c, j) => {
-      const cellColor = j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660';
+  const rows = (node.rtRows ?? []).map((r, i) => {
+    const style = r.routeType === 'Implicit' ? 'background:#f5f4f2;font-style:italic;' : '';
+    return `<tr style="height:${layout.rowHeight}px;${style}">${cellsOf(r).map((c, j) => {
+      const cellColor = r.superseded ? oracle.textMuted : j === 0 ? '#3f4750' : j === layout.headerLines.length - 1 ? oracle.textMuted : j === 2 ? color : '#6b6660';
       return `<td title="${escapeHtml(c)}" style="height:${layout.rowHeight}px;box-sizing:border-box;padding:${m.rowPadding}px ${cellPadding(j)}px ${m.rowPadding}px 0;font-size:${m.rowSize}px;line-height:${m.rowLine}px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${cellColor};font-weight:${j === 2 ? 700 : 500};${j === 0 ? 'font-family:monospace;' : ''}">${escapeHtml(c)}</td>`;
-    }).join('')}</tr>`,
-  ).join('');
+    }).join('')}</tr>` + (layout.rowNotes[i] ? `<tr style="height:${m.rowLine}px;${style}"><td colspan="${layout.columnWidths.length}" style="height:${m.rowLine}px;padding:0;color:${oracle.textMuted};font-size:${m.rowSize}px;line-height:${m.rowLine}px;">${escapeHtml(layout.rowNotes[i])}</td></tr>` : '');
+  }).join('');
   const note = layout.noteHeight ? `<div style="height:${layout.noteHeight}px;box-sizing:border-box;font-size:${m.noteSize}px;line-height:${m.noteLine}px;color:#B23A48;font-weight:700;padding:${m.notePadding}px ${m.paddingX}px;background:#fdecea;white-space:nowrap;">${lines(layout.noteLines)}</div>` : '';
   return `<div style="font-family:${m.fontFamily};box-sizing:border-box;padding:${m.border}px;">` +
     `<div title="${escapeHtml(node.label)}" style="height:${layout.titleHeight}px;box-sizing:border-box;background:${color};color:#fff;font-size:${m.titleSize}px;line-height:${m.titleLine}px;font-weight:800;padding:${m.titlePadding}px ${m.paddingX}px;white-space:nowrap;">${lines(layout.titleLines)}</div>${note}` +
@@ -266,11 +276,22 @@ function edgeGeometry(points: Point[], offsetX: number, offsetY: number): string
     `            <mxPoint x="${last.x}" y="${last.y}" as="targetPoint" />${pointArray}\n          </mxGeometry>`;
 }
 
+export interface DrawioPage { name: string; diagram: DiagramModel }
+
 export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone'): string {
-  // Centre the root container on the page (children move with it).
-  const root = diagram.nodes.find((n) => !n.parentId);
-  const offsetX = Math.max(20, Math.round((PAGE_W - (root?.width ?? 0)) / 2));
-  const offsetY = Math.max(20, Math.round((PAGE_H - (root?.height ?? 0)) / 2));
+  return toDrawioPagesXml([{ name: diagramName, diagram }]);
+}
+
+export function toDrawioPagesXml(pages: readonly DrawioPage[]): string {
+  return `<mxfile host="oci-landingzone-studio" type="device">\n`
+    + pages.map((page, index) => drawioPageXml(page.diagram, page.name, index ? `lz-${index + 1}` : 'lz')).join('')
+    + `</mxfile>\n`;
+}
+
+function drawioPageXml(diagram: DiagramModel, diagramName: string, pageId: string): string {
+  const bounds = diagramBounds(diagram.nodes);
+  const offsetX = Math.max(20, Math.round((PAGE_W - bounds.width) / 2)) - bounds.x;
+  const offsetY = Math.max(20, Math.round((PAGE_H - bounds.height) / 2)) - bounds.y;
   const nodeCells = diagram.nodes.map((n) =>
     n.parentId ? nodeCell(n) : nodeCell(n, offsetX, offsetY),
   );
@@ -283,6 +304,8 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
   const osnCells = diagram.nodes
     .filter((n) => n.kind === 'vcn')
     .map(osnCell);
+  const backendCells = diagram.nodes.filter((node) => node.kind === 'vcn' && node.firewallBackendBridgeY != null)
+    .map((node) => vertexCell(`${node.id}-firewall-backends`, '', `shape=image;imageAspect=0;noLabel=1;image=${svgUri(firewallBackendBridgeSvg(node.width, node.firewallBackendUpperArm, node.firewallBackendLowerArm))};`, 0, node.firewallBackendBridgeY! - (node.firewallBackendUpperArm ?? 0), node.width, FIREWALL_BACKEND_GAP + (node.firewallBackendUpperArm ?? 0) + (node.firewallBackendLowerArm ?? 0), node.id));
   const iconCells = diagram.nodes
     .filter((n) => n.kind === 'subnet' && n.icon)
     .flatMap(subnetIconCells);
@@ -291,7 +314,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     .flatMap(subnetEndpointCells);
   const gatewayChildCells = diagram.nodes.filter((node) => node.kind === 'gateway').flatMap(gatewayCells);
   const publicBadgeCells = diagram.nodes.filter((node) => node.kind === 'subnet' && node.publicSubnet).map((node) =>
-    vertexCell(`${node.id}-public`, 'PUBLIC', `rounded=1;arcSize=50;html=1;fillColor=${oracle.cidrBlue};strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=8.5;`, node.width - 48, 4, 44, 15, node.id));
+    vertexCell(`${node.id}-public`, 'Public', `rounded=1;arcSize=50;html=1;fillColor=${CAPTION_COLORS.green};strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=8.5;`, node.width - 48, 4, 44, 15, node.id));
   const rects = absoluteNodeRects(diagram.nodes);
   const associations = associationDisplaySegments(diagram.nodes, diagram.edges);
   const allFlows = diagram.display?.allFlows ?? false;
@@ -340,12 +363,12 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
       ];
     }
     const association = rects.get(edge.source)?.node.kind === 'rtdot' && rects.get(edge.target)?.node.kind === 'routetable';
-    const attachment = rects.get(edge.source)?.node.kind === 'attachment' || rects.get(edge.target)?.node.kind === 'attachment';
+    const attachment = ['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(rects.get(edge.source)?.node.kind ?? '') || rects.get(edge.target)?.node.kind === 'attachment';
     const points = structuralEdgePoints(edge, rects);
     const terminals = attachment
-      ? 'endArrow=oval;startArrow=oval;startFill=1;endFill=1;startSize=5;endSize=5;'
+      ? `endArrow=${rects.get(edge.target)?.node.kind === 'attachment' ? 'none' : 'oval'};startArrow=${rects.get(edge.source)?.node.kind === 'attachment' ? 'none' : 'oval'};startFill=1;endFill=1;startSize=5;endSize=5;`
       : `endArrow=${association ? 'none' : 'block'};startArrow=none;`;
-    let base = `edgeStyle=none;orthogonal=1;rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.8 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
+    let base = `edgeStyle=none;orthogonal=${association ? 0 : 1};rounded=0;html=1;${terminals}strokeColor=#6b6660;strokeWidth=${association ? 1.2 : 1.4};${association ? 'dashed=1;dashPattern=5 4;' : ''}`;
     if (association) {
       (associations.get(edge.id) ?? [points]).forEach((segment, index) => {
         const id = index ? `${edge.id}-segment-${index}` : edge.id;
@@ -376,17 +399,15 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
   });
 
   return (
-    `<mxfile host="oci-landingzone-studio" type="device">\n` +
-    `  <diagram id="lz" name="${escapeXml(diagramName)}">\n` +
+    `  <diagram id="${pageId}" name="${escapeXml(diagramName)}">\n` +
     `    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" ` +
     `arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">\n` +
     `      <root>\n` +
     `        <mxCell id="0" />\n` +
     `        <mxCell id="1" parent="0" />\n` +
-    [...nodeCells, ...shieldCells, ...routeTableCells, ...osnCells, ...iconCells, ...endpointCells, ...gatewayChildCells, ...publicBadgeCells, ...structuralCells, ...flowCases, ...edgeCells, ...flowAnnotations].join('\n') + '\n' +
+    [...nodeCells, ...shieldCells, ...routeTableCells, ...osnCells, ...backendCells, ...iconCells, ...endpointCells, ...gatewayChildCells, ...publicBadgeCells, ...structuralCells, ...flowCases, ...edgeCells, ...flowAnnotations].join('\n') + '\n' +
     `      </root>\n` +
     `    </mxGraphModel>\n` +
-    `  </diagram>\n` +
-    `</mxfile>\n`
+    `  </diagram>\n`
   );
 }
