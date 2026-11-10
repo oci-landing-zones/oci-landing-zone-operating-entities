@@ -125,7 +125,7 @@ Budgets provide spending alerts, not spending caps: they do not stop resources.
 Budget alerts are evaluated periodically, not in real time.
 See [OCI Budgets](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/budgetsoverview.htm).
 
-## 3. License
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 
