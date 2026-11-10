@@ -2,7 +2,7 @@
 
 An OCI Open LZ add-on for private resource access.
 
-Use **OCI Bastion dynamic port forwarding (SOCKS5) sessions** to reach private database web interfaces and virtual machines from an operator workstation.
+Enable native **OCI Bastion service** and use **dynamic SOCKS5 sessions for private** web interface and VM access. Including macOS and Windows guides.
 
 ## Table of contents
 
