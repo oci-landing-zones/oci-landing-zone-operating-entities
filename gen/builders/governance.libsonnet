@@ -6,8 +6,10 @@
 //
 // function(config, n) → governance output object
 
+local cost_governance = import '../lib/cost_governance.libsonnet';
+
 function(config, n)
-{
+local governance = {
   tags_configuration: {
     default_compartment_id: 'TENANCY-ROOT',
 
@@ -82,4 +84,5 @@ function(config, n)
       },
     },
   },
-}
+};
+if std.objectHas(config, 'cost_governance') then cost_governance.apply(governance, config.cost_governance, projects=cost_governance.project_names(config)) else governance

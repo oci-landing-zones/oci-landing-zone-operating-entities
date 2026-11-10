@@ -371,7 +371,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.secondary).toContain('security_cis2.json');
     expect(out.secondary).toContain('observability_cis2.json');
     expect(out.secondary).not.toContain('network.json');
-    expect(Object.keys(out.files).length).toBe(7);
+    expect(Object.keys(out.files).length).toBe(6);
     expect(out.config).toContain("kind: 'hub_a'");
 
     const net = JSON.parse(out.files['network.json']).network_configuration;

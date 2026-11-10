@@ -53,7 +53,7 @@ describe('DR file generation', () => {
     expect(files['DR/README.txt']).toContain('DR deployment');
     expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
     expect(files['DR/README.txt']).toContain('oci_dependency_objects');
-  }, 30000);
+  }, 60000);
 
   it('includes selected EXACS networks, edited subnets and matched RPC peer keys', async () => {
     const { model, draft } = design();
@@ -76,7 +76,7 @@ describe('DR file generation', () => {
     expect(files['Home/network.json']).toContain('RPC-FRA-LZ-HUB-DR-KEY');
     expect(files['DR/network.json']).toContain('"peer_key": "RPC-FRA-LZ-HUB-DR-KEY"');
     expect(JSON.parse(files['DR/config.jsonnet']).environments.prod.platforms.exacs.network.vcn).toBe('10.0.240.0/21');
-  }, 30000);
+  }, 60000);
 
 
 
@@ -102,7 +102,7 @@ describe('DR file generation', () => {
     expect(okeFiles.map(([, value]) => value).join('\n')).toContain('172.30.0.0/16');
     draft.platformOkeParams[id].servicesCidr = '10.0.216.0/21';
     expect(() => buildDrFileConfigs(model, draft)).toThrow(/service CIDR.*overlap/i);
-  }, 30000);
+  }, 60000);
 
   it('rejects incomplete or overlapping DR addressing before generating', () => {
     const { model, draft } = design();

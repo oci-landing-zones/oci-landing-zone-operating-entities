@@ -106,6 +106,9 @@ local token(text, word) =
 {
   apply(doc, config)::
     local namespace = 'tagns-lz-cost-governance.tag-lz-';
+    local owner = if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'owner_email') then config.cost_governance.owner_email else null;
+    local owner_tags = if owner != null then { [namespace + 'owner']: owner } else {};
+    local assigned_tags(obj, field='defined_tags') = tags(obj, field=field) + owner_tags;
     local workload_platforms = ['oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'];
     local envs = std.objectFields(config.environments);
     local projects = std.set(std.flattenArrays([
@@ -153,22 +156,22 @@ local token(text, word) =
     local resource(obj, path, platform) =
       if std.type(obj) != 'object' then obj else
         local tagged = walk(obj, path=path, platform=platform);
-        tagged { defined_tags: values(path, platform, obj) + tags(obj) } +
+        tagged { defined_tags: values(path, platform, obj) + assigned_tags(obj) } +
         (if (std.member(path, 'clusters') || std.member(path, 'cluster_configuration')) && platform == 'oke' then {
            options+: {
              persistent_volume_config+: {
-               defined_tags: values(path, 'oke', obj) + tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'persistent_volume_config') then obj.options.persistent_volume_config else {}),
+               defined_tags: values(path, 'oke', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'persistent_volume_config') then obj.options.persistent_volume_config else {}),
              },
              service_lb_config+: {
-               defined_tags: values(path, 'network', obj) + tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'service_lb_config') then obj.options.service_lb_config else {}),
+               defined_tags: values(path, 'network', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'service_lb_config') then obj.options.service_lb_config else {}),
              },
            },
          } else {}) +
         (if std.member(path, 'node_pools') && std.objectHas(obj, 'node_config_details') then {
-           node_config_details+: { defined_tags: values(path, 'oke', obj) + tags(obj.node_config_details) },
+           node_config_details+: { defined_tags: values(path, 'oke', obj) + assigned_tags(obj.node_config_details) },
          } else {}) +
         (if std.member(path, 'worker_pools') && platform == 'oke' then {
-           node_defined_tags: values(path, 'oke', obj) + tags(obj, field='node_defined_tags'),
+           node_defined_tags: values(path, 'oke', obj) + assigned_tags(obj, field='node_defined_tags'),
          } else {}),
           walk(obj, path=[], platform='tobedefined') =
       if std.type(obj) == 'array' then [walk(v, path=path, platform=platform) for v in obj]
@@ -178,10 +181,11 @@ local token(text, word) =
           local value = obj[key];
           local child_path = path + [key];
           if key == 'tags_configuration' then value  // Definitions must not tag themselves during bootstrap.
+          else if std.member(['defined_tags', 'default_defined_tags', 'node_defined_tags'], key) && std.type(value) == 'object' then value + owner_tags
           else if std.objectHas(sections, key) && std.type(value) == 'object' then
             walk(value, path=child_path, platform=sections[key]) +
             (if std.member(defaults_sections, key) then {
-               default_defined_tags: values([], sections[key], value) + tags(value, field='default_defined_tags'),
+               default_defined_tags: values([], sections[key], value) + assigned_tags(value, field='default_defined_tags'),
              } else {})
           else if std.member(collections, key) && std.type(value) == 'object' then {
             [name]: resource(value[name], child_path + [name], platform)

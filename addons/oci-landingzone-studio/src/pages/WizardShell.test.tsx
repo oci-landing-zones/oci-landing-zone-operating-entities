@@ -23,6 +23,14 @@ beforeEach(() => {
 });
 
 describe('diagram layout error recovery', () => {
+  it('keeps Notifications, Tags and Budgets out of Foundation', () => {
+    vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
+    const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test']}><Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes></MemoryRouter>);
+    expect(html).toContain('Observability and cost');
+    expect(html).not.toContain('id="foundation-observability-title"');
+    expect(html).not.toContain('id="cost-budgets-title"');
+    expect(html).not.toContain('id="cost-governance-tags-title"');
+  });
   it('shows generation errors in the form while rendering the previous complete diagram', () => {
     const previous = emptyLzModel();
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });

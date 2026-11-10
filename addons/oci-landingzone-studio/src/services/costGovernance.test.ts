@@ -1,0 +1,281 @@
+import { describe, expect, it } from 'vitest';
+import { emptyLzModel } from '../model/defaults';
+import { buildConfig } from './lzConfig';
+import { importConfig } from './importConfig';
+import { budgetFieldError, budgetTagValues, customBudgetError, budgetKeys, budgetRecipientError, costGovernanceConfig, parseTagValues, tagValueLists, defaultCostGovernance, ownerEmail, ownerEmailError, syncCostCenterBudgets, addCostCenters, businessUnitScopeOptions, defaultBusinessUnitScope, businessUnitAssignments, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, costCenterFilter, removeCostCenter, costCenterScopeOptions, validateCostGovernance } from './costGovernance';
+
+describe('cost governance', () => {
+  it('offers only values defined for the selected budget tag', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    cfg.tagValueLists = { 'tag-lz-cost-center': 'CC1, CC2', 'tag-lz-business-unit': 'Sales, IT', 'tag-lz-project': 'obsolete' };
+    cfg.ownerEmail = 'owner@example.com';
+    expect(budgetTagValues(model, 'tag-lz-cost-center')).toEqual(['CC1', 'CC2']);
+    expect(budgetTagValues(model, 'tag-lz-business-unit')).toEqual(['IT', 'Sales']);
+    expect(budgetTagValues(model, 'tag-lz-project')).toEqual(['notapplicable', 'proj1']);
+    expect(budgetTagValues(model, 'tag-lz-platform')).toEqual(['network', 'security']);
+    expect(budgetTagValues(model, 'tag-lz-owner')).toEqual(['owner@example.com']);
+    const budget = { name: 'budget-team', amount: 500, thresholdValue: 80, recipients: '', tagName: 'tag-lz-cost-center', tagValue: 'missing' };
+    expect(customBudgetError(budget, budgetTagValues(model, budget.tagName))).toBe('Choose a value defined for this tag.');
+    expect(customBudgetError({ ...budget, tagValue: 'CC1' }, budgetTagValues(model, budget.tagName))).toBeNull();
+  });
+  it('uses a single global owner email and retains it on export and import', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    expect(ownerEmail(cfg)).toBe('email.address@example.com');
+    cfg.ownerEmail = 'owner@example.com';
+    const config = buildConfig(model);
+    expect(config.cost_governance?.owner_email).toBe('owner@example.com');
+    expect(buildConfig(importConfig(config).model)).toEqual(config);
+    for (const invalid of ['', 'owner', 'one@example.com,two@example.com', 'one@example.com;two@example.com', ' owner@example.com']) expect(ownerEmailError(invalid)).not.toBeNull();
+    expect(ownerEmailError('owner@example.com')).toBeNull();
+    const invalid = { ...config, cost_governance: { ...config.cost_governance, owner_email: 'one@example.com,two@example.com' } };
+    expect(() => importConfig(invalid)).toThrow();
+  });
+  it('allows many cost centers per business unit and prevents assigning one center twice', () => {
+    const cfg = addCostCenters(defaultCostGovernance(), 'CC2');
+    const first = assignCostCenterBusinessUnit(cfg, 'CC12345', 'IT');
+    const both = assignCostCenterBusinessUnit(first, 'CC2', 'IT');
+    expect(businessUnitAssignments(both)).toEqual({ CC12345: 'IT', CC2: 'IT' });
+    expect(assignCostCenterBusinessUnit(both, 'CC2', 'Retail')).toBe(both);
+    const moved = assignCostCenterBusinessUnit(assignCostCenterBusinessUnit(both, 'CC2', null), 'CC2', 'Retail');
+    expect(businessUnitAssignments(moved)).toEqual({ CC12345: 'IT', CC2: 'Retail' });
+    expect(assignCostCenterBusinessUnit(moved, 'missing', 'Retail')).toBe(moved);
+    expect(assignCostCenterBusinessUnit(moved, 'CC2', 'missing')).toBe(moved);
+    expect(costGovernanceConfig(moved)).not.toHaveProperty('costCenterBusinessUnits');
+    const renamed = syncBusinessUnitAssignments({ ...moved, tagValueLists: { ...moved.tagValueLists, 'tag-lz-business-unit': 'IT, Sales' } }, 'IT, Retail');
+    expect(renamed.costCenterBusinessUnits).toEqual({ CC12345: 'IT', CC2: 'Sales' });
+    const removed = syncBusinessUnitAssignments({ ...renamed, tagValueLists: { ...renamed.tagValueLists, 'tag-lz-business-unit': 'IT' } }, 'IT, Sales');
+    expect(removed.costCenterBusinessUnits).toEqual({ CC12345: 'IT' });
+    expect(businessUnitAssignments({ ...moved, tagValueLists: { ...moved.tagValueLists, 'tag-lz-business-unit': 'IT' } })).toEqual({ CC12345: 'IT' });
+  });
+  it('inherits business unit filter choices from the configured platforms, environments and projects', () => {
+    const model = emptyLzModel(); model.environments[0].name = 'staging-custom'; model.projects[0].name = 'payments';
+    model.platforms.push({ id: 'cluster', key: 'cluster', type: 'oke_simple', environments: 'all', vcnCidr: '', subnets: [] });
+    const choices = businessUnitScopeOptions(model);
+    expect(choices.platform.map((entry) => entry.label)).toEqual(['network', 'security', 'oke']);
+    expect(choices.environment.map((entry) => entry.label)).toEqual(['shared', 'staging-custom', 'preprod']);
+    expect(choices.project.map((entry) => entry.label)).toEqual(['notapplicable', 'payments']);
+    expect(defaultBusinessUnitScope('IT', [])).toEqual({ platform: null, environment: ['shared'], project: ['notapplicable'] });
+    expect(defaultBusinessUnitScope('Retail', ['project:one']).project).toEqual(['project:one']);
+    const cfg = defaultCostGovernance(); cfg.businessUnitScopes = { IT: defaultBusinessUnitScope('IT', []) };
+    expect(costGovernanceConfig(cfg)).not.toHaveProperty('businessUnitScopes');
+  });
+  it('preserves existing cost center scopes in the three-filter editor', () => {
+    expect(costCenterFilter({}, 'CC12345')).toEqual({ platform: null, environment: null, project: null });
+    expect(costCenterFilter({ costCenterScopes: { CC1: 'shared' } }, 'CC1').environment).toEqual(['shared']);
+    expect(costCenterFilter({ costCenterScopes: { CC1: 'project:app' } }, 'CC1').project).toEqual(['project:app']);
+    expect(costCenterFilter({ costCenterScopes: { CC1: 'custom:team' }, costCenterCustomScopes: [{ id: 'team', name: 'Team', target: 'environment:prod' }] }, 'CC1').environment).toEqual(['environment:prod']);
+  });
+  it('adds a cost center with its chosen LZ scope and preserves the first center scope', () => {
+    const cfg = defaultCostGovernance();
+    const updated = addCostCenters(cfg, 'CC2345', 'environment:production');
+    expect(updated.tagValueLists?.['tag-lz-cost-center']).toBe('CC12345, CC2345');
+    expect(updated.costCenterScopes).toMatchObject({ CC12345: 'landingzone', CC2345: 'environment:production' });
+    expect(updated.additionalBudgets?.[updated.costCenterBudgetKeys!.CC2345].tagValue).toBe('CC2345');
+    const defaultScope = addCostCenters(cfg, 'CC2345');
+    expect(defaultScope.costCenterScopes?.CC2345).toBe('landingzone');
+    expect(addCostCenters(updated, 'CC2345', 'shared')).toBe(updated);
+  });
+  it('reactivates the inherited budget when CC12345 is added again after deletion', () => {
+    const removed = removeCostCenter(defaultCostGovernance(), 'CC12345');
+    const restored = syncCostCenterBudgets({ ...removed, tagValueLists: { 'tag-lz-cost-center': 'CC12345' } }, '');
+    expect(restored.removedBudgets).not.toContain('BUDGET-COST-CENTER-CC12345-KEY');
+    expect(restored.costCenterBudgetKeys?.CC12345).toBe('BUDGET-COST-CENTER-CC12345-KEY');
+  });
+  it('adds custom scope labels to the choices without exporting visual scope metadata', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    cfg.costCenterCustomScopes = [{ id: 'team', name: 'Team scope', target: 'shared' }];
+    expect(costCenterScopeOptions(model)).toContainEqual({ value: 'custom:team', label: 'Team scope' });
+    expect(costGovernanceConfig(cfg)).not.toHaveProperty('costCenterCustomScopes');
+  });
+  it('removes a cost center, its scope and its associated budget without affecting the others', () => {
+    const cfg = defaultCostGovernance(); cfg.tagValueLists = { 'tag-lz-cost-center': 'CC12345, CC2345' };
+    const added = syncCostCenterBudgets(cfg, 'CC12345');
+    added.costCenterScopes = { CC12345: 'landingzone', CC2345: 'shared' };
+    const key = added.costCenterBudgetKeys!.CC2345;
+    const updated = removeCostCenter(added, 'CC2345');
+    expect(updated.tagValueLists?.['tag-lz-cost-center']).toBe('CC12345');
+    expect(updated.costCenterScopes).not.toHaveProperty('CC2345');
+    expect(updated.additionalBudgets).not.toHaveProperty(key);
+    expect(updated.costCenterBudgetKeys).not.toHaveProperty('CC2345');
+    expect(updated.removedBudgets).not.toContain('BUDGET-COST-CENTER-CC12345-KEY');
+    expect(removeCostCenter(updated, 'CC12345').removedBudgets).toContain('BUDGET-COST-CENTER-CC12345-KEY');
+  });
+  it('does not rename another budget after a deleted cost-center budget key is reused', () => {
+    const cfg = defaultCostGovernance(); cfg.tagValueLists = { 'tag-lz-cost-center': 'CC12345, CC2345' };
+    const first = syncCostCenterBudgets(cfg, 'CC12345');
+    const removedKey = first.costCenterBudgetKeys!.CC2345;
+    delete first.additionalBudgets![removedKey];
+    const second = syncCostCenterBudgets({ ...first, tagValueLists: { 'tag-lz-cost-center': 'CC12345, CC2345, CC4567' } }, 'CC12345, CC2345');
+    const updated = syncCostCenterBudgets({ ...second, tagValueLists: { 'tag-lz-cost-center': 'CC12345, CC3456, CC4567' } }, 'CC12345, CC2345, CC4567');
+    expect(updated.additionalBudgets![updated.costCenterBudgetKeys!.CC4567].tagValue).toBe('CC4567');
+    expect(updated.additionalBudgets![updated.costCenterBudgetKeys!.CC3456].tagValue).toBe('CC3456');
+    expect(updated.costCenterBudgetKeys!.CC3456).not.toBe(updated.costCenterBudgetKeys!.CC4567);
+  });
+  it('renames a cost center budget and its target while retaining alerts and the selected area', () => {
+    const cfg = defaultCostGovernance();
+    cfg.costCenterScopes = { CC12345: 'environment:prod' };
+    cfg.costCenterBusinessUnits = { CC12345: 'Retail' };
+    cfg.costCenterFilters = { CC12345: { platform: ['network'], environment: ['environment:prod'], project: null } };
+    Object.assign(cfg.budgets['BUDGET-COST-CENTER-CC12345-KEY'], { amount: 7777, thresholdValue: 95, recipients: 'team@example.com' });
+    cfg.tagValueLists = { 'tag-lz-cost-center': 'CC2345' };
+    const updated = syncCostCenterBudgets(cfg, 'CC12345');
+    const key = updated.costCenterBudgetKeys!.CC2345;
+    expect(updated.additionalBudgets![key]).toMatchObject({ name: 'budget-cost-center-cc2345', tagName: 'tag-lz-cost-center', tagValue: 'CC2345', amount: 7777, thresholdValue: 95, recipients: 'team@example.com' });
+    expect(updated.removedBudgets).toContain('BUDGET-COST-CENTER-CC12345-KEY');
+    expect(updated.costCenterScopes).toHaveProperty('CC2345', 'environment:prod');
+    expect(updated.costCenterFilters?.CC2345).toEqual(cfg.costCenterFilters.CC12345);
+    expect(updated.costCenterFilters).not.toHaveProperty('CC12345');
+    expect(updated.costCenterBusinessUnits).toEqual({ CC2345: 'Retail' });
+    expect(removeCostCenter(updated, 'CC2345').costCenterBusinessUnits).toEqual({});
+    expect(removeCostCenter(updated, 'CC2345').costCenterFilters).not.toHaveProperty('CC2345');
+    expect(costGovernanceConfig(updated)).not.toHaveProperty('costCenterFilters');
+    const next = syncCostCenterBudgets({ ...updated, tagValueLists: { 'tag-lz-cost-center': 'CC9999' } }, 'CC2345');
+    expect(next.costCenterBudgetKeys!.CC9999).toBe(key);
+    expect(next.additionalBudgets![key].name).toBe('budget-cost-center-cc9999');
+    expect(next.additionalBudgets![key].tagValue).toBe('CC9999');
+    expect(cfg.budgets['BUDGET-COST-CENTER-CC12345-KEY'].name).toBe('budget-cost-center-cc12345');
+  });
+  it('offers current scope names and creates a budget for an extra cost center', () => {
+    const model = emptyLzModel();
+    expect(costCenterScopeOptions(model).map((option) => option.label)).toEqual(['All LZ', 'shared', 'prod', 'preprod', 'proj1']);
+    const cfg = defaultCostGovernance(); cfg.tagValueLists = { 'tag-lz-cost-center': 'CC12345, CC2345' };
+    const updated = syncCostCenterBudgets(cfg, 'CC12345');
+    expect(updated.additionalBudgets![updated.costCenterBudgetKeys!.CC2345]).toMatchObject({ name: 'budget-cost-center-cc2345', tagValue: 'CC2345', amount: 5000 });
+    expect(updated.removedBudgets).not.toContain('BUDGET-COST-CENTER-CC12345-KEY');
+  });
+  it('ignores old manual LOV overrides for inherited environment, project and platform values', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    cfg.tagValueLists = { 'tag-lz-environment': '', 'tag-lz-project': 'obsolete', 'tag-lz-platform': '', 'tag-lz-owner': 'team@example.com' };
+    expect(costGovernanceConfig(cfg).tag_value_lists).toBeUndefined();
+    expect(costGovernanceConfig(cfg).owner_email).toBe('team@example.com');
+    expect(validateCostGovernance(model)).toEqual([]);
+  });
+  it('always excludes Finance when loading an older Studio design without removals', () => {
+    const cfg = defaultCostGovernance(); cfg.removedBudgets = [];
+    expect(costGovernanceConfig(cfg).exclude_budgets).toContain('BUDGET-BUSINESS-UNIT-FINANCE-KEY');
+  });
+  it('offers IT and Retail as the initial business unit values', () => {
+    expect(tagValueLists(emptyLzModel())['tag-lz-business-unit']).toEqual(['IT', 'Retail']);
+    expect(costGovernanceConfig(defaultCostGovernance())).not.toHaveProperty('business_unit_assignments');
+  });
+  it('offers notapplicable plus the projects actually assigned to environments', () => {
+    const model = emptyLzModel();
+    expect(tagValueLists(model)['tag-lz-project']).toEqual(['notapplicable', 'proj1']);
+    model.projects.push({ id: 'project-two', name: 'proj2', environments: 'all' });
+    expect(tagValueLists(model)['tag-lz-project']).toEqual(['notapplicable', 'proj1', 'proj2']);
+    model.projects = [];
+    expect(tagValueLists(model)['tag-lz-project']).toEqual(['notapplicable']);
+  });
+  it('shows only shared and the configured environment names in the default environment LOV', () => {
+    const model = emptyLzModel();
+    expect(tagValueLists(model)['tag-lz-environment']).toEqual(['shared', 'prod', 'preprod']);
+    model.environments[0].name = 'development';
+    model.environments.pop();
+    expect(tagValueLists(model)['tag-lz-environment']).toEqual(['shared', 'development']);
+  });
+  it('offers only network and security platform values until platforms are configured', () => {
+    const model = emptyLzModel();
+    expect(tagValueLists(model)['tag-lz-platform']).toEqual(['network', 'security']);
+    model.platforms.push({ id: 'cluster', key: 'cluster', type: 'oke_simple', environments: 'all', vcnCidr: '', subnets: [] });
+    model.sharedPlatforms.push({ id: 'apps', key: 'apps', type: 'custom', vcnCidr: '', subnets: [] });
+    model.exadata.exacs.enabled = true;
+    expect(tagValueLists(model)['tag-lz-platform']).toEqual(['network', 'security', 'oke', 'apps', 'exacs']);
+    model.platforms = []; model.sharedPlatforms = []; model.exadata.exacs.enabled = false;
+    expect(tagValueLists(model)['tag-lz-platform']).toEqual(['network', 'security']);
+  });
+  it('accepts comma-separated LOV, trimming and deduplicating values', () => {
+    expect(parseTagValues('IT, Finance, Retail, IT\nOperations')).toEqual(['Finance', 'IT', 'Operations', 'Retail']);
+  });
+  it('preserves excluded inherited edits when reimporting and restoring a budget', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    Object.assign(cfg.budgets['BUDGET-LANDINGZONE-KEY'], { name: 'budget-team', amount: 1234, thresholdValue: 95 });
+    cfg.removedBudgets = ['BUDGET-LANDINGZONE-KEY'];
+    const restored = importConfig(buildConfig(model)).model.foundation.costGovernance!;
+    restored.removedBudgets = [];
+    expect(costGovernanceConfig(restored).budgets['BUDGET-LANDINGZONE-KEY']).toMatchObject({ name: 'budget-team', amount: 1234, alert_rule: { threshold_value: 95 } });
+  });
+  it('round-trips editable LOV and an additional tag budget, including its removal', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance();
+    cfg.tagValueLists = { 'tag-lz-cost-center': 'tobedefined, CC900' };
+    cfg.additionalBudgets = { 'BUDGET-CUSTOM-TEAM-KEY': { name: 'budget-team', amount: 900, thresholdValue: 95, recipients: 'team@example.com', tagName: 'tag-lz-cost-center', tagValue: 'CC900' } };
+    cfg.useSingleRecipient = false; model.foundation.costGovernance = cfg;
+    const config = buildConfig(model);
+    expect(config.cost_governance?.tag_value_lists).toEqual({ 'tag-lz-cost-center': ['CC900', 'tobedefined'] });
+    expect(config.cost_governance?.additional_budgets?.['BUDGET-CUSTOM-TEAM-KEY']).toMatchObject({ tag_name: 'tag-lz-cost-center', tag_value: 'CC900', alert_rule: { recipients: 'team@example.com' } });
+    expect(buildConfig(importConfig(config).model)).toEqual(config);
+    cfg.removedBudgets = ['BUDGET-CUSTOM-TEAM-KEY'];
+    expect(buildConfig(importConfig(buildConfig(model)).model)).toEqual(buildConfig(model));
+  });
+  it('requires a custom budget target and at least one LOV value before generation', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    cfg.tagValueLists = { 'tag-lz-owner': '' };
+    cfg.additionalBudgets = { 'BUDGET-CUSTOM-TEAM-KEY': { name: 'budget-team', amount: 900, thresholdValue: 95, recipients: 'team@example.com', tagName: 'tag-lz-owner', tagValue: '' } };
+    expect(validateCostGovernance(model)).toEqual(expect.arrayContaining(['tag-lz-owner: Enter one valid owner email address.', 'budget-team: Enter a tag value for this budget.']));
+  });
+  it('adds a budget for a new project in multiple environments without duplicates', () => {
+    const model = emptyLzModel(); model.projects.push({ id: 'payments', name: 'payments', environments: 'all' });
+    const config = buildConfig(model);
+    expect(Object.keys(config.cost_governance!.budgets)).toHaveLength(9);
+    expect(config).toHaveProperty('cost_governance.budgets.BUDGET-PROJECT-PAYMENTS-KEY.amount', 500);
+    expect(buildConfig(importConfig(config).model)).toEqual(config);
+  });
+  it('excludes a removed budget from generated configuration and preserves the choice on import', () => {
+    const cfg = defaultCostGovernance(); Object.assign(cfg, { removedBudgets: ['BUDGET-LANDINGZONE-KEY'] });
+    const result = costGovernanceConfig(cfg);
+    expect(result).toHaveProperty('exclude_budgets', ['BUDGET-BUSINESS-UNIT-FINANCE-KEY', 'BUDGET-LANDINGZONE-KEY']);
+    expect(result.budgets).toHaveProperty('BUDGET-LANDINGZONE-KEY');
+    const model = emptyLzModel(); model.foundation.costGovernance = cfg;
+    expect(buildConfig(importConfig(buildConfig(model)).model)).toEqual(buildConfig(model));
+  });
+  it('applies the single recipient without changing inherited budget identities', () => {
+    const cfg = defaultCostGovernance(); cfg.requireTagValues = true; cfg.recipients = 'finops@example.com';
+    cfg.budgets['BUDGET-LANDINGZONE-KEY'].name = 'budget-team';
+    cfg.budgets['BUDGET-LANDINGZONE-KEY'].amount = 12500;
+    cfg.budgets['BUDGET-LANDINGZONE-KEY'].thresholdValue = 125.5;
+    const result = costGovernanceConfig(cfg);
+    expect(result.require_tag_values).toBe(true);
+    expect(result.budget_recipients).toBe('finops@example.com');
+    expect(Object.keys(result.budgets)).toEqual(budgetKeys);
+    expect(result.budgets['BUDGET-LANDINGZONE-KEY']).toEqual({ name: 'budget-team', amount: 12500, alert_rule: { threshold_value: 125.5 } });
+    expect(Object.values(result.budgets).every((budget) => budget.alert_rule.recipients === undefined)).toBe(true);
+  });
+  it('preserves independent recipients and edited values through import and export', () => {
+    const model = emptyLzModel(); const cfg = defaultCostGovernance();
+    cfg.useSingleRecipient = false; cfg.requireTagValues = true;
+    cfg.budgets['BUDGET-LANDINGZONE-KEY'] = { name: 'budget-team', amount: 12500, thresholdValue: 90, recipients: 'a@example.com;b@example.com' };
+    model.foundation.costGovernance = cfg;
+    const config = buildConfig(model);
+    expect(config.cost_governance?.budget_recipients).toBeUndefined();
+    expect(config.cost_governance?.budgets['BUDGET-LANDINGZONE-KEY'].alert_rule.recipients).toBe('a@example.com,b@example.com');
+    expect(buildConfig(importConfig(config).model)).toEqual(config);
+  });
+  it('preserves the shared email mode through import and export', () => {
+    const model = emptyLzModel(); model.foundation.costGovernance = defaultCostGovernance();
+    model.foundation.costGovernance.recipients = 'finops@example.com';
+    const restored = importConfig(buildConfig(model)).model;
+    expect(restored.foundation.costGovernance?.useSingleRecipient).toBe(true);
+    expect(restored.foundation.costGovernance?.recipients).toBe('finops@example.com');
+  });
+  it('migrates old exports and rejects unsupported governance fields', () => {
+    const config = buildConfig(emptyLzModel()); delete config.cost_governance;
+    expect(importConfig(config).model.foundation.costGovernance).toBeUndefined();
+    expect(() => importConfig({ ...config, cost_governance: { unsupported: true } })).toThrow('cost_governance');
+  });
+  it('validates OCI ranges without incorrectly capping percentages at 100', () => {
+    expect(budgetFieldError('amount', 1.5)).toBeTruthy();
+    expect(budgetFieldError('amount', 0)).toBeTruthy();
+    expect(budgetFieldError('thresholdValue', 125.5)).toBeNull();
+    expect(budgetFieldError('thresholdValue', 10001)).toBeTruthy();
+    expect(budgetFieldError('thresholdValue', 1.234)).toBeTruthy();
+    expect(budgetRecipientError('a@example.com,b@example.com', true)).toBeTruthy();
+    expect(budgetRecipientError('')).toBe('Enter at least one notification email address.');
+    const model = emptyLzModel(); model.foundation.costGovernance = defaultCostGovernance();
+    model.foundation.costGovernance.budgets['BUDGET-LANDINGZONE-KEY'].amount = 0;
+    expect(validateCostGovernance(model)).not.toEqual([]);
+    model.foundation.stackScope = 'regional';
+    expect(validateCostGovernance(model)).toEqual([]);
+  });
+  it.each([{ budgets: null }, { budgets: { 'BUDGET-LANDINGZONE-KEY': { alert_rule: null } } }])('rejects explicit null objects accepted by neither contract: %j', (settings) => {
+    expect(() => importConfig({ ...buildConfig(emptyLzModel()), cost_governance: settings })).toThrow('cost_governance');
+  });
+});

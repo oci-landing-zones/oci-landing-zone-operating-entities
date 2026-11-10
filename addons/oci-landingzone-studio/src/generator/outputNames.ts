@@ -15,12 +15,14 @@ export const OUTPUT_BLURB: Record<string, string> = {
   'network.json': 'Creates the network and routing, resolving firewall and NLB targets from resource keys.',
 };
 
-/** Old staged-network bundles must be regenerated even when their config matches. */
+/** Obsolete network, observability or OKE bundles must be regenerated even when their config matches. */
 export function isCurrentOutputSet(output: { config: string; files: Record<string, string> } | null, config: string): boolean {
   return output !== null
     && output.config === config
     && Object.hasOwn(output.files, 'network.json')
     && !Object.hasOwn(output.files, 'network_pre.json')
+    && !Object.hasOwn(output.files, 'observability_cis1_pre.json')
+    && !Object.hasOwn(output.files, 'observability_cis2_pre.json')
     && !Object.hasOwn(output.files, 'oke_clusters.json')
     && !Object.hasOwn(output.files, 'oke_workers.json');
 }

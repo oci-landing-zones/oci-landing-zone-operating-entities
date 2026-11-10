@@ -50,6 +50,11 @@ describe('deploymentStages', () => {
 });
 
 describe('isCurrentOutputSet', () => {
+  it.each([1, 2])('regenerates cached CIS%s bundles with obsolete partial observability', (cis) => {
+    const saved = { config: '{}', files: { 'network.json': '{}', [`observability_cis${cis}.json`]: '{}' } };
+    expect(isCurrentOutputSet(saved, saved.config)).toBe(true);
+    expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, [`observability_cis${cis}_pre.json`]: '{}' } }, saved.config)).toBe(false);
+  });
   it('accepts current outputs and requires regeneration after design or network-format changes', () => {
     const saved = { config: '{ cis_level: 2 }', files: { 'network.json': '{}' } };
     expect(isCurrentOutputSet(saved, saved.config)).toBe(true);

@@ -1,6 +1,6 @@
 // Published One-OE cost tags and governance for single-apply Tag Default ordering.
 local lz = import '../../../../landing_zone.libsonnet';
-local budgets = import './budgets.libsonnet';
+local cost_governance = import '../../../../lib/cost_governance.libsonnet';
 local explicitFlowLogs = import './explicit_flow_logs.libsonnet';
 local namespace = 'tagns-lz-cost-governance';
 local collections = [
@@ -71,31 +71,6 @@ local tagObservability(doc) =
     for family in std.objectFields(tagged)
   };
 
-local defaultGovernance(governance) =
-  local cfg = governance.tags_configuration;
-  local costKey = 'TAGNS-LZ-COST-GOVERNANCE-KEY';
-  local cost = cfg.namespaces[costKey];
-  governance + {
-    tags_configuration: cfg + {
-      namespaces: cfg.namespaces + {
-        [costKey]: cost + {
-          tags: {
-            [key]: cost.tags[key] + {
-              tag_defaults: {
-                [key + '-REQUIRED']: {
-                  compartment_ids: ['CMP-LANDINGZONE-KEY'],
-                  default_value: if key == 'TAG-LZ-PROJECT-KEY' then 'notapplicable' else 'tobedefined',
-                  is_user_required: false,
-                },
-              },
-            }
-            for key in std.objectFields(cost.tags)
-          },
-        },
-      },
-    },
-  };
-
 function(profile) {
   local rendered = lz(profile.config),
   iam: tagResources(rendered.iam),
@@ -111,5 +86,8 @@ function(profile) {
   security_cis1_pre: tagSecurity(rendered.security_cis1_pre),
   security_cis2: tagSecurity(rendered.security_cis2),
   security_cis2_pre: tagSecurity(rendered.security_cis2_pre),
-  governance: defaultGovernance(rendered.governance) + { budgets_configuration: budgets },
+  governance: cost_governance.apply(rendered.governance, cost_governance.normalize(
+    if std.objectHas(profile.config, 'cost_governance') then profile.config.cost_governance else {},
+    projects=cost_governance.project_names(profile.config)
+  ), projects=cost_governance.project_names(profile.config)),
 }

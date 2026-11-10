@@ -26,6 +26,7 @@
  * config stays stable when the diagram-only naming context changes.
  */
 
+import { activeProjectNames, costGovernanceConfig } from './costGovernance';
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
@@ -48,6 +49,7 @@ export interface EnvConfigEntry {
 }
 
 export interface LzConfig {
+  cost_governance?: import('./costGovernance').CostGovernanceConfig;
   stack_scope?: 'complete' | 'regional';
   dr_region?: string;
   remote_peering_connections?: Record<string, {
@@ -215,6 +217,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(f.stackScope !== 'regional' ? { cost_governance: costGovernanceConfig(f.costGovernance, activeProjectNames(model)) } : {}),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,
@@ -393,6 +396,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
     ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
     ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),

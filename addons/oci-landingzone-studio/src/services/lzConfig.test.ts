@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
+
+describe('cost governance configuration', () => {
+  it('inherits One-OE tags and eight budgets with a shared recipient', () => {
+    const config = buildConfig(emptyLzModel());
+    expect(config).toHaveProperty('cost_governance.require_tag_values', false);
+    expect(config).toHaveProperty('cost_governance.budget_recipients', 'email.address@example.com');
+    expect(config).toHaveProperty('cost_governance.budgets.BUDGET-LANDINGZONE-KEY.amount', 10000);
+    expect(serializeConfig(emptyLzModel())).toContain('cost_governance:');
+  });
+  it('keeps cost governance in the Home stack', () => {
+    const model = emptyLzModel(); model.foundation.stackScope = 'regional';
+    expect(buildConfig(model)).not.toHaveProperty('cost_governance');
+  });
+});
 import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
 import type { Environment, LzModel, PlatformConfig } from '../model/types';
@@ -150,7 +164,7 @@ describe('serializeConfig', () => {
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
     const out = serializeConfig(model(), 1);
-    expect(out).toBe([
+    expect(out.split('\n').filter((line) => !line.trim().startsWith('cost_governance:')).join('\n')).toBe([
       '{',
       "  realm: 'oc1',",
       "  region: 'eu-frankfurt-1',",

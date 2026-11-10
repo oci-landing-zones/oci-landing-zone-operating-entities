@@ -15,6 +15,7 @@ import { legacyRegionalModel } from '../services/regionalDeployment';
 import type { DiagramOptions, LzModel } from '../model/types';
 import WizardStepper, { WIZARD_STEPS } from '../wizard/WizardStepper';
 import FoundationStep from '../wizard/steps/FoundationStep';
+import ObservabilityCostStep from '../wizard/steps/ObservabilityCostStep';
 import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformsStep from '../wizard/steps/PlatformsStep';
@@ -38,6 +39,7 @@ import FieldError, { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
 import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
+import { costTagScope } from '../diagram/tagScope';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 /** First step with spoke subnets — and therefore endpoints and traceable flows. */
@@ -48,7 +50,8 @@ const STEP_PROGRESS_LABELS: Record<number, string> = {
   2: 'Set up the shared network',
   3: 'Organize projects and configure environment networks',
   4: 'Add shared services and workload platforms',
-  5: 'Review and download your files',
+  5: 'Configure notifications, cost tags and budgets',
+  6: 'Review and download your files',
 };
 
 const layout = {
@@ -97,6 +100,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
   const [flowFocus, setFlowFocus] = React.useState<FlowFocus | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
+  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
+  const diagramPanel = React.useRef<HTMLElement>(null);
   const [debugMode, setDebugMode] = React.useState(false);
   const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
   const [diagramOpts, setDiagramOpts] = React.useState<DiagramOptions>({});
@@ -204,6 +209,15 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     }
   }, [getDiagram, activeStep, flowLayer, effectiveOpts]);
   const diagram = diagramResult.diagram;
+  const tagScope = useMemo(() => diagram && activeStep === 5 ? costTagScope(diagram, selectedTag, renderedModel) : null, [diagram, activeStep, selectedTag, renderedModel]);
+  function selectTag(tagName: string) {
+    setSelectedTag((previous) => previous === tagName ? null : tagName);
+    if (viewMode === 'form') setViewMode('split');
+    // On stacked layouts, bring the diagram into view after it has mounted.
+    if (window.matchMedia('(max-width: 1100px)').matches) requestAnimationFrame(() => {
+      diagramPanel.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
   const diagramError = diagramResult.error ?? routing.error;
   const diagramStatus = diagramResult.error ? 'error' : routing.status;
   function exportDiagram() {
@@ -340,6 +354,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 4 ? (
                   <PlatformsStep />
                 ) : activeStep === 5 ? (
+                  <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag} />
+                ) : activeStep === 6 ? (
                   <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} />
                 ) : null}
                 {previewError}
@@ -348,7 +364,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
             {showDiagram && (
               <ReactFlowProvider>
-              <section className="studio-diagram-panel" style={layout.panel}>
+              <section ref={diagramPanel} className="studio-diagram-panel" style={layout.panel}>
                 <div style={layout.panelAccent} />
                 <div style={layout.diagramHeader}>
                   <div className="studio-info-heading" style={{ marginBottom: 0 }}>
@@ -362,6 +378,24 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   )}
                   <DiagramZoomControls disabled={!diagram || routing.pending} />
                 </div>
+                {tagScope && <div className="cost-tag-scope-notice" role="status">
+                  <div><strong>{tagScope.tagName}</strong>
+                    {tagScope.groups ? <>
+                      <p style={{ margin: '4px 0' }}>{tagScope.message ?? (tagScope.tagName === 'tag-lz-business-unit'
+                        ? 'Studio preview: IT for shared resources and Retail for project resources. Generated tag assignments are unchanged.'
+                        : tagScope.tagName === 'tag-lz-project'
+                        ? 'Resources outside project areas use notapplicable. Each project area shows its project tag value.'
+                        : 'The colors identify tag values on generated resources.')}</p>
+                      <div className="cost-tag-scope-legend" aria-label={tagScope.tagName === 'tag-lz-platform' ? 'Platform tag legend' : tagScope.tagName === 'tag-lz-cost-center' ? 'Cost center tag legend' : tagScope.tagName === 'tag-lz-business-unit' ? 'Business unit tag legend' : tagScope.tagName === 'tag-lz-project' ? 'Project tag legend' : 'Environment tag legend'}>
+                        {tagScope.groups.map((group) => <span key={group.id}>
+                          <i aria-hidden="true" className={`cost-tag-scope-swatch${group.color ? '' : ` cost-tag-scope-swatch--${group.id}`}`} style={group.color ? { border: `3px solid ${group.color}` } : undefined} />
+                          {tagScope.tagName === 'tag-lz-owner' && `${group.label}: `}<code>{group.id}</code>
+                        </span>)}
+                      </div>
+                    </> : <><br />All landing zone: the tag default is inherited by child compartments. Explicit resource values can override it.</>}
+                  </div>
+                  <button type="button" onClick={() => setSelectedTag(null)}>Clear tag highlight</button>
+                </div>}
                 {!showForm && previewError}
                 {!!diagram?.flowErrors?.length && <div style={{ margin: '0 20px 12px' }}>
                   <ErrorNotice title="Flow preview unavailable">{diagram.flowErrors.map((message) => <div key={message}>{message}</div>)}</ErrorNotice>
@@ -369,7 +403,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 <div className="studio-diagram-canvas" aria-busy={routing.pending} data-preview-state={diagramStatus}
                   style={layout.diagramCanvas}>
                   {diagram ? <div style={{ height: '100%' }} inert={routing.pending || undefined}>
-                      <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
+                      <LzDiagram diagram={diagram} tagScope={tagScope} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
                         onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </div> : <div role="status" style={{ height: '100%', display: 'grid', placeItems: 'center', color: oracle.textMuted, fontSize: 13 }}>
                     {diagramStatus === 'error' ? 'Diagram unavailable' : routing.deferred ? 'Complete the network fields to prepare the diagram.' : 'Preparing diagram…'}

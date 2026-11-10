@@ -62,6 +62,8 @@ tagging, such as listeners, backends, and NSG rules, do not receive separate tag
 
 ### 1.3. Tag Defaults and optional required tagging
 
+In Studio, use **Observability and cost → FinOps/Governance tags → Require values for all six cost tags**. Blueprint Factory exposes the same setting as `cost_governance.require_tag_values`. The setting changes `is_user_required` for the six cost tags while preserving their default values and access-control tags. Explicit placeholder values still satisfy OCI's requirement to supply a value.
+
 By default, all six Tag Defaults use `is_user_required: false` in
 `oneoe_governance.json`. They automatically apply the configured default values
 to new taggable resources in the landing-zone compartment and its child
@@ -93,6 +95,12 @@ configuration.
 <a id="monthly-budgets"></a>
 
 ## 2. Budgets
+
+Studio inherits these eight budgets in **Observability and cost**. You can edit each budget's name, monthly amount, alert percentage and recipients. **Use one email for all budget alerts** applies one address to all active rules; turn it off to configure recipients individually. Budget keys and compartment/tag targets remain stable when names change. Budgets start collapsed; use the trash icon to omit an inherited budget, and **Removed budgets** to restore it. Additional projects assigned to an environment get their own budget automatically. Use **Add tag-based budget** to add a monthly budget targeting a FinOps/Governance tag value.
+
+In the tags table, **LOV (List of values)** is editable using comma-separated values; **Configuration** shows **All landing zone**. The generated LOV retains values already assigned by the landing zone, active budgets and Tag Defaults.
+
+Blueprint Factory accepts the same overrides under `cost_governance.budgets`, plus `cost_governance.budget_recipients` for a shared recipient string. Providing `cost_governance` opts config-mode Home designs into these budgets and the six cost Tag Defaults. Omitting it preserves the existing factory behavior. See the [configuration reference](../../../../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#cost-tags-and-inherited-budgets).
 
 The One-OE blueprint includes eight monthly budgets by default in
 `oneoe_governance.json`. They track spending across the landing zone as a whole

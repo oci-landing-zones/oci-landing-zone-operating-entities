@@ -1,5 +1,5 @@
 /**
- * ReviewStep — step 5 ("Review"). Summarises the model, then runs the *real* OCI
+ * ReviewStep — step 6 ("Review"). Summarises the model, then runs the *real* OCI
  * landing-zone jsonnet generator over the config the wizard has been building and
  * packages the resulting artifacts as one complete ZIP download.
  *
@@ -29,6 +29,7 @@ import { validatePlatformContracts } from '../../services/platformValidation';
 import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
+import { validateCostGovernance } from '../../services/costGovernance';
 import { validateRemotePeering } from '../../services/remotePeering';
 import { validateRegionalDeployment } from '../../services/regionalDeployment';
 import { regionShortNameError } from '../../services/regions';
@@ -126,6 +127,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
       ...validateNotificationEmails(model.foundation.notifications, regional),
+      ...validateCostGovernance(model),
       ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
       ...platformReadiness(model, 'oke_simple').errors,
     ])];
