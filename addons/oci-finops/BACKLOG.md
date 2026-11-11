@@ -1,6 +1,6 @@
 # Maintenance backlog
 
-Pending code cleanup for the FinOps add-on. Installation procedures are defined in [SETUP](SETUP.md).
+Pending code cleanup for the FinOps add-on. Installation procedures are defined in [SETUP](installation-guide/README.md).
 
 ## Contents
 

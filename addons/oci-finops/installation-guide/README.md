@@ -6,7 +6,7 @@ This guide covers the complete setup of the OCI FinOps Add-on: provisioning Land
 
 **Existing Landing Zone:** A One-OE Landing Zone must already be deployed in the parent tenancy. The add-on consumes its shared compartments, identity domain, hub/network resources and governance tags; it does not deploy the base Landing Zone.
 
-**Governance tagging:** One-OE must already provide an active `tagns-lz-cost-governance` namespace and the six active tag definitions listed in [FinOps Tagging](README.md#finops-tagging). All six tags are mandatory, with controlled values defined in advance by the organization. Configure the corresponding One-OE tag defaults and ensure the tag values in the private FinOps deployment inputs belong to the allowed lists. Complete this configuration before provisioning the add-on; the infrastructure and database installers reuse these tags rather than create them.
+**Governance tagging:** One-OE must already provide an active `tagns-lz-cost-governance` namespace and the six active tag definitions listed in [FinOps Tagging](../README.md#finops-tagging). All six tags are mandatory, with controlled values defined in advance by the organization. Configure the corresponding One-OE tag defaults and ensure the tag values in the private FinOps deployment inputs belong to the allowed lists. Complete this configuration before provisioning the add-on; the infrastructure and database installers reuse these tags rather than create them.
 
 ## Setup steps
 
@@ -36,12 +36,12 @@ Use **Orchestrator v2.2.0**, IAM module **v0.3.5**, and networking module **v0.9
 
 | File | Resources |
 | --- | --- |
-| [finops_iam.json](deployment/infrastructure/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies; see the [IAM policy reference](installation-guide/infrastructure/iam-policies.md). |
-| [finops_network.json](deployment/infrastructure/finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. |
-| [finops_database.json](deployment/infrastructure/finops_database.json) | Private Autonomous Database. |
-| [finops_security.json](deployment/infrastructure/finops_security.json) | Vault and encryption key in `cmp-lz-security`. |
-| [finops_observability.json](deployment/infrastructure/finops_observability.json) | Notifications topic and email subscriptions. |
-| [finops_bastion.json](deployment/infrastructure/finops_bastion.json) | Central Bastion in `cmp-lz-security`; omit this file when reusing an existing managed central Bastion there. |
+| [finops_iam.json](../deployment/infrastructure/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies; see the [IAM policy reference](infrastructure/iam-policies.md). |
+| [finops_network.json](../deployment/infrastructure/finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. |
+| [finops_database.json](../deployment/infrastructure/finops_database.json) | Private Autonomous Database. |
+| [finops_security.json](../deployment/infrastructure/finops_security.json) | Vault and encryption key in `cmp-lz-security`. |
+| [finops_observability.json](../deployment/infrastructure/finops_observability.json) | Notifications topic and email subscriptions. |
+| [finops_bastion.json](../deployment/infrastructure/finops_bastion.json) | Central Bastion in `cmp-lz-security`; omit this file when reusing an existing managed central Bastion there. |
 
 ### Changes before deployment
 
@@ -72,7 +72,7 @@ The initial ADB password must meet the [ADB password requirements](https://docs.
 
 2. **Bootstrap the same FinOps stack.** In the private IAM copy, temporarily omit `identity_domain_dynamic_groups_configuration` and only `PCY-LZ-FINOPS-ADB-RESOURCE-PRINCIPAL` from supplied policies. Keep the compartment, administrator groups/policies and all other selected FinOps JSONs, including ADB. Validate, review the plan and apply.
 3. **Complete ADB Resource Principal IAM.** Restore those two entries, replacing `<FINOPS_COMPARTMENT_OCID>` and `<FINOPS_ADB_OCID>` with the created resource OCIDs. Review and apply to the same stack. These placeholders are not automatically substituted inside policy strings or matching rules.
-4. **Complete hub connectivity.** Follow the [One-OE network and access integration reference](installation-guide/infrastructure/one-oe-integration.md) for routing, attachment imports and access validation.
+4. **Complete hub connectivity.** Follow the [One-OE network and access integration reference](infrastructure/one-oe-integration.md) for routing, attachment imports and access validation.
 5. **Confirm readiness.** Verify ADB/Vault availability, Bastion access, and the intended IAM permissions. Confirm each Notifications email subscription is `ACTIVE` and retain the topic OCID for the Core configuration.
 
 ### Created resource names
@@ -110,7 +110,7 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Create the password Secrets
 
-The [security configuration](deployment/infrastructure/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, already created in Step 1, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
+The [security configuration](../deployment/infrastructure/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, already created in Step 1, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
 | Secret name | Content | Purpose |
 | --- | --- | --- |
@@ -122,13 +122,13 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 ### Before starting the module installation
 
-**Python is the default method.** Follow the [Python configuration and validation procedure](installation-guide/database-modules/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
+**Python is the default method.** Follow the [Python configuration and validation procedure](database-modules/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
 
 ## Step 3: Install the FinOps database modules
 
 ### Common database prerequisites
 
-Both routes use an existing compatible ADB in the parent tenancy, with working connectivity, credentials and OCI authorization for the selected source/modules. Complete the [ADB Resource Principal and IAM prerequisites](installation-guide/database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both sources; policies depend on Oracle-managed reports or a customer bucket. The route guides specify their host and credential requirements.
+Both routes use an existing compatible ADB in the parent tenancy, with working connectivity, credentials and OCI authorization for the selected source/modules. Complete the [ADB Resource Principal and IAM prerequisites](database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both sources; policies depend on Oracle-managed reports or a customer bucket. The route guides specify their host and credential requirements.
 
 ### Installation method
 
@@ -136,18 +136,18 @@ Both options install the same FinOps schemas and SQL modules. **Python is the de
 
 | **Your starting point** | **Choose** |
 | --- | --- |
-| The ADB, compartments, Vault, Secrets and tags follow the Landing Zone names and prerequisites expected by the installer. | **[Option A — Python installer (default)](installation-guide/database-modules/python-installation.md)**. Python discovers the resources and guides the installation. |
-| Your Landing Zone resources use different names or credential conventions, or you need to run SQL directly. | **[Option B — Direct SQL installation](installation-guide/database-modules/manual-sql-installation.md)**. Supply the connection, credentials and module inputs explicitly. |
+| The ADB, compartments, Vault, Secrets and tags follow the Landing Zone names and prerequisites expected by the installer. | **[Option A — Python installer (default)](database-modules/python-installation.md)**. Python discovers the resources and guides the installation. |
+| Your Landing Zone resources use different names or credential conventions, or you need to run SQL directly. | **[Option B — Direct SQL installation](database-modules/manual-sql-installation.md)**. Supply the connection, credentials and module inputs explicitly. |
 
 Start with Python and check its prerequisite table. If those conventions do not match, use the manual SQL route. Required IAM permissions, source access and database compatibility apply to both options. Each guide has a contents index and the detailed installation and verification sequence.
 
-After installation, use [ADB maintenance and diagnostics](installation-guide/database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
+After installation, use [ADB maintenance and diagnostics](database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
 
 ## Step 4: Oracle Analytics Cloud Dashboard
 
 OAC service creation is a separate administration step, performed manually in OCI Console. Use the existing OAC service if your environment already provides one.
 
-1. [Create the OAC service and prepare its ADB connectivity](installation-guide/oac/oac-service-setup.md) when needed.
-2. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md) using the dedicated OAC reader created with the schemas.
-3. [Configure consumer access](installation-guide/oac/oac-user-onboarding.md) before sharing the workbook.
-4. Optional: [Index datasets and enable AI Assistant for workbook users](installation-guide/oac/oac-ai-assistant-consumers.md).
+1. [Create the OAC service and prepare its ADB connectivity](oac/oac-service-setup.md) when needed.
+2. [Import the workbook and configure its database connection](oac/oac-workbook-import.md) using the dedicated OAC reader created with the schemas.
+3. [Configure consumer access](oac/oac-user-onboarding.md) before sharing the workbook.
+4. Optional: [Index datasets and enable AI Assistant for workbook users](oac/oac-ai-assistant-consumers.md).

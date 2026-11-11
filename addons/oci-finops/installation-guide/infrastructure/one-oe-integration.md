@@ -1,6 +1,6 @@
 # One-OE network and access integration
 
-Technical reference for [Step 1 of the FinOps setup](../../SETUP.md#step-1-provision-finops-infrastructure-and-adb). A One-OE Landing Zone is already deployed.
+Technical reference for [Step 1 of the FinOps setup](../README.md#step-1-provision-finops-infrastructure-and-adb). A One-OE Landing Zone is already deployed.
 
 ## Contents
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This module publishes a stable database interface for an OAC cost-detail dataset. Its materialized view and tag-column contract are defined here; OAC connections, datasets, and workbooks are separate service assets. The [installation guide](../SETUP.md) provides the deployment and verification sequence.
+This module publishes a stable database interface for an OAC cost-detail dataset. Its materialized view and tag-column contract are defined here; OAC connections, datasets, and workbooks are separate service assets. The [installation guide](../installation-guide/README.md) provides the deployment and verification sequence.
 
 ## Execution flow
 
