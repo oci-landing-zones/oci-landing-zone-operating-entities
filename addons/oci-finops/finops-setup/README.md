@@ -30,12 +30,12 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 
 | File | Purpose |
 |---|---|
-| [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops`, two administrator groups and their policies, plus the ADB dynamic group and resource-principal policy. Resolve the compartment and ADB OCIDs in the final deployment copy; see the staged IAM setup below. |
-| [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
-| [finops_bastion.json](deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
-| [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
-| [finops_security.json](deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 3. |
-| [finops_database.json](deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared above; see Step 2. |
+| [finops_iam.json](../deployment/finops_iam.json) | Create `cmp-finops`, two administrator groups and their policies, plus the ADB dynamic group and resource-principal policy. Resolve the compartment and ADB OCIDs in the final deployment copy; see the staged IAM setup below. |
+| [finops_network.json](../deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
+| [finops_bastion.json](../deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
+| [finops_observability.json](../deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
+| [finops_security.json](../deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 3. |
+| [finops_database.json](../deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared above; see Step 2. |
 
 The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace and its six tags: `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`. Provision them through the One-OE [governance configuration](../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json) before deploying the FinOps addon. The addon reuses these tags; their definitions, allowed values, and tag defaults remain managed by One-OE.
 
@@ -47,7 +47,7 @@ The configurations prepare infrastructure and access. Operations provisions ADB,
 
 Terraform creates the `nott-lz-finops` topic and its configured subscriptions. Complete these steps before installing the FOCUS shared core:
 
-1. In your deployment copy of [finops_observability.json](deployment/finops_observability.json), set `notifications_configuration.topics.NOTT-LZ-FINOPS-KEY.subscriptions` to the intended recipients. Replace any example or existing email address with your own operational mailbox; do not deploy another installation's recipient. For example:
+1. In your deployment copy of [finops_observability.json](../deployment/finops_observability.json), set `notifications_configuration.topics.NOTT-LZ-FINOPS-KEY.subscriptions` to the intended recipients. Replace any example or existing email address with your own operational mailbox; do not deploy another installation's recipient. For example:
 
    ```json
    "subscriptions": [
@@ -65,7 +65,7 @@ Terraform creates the `nott-lz-finops` topic and its configured subscriptions. C
 
 ### Configure Bastion access before deployment
 
-Use [finops_bastion.json](deployment/finops_bastion.json) for the central Bastion in `CMP-LZ-SECURITY-KEY`, targeting `SN-FRA-LZ-HUB-MGMT-KEY`. Reuse an already managed hub Bastion. When migrating from the previous FinOps-local Bastion, preserve its deployed configuration and state until central access has been validated: replacing its resource key or target subnet can delete and recreate the resource.
+Use [finops_bastion.json](../deployment/finops_bastion.json) for the central Bastion in `CMP-LZ-SECURITY-KEY`, targeting `SN-FRA-LZ-HUB-MGMT-KEY`. Reuse an already managed hub Bastion. When migrating from the previous FinOps-local Bastion, preserve its deployed configuration and state until central access has been validated: replacing its resource key or target subnet can delete and recreate the resource.
 
 Before planning, replace `<YOUR_IP>` in `cidr_block_allow_list` with the public IPv4 address used by the Bastion client; keep `/32` for a single source IP. For an approved corporate range, replace the entire `<YOUR_IP>/32` entry with the required CIDR. The placeholder is not a valid CIDR and must not be deployed unchanged. Keep `enable_cidr_check` enabled and restrict the allowlist to the required sources.
 
@@ -230,7 +230,7 @@ Validate the adapted configuration and inspect the plan for unintended replaceme
 
 ### Prerequisites
 
-Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](deployment/finops_database.json) with an initial ADMIN password used for provisioning. Change it after database creation as described in Step 3. The initial password must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
+Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](../deployment/finops_database.json) with an initial ADMIN password used for provisioning. Change it after database creation as described in Step 3. The initial password must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
 
 Keep the real password out of Git. The Autonomous Database module marks `admin_password` as sensitive to hide it in normal Terraform plan and apply output; this does not encrypt the JSON file, saved plan, or Terraform state. Restrict access to the private deployment copy, saved plans, and state.
 
@@ -239,7 +239,7 @@ Confirm that `CMP-FINOPS-KEY`, `SN-FRA-LZ-FINOPS-DB-KEY`, and `NSG-FRA-LZ-FINOPS
 ### Deployment options
 
 - **Using the Orchestrator JSON configuration**
-Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the stack inputs. Run Terraform validation and plan, review the proposed resources, and apply only after approval.
+Include the reviewed private copy of [finops_database.json](../deployment/finops_database.json) with the stack inputs. Run Terraform validation and plan, review the proposed resources, and apply only after approval.
 
 - **Using the OCI Console**  
 Alternatively, you can manually create the Autonomous Database through the OCI Console.  
@@ -260,7 +260,7 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Create the password Secrets
 
-The [security configuration](deployment/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the Vault's configured encryption key and the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
+The [security configuration](../deployment/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the Vault's configured encryption key and the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
 | Secret name | Content | Purpose |
 | --- | --- | --- |
