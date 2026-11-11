@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The OCI provider has three mandatory components for the complete solution: FOCUS ingestion (00), the FinOps tag catalog and reporting profile (01a), and tenancy/account context and contracts (02). These form the functional baseline. Optional extensions add datasets independently. All components run in `FOCUSPLATFORM` after the shared schema and common core; each also needs its own OCI API permissions. Start with the [platform installation guide](../installation-guide/README.md) for these prerequisites and the installation sequence.
+The OCI provider has three mandatory components for the complete solution: FOCUS ingestion (00), the FinOps tag catalog and reporting profile (01a), and tenancy/account context and contracts (02). These form the functional baseline. Optional extensions add datasets independently. All components run in `FOCUSPLATFORM` after the shared schema and common core; each also needs its own OCI API permissions. Start with the [platform installation guide](../SETUP.md) for these prerequisites and the installation sequence.
 
 ## Functional architecture and data dependencies
 

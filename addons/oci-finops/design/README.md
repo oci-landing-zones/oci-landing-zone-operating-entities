@@ -1,6 +1,6 @@
 # Design documentation
 
-This guide describes the platform architecture and links to each module's data model, database objects and processing flows. For prerequisites, commands and verification steps, use the [installation guide](../installation-guide/README.md).
+This guide describes the platform architecture and links to each module's data model, database objects and processing flows. For prerequisites, commands and verification steps, use the [installation guide](../SETUP.md).
 
 ## Architecture
 
@@ -14,7 +14,7 @@ Visualization modules publish database reporting interfaces independently of the
 
 [Open the full-size architecture diagram](diagrams/02-oci-provider.svg).
 
-Arrows represent data consumption in the V2 architecture. OAC reads costs and selected tags through the database reporting interface and combines them with datasets from the installed OCI modules: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Shared foundation prerequisites apply to all database modules; the [installation guide](../installation-guide/README.md) defines installation order. Each concrete module design lists its database objects, table columns and Oracle types; Module 00 creates schemas and grants without application tables.
+Arrows represent data consumption in the V2 architecture. OAC reads costs and selected tags through the database reporting interface and combines them with datasets from the installed OCI modules: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Shared foundation prerequisites apply to all database modules; the [installation guide](../SETUP.md) defines installation order. Each concrete module design lists its database objects, table columns and Oracle types; Module 00 creates schemas and grants without application tables.
 
 ## Foundation
 

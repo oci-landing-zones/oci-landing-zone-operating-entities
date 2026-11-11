@@ -124,12 +124,30 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 **Python is the default method.** Follow the [Python configuration and validation procedure](installation-guide/database-modules/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
 
-For a manual SQL installation, consult the [manual prerequisites and connection preparation](installation-guide/database-modules/manual-sql-installation.md#manual-prerequisites).
-
 ## Step 3: Install the FinOps database modules
 
-Follow the [FinOps installation guide](installation-guide/README.md) for the database module installation procedure and verification.
+### Common database prerequisites
+
+Both routes use an existing compatible ADB in the parent tenancy, with working connectivity, credentials and OCI authorization for the selected source/modules. Complete the [ADB Resource Principal and IAM prerequisites](installation-guide/database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both sources; policies depend on Oracle-managed reports or a customer bucket. The route guides specify their host and credential requirements.
+
+### Installation method
+
+Both options install the same FinOps schemas and SQL modules. **Python is the default method** for the Landing Zone setup:
+
+| **Your starting point** | **Choose** |
+| --- | --- |
+| The ADB, compartments, Vault, Secrets and tags follow the Landing Zone names and prerequisites expected by the installer. | **[Option A — Python installer (default)](installation-guide/database-modules/python-installation.md)**. Python discovers the resources and guides the installation. |
+| Your Landing Zone resources use different names or credential conventions, or you need to run SQL directly. | **[Option B — Direct SQL installation](installation-guide/database-modules/manual-sql-installation.md)**. Supply the connection, credentials and module inputs explicitly. |
+
+Start with Python and check its prerequisite table. If those conventions do not match, use the manual SQL route. Required IAM permissions, source access and database compatibility apply to both options. Each guide has a contents index and the detailed installation and verification sequence.
+
+After installation, use [ADB maintenance and diagnostics](installation-guide/database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
 
 ## Step 4: Oracle Analytics Cloud Dashboard
 
-Follow the [OAC setup guides](installation-guide/README.md#2-create-and-configure-oac) for service creation, ADB connectivity, workbook import, consumer access and optional AI Assistant configuration. OAC is configured separately from the infrastructure JSONs.
+OAC service creation is a separate administration step, performed manually in OCI Console. Use the existing OAC service if your environment already provides one.
+
+1. [Create the OAC service and prepare its ADB connectivity](installation-guide/oac/oac-service-setup.md) when needed.
+2. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md) using the dedicated OAC reader created with the schemas.
+3. [Configure consumer access](installation-guide/oac/oac-user-onboarding.md) before sharing the workbook.
+4. Optional: [Index datasets and enable AI Assistant for workbook users](installation-guide/oac/oac-ai-assistant-consumers.md).

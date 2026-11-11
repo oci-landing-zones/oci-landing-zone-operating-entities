@@ -2,7 +2,7 @@
 
 Use this route when the existing Landing Zone resources match the exact names below. For a different resource/credential convention, use [direct SQL](manual-sql-installation.md).
 
-The [common deployment prerequisites](../README.md#common-prerequisites) apply to this route.
+The [common deployment prerequisites](../../SETUP.md#common-database-prerequisites) apply to this route.
 
 ## Contents
 
