@@ -1,5 +1,5 @@
 // Generate portable ER diagrams for Markdown viewers that do not render Mermaid.
-// Run from the repository root: node design/diagrams/generate_er.js
+// Run from the add-on directory (addons/oci-finops/): node design/diagrams/generate_er.js
 const fs = require('fs');
 const path = require('path');
 

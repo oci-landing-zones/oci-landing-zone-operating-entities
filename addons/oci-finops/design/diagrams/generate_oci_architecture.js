@@ -1,5 +1,5 @@
 // Fixed positions preserve numeric order independently of graph-layout engines.
-// Run from the repository root: node design/diagrams/generate_oci_architecture.js
+// Run from the add-on directory (addons/oci-finops/): node design/diagrams/generate_oci_architecture.js
 const fs = require('fs');
 const path = require('path');
 const escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;');
