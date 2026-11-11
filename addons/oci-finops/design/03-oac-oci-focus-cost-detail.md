@@ -61,6 +61,7 @@ Tag-value extraction and OAC builds have independent locks and can compete for c
 | [OAC_OCI_FOCUS_COST_DETAIL_LOAD_GATE](#oac_oci_focus_cost_detail_load_gate) | Table | Initial-load state machine |
 | [OAC_OCI_FOCUS_TAG_SLOT_V](#published-tag-labels) | View | OAC label and slot lookup for the published MV |
 | [OAC_OCI_FOCUS_COST_DETAIL_API](#oac_oci_focus_cost_detail_api) | Package and body | Builds, publishes and refreshes the reporting MV. |
+| [OAC_OCI_FOCUS_COST_DETAIL_REBUILD](#oac_oci_focus_cost_detail_rebuild) | Procedure (on-demand maintenance) | Builds a replacement MV candidate from a chosen landing table. |
 | [OAC_OCI_FOCUS_COST_DETAIL_MV_V<n>](#published-cost-interface) | Materialized view | Initially empty MV, then populated published MV or later candidate |
 | [OAC_OCI_FOCUS_COST_DETAIL](#published-cost-interface) | Synonym | Stable consumer name |
 | [OAC_OCI_FOCUS_COST_DETAIL_INITIAL_LOAD_GATE](#oac_oci_focus_cost_detail_initial_load_gate) | Scheduler job | Monitors initial pipeline catch-up |
@@ -156,6 +157,12 @@ The Oracle-maintained log captures primary key, ROWID, SEQUENCE and new values f
 ### `OAC_OCI_FOCUS_COST_DETAIL_API`
 
 Prepares and populates the first MV, monitors first pipeline catch-up, builds profile candidates, explicitly publishes a reviewed candidate, and refreshes the published MV. `BUILD_ACTIVE`, `PUBLISH_READY`, `POPULATE_INITIAL`, `CHECK_INITIAL_LOAD`, `STOP_INITIAL_LOAD_GATE`, `REFRESH_CURRENT`.
+
+### `OAC_OCI_FOCUS_COST_DETAIL_REBUILD`
+
+A `FOCUSPLATFORM`-owned, definer-rights procedure created on demand by the source-table rebuild maintenance script, outside the standard module installation. Its `P_SOURCE_TABLE IN VARCHAR2` input selects a local landing table. It builds and validates a FAST-capable candidate with the selected tag profile under the shared build/refresh lock, recording a `READY` candidate while leaving the published synonym unchanged.
+
+See [rebuild and publish the OAC cost-detail MV](../installation-guide/database-modules/maintenance-and-diagnostics.md#rebuild-and-publish-the-oac-cost-detail-mv) for the maintenance procedure.
 
 ### `OAC_OCI_FOCUS_COST_DETAIL_INITIAL_LOAD_GATE`
 

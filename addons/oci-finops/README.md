@@ -1,4 +1,4 @@
-# OCI FinOps Solution
+# OCI FinOps Add-on
 
 **Contents**
 
@@ -13,7 +13,7 @@
 
 ## Overview
 
-The OCI FinOps Solution is an add-on to the OCI Operating Entities Landing Zone. It provides cost visibility, financial allocation and optimization insights by bringing FOCUS reports into Oracle Autonomous Database (ADB) and presenting them through Oracle Analytics Cloud (OAC).
+The OCI FinOps Add-on extends the OCI Operating Entities Landing Zone. It provides cost visibility, financial allocation and optimization insights by bringing FOCUS reports into Oracle Autonomous Database (ADB) and presenting them through Oracle Analytics Cloud (OAC).
 
 The solution runs in an OCI **parent tenancy**. The current implementation is **V2**, with OCI as the provider implemented today; the modular architecture allows additional providers to be introduced.
 

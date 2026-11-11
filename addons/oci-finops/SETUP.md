@@ -1,6 +1,6 @@
-# OCI FinOps Setup Guide
+# OCI FinOps Add-on Setup Guide
 
-This guide covers the complete setup of the OCI FinOps add-on: provisioning Landing Zone resources and ADB, preparing database credentials, installing the database modules, and configuring OAC.
+This guide covers the complete setup of the OCI FinOps Add-on: provisioning Landing Zone resources and ADB, preparing database credentials, installing the database modules, and configuring OAC.
 
 ## Prerequisites
 
