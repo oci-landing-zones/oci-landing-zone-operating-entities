@@ -6,6 +6,8 @@ This guide covers the complete setup of the OCI FinOps add-on: provisioning Land
 
 To deploy the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).
 
+**Governance tagging:** One-OE must already provide an active `tagns-lz-cost-governance` namespace and the six active tag definitions listed in [FinOps Tagging](README.md#finops-tagging). All six tags are mandatory, with controlled values defined in advance by the organization. Configure the corresponding One-OE tag defaults and ensure the tag values in the private FinOps deployment inputs belong to the allowed lists. Complete this configuration before provisioning the add-on; the infrastructure and database installers reuse these tags rather than create them.
+
 ## Setup steps
 
 Complete the following steps in order:
@@ -38,10 +40,6 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
 | [finops_security.json](deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 3. |
 | [finops_database.json](deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared above; see Step 2. |
-
-The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace and its six tags: `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`. Provision them through the One-OE [governance configuration](../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json) before deploying the FinOps addon. The addon reuses these tags; their definitions, allowed values, and tag defaults remain managed by One-OE.
-
-**FOCUS installer compatibility:** The tag catalog installer in `finops-focus-platform` must support the six tag names above, including `tag-lz-platform`. Versions that require `tag-lz-application` must be updated before installing the tag catalog; commit `ffe4956` alone does not establish compatibility with this renamed tag. The installer checks existing OCI tags and does not create them. Apply the One-OE governance configuration before running a compatible tag catalog installer.
 
 The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the central Bastion in `cmp-lz-security`, targeting the hub management subnet in `cmp-lz-network`. Both FinOps groups have shared-security session access. Restricted session grants in `cmp-finops` are retained for installations that still use the previous local Bastion.
 
