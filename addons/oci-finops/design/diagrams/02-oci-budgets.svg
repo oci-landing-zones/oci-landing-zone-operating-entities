@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1070" viewBox="0 0 2100 1070" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-budgets entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci budgets — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="logical" d="M 670 203.5 L 760 203.5"/>
+<text class="cardinality" x="678" y="193.5">1</text>
+<text class="cardinality" x="718" y="193.5">0..*</text>
+<path class="fk" d="M 1380 203.5 L 1470 203.5"/>
+<text class="cardinality" x="1388" y="193.5">1</text>
+<text class="cardinality" x="1428" y="193.5">0..*</text>
+<path class="fk" d="M 1780 277 L 1380 643.5"/>
+<text class="cardinality" x="1790" y="297">1</text>
+<text class="cardinality" x="1388" y="633.5">0..*</text>
+<path class="logical" d="M 1780 570 L 1780 277"/>
+<text class="cardinality" x="1790" y="558">0..*</text>
+<text class="cardinality" x="1790" y="297">0..*</text>
+<rect class="card" x="50" y="130" width="620" height="147" rx="8"/>
+<path class="header" d="M 52 178 L 668 178 L 668 133 L 53 133 Z"/>
+<line x1="50" y1="180" x2="670" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="163">OCI_BUDGET_CONFIG</text>
+<text class="attribute" x="68" y="208">PK  CONFIG_ID</text>
+<text class="attribute" x="68" y="237">TENANCY_OCID / HOME_REGION</text>
+<text class="attribute" x="68" y="266">IS_SYNC_ENABLED</text>
+<rect class="card" x="760" y="130" width="620" height="147" rx="8"/>
+<path class="header" d="M 762 178 L 1378 178 L 1378 133 L 763 133 Z"/>
+<line x1="760" y1="180" x2="1380" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="777" y="163">OCI_BUDGET_SYNC_RUN</text>
+<text class="attribute" x="778" y="208">PK  SYNC_RUN_ID</text>
+<text class="attribute" x="778" y="237">STATUS</text>
+<text class="attribute" x="778" y="266">BUDGETS_READ / ALERT_RULES_READ</text>
+<rect class="card" x="1470" y="130" width="620" height="147" rx="8"/>
+<path class="header" d="M 1472 178 L 2088 178 L 2088 133 L 1473 133 Z"/>
+<line x1="1470" y1="180" x2="2090" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1487" y="163">OCI_BUDGET_SNAP</text>
+<text class="attribute" x="1488" y="208">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="1488" y="237">PK  BUDGET_ID</text>
+<text class="attribute" x="1488" y="266">TARGET_TYPE / TARGETS_JSON</text>
+<rect class="card" x="760" y="570" width="620" height="147" rx="8"/>
+<path class="header" d="M 762 618 L 1378 618 L 1378 573 L 763 573 Z"/>
+<line x1="760" y1="620" x2="1380" y2="620" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="777" y="603">OCI_BUDGET_ALERT_RULE_SNAP</text>
+<text class="attribute" x="778" y="648">PK/FK  SYNC_RUN_ID + BUDGET_ID</text>
+<text class="attribute" x="778" y="677">PK  ALERT_RULE_ID</text>
+<text class="attribute" x="778" y="706">TYPE / THRESHOLD / RECIPIENTS</text>
+<rect class="card" x="1470" y="570" width="620" height="147" rx="8"/>
+<path class="header" d="M 1472 618 L 2088 618 L 2088 573 L 1473 573 Z"/>
+<line x1="1470" y1="620" x2="2090" y2="620" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1487" y="603">OCI_FOCUS_REPORTS</text>
+<text class="attribute" x="1488" y="648">PK  CHARGEPERIODSTART</text>
+<text class="attribute" x="1488" y="677">PK  OCI_REFERENCENUMBER</text>
+<text class="attribute" x="1488" y="706">BILLEDCOST / BILLINGCURRENCY</text>
+</svg>

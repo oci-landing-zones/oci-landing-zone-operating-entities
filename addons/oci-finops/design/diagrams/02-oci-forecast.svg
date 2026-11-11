@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1740" height="960" viewBox="0 0 1740 960" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-forecast entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci forecast — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="logical" d="M 750 203.5 L 990 203.5"/>
+<text class="cardinality" x="758" y="193.5">1</text>
+<text class="cardinality" x="948" y="193.5">0..*</text>
+<path class="fk" d="M 1340 277 L 400 540"/>
+<text class="cardinality" x="1350" y="297">1</text>
+<text class="cardinality" x="410" y="528">0..*</text>
+<path class="fk" d="M 1340 277 L 1340 540"/>
+<text class="cardinality" x="1350" y="297">1</text>
+<text class="cardinality" x="1350" y="528">0..*</text>
+<path class="logical" d="M 750 613.5 L 990 613.5"/>
+<text class="cardinality" x="758" y="603.5">0..1</text>
+<text class="cardinality" x="948" y="603.5">0..*</text>
+<rect class="card" x="50" y="130" width="700" height="147" rx="8"/>
+<path class="header" d="M 52 178 L 748 178 L 748 133 L 53 133 Z"/>
+<line x1="50" y1="180" x2="750" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="163">OCI_FORECAST_CONFIG</text>
+<text class="attribute" x="68" y="208">PK  CONFIG_ID</text>
+<text class="attribute" x="68" y="237">HISTORY_DAYS</text>
+<text class="attribute" x="68" y="266">HORIZON_DAYS</text>
+<rect class="card" x="990" y="130" width="700" height="147" rx="8"/>
+<path class="header" d="M 992 178 L 1688 178 L 1688 133 L 993 133 Z"/>
+<line x1="990" y1="180" x2="1690" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="163">OCI_FORECAST_RUN</text>
+<text class="attribute" x="1008" y="208">PK  SYNC_RUN_ID</text>
+<text class="attribute" x="1008" y="237">AS_OF_DAY</text>
+<text class="attribute" x="1008" y="266">STATUS</text>
+<rect class="card" x="50" y="540" width="700" height="147" rx="8"/>
+<path class="header" d="M 52 588 L 748 588 L 748 543 L 53 543 Z"/>
+<line x1="50" y1="590" x2="750" y2="590" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="573">OCI_FORECAST_REQUEST</text>
+<text class="attribute" x="68" y="618">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="68" y="647">PK  QUERY_LEVEL / REQUEST_KIND</text>
+<text class="attribute" x="68" y="676">PK  CHUNK_NO</text>
+<rect class="card" x="990" y="540" width="700" height="147" rx="8"/>
+<path class="header" d="M 992 588 L 1688 588 L 1688 543 L 993 543 Z"/>
+<line x1="990" y1="590" x2="1690" y2="590" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="573">OCI_FORECAST_POINT</text>
+<text class="attribute" x="1008" y="618">PK  POINT_ID</text>
+<text class="attribute" x="1008" y="647">FK  SYNC_RUN_ID</text>
+<text class="attribute" x="1008" y="676">UQ  POINT GRAIN</text>
+</svg>

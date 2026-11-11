@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1250" viewBox="0 0 1900 1250" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-ingestion entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci ingestion — physical ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="fk" d="M 860 277 L 860 405"/>
+<text class="cardinality" x="870" y="297">1</text>
+<text class="cardinality" x="870" y="393">0..1</text>
+<rect class="card" x="40" y="130" width="420" height="147" rx="8"/>
+<path class="header" d="M 42 178 L 458 178 L 458 133 L 43 133 Z"/>
+<line x1="40" y1="180" x2="460" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="57" y="163">OCI_FOCUS_FAIL_SCAN_CURSOR</text>
+<text class="attribute" x="58" y="208">PK  PIPELINE_NAME</text>
+<text class="attribute" x="58" y="237">GENERATION_NO</text>
+<text class="attribute" x="58" y="266">LAST_CUTOFF</text>
+<rect class="card" x="650" y="130" width="420" height="147" rx="8"/>
+<path class="header" d="M 652 178 L 1068 178 L 1068 133 L 653 133 Z"/>
+<line x1="650" y1="180" x2="1070" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="667" y="163">OCI_FOCUS_FAIL_FILE</text>
+<text class="attribute" x="668" y="208">PK  PIPELINE_NAME</text>
+<text class="attribute" x="668" y="237">PK  GENERATION_NO</text>
+<text class="attribute" x="668" y="266">PK  SOURCE_NAME_HASH</text>
+<rect class="card" x="1260" y="130" width="420" height="147" rx="8"/>
+<path class="header" d="M 1262 178 L 1678 178 L 1678 133 L 1263 133 Z"/>
+<line x1="1260" y1="180" x2="1680" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1277" y="163">OCI_FOCUS_REMED_MANUAL</text>
+<text class="attribute" x="1278" y="208">PK  MANUAL_ID</text>
+<text class="attribute" x="1278" y="237">FILE IDENTITY</text>
+<text class="attribute" x="1278" y="266">RESOLUTION_STATUS</text>
+<rect class="card" x="40" y="405" width="420" height="147" rx="8"/>
+<path class="header" d="M 42 453 L 458 453 L 458 408 L 43 408 Z"/>
+<line x1="40" y1="455" x2="460" y2="455" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="57" y="438">OCI_FOCUS_FAIL_SCAN_RUN</text>
+<text class="attribute" x="58" y="483">PK  RUN_ID</text>
+<text class="attribute" x="58" y="512">PIPELINE_NAME</text>
+<text class="attribute" x="58" y="541">GENERATION_NO</text>
+<rect class="card" x="650" y="405" width="420" height="147" rx="8"/>
+<path class="header" d="M 652 453 L 1068 453 L 1068 408 L 653 408 Z"/>
+<line x1="650" y1="455" x2="1070" y2="455" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="667" y="438">OCI_FOCUS_REMED_FILE</text>
+<text class="attribute" x="668" y="483">PK/FK  PIPELINE_NAME</text>
+<text class="attribute" x="668" y="512">PK/FK  GENERATION_NO</text>
+<text class="attribute" x="668" y="541">PK/FK  SOURCE_NAME_HASH</text>
+<rect class="card" x="1260" y="405" width="420" height="147" rx="8"/>
+<path class="header" d="M 1262 453 L 1678 453 L 1678 408 L 1263 408 Z"/>
+<line x1="1260" y1="455" x2="1680" y2="455" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1277" y="438">OCI_FOCUS_COPY_RECOVERY</text>
+<text class="attribute" x="1278" y="483">PK  RECOVERY_ID</text>
+<text class="attribute" x="1278" y="512">FILE IDENTITY</text>
+<text class="attribute" x="1278" y="541">DECISION</text>
+<rect class="card" x="40" y="680" width="420" height="118" rx="8"/>
+<path class="header" d="M 42 728 L 458 728 L 458 683 L 43 683 Z"/>
+<line x1="40" y1="730" x2="460" y2="730" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="57" y="713">OCI_FOCUS_REMED_STAGE</text>
+<text class="attribute" x="58" y="758">49 RAW CSV COLUMNS</text>
+<text class="attribute" x="58" y="787">SHARED SINGLE-FILE STAGE</text>
+<rect class="card" x="650" y="680" width="420" height="147" rx="8"/>
+<path class="header" d="M 652 728 L 1068 728 L 1068 683 L 653 683 Z"/>
+<line x1="650" y1="730" x2="1070" y2="730" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="667" y="713">OCI_FOCUS_REMED_RUN</text>
+<text class="attribute" x="668" y="758">PK  RUN_ID</text>
+<text class="attribute" x="668" y="787">PIPELINE_NAME</text>
+<text class="attribute" x="668" y="816">FILES_FULL / PARTIAL / ERROR</text>
+<rect class="card" x="1260" y="680" width="420" height="147" rx="8"/>
+<path class="header" d="M 1262 728 L 1678 728 L 1678 683 L 1263 683 Z"/>
+<line x1="1260" y1="730" x2="1680" y2="730" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1277" y="713">OCI_FOCUS_REPORTS</text>
+<text class="attribute" x="1278" y="758">PK  CHARGEPERIODSTART</text>
+<text class="attribute" x="1278" y="787">PK  OCI_REFERENCENUMBER</text>
+<text class="attribute" x="1278" y="816">49 TYPED CSV COLUMNS</text>
+<rect class="card" x="40" y="955" width="420" height="118" rx="8"/>
+<path class="header" d="M 42 1003 L 458 1003 L 458 958 L 43 958 Z"/>
+<line x1="40" y1="1005" x2="460" y2="1005" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="57" y="988">OCI_FOCUS_REMED_TARGET_CONFIG</text>
+<text class="attribute" x="58" y="1033">PK  TARGET_TABLE</text>
+<text class="attribute" x="58" y="1062">ENABLED</text>
+</svg>

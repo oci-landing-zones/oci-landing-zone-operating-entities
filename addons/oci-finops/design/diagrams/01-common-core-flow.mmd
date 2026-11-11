@@ -1,0 +1,21 @@
+flowchart TD
+    A["Scheduler FINOPS_CORE_DAILY or manual call"] --> B["FINOPS_CORE_RUN_DAILY requests non-waiting lock"]
+    B --> C{"Lock acquired?"}
+    C -- No --> X["Skip this invocation; no new audit or email"]
+    C -- Yes --> D["Mark abandoned RUNNING audits INTERRUPTED"]
+    D --> E["Insert FINOPS_CORE_RUN audit row"]
+    E --> F{"Another enabled provider?"}
+    F -- Yes --> G["Insert FINOPS_CORE_PROVIDER_RUN row"]
+    G --> H["Call provider API RUN; provider processes pipelines and writes FINOPS_CORE_PIPELINE_RUN rows"]
+    H --> I{"Provider call succeeds?"}
+    I -- Yes --> J["Aggregate its pipeline rows into the provider run"]
+    I -- No --> K["Record provider ERROR"]
+    J --> F
+    K --> F
+    F -- No --> L["Aggregate provider and pipeline results into FINOPS_CORE_RUN"]
+    L --> M{"P_SEND_EMAIL = Y?"}
+    M -- No --> N["Set EMAIL_STATUS to SKIPPED"]
+    M -- Yes --> O["FINOPS_CORE_REPORT builds combined report"]
+    O --> P["Publish through OCI Notifications; record SENT or ERROR"]
+    N --> Q["Release lock; raise if provider or email failed"]
+    P --> Q

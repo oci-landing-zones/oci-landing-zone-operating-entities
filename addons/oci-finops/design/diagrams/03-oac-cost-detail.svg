@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1740" height="1870" viewBox="0 0 1740 1870" role="img" aria-labelledby="title desc">
+<title id="title">03-oac-cost-detail entity relationships</title>
+<desc id="desc">Entity relationship diagram with tables and derived reporting objects. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oac cost detail — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="fk" d="M 1340 277 L 1340 475"/>
+<text class="cardinality" x="1350" y="297">1</text>
+<text class="cardinality" x="1350" y="463">0..*</text>
+<path class="logical" d="M 750 203.5 L 990 203.5"/>
+<text class="cardinality" x="758" y="193.5">0..*</text>
+<text class="cardinality" x="948" y="193.5">0..*</text>
+<path class="logical" d="M 750 548.5 L 990 563"/>
+<text class="cardinality" x="758" y="538.5">0..1</text>
+<text class="cardinality" x="948" y="553">0..*</text>
+<path class="logical" d="M 750 903.5 L 990 903.5"/>
+<text class="cardinality" x="758" y="893.5">1</text>
+<text class="cardinality" x="948" y="893.5">0..*</text>
+<path class="logical" d="M 1340 651 L 1340 830"/>
+<text class="cardinality" x="1350" y="671">0..*</text>
+<text class="cardinality" x="1350" y="818">1</text>
+<path class="logical" d="M 1340 977 L 750 1249"/>
+<text class="cardinality" x="1350" y="997">1</text>
+<text class="cardinality" x="758" y="1239">0..1</text>
+<path class="logical" d="M 750 1249 L 990 1263.5"/>
+<text class="cardinality" x="758" y="1239">1</text>
+<text class="cardinality" x="948" y="1253.5">0..*</text>
+<path class="logical" d="M 1550 651 L 1340 1190"/>
+<text class="cardinality" x="1560" y="671">0..*</text>
+<text class="cardinality" x="1350" y="1178">0..*</text>
+<rect class="card" x="50" y="130" width="700" height="147" rx="8"/>
+<path class="header" d="M 52 178 L 748 178 L 748 133 L 53 133 Z"/>
+<line x1="50" y1="180" x2="750" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="163">MV_CAPABILITIES_TABLE</text>
+<text class="attribute" x="68" y="208">STATEMENT_ID</text>
+<text class="attribute" x="68" y="237">CAPABILITY_NAME</text>
+<text class="attribute" x="68" y="266">POSSIBLE</text>
+<rect class="card" x="990" y="130" width="700" height="147" rx="8"/>
+<path class="header" d="M 992 178 L 1688 178 L 1688 133 L 993 133 Z"/>
+<line x1="990" y1="180" x2="1690" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="163">OAC_OCI_FOCUS_COST_DETAIL_RUN</text>
+<text class="attribute" x="1008" y="208">PK  RUN_ID</text>
+<text class="attribute" x="1008" y="237">RUN_KIND / STATUS</text>
+<text class="attribute" x="1008" y="266">MV_NAME / PROFILE_VERSION</text>
+<rect class="card" x="50" y="475" width="700" height="147" rx="8"/>
+<path class="header" d="M 52 523 L 748 523 L 748 478 L 53 478 Z"/>
+<line x1="50" y1="525" x2="750" y2="525" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="508">OCI_TAG_PROFILE_ITEM</text>
+<text class="attribute" x="68" y="553">PK  PROFILE NAME + VERSION</text>
+<text class="attribute" x="68" y="582">PK  NAMESPACE ID + TAG NAME</text>
+<text class="attribute" x="68" y="611">UQ  DISPLAY_ORDER = SLOT n</text>
+<rect class="card" x="990" y="475" width="700" height="176" rx="8"/>
+<path class="header" d="M 992 523 L 1688 523 L 1688 478 L 993 478 Z"/>
+<line x1="990" y1="525" x2="1690" y2="525" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="508">OAC_OCI_FOCUS_COST_DETAIL_TAG_COLUMN</text>
+<text class="attribute" x="1008" y="553">PK/FK  RUN_ID</text>
+<text class="attribute" x="1008" y="582">PK  DISPLAY_ORDER = SLOT n</text>
+<text class="attribute" x="1008" y="611">MV_COLUMN_NAME = TAG_n</text>
+<text class="attribute" x="1008" y="640">NAMESPACE ID + TAG NAME</text>
+<rect class="card" x="50" y="830" width="700" height="147" rx="8"/>
+<path class="header" d="M 52 878 L 748 878 L 748 833 L 53 833 Z"/>
+<line x1="50" y1="880" x2="750" y2="880" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="863">OCI_FOCUS_REPORTS</text>
+<text class="attribute" x="68" y="908">PK  CHARGEPERIODSTART</text>
+<text class="attribute" x="68" y="937">PK  OCI_REFERENCENUMBER</text>
+<text class="attribute" x="68" y="966">TAGS JSON SOURCE</text>
+<rect class="card" x="990" y="830" width="700" height="147" rx="8"/>
+<path class="header" d="M 992 878 L 1688 878 L 1688 833 L 993 833 Z"/>
+<line x1="990" y1="880" x2="1690" y2="880" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="863">OAC_OCI_FOCUS_COST_DETAIL_MV_V&lt;n&gt;</text>
+<text class="attribute" x="1008" y="908">DERIVED MATERIALIZED VIEW</text>
+<text class="attribute" x="1008" y="937">48 FOCUS FIELDS + TAG_1..TAG_N</text>
+<text class="attribute" x="1008" y="966">TAGS JSON KEY = namespace.tag</text>
+<rect class="card" x="50" y="1190" width="700" height="118" rx="8"/>
+<path class="header" d="M 52 1238 L 748 1238 L 748 1193 L 53 1193 Z"/>
+<line x1="50" y1="1240" x2="750" y2="1240" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="1223">OAC_OCI_FOCUS_COST_DETAIL</text>
+<text class="attribute" x="68" y="1268">SYNONYM TO PUBLISHED MV</text>
+<text class="attribute" x="68" y="1297">STABLE OAC DATASET NAME</text>
+<rect class="card" x="990" y="1190" width="700" height="147" rx="8"/>
+<path class="header" d="M 992 1238 L 1688 1238 L 1688 1193 L 993 1193 Z"/>
+<line x1="990" y1="1240" x2="1690" y2="1240" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1007" y="1223">OAC_OCI_FOCUS_TAG_SLOT_V</text>
+<text class="attribute" x="1008" y="1268">DERIVED VIEW OF PUBLISHED SLOTS</text>
+<text class="attribute" x="1008" y="1297">SLOT_NUMBER -&gt; TAG_n</text>
+<text class="attribute" x="1008" y="1326">NAMESPACE + TAG + DISPLAY_LABEL</text>
+<rect class="card" x="50" y="1390" width="700" height="292" rx="8"/>
+<path class="header" d="M 52 1438 L 748 1438 L 748 1393 L 53 1393 Z"/>
+<line x1="50" y1="1440" x2="750" y2="1440" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="1423">OAC_OCI_FOCUS_COST_DETAIL_LOAD_GATE</text>
+<text class="attribute" x="68" y="1468">PK  GATE_ID</text>
+<text class="attribute" x="68" y="1497">STATUS</text>
+<text class="attribute" x="68" y="1526">PIPELINES_STARTED_AT</text>
+<text class="attribute" x="68" y="1555">LAST_CHECK_AT</text>
+<text class="attribute" x="68" y="1584">FAILED_PIPELINES</text>
+<text class="attribute" x="68" y="1613">ERROR_MESSAGE</text>
+<text class="attribute" x="68" y="1642">UPDATED_AT</text>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1010" viewBox="0 0 1600 1010" role="img" aria-labelledby="title desc">
+<title id="title">01-common-core entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">common core — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="fk" d="M 270 277 L 590 503.5"/>
+<text class="cardinality" x="280" y="297">1</text>
+<text class="cardinality" x="548" y="493.5">0..*</text>
+<path class="fk" d="M 1330 248 L 1010 503.5"/>
+<text class="cardinality" x="1340" y="268">1</text>
+<text class="cardinality" x="1018" y="493.5">0..*</text>
+<path class="fk" d="M 800 577 L 800 720"/>
+<text class="cardinality" x="810" y="597">1</text>
+<text class="cardinality" x="810" y="708">0..*</text>
+<rect class="card" x="60" y="130" width="420" height="147" rx="8"/>
+<path class="header" d="M 62 178 L 478 178 L 478 133 L 63 133 Z"/>
+<line x1="60" y1="180" x2="480" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="77" y="163">FINOPS_CORE_PROVIDER</text>
+<text class="attribute" x="78" y="208">PK  PROVIDER_CODE</text>
+<text class="attribute" x="78" y="237">UQ  LANDING_TABLE</text>
+<text class="attribute" x="78" y="266">UQ  API_PACKAGE</text>
+<rect class="card" x="1120" y="130" width="420" height="118" rx="8"/>
+<path class="header" d="M 1122 178 L 1538 178 L 1538 133 L 1123 133 Z"/>
+<line x1="1120" y1="180" x2="1540" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1137" y="163">FINOPS_CORE_RUN</text>
+<text class="attribute" x="1138" y="208">PK  RUN_ID</text>
+<text class="attribute" x="1138" y="237">STATUS</text>
+<rect class="card" x="590" y="430" width="420" height="147" rx="8"/>
+<path class="header" d="M 592 478 L 1008 478 L 1008 433 L 593 433 Z"/>
+<line x1="590" y1="480" x2="1010" y2="480" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="607" y="463">FINOPS_CORE_PROVIDER_RUN</text>
+<text class="attribute" x="608" y="508">PK/FK  RUN_ID</text>
+<text class="attribute" x="608" y="537">PK/FK  PROVIDER_CODE</text>
+<text class="attribute" x="608" y="566">STATUS</text>
+<rect class="card" x="590" y="720" width="420" height="147" rx="8"/>
+<path class="header" d="M 592 768 L 1008 768 L 1008 723 L 593 723 Z"/>
+<line x1="590" y1="770" x2="1010" y2="770" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="607" y="753">FINOPS_CORE_PIPELINE_RUN</text>
+<text class="attribute" x="608" y="798">PK/FK  RUN_ID</text>
+<text class="attribute" x="608" y="827">PK/FK  PROVIDER_CODE</text>
+<text class="attribute" x="608" y="856">PK  PIPELINE_NAME</text>
+<rect class="card" x="1120" y="720" width="420" height="118" rx="8"/>
+<path class="header" d="M 1122 768 L 1538 768 L 1538 723 L 1123 723 Z"/>
+<line x1="1120" y1="770" x2="1540" y2="770" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1137" y="753">FINOPS_CORE_NOTIFY_CONFIG</text>
+<text class="attribute" x="1138" y="798">PK  CONFIG_ID</text>
+<text class="attribute" x="1138" y="827">TOPIC_OCID</text>
+<rect class="card" x="1120" y="850" width="420" height="147" rx="8"/>
+<path class="header" d="M 1122 908 L 1538 908 L 1538 863 L 1123 863 Z"/>
+<line x1="1120" y1="910" x2="1540" y2="910" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1137" y="893">FINOPS_CORE_SCHEDULE_CONFIG</text>
+<text class="attribute" x="1138" y="938">PK  CONFIG_ID</text>
+<text class="attribute" x="1138" y="967">TIME_ZONE</text>
+<text class="attribute" x="1138" y="996">UPDATED_AT</text>
+</svg>

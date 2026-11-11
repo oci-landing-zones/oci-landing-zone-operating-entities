@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1190" viewBox="0 0 2100 1190" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-account-contracts entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci account contracts — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="logical" d="M 300 277 L 300 470"/>
+<text class="cardinality" x="310" y="297">1</text>
+<text class="cardinality" x="310" y="458">0..*</text>
+<path class="fk" d="M 1260 189 L 1470 203.5"/>
+<text class="cardinality" x="1268" y="179">1</text>
+<text class="cardinality" x="1428" y="193.5">0..*</text>
+<path class="fk" d="M 550 543.5 L 760 543.5"/>
+<text class="cardinality" x="558" y="533.5">1</text>
+<text class="cardinality" x="718" y="533.5">0..*</text>
+<path class="fk" d="M 1260 543.5 L 1470 543.5"/>
+<text class="cardinality" x="1268" y="533.5">1</text>
+<text class="cardinality" x="1428" y="533.5">0..1</text>
+<path class="fk" d="M 1010 617 L 1010 830"/>
+<text class="cardinality" x="1020" y="637">1</text>
+<text class="cardinality" x="1020" y="818">0..*</text>
+<path class="fk" d="M 1160 617 L 1470 903.5"/>
+<text class="cardinality" x="1170" y="637">1</text>
+<text class="cardinality" x="1428" y="893.5">0..*</text>
+<rect class="card" x="50" y="130" width="500" height="147" rx="8"/>
+<path class="header" d="M 52 178 L 548 178 L 548 133 L 53 133 Z"/>
+<line x1="50" y1="180" x2="550" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="163">OCI_ACCOUNT_SOURCE</text>
+<text class="attribute" x="68" y="208">PK  CONFIG_ID</text>
+<text class="attribute" x="68" y="237">TENANCY_OCID</text>
+<text class="attribute" x="68" y="266">HOME_REGION</text>
+<rect class="card" x="760" y="130" width="500" height="118" rx="8"/>
+<path class="header" d="M 762 178 L 1258 178 L 1258 133 L 763 133 Z"/>
+<line x1="760" y1="180" x2="1260" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="777" y="163">OCI_ACCOUNT_CONTEXT_RUN</text>
+<text class="attribute" x="778" y="208">PK  RUN_ID</text>
+<text class="attribute" x="778" y="237">STATUS</text>
+<rect class="card" x="1470" y="130" width="500" height="147" rx="8"/>
+<path class="header" d="M 1472 178 L 1968 178 L 1968 133 L 1473 133 Z"/>
+<line x1="1470" y1="180" x2="1970" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1487" y="163">OCI_ACCOUNT_ENTITY</text>
+<text class="attribute" x="1488" y="208">PK  VERSION_ID</text>
+<text class="attribute" x="1488" y="237">FK  LAST_SEEN_RUN_ID</text>
+<text class="attribute" x="1488" y="266">ENTITY_TYPE + ENTITY_ID</text>
+<rect class="card" x="50" y="470" width="500" height="147" rx="8"/>
+<path class="header" d="M 52 518 L 548 518 L 548 473 L 53 473 Z"/>
+<line x1="50" y1="520" x2="550" y2="520" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="503">OCI_ACCOUNT_CONTRACT_CONFIG</text>
+<text class="attribute" x="68" y="548">PK  SUBSCRIPTION_ID</text>
+<text class="attribute" x="68" y="577">TENANCY_OCID</text>
+<text class="attribute" x="68" y="606">ENDPOINT_REGION</text>
+<rect class="card" x="760" y="470" width="500" height="147" rx="8"/>
+<path class="header" d="M 762 518 L 1258 518 L 1258 473 L 763 473 Z"/>
+<line x1="760" y1="520" x2="1260" y2="520" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="777" y="503">OCI_ACCOUNT_CONTRACT_RUN</text>
+<text class="attribute" x="778" y="548">PK  SYNC_RUN_ID</text>
+<text class="attribute" x="778" y="577">FK  SUBSCRIPTION_ID</text>
+<text class="attribute" x="778" y="606">STATUS</text>
+<rect class="card" x="1470" y="470" width="500" height="147" rx="8"/>
+<path class="header" d="M 1472 518 L 1968 518 L 1968 473 L 1473 473 Z"/>
+<line x1="1470" y1="520" x2="1970" y2="520" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1487" y="503">OCI_ACCOUNT_CONTRACT_SUBSCRIPTION_SNAP</text>
+<text class="attribute" x="1488" y="548">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="1488" y="577">SUBSCRIPTION_ID</text>
+<text class="attribute" x="1488" y="606">IS_CURRENT</text>
+<rect class="card" x="760" y="830" width="500" height="147" rx="8"/>
+<path class="header" d="M 762 878 L 1258 878 L 1258 833 L 763 833 Z"/>
+<line x1="760" y1="880" x2="1260" y2="880" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="777" y="863">OCI_ACCOUNT_CONTRACT_SERVICE_SNAP</text>
+<text class="attribute" x="778" y="908">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="778" y="937">PK  SERVICE_ID</text>
+<text class="attribute" x="778" y="966">IS_CURRENT</text>
+<rect class="card" x="1470" y="830" width="500" height="147" rx="8"/>
+<path class="header" d="M 1472 878 L 1968 878 L 1968 833 L 1473 833 Z"/>
+<line x1="1470" y1="880" x2="1970" y2="880" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1487" y="863">OCI_ACCOUNT_CONTRACT_COMMITMENT_SNAP</text>
+<text class="attribute" x="1488" y="908">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="1488" y="937">PK  COMMITMENT_ID</text>
+<text class="attribute" x="1488" y="966">SERVICE_ID</text>
+</svg>

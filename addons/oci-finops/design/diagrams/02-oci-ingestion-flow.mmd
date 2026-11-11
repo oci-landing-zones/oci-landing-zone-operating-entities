@@ -1,0 +1,35 @@
+flowchart TD
+    A["OCI FOCUS pipeline attempts a source file"] --> B{"Oracle file status?"}
+    B -- COMPLETED --> C["Rows are already in OCI_FOCUS_REPORTS"]
+    B -- FAILED --> D["Oracle status table retains the failed file"]
+    E["Daily or initial FINOPS_CORE_DAILY run"] --> F["OCI_FOCUS_CORE_API.RUN acquires the shared OCI mutex"]
+    D -.->|read by discovery| G
+    F --> G["Scan every eligible pipeline; queue all new FAILED files"]
+    G --> H{"Interrupted active file?"}
+    H -- Yes --> I{"Recovery evidence safe?"}
+    I -- Completed COPY --> J["Resume remaining stage rows"]
+    I -- Dead empty COPY --> K["Requeue file as NEW"]
+    I -- Ambiguous --> Z["Stop OCI run; report recovery error"]
+    H -- No --> M{"Next NEW file in this pipeline within its limit?"}
+    K --> M
+    M -- Yes --> N["COPY_DATA loads one file into shared raw stage"]
+    M -- No --> V["Finalize FINOPS_CORE_PIPELINE_RUN result"]
+    N --> O{"COPY completed and row counts match?"}
+    O -- No --> P["Mark file ERROR; no automatic retry"]
+    P --> M
+    O -- Yes --> J
+    J --> R["Convert and insert one remaining stage row"]
+    R --> S{"Landing INSERT succeeds?"}
+    S -- Yes --> T["Commit landing row, counter, and stage deletion"]
+    S -- No --> U["Commit manual row, counter, and stage deletion"]
+    T --> W{"Stage rows remain?"}
+    U --> W
+    W -- Yes --> R
+    W -- No --> X{"Stage empty and counts reconcile?"}
+    X -- No --> Z
+    X -- Yes --> Y["Mark file FULL or PARTIAL"]
+    Y --> M
+    V --> AB{"Another eligible pipeline?"}
+    AB -- Yes --> M
+    AB -- No --> AA["Core aggregates results and optionally sends report"]
+    Z --> AA

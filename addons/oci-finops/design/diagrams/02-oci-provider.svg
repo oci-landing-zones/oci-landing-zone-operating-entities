@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1500" viewBox="0 0 1600 1500" role="img" aria-labelledby="title desc">
+<title id="title">FinOps platform: shared foundation, OCI provider and OAC</title>
+<desc id="desc">FinOps V2 architecture. Shared schema and Common Core support all database modules. OCI includes the mandatory ingestion, tag catalog/profile and account context baseline, plus optional tag values, Budgets, Cloud Advisor, Anomalies and Forecast. The OAC database reporting module publishes costs and selected tags. The separate OAC service consumes that reporting interface and OCI module datasets. All arrows use the same style and show V2 data consumption, not installation order.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#52617a"/></marker></defs>
+<rect width="1600" height="1500" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#202b42">
+<rect x="20" y="20" width="1560" height="1040" rx="14" fill="#ffffff" stroke="#a4b5cb"/>
+<text x="800" y="48" text-anchor="middle" font-size="21">Oracle Autonomous Database (ADB)</text>
+<rect x="60" y="70" width="1480" height="165" rx="14" fill="#f0f6fc" stroke="#93b1cf"/>
+<text x="800" y="98" text-anchor="middle" font-size="21">Shared foundation - required by all database modules</text>
+<g id="SCHEMA" data-x="100" data-y="125">
+<rect x="100" y="125" width="420" height="80" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="310" y="159" text-anchor="middle" font-size="18">00 Schema and access</text>
+<text x="310" y="183" text-anchor="middle" font-size="18">FOCUSPLATFORM and OAC reader</text>
+</g>
+<g id="CORE" data-x="590" data-y="125">
+<rect x="590" y="125" width="910" height="80" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="1045" y="147" text-anchor="middle" font-size="18">01 Common Core - provider-neutral</text>
+<text x="1045" y="171" text-anchor="middle" font-size="18">Provider registry | Daily reconciliation | Execution audit</text>
+<text x="1045" y="195" text-anchor="middle" font-size="18">Shared schedule time zone | Optional operational notifications</text>
+</g>
+<text x="800" y="265" text-anchor="middle" font-size="17">OCI provider and OAC database modules use the shared schema and core shown above.</text>
+<rect x="60" y="290" width="1480" height="515" rx="14" fill="#ffffff" stroke="#b6c2d6"/>
+<text x="800" y="318" text-anchor="middle" font-size="21">OCI provider</text>
+<rect x="80" y="345" width="1440" height="165" rx="14" fill="#faf8ff" stroke="#b8a8eb"/>
+<text x="800" y="373" text-anchor="middle" font-size="21">Mandatory OCI functional baseline</text>
+<rect x="80" y="590" width="1440" height="180" rx="14" fill="#f7faff" stroke="#bdcddd"/>
+<text x="800" y="618" text-anchor="middle" font-size="21">Optional OCI extensions</text>
+<rect x="100" y="880" width="1400" height="150" rx="14" fill="#f6fcf9" stroke="#9bc7b7"/>
+<text x="800" y="908" text-anchor="middle" font-size="21">OAC database reporting module</text>
+<rect x="300" y="1130" width="1000" height="260" rx="14" fill="#f6fcf9" stroke="#9bc7b7"/>
+<text x="800" y="1158" text-anchor="middle" font-size="21">Oracle Analytics Cloud (OAC) service - outside ADB</text>
+<path d="M310 475 V530 H205 V650" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M800 475 V555 H255 V650" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M100 437 H45 V860 H465 V965 H520" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M590 437 H565 V575 H372 V840 H1135 V965 H1080" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M800 1000 V1085 H235 V1210 H350" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M230 735 V810 H366 M378 810 H1525" fill="none" stroke="#52617a" stroke-width="1.8"/>
+<path d="M515 735 V810" fill="none" stroke="#52617a" stroke-width="1.8"/>
+<path d="M800 735 V810" fill="none" stroke="#52617a" stroke-width="1.8"/>
+<path d="M1085 735 V810" fill="none" stroke="#52617a" stroke-width="1.8"/>
+<path d="M1370 735 V810" fill="none" stroke="#52617a" stroke-width="1.8"/>
+<path d="M1500 437 H1525 V1335 H1250" fill="none" stroke="#52617a" stroke-width="1.8" marker-end="url(#arrow)"/>
+<circle cx='515' cy='810' r='3' fill='#52617a'/>
+<circle cx='800' cy='810' r='3' fill='#52617a'/>
+<circle cx='1085' cy='810' r='3' fill='#52617a'/>
+<circle cx='1370' cy='810' r='3' fill='#52617a'/>
+<circle cx='1525' cy='810' r='3' fill='#52617a'/>
+<rect x="265.5" y="511" width="89" height="21" rx="4" fill="white"/>
+<text x="310" y="526" text-anchor="middle" font-size="14">FOCUS rows</text>
+<rect x="606.75" y="536" width="96.5" height="21" rx="4" fill="white"/>
+<text x="655" y="551" text-anchor="middle" font-size="14">Tag catalog</text>
+<rect x="405.5" y="841" width="89" height="21" rx="4" fill="white"/>
+<text x="450" y="856" text-anchor="middle" font-size="14">FOCUS rows</text>
+<rect x="643" y="821" width="134" height="21" rx="4" fill="white"/>
+<text x="710" y="836" text-anchor="middle" font-size="14">Selected profile</text>
+<rect x="414.25" y="1066" width="171.5" height="21" rx="4" fill="white"/>
+<text x="500" y="1081" text-anchor="middle" font-size="14">Cost-detail interface</text>
+<rect x="1371.75" y="1090" width="126.5" height="21" rx="4" fill="white"/>
+<text x="1435" y="1105" text-anchor="middle" font-size="14">OCI module data</text>
+<g id="ING" data-x="100" data-y="400">
+<rect x="100" y="400" width="420" height="75" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="310" y="431.5" text-anchor="middle" font-size="18">00 FOCUS ingestion</text>
+<text x="310" y="455.5" text-anchor="middle" font-size="18">Landing and remediation</text>
+</g>
+<g id="TAG" data-x="590" data-y="400">
+<rect x="590" y="400" width="420" height="75" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="800" y="431.5" text-anchor="middle" font-size="18">01a FinOps tag catalog</text>
+<text x="800" y="455.5" text-anchor="middle" font-size="18">and reporting profile</text>
+</g>
+<g id="ACCOUNT" data-x="1080" data-y="400">
+<rect x="1080" y="400" width="420" height="75" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="1290" y="431.5" text-anchor="middle" font-size="18">02 Tenancy/account context</text>
+<text x="1290" y="455.5" text-anchor="middle" font-size="18">and contracts</text>
+</g>
+<g id="VALUES" data-x="100" data-y="650">
+<rect x="100" y="650" width="260" height="85" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="230" y="686.5" text-anchor="middle" font-size="18">01b All defined-tag values</text>
+<text x="230" y="710.5" text-anchor="middle" font-size="18">Separate historical table</text>
+</g>
+<g id="BUDGET" data-x="385" data-y="650">
+<rect x="385" y="650" width="260" height="85" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="515" y="698.5" text-anchor="middle" font-size="18">03 Budgets</text>
+</g>
+<g id="ADVISOR" data-x="670" data-y="650">
+<rect x="670" y="650" width="260" height="85" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="800" y="698.5" text-anchor="middle" font-size="18">04 Cloud Advisor</text>
+</g>
+<g id="ANOMALY" data-x="955" data-y="650">
+<rect x="955" y="650" width="260" height="85" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="1085" y="698.5" text-anchor="middle" font-size="18">05 Cost Anomalies</text>
+</g>
+<g id="FORECAST" data-x="1240" data-y="650">
+<rect x="1240" y="650" width="260" height="85" rx="12" fill="#f0edff" stroke="#9478e8" stroke-width="1.5"/>
+<text x="1370" y="698.5" text-anchor="middle" font-size="18">06 Native Forecast</text>
+</g>
+<g id="COST" data-x="520" data-y="930">
+<rect x="520" y="930" width="560" height="70" rx="12" fill="#e9f6ef" stroke="#6f9f88" stroke-width="1.5"/>
+<text x="800" y="971" text-anchor="middle" font-size="18">Cost detail with selected tag values</text>
+</g>
+<g id="OAC_COST" data-x="350" data-y="1180">
+<rect x="350" y="1180" width="900" height="60" rx="12" fill="#e9f6ef" stroke="#6f9f88" stroke-width="1.5"/>
+<text x="800" y="1204" text-anchor="middle" font-size="18">Cost and selected-tag datasets</text>
+<text x="800" y="1228" text-anchor="middle" font-size="18">Reporting interface</text>
+</g>
+<g id="OAC_MODULES" data-x="350" data-y="1290">
+<rect x="350" y="1290" width="900" height="60" rx="12" fill="#e9f6ef" stroke="#6f9f88" stroke-width="1.5"/>
+<text x="800" y="1314" text-anchor="middle" font-size="18">OCI module datasets</text>
+<text x="800" y="1338" text-anchor="middle" font-size="18">Account context | Budgets | Advisor | Anomalies | Forecast | Tag values</text>
+</g>
+<text x="800" y="1430" text-anchor="middle" font-size="18">Workbook V2: costs, selected tags and datasets from every installed OCI module.</text>
+<text x="800" y="1460" text-anchor="middle" font-size="17">Arrows show data consumption, not installation order.</text>
+</g></svg>

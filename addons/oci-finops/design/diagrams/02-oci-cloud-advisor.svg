@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2180" height="1120" viewBox="0 0 2180 1120" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-cloud-advisor entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci cloud advisor — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="logical" d="M 660 189 L 785 203.5"/>
+<text class="cardinality" x="668" y="179">1</text>
+<text class="cardinality" x="743" y="193.5">0..*</text>
+<path class="fk" d="M 1395 203.5 L 1520 189"/>
+<text class="cardinality" x="1403" y="193.5">1</text>
+<text class="cardinality" x="1478" y="179">0..*</text>
+<path class="fk" d="M 1090 277 L 355 550"/>
+<text class="cardinality" x="1100" y="297">1</text>
+<text class="cardinality" x="365" y="538">0..*</text>
+<path class="fk" d="M 1090 277 L 1090 550"/>
+<text class="cardinality" x="1100" y="297">1</text>
+<text class="cardinality" x="1100" y="538">0..*</text>
+<path class="fk" d="M 1273 277 L 1825 550"/>
+<text class="cardinality" x="1283" y="297">1</text>
+<text class="cardinality" x="1835" y="538">0..*</text>
+<path class="logical" d="M 1825 248 L 660 623.5"/>
+<text class="cardinality" x="1835" y="268">0..1</text>
+<text class="cardinality" x="668" y="613.5">0..*</text>
+<rect class="card" x="50" y="130" width="610" height="118" rx="8"/>
+<path class="header" d="M 52 178 L 658 178 L 658 133 L 53 133 Z"/>
+<line x1="50" y1="180" x2="660" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="163">OCI_ADVISOR_CONFIG</text>
+<text class="attribute" x="68" y="208">PK  CONFIG_ID</text>
+<text class="attribute" x="68" y="237">UQ  TENANCY_OCID + ENDPOINT_REGION</text>
+<rect class="card" x="785" y="130" width="610" height="147" rx="8"/>
+<path class="header" d="M 787 178 L 1393 178 L 1393 133 L 788 133 Z"/>
+<line x1="785" y1="180" x2="1395" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="802" y="163">OCI_ADVISOR_SYNC_RUN</text>
+<text class="attribute" x="803" y="208">PK  SYNC_RUN_ID</text>
+<text class="attribute" x="803" y="237">STATUS</text>
+<text class="attribute" x="803" y="266">RECOMMENDATIONS_READ / ACTIONS_READ</text>
+<rect class="card" x="1520" y="130" width="610" height="118" rx="8"/>
+<path class="header" d="M 1522 178 L 2128 178 L 2128 133 L 1523 133 Z"/>
+<line x1="1520" y1="180" x2="2130" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1537" y="163">OCI_ADVISOR_RECOMMENDATION</text>
+<text class="attribute" x="1538" y="208">PK  RECOMMENDATION_ID</text>
+<text class="attribute" x="1538" y="237">FK  LAST_SEEN_RUN_ID</text>
+<rect class="card" x="50" y="550" width="610" height="147" rx="8"/>
+<path class="header" d="M 52 598 L 658 598 L 658 553 L 53 553 Z"/>
+<line x1="50" y1="600" x2="660" y2="600" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="67" y="583">OCI_ADVISOR_RESOURCE_ACTION</text>
+<text class="attribute" x="68" y="628">PK  RESOURCE_ACTION_ID</text>
+<text class="attribute" x="68" y="657">FK  LAST_SEEN_RUN_ID</text>
+<text class="attribute" x="68" y="686">RECOMMENDATION_ID (logical)</text>
+<rect class="card" x="785" y="550" width="610" height="118" rx="8"/>
+<path class="header" d="M 787 598 L 1393 598 L 1393 553 L 788 553 Z"/>
+<line x1="785" y1="600" x2="1395" y2="600" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="802" y="583">OCI_ADVISOR_RECOMMENDATION_SNAP</text>
+<text class="attribute" x="803" y="628">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="803" y="657">PK  RECOMMENDATION_ID</text>
+<rect class="card" x="1520" y="550" width="610" height="147" rx="8"/>
+<path class="header" d="M 1522 598 L 2128 598 L 2128 553 L 1523 553 Z"/>
+<line x1="1520" y1="600" x2="2130" y2="600" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1537" y="583">OCI_ADVISOR_RESOURCE_ACTION_SNAP</text>
+<text class="attribute" x="1538" y="628">PK/FK  SYNC_RUN_ID</text>
+<text class="attribute" x="1538" y="657">PK  RESOURCE_ACTION_ID</text>
+<text class="attribute" x="1538" y="686">RECOMMENDATION_ID (logical)</text>
+</svg>

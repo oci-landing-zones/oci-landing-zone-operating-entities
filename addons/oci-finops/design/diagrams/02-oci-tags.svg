@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img" aria-labelledby="title desc">
+<title id="title">02-oci-tags entity relationships</title>
+<desc id="desc">Entity relationship diagram: every table appears once with primary and foreign key columns. Solid links are declared foreign keys; dashed links are logical associations.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#17283a}.title{font-size:27px;font-weight:700}.entity{font-family:Consolas,Menlo,monospace;font-size:19px;font-weight:700}.attribute{font-family:Consolas,Menlo,monospace;font-size:17px}.legend{font-size:17px;fill:#40566e}.cardinality{font-size:18px;font-weight:700;fill:#203e57}.card{fill:#f0f6fc;stroke:#476987;stroke-width:2}.header{fill:#dcebf8}.fk{stroke:#276749;stroke-width:3;fill:none}.logical{stroke:#97621d;stroke-width:3;stroke-dasharray:9 6;fill:none}</style>
+<text class="title" x="40" y="48">oci tags — ERD</text>
+<text class="legend" x="40" y="82">PK = primary key · FK = declared foreign key · UQ = unique key · solid green = FK · dashed amber = logical link</text>
+<path class="fk" d="M 480 189 L 1120 189"/>
+<text class="cardinality" x="488" y="179">1</text>
+<text class="cardinality" x="1078" y="179">0..*</text>
+<path class="fk" d="M 270 248 L 270 445"/>
+<text class="cardinality" x="280" y="268">1</text>
+<text class="cardinality" x="280" y="433">0..*</text>
+<path class="fk" d="M 480 518.5 L 1120 533"/>
+<text class="cardinality" x="488" y="508.5">1</text>
+<text class="cardinality" x="1078" y="523">0..*</text>
+<path class="fk" d="M 1330 248 L 1330 445"/>
+<text class="cardinality" x="1340" y="268">1</text>
+<text class="cardinality" x="1340" y="433">0..*</text>
+<path class="fk" d="M 270 592 L 270 765"/>
+<text class="cardinality" x="280" y="612">1</text>
+<text class="cardinality" x="280" y="753">0..1</text>
+<rect class="card" x="60" y="130" width="420" height="118" rx="8"/>
+<path class="header" d="M 62 178 L 478 178 L 478 133 L 63 133 Z"/>
+<line x1="60" y1="180" x2="480" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="77" y="163">OCI_TAG_NAMESPACE</text>
+<text class="attribute" x="78" y="208">PK  TAG_NAMESPACE_ID</text>
+<text class="attribute" x="78" y="237">NAMESPACE_NAME</text>
+<rect class="card" x="1120" y="130" width="420" height="118" rx="8"/>
+<path class="header" d="M 1122 178 L 1538 178 L 1538 133 L 1123 133 Z"/>
+<line x1="1120" y1="180" x2="1540" y2="180" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1137" y="163">OCI_TAG_DEFINITION</text>
+<text class="attribute" x="1138" y="208">PK/FK  TAG_NAMESPACE_ID</text>
+<text class="attribute" x="1138" y="237">PK  TAG_NAME</text>
+<rect class="card" x="60" y="445" width="420" height="147" rx="8"/>
+<path class="header" d="M 62 493 L 478 493 L 478 448 L 63 448 Z"/>
+<line x1="60" y1="495" x2="480" y2="495" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="77" y="478">OCI_TAG_PROFILE</text>
+<text class="attribute" x="78" y="523">PK  PROFILE_NAME</text>
+<text class="attribute" x="78" y="552">PK  PROFILE_VERSION</text>
+<text class="attribute" x="78" y="581">FK  TAG_NAMESPACE_ID</text>
+<rect class="card" x="1120" y="445" width="420" height="176" rx="8"/>
+<path class="header" d="M 1122 493 L 1538 493 L 1538 448 L 1123 448 Z"/>
+<line x1="1120" y1="495" x2="1540" y2="495" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="1137" y="478">OCI_TAG_PROFILE_ITEM</text>
+<text class="attribute" x="1138" y="523">PK/FK  PROFILE_NAME</text>
+<text class="attribute" x="1138" y="552">PK/FK  PROFILE_VERSION</text>
+<text class="attribute" x="1138" y="581">FK  TAG_NAMESPACE_ID</text>
+<text class="attribute" x="1138" y="610">PK/FK  TAG_NAME</text>
+<rect class="card" x="60" y="765" width="420" height="147" rx="8"/>
+<path class="header" d="M 62 813 L 478 813 L 478 768 L 63 768 Z"/>
+<line x1="60" y1="815" x2="480" y2="815" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="77" y="798">OCI_TAG_PROFILE_SELECTION</text>
+<text class="attribute" x="78" y="843">PK  SELECTION_ID</text>
+<text class="attribute" x="78" y="872">FK  PROFILE_NAME</text>
+<text class="attribute" x="78" y="901">FK  PROFILE_VERSION</text>
+</svg>
