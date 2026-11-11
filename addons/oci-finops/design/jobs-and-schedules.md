@@ -12,7 +12,7 @@
 
 This is the cross-module reference for Scheduler jobs defined by the solution, including disabled jobs and jobs created only for a particular operation. Optional-module jobs exist only when their module is present. States below describe the definitions and their lifecycle, rather than the current state of a deployed database.
 
-Recurring application jobs use `FINOPS_CORE_SCHEDULE_API.LOCAL_START_DATE()` and the region stored in `FINOPS_CORE_SCHEDULE_CONFIG.TIME_ZONE`. Fixed times below are local to that configured time zone, including its daylight-saving rules; they are not fixed UTC times. A time-zone configuration change alone does not rewrite existing Scheduler start dates; see [ADB stop and restart windows](../installation-guide/adb/maintenance-and-diagnostics.md#adb-stop-and-restart-windows) for schedule maintenance.
+Recurring application jobs use `FINOPS_CORE_SCHEDULE_API.LOCAL_START_DATE()` and the region stored in `FINOPS_CORE_SCHEDULE_CONFIG.TIME_ZONE`. Fixed times below are local to that configured time zone, including its daylight-saving rules; they are not fixed UTC times. A time-zone configuration change alone does not rewrite existing Scheduler start dates; see [ADB stop and restart windows](../installation-guide/database-modules/maintenance-and-diagnostics.md#adb-stop-and-restart-windows) for schedule maintenance.
 
 ## Recurring jobs
 
@@ -58,4 +58,4 @@ The [year-pipeline design](02-oci-ingestion.md#year-pipelines) defines source se
 
 ## Current database state
 
-Schedules can subsequently be changed, jobs disabled, and one-time jobs completed or removed. The read-only [job inventory](../deployment/sql/monitoring/04_focusplatform_job_inventory.sql) reports the actual `ENABLED` flag, Scheduler state, repeat expression, start-date time zone, next run and currently running jobs in the owner schema. Its use belongs to [maintenance and diagnostics](../installation-guide/adb/maintenance-and-diagnostics.md#operating-state).
+Schedules can subsequently be changed, jobs disabled, and one-time jobs completed or removed. The read-only [job inventory](../deployment/sql/monitoring/04_focusplatform_job_inventory.sql) reports the actual `ENABLED` flag, Scheduler state, repeat expression, start-date time zone, next run and currently running jobs in the owner schema. Its use belongs to [maintenance and diagnostics](../installation-guide/database-modules/maintenance-and-diagnostics.md#operating-state).

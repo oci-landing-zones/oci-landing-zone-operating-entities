@@ -16,4 +16,4 @@ The platform combines a shared database foundation, provider-specific modules an
 
 ## Installation
 
-Follow the [installation guide](installation-guide/README.md) to install the add-on schemas in an existing ADB using Python with Landing Zone conventions or direct SQL, then create or configure OAC and import the workbook. Post-installation procedures are covered in [ADB maintenance and diagnostics](installation-guide/adb/maintenance-and-diagnostics.md).
+Follow the [installation guide](installation-guide/README.md) to install the add-on schemas in an existing ADB using Python with Landing Zone conventions or direct SQL, then create or configure OAC and import the workbook. Post-installation procedures are covered in [ADB maintenance and diagnostics](installation-guide/database-modules/maintenance-and-diagnostics.md).

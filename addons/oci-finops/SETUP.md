@@ -122,15 +122,15 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 ### Before starting the module installation
 
-**Python is the default method.** Follow the [Python configuration and validation procedure](installation-guide/adb/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
+**Python is the default method.** Follow the [Python configuration and validation procedure](installation-guide/database-modules/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
 
-For a manual SQL installation, consult the [manual prerequisites and connection preparation](installation-guide/adb/manual-sql-installation.md#manual-prerequisites).
+For a manual SQL installation, consult the [manual prerequisites and connection preparation](installation-guide/database-modules/manual-sql-installation.md#manual-prerequisites).
 
 ## Step 3: Install the FinOps database modules
 
-Use the [Python installer](installation-guide/adb/python-installation.md) as the primary and default installation method. The guide covers the Landing Zone resource and Secret conventions, installation sequence and verification.
+Use the [Python installer](installation-guide/database-modules/python-installation.md) as the primary and default installation method. The guide covers the Landing Zone resource and Secret conventions, installation sequence and verification.
 
-For an alternative installation method, see the [manual SQL installation guide](installation-guide/adb/manual-sql-installation.md).
+For an alternative installation method, see the [manual SQL installation guide](installation-guide/database-modules/manual-sql-installation.md).
 
 ## Step 4: Oracle Analytics Cloud Dashboard
 

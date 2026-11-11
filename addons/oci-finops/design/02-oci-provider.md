@@ -44,7 +44,7 @@ This page defines component boundaries and data dependencies. Each linked compon
 | Cost Anomalies (05) | Optional | OCI anomaly monitors and events. Skipping it leaves out native anomaly datasets. | [Cost Anomalies](02-oci-cost-anomalies.md) |
 | Native Forecast (06) | Optional | OCI Usage API actuals and BASIC forecast. Skipping it leaves out native forecast datasets. | [Native Forecast](02-oci-forecast.md) |
 
-Deployment commands and verification markers are defined once in the [installation guide](../installation-guide/adb/manual-sql-installation.md#run-modules-in-order).
+Deployment commands and verification markers are defined once in the [installation guide](../installation-guide/database-modules/manual-sql-installation.md#run-modules-in-order).
 
 ## Visualization boundary
 

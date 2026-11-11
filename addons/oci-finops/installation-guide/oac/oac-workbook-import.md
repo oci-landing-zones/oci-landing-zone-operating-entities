@@ -65,7 +65,7 @@ If database authorization fails, have the database administrator compare the ins
 
 ## After reporting profile changes
 
-Apply the profile, build and explicitly publish its validated candidate using the [database procedure](../adb/manual-sql-installation.md#change-a-profile-and-publish-an-mv-candidate). Then align workbook metadata and presentation with the published column contract:
+Apply the profile, build and explicitly publish its validated candidate using the [database procedure](../database-modules/manual-sql-installation.md#change-a-profile-and-publish-an-mv-candidate). Then align workbook metadata and presentation with the published column contract:
 
 | Profile change | MV column contract | OAC effect |
 | --- | --- | --- |

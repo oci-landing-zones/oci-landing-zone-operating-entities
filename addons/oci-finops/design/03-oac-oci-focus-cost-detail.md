@@ -36,13 +36,13 @@ Initial publication can briefly expose a `READY` build before its audit reaches 
 
 The module requires the OCI landing, an active reporting profile, Module 00 reporting privileges and FAST-refresh eligibility. Ingestion-owned retention changes the landing; its deletes reach reporting through the MV log and a later successful FAST refresh. DELETE propagation requires `REFRESH_FAST_AFTER_ONETAB_DML` capability.
 
-A custom-source rebuild can use another compatible local landing table or scalar structure. It projects available fields/tags, emits typed `NULL` for unavailable slots and validates a separate READY candidate before publication. `SOURCE_TABLE` in the build audit identifies that source. Source-table requirements and procedures are in the [maintenance guide](../installation-guide/adb/maintenance-and-diagnostics.md#rebuild-and-publish-the-oac-cost-detail-mv).
+A custom-source rebuild can use another compatible local landing table or scalar structure. It projects available fields/tags, emits typed `NULL` for unavailable slots and validates a separate READY candidate before publication. `SOURCE_TABLE` in the build audit identifies that source. Source-table requirements and procedures are in the [maintenance guide](../installation-guide/database-modules/maintenance-and-diagnostics.md#rebuild-and-publish-the-oac-cost-detail-mv).
 
 ## Capacity considerations
 
 Storage covers the landing, MV, MV log, indexes and temporary build workspace. Initial population uses an empty landing; later candidates scan populated data. Builds and FAST refreshes use parallel degree 8.
 
-Tag-value extraction and OAC builds have independent locks and can compete for capacity. Long scans need a consistent snapshot and sufficient UNDO; `ORA-01555` represents a failed build, not a published candidate. The validated synonym target remains available while a replacement is incomplete. Diagnosis procedures are in the [maintenance guide](../installation-guide/adb/maintenance-and-diagnostics.md#oac-build-capacity-and-failures).
+Tag-value extraction and OAC builds have independent locks and can compete for capacity. Long scans need a consistent snapshot and sufficient UNDO; `ORA-01555` represents a failed build, not a published candidate. The validated synonym target remains available while a replacement is incomplete. Diagnosis procedures are in the [maintenance guide](../installation-guide/database-modules/maintenance-and-diagnostics.md#oac-build-capacity-and-failures).
 
 ## Entity relationships
 
