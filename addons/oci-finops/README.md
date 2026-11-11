@@ -27,9 +27,18 @@ See [Design](design/README.md) for the solution's internal operation: component 
 
 ## Tagging inherited from One-OE
 
-The add-on reuses One-OE's `tagns-lz-cost-governance` namespace for business unit, cost center, environment, owner, platform and project. The namespace, tag definitions, allowed values and defaults belong to the Landing Zone and must be in place before deploying the add-on.
+The FinOps tagging strategy complements the One-OE compartment hierarchy with consistent financial ownership and cost-allocation metadata. The add-on reuses the `tagns-lz-cost-governance` namespace provided and managed by One-OE.
 
-FinOps consumes these existing tags for cost allocation and reporting. See the [tag catalog and reporting-profile design](design/02-oci-tags.md) for their use inside the platform.
+| Tag | Purpose | Values |
+| --- | --- | --- |
+| `tag-lz-business-unit` | Business unit responsible for the resource and its costs. | Controlled list. |
+| `tag-lz-cost-center` | Financial allocation code used to assign costs to a cost center. | Controlled list. |
+| `tag-lz-platform` | Platform or service to which the resource belongs. | Controlled list. |
+| `tag-lz-environment` | Environment associated with the resource. | Controlled list; optional on resources where the compartment hierarchy already provides the environment context. |
+| `tag-lz-owner` | Email address of the responsible owner. | Manually entered email address. |
+| `tag-lz-project` | Project to which the resource and its costs are assigned. | Manually entered project name. |
+
+The namespace, tag definitions, controlled values and defaults belong to One-OE and must be prepared before deploying the add-on. FinOps consumes these existing tags for cost allocation and reporting. See the [tag catalog and reporting-profile design](design/02-oci-tags.md) for their use inside the platform.
 
 ## Installation
 
