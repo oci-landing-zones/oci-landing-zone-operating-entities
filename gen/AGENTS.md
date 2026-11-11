@@ -286,7 +286,7 @@ function(hub_ctx) -> {
   fw_nsg_key:          string|null, // NSG key for firewall ingress rules (null if no FW)
   spoke_ingress_nsg_keys: [string], // NSGs that receive generated ingress rules for every routed VCN
   lb_return_nsg_key:   string|null, // stateless LB NSG that receives generated backend return-flow rules
-  has_spoke_natgw:     bool,        // whether spokes get NAT GW + direct peer routes
+  has_spoke_natgw:     bool,        // true only for Hub E: spoke NAT GW + direct peer routes
   post_route_entity_id:   string,   // (if firewall) naming-derived NFW/NLB resource key
   post_route_entity_desc: string,   // human description of the routing target
 }
