@@ -8,6 +8,7 @@
   - [Inside the database](#inside-the-database)
 - [FinOps Tagging](#finops-tagging)
 - [Installation](#installation)
+- [Maintenance backlog](#maintenance-backlog)
 - [License](#license)
 
 ## Overview
@@ -90,6 +91,10 @@ The namespace, tag definitions, controlled values and defaults belong to One-OE 
 Follow the [complete FinOps setup guide](SETUP.md), from provisioning infrastructure and ADB with IaC, through changing the ADMIN password and preparing Secrets, to installing database modules with Python or SQL and configuring OAC.
 
 The guide defines the sequence and links to the detailed procedures.
+
+## Maintenance backlog
+
+See the [maintenance backlog](BACKLOG.md) for pending code cleanup and its validation criteria.
 
 ## License
 
