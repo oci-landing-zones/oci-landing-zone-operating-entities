@@ -4,6 +4,8 @@ function(config)
   local lz = import 'landing_zone.libsonnet';
   local result = lz(config);
   local cis_level = result.cis_level;
+  local normalized = (import 'config.libsonnet').normalize(config);
+  local label_tags = std.objectHas(normalized, 'cost_governance') && normalized.cost_governance.tag_resource_labels;
   local security_output(phase) =
     local security = result['security_cis%d%s' % [cis_level, phase]];
     if result.stack_scope != 'regional' then security else {
@@ -46,5 +48,6 @@ function(config)
   + (if std.objectHas(result, 'extra') then { [key + '.json']: result.extra[key] for key in std.objectFields(result.extra) } else {})
   + (if result.stack_scope == 'complete' then {
        'iam.json': result.iam,
-       'governance.json': result.governance,
+       'governance.json': if label_tags then (import 'lib/governance_resource_tags.libsonnet')(result.governance, normalized) else result.governance,
+       [if label_tags then 'governance_pre.json']: result.governance,
      } else {})

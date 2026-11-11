@@ -29,7 +29,7 @@ local default_tags = {
   [prefix + 'cost-center']: 'tobedefined',
   [prefix + 'business-unit']: 'tobedefined',
   [prefix + 'owner']: 'tobedefined',
-  [prefix + 'platform']: 'tobedefined',
+  [prefix + 'platform']: 'governance',
   [prefix + 'environment']: 'shared',
   [prefix + 'project']: 'notapplicable',
 };
@@ -60,7 +60,7 @@ local default_tags = {
           processing_period_type: 'MONTH',
           day_of_month_to_begin: 1,
         },
-        defined_tags: if is_compartment then default_tags else default_tags + { [prefix + budget.tag]: budget.value },
+        defined_tags: (if is_compartment then default_tags else default_tags + { [prefix + budget.tag]: budget.value }) + { [prefix + 'platform']: 'governance', [prefix + 'environment']: 'shared' },
         alert_rule: {
           name: budget.name + '-' + std.strReplace(std.toString(threshold), '.', '-'),
           threshold_metric: 'ACTUAL',

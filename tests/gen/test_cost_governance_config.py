@@ -12,6 +12,43 @@ class CostGovernanceConfigTests(unittest.TestCase):
         return json.loads(run_cmd([jsonnet_command(), '-e',
             "(import 'gen/landing_zone.libsonnet')(%s).governance" % json.dumps(config)]).stdout)
 
+    def test_removed_business_unit_does_not_return_through_an_inherited_budget(self):
+        doc = self.render({'tag_value_lists': {'tag-lz-business-unit': ['IT']}})
+        budgets = doc['budgets_configuration']['budgets']
+        self.assertIn('BUDGET-BUSINESS-UNIT-IT-KEY', budgets)
+        self.assertNotIn('BUDGET-BUSINESS-UNIT-RETAIL-KEY', budgets)
+        self.assertNotIn('BUDGET-BUSINESS-UNIT-FINANCE-KEY', budgets)
+        tag = doc['tags_configuration']['namespaces']['TAGNS-LZ-COST-GOVERNANCE-KEY']['tags']['TAG-LZ-BUSINESS-UNIT-KEY']
+        self.assertEqual(['IT', 'tobedefined'], tag['valid_values'])
+
+    def test_platform_target_does_not_change_the_budget_own_governance_platform(self):
+        doc = self.render({'additional_budgets': {'BUDGET-CUSTOM-NETWORK-KEY': {
+            'name': 'budget-network', 'amount': 100, 'tag_name': 'tag-lz-platform', 'tag_value': 'network',
+        }}})
+        budget = doc['budgets_configuration']['budgets']['BUDGET-CUSTOM-NETWORK-KEY']
+        self.assertEqual(['tagns-lz-cost-governance.tag-lz-platform.network'], budget['target']['values'])
+        self.assertEqual('governance', budget['defined_tags']['tagns-lz-cost-governance.tag-lz-platform'])
+
+    def test_budget_environment_is_shared_while_its_target_stays_prod(self):
+        doc = self.render({})
+        budget = doc['budgets_configuration']['budgets']['BUDGET-ENV-PROD-KEY']
+        self.assertEqual('shared', budget['defined_tags']['tagns-lz-cost-governance.tag-lz-environment'])
+        self.assertEqual(['tagns-lz-cost-governance.tag-lz-environment.prod'], budget['target']['values'])
+
+    def test_each_configured_business_unit_requires_a_cost_center(self):
+        with self.assertRaises(AssertionError):
+            self.render({'tag_value_lists': {'tag-lz-business-unit': ['IT']}, 'cost_center_business_units': {}})
+
+    def test_all_budgets_use_governance_platform(self):
+        doc = self.render({})
+        field = 'tagns-lz-cost-governance.tag-lz-platform'
+        self.assertEqual('governance', doc['budgets_configuration']['default_defined_tags'][field])
+        for budget in doc['budgets_configuration']['budgets'].values():
+            self.assertEqual('governance', budget['defined_tags'][field])
+        values = doc['tags_configuration']['namespaces']['TAGNS-LZ-COST-GOVERNANCE-KEY']['tags']['TAG-LZ-PLATFORM-KEY']['valid_values']
+        self.assertIn('governance', values)
+        self.assertIn('iam', values)
+
     def test_both_tag_modes_keep_all_six_defaults_and_values(self):
         for required in (False, True):
             with self.subTest(required=required):

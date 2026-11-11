@@ -46,6 +46,33 @@ tags.apply({
     def value(self, resource, name):
         return resource['defined_tags']['tagns-lz-cost-governance.tag-lz-' + name]
 
+    def test_general_iam_resources_use_iam_and_specialized_compartments_keep_their_platform(self):
+        doc = json.loads(run_cmd([jsonnet_command(), '-e', """
+(import 'gen/lib/cost_tags.libsonnet').apply({
+  compartments_configuration: { compartments: {
+    'CMP-LANDINGZONE-KEY': {}, 'CMP-LZ-NETWORK-KEY': {}, 'CMP-LZ-SECURITY-KEY': {},
+  } },
+  identity_domains_configuration: { identity_domains: { DOMAIN: {} } },
+  identity_domain_groups_configuration: { groups: { GROUP: {} } },
+  policies_configuration: { supplied_policies: { POLICY: {} } },
+}, { environments: {} })
+"""]).stdout)
+        compartments = doc['compartments_configuration']['compartments']
+        self.assertEqual('iam', self.value(compartments['CMP-LANDINGZONE-KEY'], 'platform'))
+        self.assertEqual('network', self.value(compartments['CMP-LZ-NETWORK-KEY'], 'platform'))
+        self.assertEqual('security', self.value(compartments['CMP-LZ-SECURITY-KEY'], 'platform'))
+        for family, collection, key in [('identity_domains_configuration', 'identity_domains', 'DOMAIN'), ('identity_domain_groups_configuration', 'groups', 'GROUP'), ('policies_configuration', 'supplied_policies', 'POLICY')]:
+            self.assertEqual('iam', self.value(doc[family][collection][key], 'platform'))
+
+    def test_project_admin_groups_are_shared_but_keep_their_project(self):
+        doc = json.loads(run_cmd([jsonnet_command(), '-e', """
+(import 'gen/lib/cost_tags.libsonnet').apply({identity_domain_groups_configuration:{groups:{'GRP-PROD-PAYMENTS-KEY':{}}}}, {environments:{prod:{projects:{payments:{}}}}})
+"""]).stdout)
+        group = doc['identity_domain_groups_configuration']['groups']['GRP-PROD-PAYMENTS-KEY']
+        self.assertEqual('iam', self.value(group, 'platform'))
+        self.assertEqual('shared', self.value(group, 'environment'))
+        self.assertEqual('payments', self.value(group, 'project'))
+
     def test_custom_environment_project_and_authorization_preserved(self):
         vcn = self.doc['network_configuration']['vcns']['VCN-SANDBOX-BILLING-KEY']
         self.assertEqual('sandbox', self.value(vcn, 'environment'))
@@ -106,7 +133,7 @@ tags.apply({
         cmps = self.doc['compartments_configuration']['compartments']
         self.assertEqual('oke', self.value(cmps['CMP-SANDBOX-KUBERNETES-KEY'], 'platform'))
         self.assertEqual('security', self.value(cmps['CMP-PROD-SECURITY-KEY'], 'platform'))
-        self.assertEqual('tobedefined', self.value(cmps['CMP-SHARED-ANALYTICS-KEY'], 'platform'))
+        self.assertEqual('iam', self.value(cmps['CMP-SHARED-ANALYTICS-KEY'], 'platform'))
         obs = self.doc['notifications_configuration']
         self.assertEqual('observability', obs['default_defined_tags']['tagns-lz-cost-governance.tag-lz-platform'])
         self.assertNotIn('defined_tags', obs['topics']['TOPIC-SANDBOX-KEY']['subscriptions'][0])

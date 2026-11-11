@@ -91,7 +91,7 @@ local p = publish(profiles.hub_e);
                 elif key.endswith("-SECURITY-KEY"):
                     self.assertEqual("security", compartment["defined_tags"][platform], key)
                 else:
-                    self.assertEqual("tobedefined", compartment["defined_tags"][platform], key)
+                    self.assertEqual("iam", compartment["defined_tags"][platform], key)
 
     def test_tagging_preserves_every_other_configuration_field(self) -> None:
         def strip_cost_tags(value):

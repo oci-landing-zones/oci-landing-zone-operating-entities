@@ -38,7 +38,11 @@ local name(value, label) =
 
   normalize(raw, projects=[])::
     local label = 'config.cost_governance';
-    local cfg = validation.allowed_keys(validation.object(raw, label), label, ['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'additional_budgets', 'tag_value_lists']);
+    local cfg = validation.allowed_keys(validation.object(raw, label), label, ['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'additional_budgets', 'tag_value_lists', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units']);
+    local assignments = validation.object(if std.objectHas(cfg, 'cost_center_assignments') then cfg.cost_center_assignments else {}, label + '.cost_center_assignments');
+    local label_resources = if std.objectHas(cfg, 'tag_resource_labels') then cfg.tag_resource_labels else false;
+    assert std.type(label_resources) == 'boolean' : label + '.tag_resource_labels must be a boolean';
+    local raw_units = validation.object(if std.objectHas(cfg, 'cost_center_business_units') then cfg.cost_center_business_units else {}, label + '.cost_center_business_units');
     local required = if std.objectHas(cfg, 'require_tag_values') then cfg.require_tag_values else false;
     assert std.type(required) == 'boolean' : label + '.require_tag_values must be a boolean';
     local excluded = validation.array(if std.objectHas(cfg, 'exclude_budgets') then cfg.exclude_budgets else [], label + '.exclude_budgets');
@@ -52,6 +56,17 @@ local name(value, label) =
       validation.object(if std.objectHas(cfg, 'budgets') then cfg.budgets else {}, label + '.budgets'),
       label + '.budgets', inherited_keys
     );
+    local unit_assignments = {
+      [center]:
+        assert center != '' && center == std.stripChars(center, ' \t\n\r') : label + '.cost_center_business_units requires non-empty cost center keys';
+        local unit = raw_units[center];
+        assert std.type(unit) == 'string' && unit != '' && unit == std.stripChars(unit, ' \t\n\r') : label + '.cost_center_business_units requires non-empty business unit values';
+        assert !std.objectHas(lists, 'tag-lz-business-unit') || std.member(lists['tag-lz-business-unit'], unit) : label + '.cost_center_business_units must use a configured Business Unit';
+        unit
+      for center in std.objectFields(raw_units)
+    };
+    assert !std.objectHas(cfg, 'cost_center_business_units') || !std.objectHas(lists, 'tag-lz-business-unit') ||
+      std.length([unit for unit in lists['tag-lz-business-unit'] if !std.member(std.objectValues(unit_assignments), unit)]) == 0 : label + ': each Business Unit must have at least one cost center';
     local entries = overrides + {
       [key]:
         local entry = validation.allowed_keys(validation.object(additional[key], label + '.additional_budgets.' + key), label + '.additional_budgets.' + key, ['name', 'amount', 'alert_rule', 'tag_name', 'tag_value']);
@@ -63,6 +78,21 @@ local name(value, label) =
     };
     {
       require_tag_values: required,
+      tag_resource_labels: label_resources,
+      cost_center_business_units: unit_assignments,
+      cost_center_assignments: {
+        [center]:
+          assert center != '' && center == std.stripChars(center, ' \t\n\r') : label + '.cost_center_assignments requires non-empty cost center values';
+          local rule = validation.allowed_keys(validation.object(assignments[center], label + '.cost_center_assignments.' + center), label + '.cost_center_assignments.' + center, ['platform', 'environment', 'project']);
+          {
+            [dimension]:
+              local values = if std.objectHas(rule, dimension) then rule[dimension] else null;
+              assert values == null || (std.type(values) == 'array' && std.length([v for v in values if std.type(v) != 'string' || v == '' || v != std.stripChars(v, ' \t\n\r')]) == 0) : label + '.cost_center_assignments filters must be arrays of non-empty strings or null';
+              if values == null then null else std.set(values)
+            for dimension in ['platform', 'environment', 'project']
+          }
+        for center in std.objectFields(assignments)
+      },
       [if std.objectHas(cfg, 'owner_email') then 'owner_email']:
         assert std.type(cfg.owner_email) == 'string' && valid_email(cfg.owner_email) : label + '.owner_email must be one valid email address';
         cfg.owner_email,
@@ -105,7 +135,14 @@ local name(value, label) =
 
   apply(governance, config, projects=[])::
     local namespace = governance.tags_configuration.namespaces[namespace_key];
-    local rendered_budgets = budgets(overrides=config.budgets, recipients=if std.objectHas(config, 'budget_recipients') then config.budget_recipients else null, excluded=config.exclude_budgets, projects=projects, additional=config.additional_budgets);
+    local base_budgets = budgets(projects=projects).budgets;
+    local unit_field = namespace.name + '.tag-lz-business-unit';
+    local inactive_unit_budgets = if !std.objectHas(config.tag_value_lists, 'tag-lz-business-unit') then [] else [
+      key for key in std.objectFields(base_budgets)
+      if base_budgets[key].target.type == 'TAG' && std.startsWith(base_budgets[key].target.values[0], unit_field + '.') &&
+         !std.member(config.tag_value_lists['tag-lz-business-unit'], base_budgets[key].defined_tags[unit_field])
+    ];
+    local rendered_budgets = budgets(overrides=config.budgets, recipients=if std.objectHas(config, 'budget_recipients') then config.budget_recipients else null, excluded=config.exclude_budgets + inactive_unit_budgets, projects=projects, additional=config.additional_budgets);
     governance + {
       tags_configuration+: {
         namespaces+: {
@@ -117,7 +154,7 @@ local name(value, label) =
                   local field = namespace.name + '.' + tag.name;
                   local base = if key == 'TAG-LZ-OWNER-KEY' && std.objectHas(config, 'owner_email') then [config.owner_email] else if std.objectHas(config.tag_value_lists, tag.name) then config.tag_value_lists[tag.name] else tag.valid_values;
                   // Keep assigned values and defaults valid when users replace a LOV.
-                  local protected = (if std.member(['TAG-LZ-PLATFORM-KEY', 'TAG-LZ-ENVIRONMENT-KEY', 'TAG-LZ-PROJECT-KEY'], key) then tag.valid_values else ['tobedefined']) +
+                  local protected = (if key == 'TAG-LZ-COST-CENTER-KEY' then std.objectFields(config.cost_center_assignments) else if key == 'TAG-LZ-BUSINESS-UNIT-KEY' then std.objectValues(config.cost_center_business_units) else []) + (if std.member(['TAG-LZ-PLATFORM-KEY', 'TAG-LZ-ENVIRONMENT-KEY', 'TAG-LZ-PROJECT-KEY'], key) then tag.valid_values else ['tobedefined']) +
                     [rendered_budgets.budgets[budget].defined_tags[field] for budget in std.objectFields(rendered_budgets.budgets) if std.objectHas(rendered_budgets.budgets[budget].defined_tags, field)];
                   base + std.set([v for v in protected if !std.member(base, v)]),
                 tag_defaults: {

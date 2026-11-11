@@ -67,6 +67,8 @@
                             "network",
                             "security",
                             "observability",
+                            "iam",
+                            "governance",
                             "oke",
                             "ocvs",
                             "exacs",

@@ -50,13 +50,13 @@ local collections = [
 local sections = {
   network_configuration: 'network',
   nlb_configuration: 'network',
-  compartments_configuration: 'tobedefined',
-  groups_configuration: 'tobedefined',
-  dynamic_groups_configuration: 'tobedefined',
-  policies_configuration: 'tobedefined',
-  identity_domains_configuration: 'tobedefined',
-  identity_domain_groups_configuration: 'tobedefined',
-  identity_domain_dynamic_groups_configuration: 'tobedefined',
+  compartments_configuration: 'iam',
+  groups_configuration: 'iam',
+  dynamic_groups_configuration: 'iam',
+  policies_configuration: 'iam',
+  identity_domains_configuration: 'iam',
+  identity_domain_groups_configuration: 'iam',
+  identity_domain_dynamic_groups_configuration: 'iam',
   alarms_configuration: 'observability',
   events_configuration: 'observability',
   home_region_events_configuration: 'observability',
@@ -109,6 +109,23 @@ local token(text, word) =
     local owner = if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'owner_email') then config.cost_governance.owner_email else null;
     local owner_tags = if owner != null then { [namespace + 'owner']: owner } else {};
     local assigned_tags(obj, field='defined_tags') = tags(obj, field=field) + owner_tags;
+    local center_field = namespace + 'cost-center';
+    local center_rules = if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'cost_center_assignments') then config.cost_governance.cost_center_assignments else {};
+    local assign_center_only(assigned) =
+      // Explicit cost-center tags (including a budget's target) remain authoritative.
+      if std.objectHas(assigned, center_field) && assigned[center_field] != 'tobedefined' then assigned else
+      local matches = [center for center in std.objectFields(center_rules)
+        if std.length([dimension for dimension in ['platform', 'environment', 'project']
+          if std.objectHas(center_rules[center], dimension) && center_rules[center][dimension] != null &&
+             std.length(center_rules[center][dimension]) > 0 &&
+             !std.member(center_rules[center][dimension], if std.objectHas(assigned, namespace + dimension) then assigned[namespace + dimension] else 'tobedefined')]) == 0];
+      assert std.length(matches) <= 1 : 'Multiple cost centers match a resource: ' + std.join(', ', matches);
+      assigned + (if std.length(matches) == 1 then { [center_field]: matches[0] } else {});
+    local assign_center(assigned) =
+      local tagged = assign_center_only(assigned);
+      local units = if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'cost_center_business_units') then config.cost_governance.cost_center_business_units else {};
+      tagged + (if std.objectHas(tagged, center_field) && std.objectHas(units, tagged[center_field]) then { [namespace + 'business-unit']: units[tagged[center_field]] } else {});
+
     local workload_platforms = ['oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'];
     local envs = std.objectFields(config.environments);
     local projects = std.set(std.flattenArrays([
@@ -140,38 +157,37 @@ local token(text, word) =
       local compartment = std.startsWith(resource_key, 'CMP-');
       local matched_platforms = most_specific([name for name in std.objectFields(platform_types) if token(resource_key, name)]);
       local actual_platform =
-        if platform != 'tobedefined' then platform
-        else if compartment && token(resource_key, 'NETWORK') then 'network'
+        if compartment && token(resource_key, 'NETWORK') then 'network'
         else if compartment && token(resource_key, 'SECURITY') then 'security'
         else if compartment && std.length(matched_platforms) == 1 && std.member(workload_platforms, platform_types[matched_platforms[0]]) then platform_types[matched_platforms[0]]
-        else 'tobedefined';
+        else platform;
       {
         [namespace + 'cost-center']: 'tobedefined',
         [namespace + 'business-unit']: 'tobedefined',
         [namespace + 'owner']: 'tobedefined',
         [namespace + 'platform']: actual_platform,
-        [namespace + 'environment']: if std.length(matched_envs) == 1 then matched_envs[0] else 'shared',
+        [namespace + 'environment']: if std.member(path, 'groups') || std.member(path, 'dynamic_groups') then 'shared' else if std.length(matched_envs) == 1 then matched_envs[0] else 'shared',
         [namespace + 'project']: if std.length(matched_projects) == 1 then matched_projects[0] else 'notapplicable',
       };
     local resource(obj, path, platform) =
       if std.type(obj) != 'object' then obj else
         local tagged = walk(obj, path=path, platform=platform);
-        tagged { defined_tags: values(path, platform, obj) + assigned_tags(obj) } +
+        tagged { defined_tags: assign_center(values(path, platform, obj) + assigned_tags(obj)) } +
         (if (std.member(path, 'clusters') || std.member(path, 'cluster_configuration')) && platform == 'oke' then {
            options+: {
              persistent_volume_config+: {
-               defined_tags: values(path, 'oke', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'persistent_volume_config') then obj.options.persistent_volume_config else {}),
+               defined_tags: assign_center(values(path, 'oke', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'persistent_volume_config') then obj.options.persistent_volume_config else {})),
              },
              service_lb_config+: {
-               defined_tags: values(path, 'network', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'service_lb_config') then obj.options.service_lb_config else {}),
+               defined_tags: assign_center(values(path, 'network', obj) + assigned_tags(if std.objectHas(obj, 'options') && std.objectHas(obj.options, 'service_lb_config') then obj.options.service_lb_config else {})),
              },
            },
          } else {}) +
         (if std.member(path, 'node_pools') && std.objectHas(obj, 'node_config_details') then {
-           node_config_details+: { defined_tags: values(path, 'oke', obj) + assigned_tags(obj.node_config_details) },
+           node_config_details+: { defined_tags: assign_center(values(path, 'oke', obj) + assigned_tags(obj.node_config_details)) },
          } else {}) +
         (if std.member(path, 'worker_pools') && platform == 'oke' then {
-           node_defined_tags: values(path, 'oke', obj) + assigned_tags(obj, field='node_defined_tags'),
+           node_defined_tags: assign_center(values(path, 'oke', obj) + assigned_tags(obj, field='node_defined_tags')),
          } else {}),
           walk(obj, path=[], platform='tobedefined') =
       if std.type(obj) == 'array' then [walk(v, path=path, platform=platform) for v in obj]
@@ -181,11 +197,11 @@ local token(text, word) =
           local value = obj[key];
           local child_path = path + [key];
           if key == 'tags_configuration' then value  // Definitions must not tag themselves during bootstrap.
-          else if std.member(['defined_tags', 'default_defined_tags', 'node_defined_tags'], key) && std.type(value) == 'object' then value + owner_tags
+          else if std.member(['defined_tags', 'default_defined_tags', 'node_defined_tags'], key) && std.type(value) == 'object' then assign_center(value + owner_tags)
           else if std.objectHas(sections, key) && std.type(value) == 'object' then
             walk(value, path=child_path, platform=sections[key]) +
             (if std.member(defaults_sections, key) then {
-               default_defined_tags: values([], sections[key], value) + assigned_tags(value, field='default_defined_tags'),
+               default_defined_tags: assign_center(values([], sections[key], value) + assigned_tags(value, field='default_defined_tags')),
              } else {})
           else if std.member(collections, key) && std.type(value) == 'object' then {
             [name]: resource(value[name], child_path + [name], platform)

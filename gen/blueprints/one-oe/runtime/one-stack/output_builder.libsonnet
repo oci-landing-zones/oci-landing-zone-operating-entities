@@ -21,13 +21,13 @@ local values(path, platform='tobedefined') =
   local compartmentPlatform =
     if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-NETWORK-KEY') then 'network'
     else if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-SECURITY-KEY') then 'security'
-    else 'tobedefined';
+    else 'iam';
   {
     [namespace + '.tag-lz-cost-center']: 'tobedefined',
     [namespace + '.tag-lz-business-unit']: 'tobedefined',
     [namespace + '.tag-lz-owner']: 'tobedefined',
     [namespace + '.tag-lz-platform']: if platform == 'tobedefined' then compartmentPlatform else platform,
-    [namespace + '.tag-lz-environment']: if contains('PREPROD') then 'preprod' else if contains('PROD') then 'prod' else 'shared',
+    [namespace + '.tag-lz-environment']: if std.member(path, 'groups') then 'shared' else if contains('PREPROD') then 'preprod' else if contains('PROD') then 'prod' else 'shared',
     [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'notapplicable',
   };
 
