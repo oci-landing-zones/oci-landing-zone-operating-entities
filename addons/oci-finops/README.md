@@ -1,17 +1,20 @@
 # OCI FinOps Solution
 
-The OCI FinOps Solution is an add-on to the OCI Operating Entities Landing Zone. It provides cost visibility, financial allocation and optimization insights by bringing FOCUS reports into Oracle Autonomous Database (ADB) and presenting them through Oracle Analytics Cloud (OAC).
-
-The solution runs in an OCI **parent tenancy**. The current implementation is **V2**, with OCI as the provider implemented today; the modular architecture allows additional providers to be introduced.
-
 **Contents**
 
+- [Overview](#overview)
 - [Architecture](#architecture)
   - [Workloads and Landing Zone integration](#workloads-and-landing-zone-integration)
   - [Inside the database](#inside-the-database)
 - [FinOps Tagging](#finops-tagging)
 - [Installation](#installation)
 - [License](#license)
+
+## Overview
+
+The OCI FinOps Solution is an add-on to the OCI Operating Entities Landing Zone. It provides cost visibility, financial allocation and optimization insights by bringing FOCUS reports into Oracle Autonomous Database (ADB) and presenting them through Oracle Analytics Cloud (OAC).
+
+The solution runs in an OCI **parent tenancy**. The current implementation is **V2**, with OCI as the provider implemented today; the modular architecture allows additional providers to be introduced.
 
 **What is FinOps?** FinOps brings financial accountability to cloud usage through collaboration between engineering, finance and business teams, helping organizations make informed decisions about cost and value.
 
@@ -29,17 +32,17 @@ OAC is a separate presentation service. Its private access channel connects to t
 
 | Resource | Role |
 | --- | --- |
-| FinOps compartment | Groups the FinOps platform resources. |
-| Database and OAC administrator groups | Separate service-administration responsibilities. |
-| ADB Dynamic Group and IAM policies | Authorize database access to FOCUS reports and module APIs, plus administrator access to platform services. |
-| VCN, private subnets and network security groups | Separate ADB, OAC connectivity and infrastructure access. |
-| Service gateway and hub DRG attachment | Connect FinOps to regional OCI services and the existing Landing Zone hub. |
-| Autonomous Database | Hosts ingestion, processing and database reporting objects behind a private endpoint. |
-| Vault and encryption key | Provide the shared-security location for database password Secrets. |
-| Notifications topic and email subscriptions | Deliver platform operational notifications to confirmed subscribers. |
-| Optional central Bastion | Provides administrative access through the hub management subnet. |
-| Database password Secrets | Store the current ADMIN password and the passwords for the FinOps owner and OAC reader. |
-| OAC service and private access channel | Present dashboards and connect OAC to the private ADB endpoint. |
+| **FinOps compartment** | Groups the FinOps platform resources. |
+| **Database and OAC administrator groups** | Separate service-administration responsibilities. |
+| **ADB Dynamic Group and IAM policies** | Authorize database access to FOCUS reports and module APIs, plus administrator access to platform services. |
+| **VCN, private subnets and network security groups** | Separate ADB, OAC connectivity and infrastructure access. |
+| **Service gateway and hub DRG attachment** | Connect FinOps to regional OCI services and the existing Landing Zone hub. |
+| **Autonomous Database** | Hosts ingestion, processing and database reporting objects behind a private endpoint. |
+| **Vault and encryption key** | Provide the shared-security location for database password Secrets. |
+| **Notifications topic and email subscriptions** | Deliver platform operational notifications to confirmed subscribers. |
+| **Optional central Bastion** | Provides administrative access through the hub management subnet. |
+| **Database password Secrets** | Store the current ADMIN password and the passwords for the FinOps owner and OAC reader. |
+| **OAC service and private access channel** | Present dashboards and connect OAC to the private ADB endpoint. |
 
 The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](finops-setup/README.md#step-1-setup-one-oe-landing-zone-with-finops-v2) for the configuration files, resource ownership and dependencies.
 
