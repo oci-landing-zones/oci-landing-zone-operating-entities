@@ -26,23 +26,23 @@ The solution runs in an OCI **parent tenancy**. The current implementation is **
 
 The FinOps workload integrates a private ADB and OAC reporting with the existing One-OE hub and shared services. Its dedicated VCN connects to the hub, with private subnets and network security groups separating database, OAC connectivity and infrastructure access.
 
-OAC is a separate presentation service. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles. The solution reuses One-OE's identity domain, hub and governance tags.
+OAC is a separate presentation service. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles. The solution uses One-OE's existing identity domain and governance tags, and connects its dedicated FinOps VCN to the Landing Zone hub.
 
 <img src="images/OCI_FinOps_Arch.png" width="900" alt="One-OE FinOps architecture with private Autonomous Database, Oracle Analytics Cloud, and an optional Object Storage bucket">
 
-| Resource | Role |
+| **Resource** | **Description** |
 | --- | --- |
-| **FinOps compartment** | Groups the FinOps platform resources. |
-| **Database and OAC administrator groups** | Separate service-administration responsibilities. |
-| **ADB Dynamic Group and IAM policies** | Authorize database access to FOCUS reports and module APIs, plus administrator access to platform services. |
-| **VCN, private subnets and network security groups** | Separate ADB, OAC connectivity and infrastructure access. |
-| **Service gateway and hub DRG attachment** | Connect FinOps to regional OCI services and the existing Landing Zone hub. |
-| **Autonomous Database** | Hosts ingestion, processing and database reporting objects behind a private endpoint. |
-| **Vault and encryption key** | Provide the shared-security location for database password Secrets. |
-| **Notifications topic and email subscriptions** | Deliver platform operational notifications to confirmed subscribers. |
-| **Optional central Bastion** | Provides administrative access through the hub management subnet. |
-| **Database password Secrets** | Store the current ADMIN password and the passwords for the FinOps owner and OAC reader. |
-| **OAC service and private access channel** | Present dashboards and connect OAC to the private ADB endpoint. |
+| **FinOps compartment** | Dedicated compartment for the FinOps database and platform services. |
+| **IAM Groups** | Separate database and OAC administration groups, with service permissions in the FinOps compartment and network dependencies in shared networking. |
+| **IAM Policies and ADB Dynamic Group** | Provide administrator access to the platform and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. |
+| **Autonomous Database (ADB)** | Central data store for the FinOps platform. Its private endpoint is inside the FinOps VCN; native database pipelines ingest FOCUS reports, while database modules prepare the reporting data. |
+| **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports for cost visibility, allocation and analysis. A private access channel connects OAC to the private ADB endpoint. |
+| **VCN & Subnets** | A dedicated VCN with private subnets for ADB, OAC connectivity and infrastructure access. Network security groups control access to FinOps endpoints; a service gateway provides OCI service connectivity and a DRG attachment connects the VCN to the One-OE hub. |
+| **Tags** | Reuses One-OE's `tagns-lz-cost-governance` namespace for financial ownership and cost-allocation metadata. See [FinOps Tagging](#finops-tagging) for the six tags and their meaning. |
+| **Object Storage Bucket (Optional)** | Provides a customer-managed source for OCI FOCUS report files as an alternative to Oracle-managed report storage. The bucket is supplied separately from the current IaC configurations. |
+| **Vault, encryption key and Secrets** | The Vault and key provide secure storage for database credentials. The ADMIN, FinOps schema-owner and OAC-reader password Secrets are prepared separately after infrastructure creation. |
+| **Notifications** | A topic and confirmed email subscriptions deliver platform operational notifications. |
+| **Bastion (Optional)** | Provides administrative access to private FinOps endpoints through a central Bastion in shared security; an existing Bastion can be reused. |
 
 The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](finops-setup/README.md#step-1-setup-one-oe-landing-zone-with-finops-v2) for the configuration files, resource ownership and dependencies.
 
