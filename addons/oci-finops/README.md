@@ -7,7 +7,7 @@ The solution runs in an OCI **parent tenancy**. The current implementation is **
 **Contents**
 
 - [Architecture](#architecture)
-- [Tagging inherited from One-OE](#tagging-inherited-from-one-oe)
+- [FinOps Tagging](#finops-tagging)
 - [Installation](#installation)
 - [License](#license)
 
@@ -25,7 +25,7 @@ A shared Core coordinates provider processing, records execution status and send
 
 See [Design](design/README.md) for the solution's internal operation: component boundaries, data models, database objects and processing flows.
 
-## Tagging inherited from One-OE
+## FinOps Tagging
 
 The FinOps tagging strategy complements the One-OE compartment hierarchy with consistent financial ownership and cost-allocation metadata. The add-on reuses the `tagns-lz-cost-governance` namespace provided and managed by One-OE.
 
