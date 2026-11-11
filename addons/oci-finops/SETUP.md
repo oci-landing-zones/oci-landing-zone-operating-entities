@@ -23,7 +23,12 @@ Infrastructure provisioning does not create the password Secrets. Complete the c
 
 The JSON configurations provision the FinOps infrastructure, including the Autonomous Database, through the Terraform-based Orchestrator. The optional Bastion configuration adds managed access to private FinOps endpoints. Oracle Analytics Cloud is configured separately.
 
-Prefer OCI Resource Manager with customer-controlled private Object Storage and a pinned Orchestrator version. Terraform CLI remains a supported alternative. Review the dependencies, network integration, and validation requirements below before applying.
+Choose where to run the Landing Zone Orchestrator:
+
+- **OCI Resource Manager (recommended):** OCI runs Terraform as a managed service. Store your deployment JSON files in a private Object Storage bucket controlled by your organization, and configure the Orchestrator to read them with authorized access.
+- **Terraform CLI:** run the Orchestrator using Terraform on a prepared administration host or controlled CI/CD runner. Supply the deployment JSON files from a protected location accessible to that runtime.
+
+Both options use the Orchestrator to provision the resources described by the JSON files. Select the specific Orchestrator version listed below, so repository updates do not silently change the deployment code. Before applying changes, validate the configuration, check the Landing Zone dependencies and network integration, and review the Terraform plan.
 
 The published V2 network configuration targets Hub A, including its management subnet `10.0.3.0/24`. Adapt a deployment copy to the selected hub topology and complete the required hub routing in the owning Landing Zone stack. For Hub E, verify the actual management subnet; the standard published blueprint uses `10.0.1.0/24`.
 
