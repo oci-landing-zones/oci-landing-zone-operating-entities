@@ -64,7 +64,7 @@ Prepare a host with the following tools and access before running the installer.
 
 | Requirement | Required capability or version |
 | --- | --- |
-| Repository checkout | A complete local clone of this repository, including `deployment`, `deployment/sql/install`, module `internal/` and `verify/` files. Keep its directory structure intact. |
+| Repository checkout | A complete local clone of this repository, including the full `addons/oci-finops/deployment/` tree and its module `internal/` and `verify/` files. Keep its directory structure intact. |
 | Git | A supported Git release for cloning/updating the checkout. This repository does not impose a Git-specific minimum version. |
 | Python | Python **3.10 or later**, with an environment containing the packages pinned in `deployment/python/requirements.txt`. |
 | Python OCI dependencies | OCI SDK `2.189.0` and OCI CLI `3.95.1`, as currently pinned in the requirements file. The installer uses the SDK; the CLI is available for operator-side authentication tasks. |
@@ -72,7 +72,7 @@ Prepare a host with the following tools and access before running the installer.
 | OCI access | Access to the selected region's OCI APIs and the resource-discovery/Vault permissions in the prerequisite table above. |
 | Database connectivity | A working route/DNS resolution to the ADB endpoint and the environment's required private access. Resolve any descriptor changes before validation. |
 
-Run Python commands from the repository root, using the prepared Python environment. The direct SQL route needs the checkout, SQL*Plus/client and database connectivity; Python dependencies and Python OCI authentication are not required for that route.
+Run Python commands from the add-on directory, `addons/oci-finops/`, using the prepared Python environment. Paths starting with `deployment/` in this guide are relative to that directory. The direct SQL route needs the checkout, SQL*Plus/client and database connectivity; Python dependencies and Python OCI authentication are not required for that route.
 
 ## Supported Python authentication
 
@@ -98,9 +98,10 @@ For Instance Principal, use the installation Compute instance's authorized dynam
 
 ## Configure, validate and install
 
-From the repository root, with the environment above prepared:
+With the environment prepared, enter the add-on directory from the root of your checkout and run:
 
 ```text
+cd addons/oci-finops
 python deployment/python/finops_addon.py configure
 python deployment/python/finops_addon.py validate
 python deployment/python/finops_addon.py install

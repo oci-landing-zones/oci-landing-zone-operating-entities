@@ -30,7 +30,7 @@ Use this route when Python's named-resource convention does not match. The ADB c
 | OCI authorization | ADB Resource Principal membership and source/API permissions for the chosen modules; see the [IAM reference](oci-resource-principal-iam.md). Different names do not waive access requirements. |
 | Source/profile | Your FOCUS source and valid existing tag namespace or explicit list. `installation_mode=STANDALONE` allows a custom profile; governance tags apply only to the governed default profile. |
 | Schema safety | New `FOCUSPLATFORM` and `OAC_FOCUS_READER` users for bootstrap; inspect existing/partial modules before create-only scripts. These application user names remain fixed in both routes. |
-| Files/tools | Full checkout, including module `internal/` and `verify/` files; Git for obtaining/updating the complete checkout, and SQL*Plus with compatible client libraries on the installation host. SQL*Plus working directory is `deployment/sql/install`. |
+| Files/tools | Full checkout, including module `internal/` and `verify/` files; Git for obtaining/updating the complete checkout, and SQL*Plus with compatible client libraries on the installation host. SQL*Plus working directory is `addons/oci-finops/deployment/sql/install`, relative to the repository root. |
 
 ## Wallet and connection
 
@@ -38,10 +38,10 @@ Prepare your own working ADB wallet/TNS alias or supported connection configurat
 
 ## Connect and initialize the ADMIN session
 
-With the complete repository already cloned locally, start from its root:
+With the complete repository already cloned locally, start from the root of your checkout:
 
 ```text
-cd deployment/sql/install
+cd addons/oci-finops/deployment/sql/install
 sqlplus /nolog
 ```
 
