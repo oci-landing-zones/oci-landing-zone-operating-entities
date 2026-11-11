@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { evaluate, setAssetLoader } from './jsonnetVm';
 import { GeneratorError, generateFromUpstreamDefaults, generateOutputs } from './generate';
 import { buildVirtualFs } from './virtualFs';
-import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
+import { emptyLzModel as emptyModel, envNetworkDefaults } from '../model/defaults';
 import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePatch, platformEnvInstances } from '../services/platforms';
 import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
@@ -15,6 +15,14 @@ import { createRegionalModel } from '../services/regionalDeployment';
 import { buildRouteTables } from '../services/routeTables';
 import { buildGraph } from '../diagram/buildGraph';
 import ipsecOptions from '../../../../gen/addons/oci-hybrid-connectivity/ipsec-options.json';
+
+import { defaultCostGovernance } from '../services/costGovernance';
+
+function emptyLzModel() {
+  const model = emptyModel();
+  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com' };
+  return model;
+}
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {

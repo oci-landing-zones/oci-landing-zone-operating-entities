@@ -2,6 +2,7 @@ import type { BusinessUnitScope, CostGovernance, DiagramModel } from '../model/t
 import { costTagDefinitions, businessUnitAssignments, parseTagValues } from '../services/costGovernance';
 import { absoluteNodeRects } from './flowGeometry';
 import { generatorNames } from '../services/generatorNaming';
+import { managementGroupLayout, resourceGroupLayout } from './resourceGroups';
 
 export interface CostTagScope {
   tagName: string;
@@ -79,6 +80,10 @@ export function costTagScope(diagram: DiagramModel, tagName: string | null, mode
       }
       let selection = model?.foundation?.costGovernance?.costCenterScopes?.[value] ?? 'landingzone';
       if (selection.startsWith('custom:')) selection = model?.foundation?.costGovernance?.costCenterCustomScopes?.find((scope) => `custom:${scope.id}` === selection)?.target ?? '';
+      if (selection === 'landingzone' && model) {
+        const filtered = filteredResourceScope(diagram, model, { platform: null, environment: null, project: null });
+        return { id: value, label: 'Cost center', color: colors[index] ?? `hsl(${(index * 137.508 % 360).toFixed(2)} 65% 32%)`, nodeIds: filtered.nodeIds, areas: filtered.areas };
+      }
       const environment = model?.environments.find((env) => `environment:${env.id ?? env.name}` === selection);
       const project = model?.projects?.find((entry) => `project:${entry.id ?? entry.name}` === selection);
       const target = selection === 'shared' ? environmentGroups.find((group) => group.id === 'shared')
@@ -89,11 +94,11 @@ export function costTagScope(diagram: DiagramModel, tagName: string | null, mode
         areas: selection === 'landingzone' ? [{ x, y, width, height }] : target?.areas ?? (target?.bounds ? [target.bounds] : []) };
     });
     return { tagName, overlay: true, nodeIds: [...new Set(groups.flatMap((group) => group.nodeIds))], groups, bounds: { x, y, width, height },
-      message: groups.some((group) => group.areas.length === 0) ? 'No resources match the selected filters for one or more cost centers.' : 'Studio preview: each cost center outlines its selected scope. Active filters must all match; Not apply skips a filter.' };
+      message: groups.some((group) => group.areas.length === 0) ? 'No resources match the selected filters for one or more cost centers.' : 'Each cost center outlines its selected scope. Matching generated resources receive its tag value. Active filters must all match; Not apply skips a filter.' };
   }
   if (tagName === 'tag-lz-business-unit') {
     const cfg = model?.foundation?.costGovernance ?? {};
-    const units = parseTagValues(cfg.tagValueLists?.[tagName] ?? 'IT, Retail');
+    const units = parseTagValues(cfg.tagValueLists?.[tagName] ?? 'IT');
     const assignments = businessUnitAssignments(cfg);
     const centers = costTagScope(diagram, 'tag-lz-cost-center', model)?.groups ?? [];
     const colors = ['#176b9b', '#a86412', '#267246', '#7550a1'];
@@ -106,7 +111,7 @@ export function costTagScope(diagram: DiagramModel, tagName: string | null, mode
     });
     const empty = groups.filter((group) => !group.nodeIds.length).map((group) => group.id);
     return { tagName, overlay: true, nodeIds: [...new Set(groups.flatMap((group) => group.nodeIds))], groups, bounds: { x, y, width, height },
-      message: 'Studio preview: business units inherit the scopes of their assigned cost centers. Each cost center belongs to at most one business unit. Generated tag assignments are unchanged.' +
+      message: 'Business units inherit the scopes of their assigned cost centers and are applied to matching generated resources. Each cost center belongs to at most one business unit.' +
         (empty.length ? ` No assigned cost center resources: ${empty.join(', ')}.` : ''),
     };
   }
@@ -157,18 +162,25 @@ export function costTagScope(diagram: DiagramModel, tagName: string | null, mode
         width: Math.max(...targets.map((rect) => rect.x + rect.width)) - left,
         height: Math.max(...targets.map((rect) => rect.y + rect.height)) - top };
     };
+    const management = diagram.nodes.filter((node) => node.kind === 'resourcegroup' && ['identitydomain', 'budgets', 'requiredtags'].includes(node.resourceKind ?? '') && (node.resourceItems ?? []).every((item) => !item.scope || item.scope.environment === 'shared'));
     const colors = ['#267246', '#a86412', '#176b9b', '#993c60'];
     const groups = [
       { id: 'shared', label: 'Shared', nodeIds: shared.map((node) => node.id), color: '#7550a1' },
       ...environments.map((env, index) => ({ id: env.name.trim(), label: env.name.trim(),
         nodeIds: byId.has(`cmp-env-${index}`) ? [`cmp-env-${index}`] : [], color: colors[index % colors.length] })),
-    ].filter((group) => group.nodeIds.length).map((group) => ({ ...group, bounds: boundsFor(group.nodeIds) }));
+    ].filter((group) => group.nodeIds.length || group.id === 'shared' && management.length).map((group) => {
+      const extra = group.id === 'shared' ? management.map((node) => node.id) : [];
+      const ids = [...group.nodeIds, ...extra];
+      return { ...group, nodeIds: ids, bounds: boundsFor(ids),
+        ...(extra.length ? { areas: [...(group.nodeIds.length ? [boundsFor(group.nodeIds)] : []), ...extra.map((id) => boundsFor([id]))] } : {}),
+      };
+    });
     const matchedIds = groups.flatMap((group) => group.nodeIds);
     return { tagName, overlay: true, nodeIds: matchedIds, groups, bounds: matchedIds.length ? boundsFor(matchedIds) : { x, y, width, height } };
   }
   if (tagName === 'tag-lz-platform') {
     const candidates = new Set(nodeIds);
-    const groups = (['network', 'security'] as const).map((id) => ({
+    const groups: { id: string; label: string; nodeIds: string[]; color?: string }[] = (['network', 'security'] as const).map((id) => ({
       id, label: id === 'network' ? 'Network' : 'Security',
       nodeIds: diagram.nodes.filter((node) => {
         if (!candidates.has(node.id) || node.kind !== 'compartment') return false;
@@ -178,6 +190,14 @@ export function costTagScope(diagram: DiagramModel, tagName: string | null, mode
           : parent?.parentId === root.id && node.label === `${parent.label}-${id}`;
       }).map((node) => node.id),
     }));
+    for (const category of [
+      { id: 'observability', label: 'Observability', kinds: ['events', 'notifications', 'flowlogs'], color: '#007b83' },
+      { id: 'iam', label: 'IAM', kinds: ['identitydomain'], color: '#7550a1' },
+      { id: 'governance', label: 'Governance', kinds: ['budgets', 'requiredtags'], color: '#8a5a24' },
+    ]) {
+      const ids = diagram.nodes.filter((node) => node.kind === 'resourcegroup' && node.resourceKind && category.kinds.includes(node.resourceKind)).map((node) => node.id);
+      if (ids.length) groups.push({ id: category.id, label: category.label, nodeIds: ids, color: category.color });
+    }
     const matchedIds = groups.flatMap((group) => group.nodeIds);
     const rects = absoluteNodeRects(diagram.nodes);
     const targets = matchedIds.map((id) => rects.get(id)!);
@@ -215,7 +235,7 @@ function filteredResourceScope(diagram: DiagramModel, model: TagScopeModel, filt
     ...(model?.exadata?.exacc?.enabled ? [{ key: 'exacc', value: 'exacc' }] : []),
     ...(model?.exadata?.exacs?.enabled ? [{ key: 'exacs', value: 'exacs' }] : []),
   ];
-  const candidates = diagram.nodes.filter((node) => ['landingzone', 'compartment', 'project', 'resourcegroup'].includes(node.kind) && inside(node.id, new Set([root.id])));
+  const candidates = diagram.nodes.filter((node) => ['landingzone', 'compartment', 'project', 'resourcegroup'].includes(node.kind) && !(node.kind === 'resourcegroup' && node.resourceKind) && inside(node.id, new Set([root.id])));
   const environmentRoots = filter.environment === null || filter.environment.length === 0 ? null : new Set(filter.environment.flatMap((value) => {
     const env = model?.environments.find((entry) => `environment:${entry.id ?? entry.name}` === value);
     return environmentGroups.find((group) => group.id === (env?.name.trim() ?? value))?.nodeIds ?? [];
@@ -235,5 +255,40 @@ function filteredResourceScope(diagram: DiagramModel, model: TagScopeModel, filt
   const matching = candidates.filter((node) => [environmentRoots, projectRoots, platformRoots].every((roots) => roots === null || inside(node.id, roots)));
   const matchingIds = new Set(matching.map((node) => node.id));
   const ids = matching.filter((node) => !node.parentId || !inside(node.parentId, matchingIds)).map((node) => node.id);
-  return { nodeIds: ids, areas: ids.map((id) => { const rect = rects.get(id)!; return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }; }) };
+  const areas = ids.map((id) => { const rect = rects.get(id)!; return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }; });
+  const selectedNames = (dimension: keyof BusinessUnitScope) => {
+    const values = filter[dimension];
+    if (!values?.length) return null;
+    return values.map((value) => {
+      const entries = dimension === 'environment' ? model.environments : dimension === 'project' ? model.projects ?? [] : [];
+      return entries.find((entry) => `${dimension}:${entry.id ?? entry.name}` === value)?.name.trim() ?? value;
+    });
+  };
+  const selected = { platform: selectedNames('platform'), environment: selectedNames('environment'), project: selectedNames('project') };
+  const platformFor = { identitydomain: 'iam', budgets: 'governance', requiredtags: 'governance', events: 'observability', notifications: 'observability', flowlogs: 'observability', vault: 'security', scanning: 'security', securityrecipes: 'security' };
+  for (const node of diagram.nodes.filter((entry) => entry.kind === 'resourcegroup' && entry.resourceKind && !inside(entry.id, new Set(ids)))) {
+    const items = node.resourceItems ?? [];
+    const matchingItems = items.filter((item) => {
+      const scope = item.scope ?? { platform: platformFor[node.resourceKind!], environment: 'shared', project: 'notapplicable' };
+      return (['platform', 'environment', 'project'] as const).every((dimension) => selected[dimension] === null || selected[dimension]!.includes(scope[dimension]));
+    });
+    if (!matchingItems.length) continue;
+    ids.push(node.id);
+    const rect = rects.get(node.id)!;
+    if (matchingItems.length === items.length || node.resourceKind === 'requiredtags') {
+      areas.push({ x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+      continue;
+    }
+    const keys = new Set(matchingItems.map((item) => item.key));
+    if (node.resourceKind === 'identitydomain' || node.resourceKind === 'budgets') {
+      const layout = managementGroupLayout(node.resourceKind, items, node.width);
+      for (const row of layout.rows.filter((entry) => keys.has(entry.key))) areas.push({ x: rect.x + row.x, y: rect.y + row.y, width: row.width, height: row.height });
+      if (node.resourceKind === 'identitydomain' && keys.has(items[0].key)) areas.push({ x: rect.x, y: rect.y, width: node.width >= 600 ? 200 : node.width, height: node.width >= 600 ? Math.min(140, node.height) : layout.bodyTop });
+    } else {
+      const layout = resourceGroupLayout(node.resourceKind!, items, node.width);
+      for (const row of layout.rows.filter((entry) => keys.has(entry.key))) areas.push({ x: rect.x + 6, y: rect.y + row.y - 12, width: rect.width - 12, height: row.lines.length * 14 + 4 });
+    }
+  }
+  return { nodeIds: ids, areas };
+
 }

@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
 import Switch from '../../components/Switch';
+import NotificationsSection from './NotificationsSection';
 import DeleteButton from '../../components/DeleteButton';
 import FieldError from '../../components/FieldError';
 import InfoButton from '../../components/InfoButton';
@@ -290,6 +291,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         </div>
       </section>
 
+      <NotificationsSection />
     </div>
   );
 }

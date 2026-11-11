@@ -3,10 +3,10 @@ import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 
 describe('cost governance configuration', () => {
-  it('inherits One-OE tags and eight budgets with a shared recipient', () => {
+  it('inherits One-OE tags and budgets but requires the shared recipient to be entered', () => {
     const config = buildConfig(emptyLzModel());
     expect(config).toHaveProperty('cost_governance.require_tag_values', false);
-    expect(config).toHaveProperty('cost_governance.budget_recipients', 'email.address@example.com');
+    expect(config).toHaveProperty('cost_governance.budget_recipients', '');
     expect(config).toHaveProperty('cost_governance.budgets.BUDGET-LANDINGZONE-KEY.amount', 10000);
     expect(serializeConfig(emptyLzModel())).toContain('cost_governance:');
   });

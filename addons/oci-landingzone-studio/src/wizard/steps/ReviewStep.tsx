@@ -30,6 +30,7 @@ import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
 import { validateCostGovernance } from '../../services/costGovernance';
+import { costCenterCoverageError, type UncoveredCostResource } from '../../services/costCenterCoverage';
 import { validateRemotePeering } from '../../services/remotePeering';
 import { validateRegionalDeployment } from '../../services/regionalDeployment';
 import { regionShortNameError } from '../../services/regions';
@@ -99,7 +100,7 @@ function DeploymentText({ text }: { text: string }) {
   })}</>;
 }
 
-export default function ReviewStep({ designName, getDiagram, diagramReady = true, generatedFiles }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean; generatedFiles?: readonly string[] }) {
+export default function ReviewStep({ designName, getDiagram, diagramReady = true, generatedFiles, uncoveredCostResources }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean; generatedFiles?: readonly string[]; uncoveredCostResources?: readonly UncoveredCostResource[] }) {
   const { model, homeSource } = useWizard();
   const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
@@ -123,15 +124,17 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
   const exacs = exadataReadiness(model, 'exacs');
   const contractErrors = useMemo(() => {
     const shortNameError = regionShortNameError(model.foundation.regionShortName);
+    const coverageError = costCenterCoverageError(uncoveredCostResources ?? [], model);
     return [...new Set([
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
       ...validateNotificationEmails(model.foundation.notifications, regional),
       ...validateCostGovernance(model),
+      ...(coverageError ? [coverageError] : []),
       ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
       ...platformReadiness(model, 'oke_simple').errors,
     ])];
-  }, [model, regional]);
+  }, [model, regional, uncoveredCostResources]);
   const hasSecrets = containsInlineSecrets(model.hybridConnectivity);
   const prerequisites = deploymentPrerequisites(deploymentConfig);
   const handover = deploymentHandover(deploymentConfig);

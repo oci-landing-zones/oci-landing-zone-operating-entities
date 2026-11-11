@@ -1058,6 +1058,42 @@ fieldset[aria-invalid="true"] {
 /* Soft lower-right elevation for every route-table card. */
 .route-table-card { box-shadow: 5px 6px 8px rgba(32, 31, 28, 0.42); }
 
+.cost-tag-help-trigger {
+  border: 0;
+  padding: 3px 0;
+  min-height: 32px;
+  max-width: 100%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline dotted #65615C;
+  text-underline-offset: 4px;
+  cursor: help;
+  overflow-wrap: anywhere;
+}
+.cost-tag-help-trigger:focus-visible { outline: 2px solid #A23829; outline-offset: 3px; border-radius: 2px; }
+.cost-tag-help-panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  border: 1px solid #B8B4B0;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #201F1C;
+  box-shadow: 0 8px 24px rgba(32, 31, 28, 0.18);
+  font-family: 'Oracle Sans', 'Helvetica Neue', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.cost-tag-help-panel > strong { font-size: 14px; }
+.cost-tag-help-panel p { margin: 10px 0 0; }
 .cost-tag-locator {
   display: inline-grid;
   place-items: center;
@@ -1107,6 +1143,9 @@ fieldset[aria-invalid="true"] {
 
 .react-flow__node.cost-tag-scope-network { outline-color: #176b9b; }
 .react-flow__node.cost-tag-scope-security { outline-color: #a84b12; }
+.react-flow__node.cost-tag-scope-observability { outline-color: #007b83; }
+.react-flow__node.cost-tag-scope-iam { outline-color: #7550a1; }
+.react-flow__node.cost-tag-scope-governance { outline-color: #8a5a24; }
 .cost-tag-scope-legend { display: flex; gap: 16px; flex-wrap: wrap; }
 .cost-tag-scope-legend > span { display: inline-flex; align-items: center; gap: 6px; }
 .cost-tag-scope-swatch { display: inline-block; width: 18px; height: 12px; border-radius: 2px; }

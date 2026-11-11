@@ -11,6 +11,48 @@ const diagram: DiagramModel = { edges: [], nodes: [
 ] };
 
 describe('cost tag inherited scope', () => {
+  it('highlights the IAM domain above the landing zone and intersects individual group filters', () => {
+    const domain: DiagramNode = { ...node('domain', 'resourcegroup', 'tenancy'), x: 20, y: 60, width: 1100, height: 240, resourceKind: 'identitydomain', resourceItems: [
+      { key: 'COMMON', name: 'id_lz_common', scope: { platform: 'iam', environment: 'shared', project: 'notapplicable' } },
+      { key: 'ADMIN', name: 'grp-iam-admin', scope: { platform: 'iam', environment: 'shared', project: 'notapplicable' } },
+      { key: 'PROJECT', name: 'grp-project-admin', scope: { platform: 'iam', environment: 'prod', project: 'proj1' } },
+    ] };
+    const graph = { ...diagram, nodes: [...diagram.nodes, domain] };
+    const filter = { platform: ['iam'], environment: null as string[] | null, project: null as string[] | null };
+    const model = { environments: [{ id: 'prod-id', name: 'prod' }], projects: [{ id: 'project-id', name: 'proj1' }], foundation: { costGovernance: { costCenterFilters: { CC12345: filter } } } };
+    const all = costTagScope(graph, 'tag-lz-cost-center', model)!;
+    expect(all.nodeIds).toContain('domain');
+    expect(all.groups![0].areas).toHaveLength(1);
+    filter.environment = ['environment:prod-id']; filter.project = ['project:project-id'];
+    const narrowed = costTagScope(graph, 'tag-lz-cost-center', model)!;
+    expect(narrowed.nodeIds).toContain('domain');
+    expect(narrowed.groups![0].areas).toHaveLength(1);
+    expect(narrowed.groups![0].areas![0].width).toBeLessThan(domain.width);
+  });
+  it('includes Observability, IAM and Governance management blocks in Platform highlights', () => {
+    const nodes = [...diagram.nodes,
+      { ...node('domain', 'resourcegroup', 'tenancy'), resourceKind: 'identitydomain' as const },
+      { ...node('budgets', 'resourcegroup', 'tenancy'), resourceKind: 'budgets' as const },
+      { ...node('tags', 'resourcegroup', 'tenancy'), resourceKind: 'requiredtags' as const },
+      { ...node('events', 'resourcegroup', 'shared'), resourceKind: 'events' as const },
+    ];
+    const scope = costTagScope({ nodes, edges: [] }, 'tag-lz-platform');
+    expect(scope?.groups?.find((group) => group.id === 'iam')?.nodeIds).toEqual(['domain']);
+    expect(scope?.groups?.find((group) => group.id === 'governance')?.nodeIds).toEqual(['budgets', 'tags']);
+    expect(scope?.groups?.find((group) => group.id === 'observability')?.nodeIds).toEqual(['events']);
+  });
+  it('marks management blocks as shared in purple without enclosing production', () => {
+    const nodes = [node('region', 'region'), node('tenancy', 'tenancy', 'region'), node('landingzone', 'landingzone', 'tenancy'),
+      { ...node('cmp-env-0', 'compartment', 'landingzone'), label: 'cmp-lz-prod' },
+      ...(['identitydomain', 'budgets', 'requiredtags'] as const).map((kind) => ({ ...node(kind, 'resourcegroup', 'tenancy'), resourceKind: kind, resourceItems: [{ key: kind, name: kind, scope: { platform: kind === 'identitydomain' ? 'iam' : 'governance', environment: 'shared', project: 'notapplicable' } }] })),
+    ];
+    const scope = costTagScope({ nodes, edges: [] }, 'tag-lz-environment', { environments: [{ id: 'prod', name: 'prod' }] });
+    const shared = scope?.groups?.find((group) => group.id === 'shared');
+    expect(shared?.color).toBe('#7550a1');
+    expect(shared?.nodeIds).toEqual(['identitydomain', 'budgets', 'requiredtags']);
+    expect(shared?.areas).toHaveLength(3);
+    expect(shared?.nodeIds).not.toContain('cmp-env-0');
+  });
   it('outlines the entire landing zone once for its owner, excluding other tenancy resources', () => {
     const original = JSON.stringify(diagram);
     for (const tag of ['owner']) {
@@ -76,7 +118,7 @@ describe('cost tag inherited scope', () => {
     ];
     const original = JSON.stringify(nodes);
     const scope = costTagScope({ nodes, edges: [] }, 'tag-lz-project', { environments: [{ name: 'prod' }], projects: [{ name: 'proj1' }, { name: 'proj2' }], foundation: { costGovernance: {
-      tagValueLists: { 'tag-lz-cost-center': 'CC1, CC2, CC3' }, costCenterBusinessUnits: { CC1: 'IT', CC2: 'Retail', CC3: 'Retail' },
+      tagValueLists: { 'tag-lz-cost-center': 'CC1, CC2, CC3', 'tag-lz-business-unit': 'IT, Retail' }, costCenterBusinessUnits: { CC1: 'IT', CC2: 'Retail', CC3: 'Retail' },
       costCenterFilters: {
         CC1: { platform: null, environment: ['shared'], project: null },
         CC2: { platform: null, environment: null, project: ['project:proj1'] },
@@ -101,7 +143,7 @@ describe('cost tag inherited scope', () => {
       { ...node('proj2', 'project', 'projects'), x: 200, label: 'cmp-lz-prod-proj2' },
     ];
     const scope = costTagScope({ nodes, edges: [] }, 'tag-lz-business-unit', { environments: [{ name: 'prod' }], projects: [{ name: 'proj1' }, { name: 'proj2' }], foundation: { costGovernance: {
-      tagValueLists: { 'tag-lz-cost-center': 'CC1, CC2, CC3' }, costCenterBusinessUnits: { CC1: 'IT', CC2: 'Retail', CC3: 'Retail' },
+      tagValueLists: { 'tag-lz-cost-center': 'CC1, CC2, CC3', 'tag-lz-business-unit': 'IT, Retail' }, costCenterBusinessUnits: { CC1: 'IT', CC2: 'Retail', CC3: 'Retail' },
       costCenterFilters: {
         CC1: { platform: null, environment: ['shared'], project: null },
         CC2: { platform: null, environment: null, project: ['project:proj1'] },
@@ -178,7 +220,7 @@ describe('cost tag inherited scope', () => {
       node('projects', 'compartment', 'cmp-env-0'),
       { ...node('proj1', 'project', 'projects'), label: 'cmp-lz-prod-proj1' }];
     const model = { environments: [{ id: 'prod-id', name: 'prod' }], projects: [{ id: 'app-id', name: 'proj1' }], foundation: { costGovernance: {
-      tagValueLists: { 'tag-lz-cost-center': 'IT, Retail' }, costCenterBusinessUnits: { IT: 'IT', Retail: 'Retail' },
+      tagValueLists: { 'tag-lz-cost-center': 'IT, Retail', 'tag-lz-business-unit': 'IT, Retail' }, costCenterBusinessUnits: { IT: 'IT', Retail: 'Retail' },
       costCenterFilters: {
         IT: { platform: ['security'], environment: ['shared'], project: ['notapplicable'] },
         Retail: { platform: null as string[] | null, environment: ['environment:prod-id'], project: ['project:app-id'] },
@@ -224,8 +266,8 @@ describe('cost tag inherited scope', () => {
       expect(ids()).toEqual(['shared-security']);
     }
   });
-  it('does not assign the default Retail scope to the landing zone when no projects exist', () => {
-    expect(costTagScope(diagram, 'tag-lz-business-unit', { environments: [], projects: [] })?.groups?.find((group) => group.id === 'Retail')?.nodeIds).toEqual([]);
+  it('shows only IT in the default Business Unit preview', () => {
+    expect(costTagScope(diagram, 'tag-lz-business-unit', { environments: [], projects: [] })?.groups?.map((group) => group.id)).toEqual(['IT']);
   });
   it('does not invent a scope for unknown tags, absent selections or missing landing zone', () => {
     expect(costTagScope(diagram, 'tag-unknown')).toBeNull();

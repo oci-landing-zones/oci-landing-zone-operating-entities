@@ -46,11 +46,11 @@ const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-se
 const FLOW_STEP = 3;
 
 const STEP_PROGRESS_LABELS: Record<number, string> = {
-  1: 'Set deployment type, location and environments',
+  1: 'Set deployment type, location, environments and notifications',
   2: 'Set up the shared network',
   3: 'Organize projects and configure environment networks',
   4: 'Add shared services and workload platforms',
-  5: 'Configure notifications, cost tags and budgets',
+  5: 'Configure cost tags and budgets',
   6: 'Review and download your files',
 };
 
@@ -354,9 +354,9 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 4 ? (
                   <PlatformsStep />
                 ) : activeStep === 5 ? (
-                  <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag} />
+                  <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag} uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
                 ) : activeStep === 6 ? (
-                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} />
+                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
                 ) : null}
                 {previewError}
               </div>
@@ -368,7 +368,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 <div style={layout.panelAccent} />
                 <div style={layout.diagramHeader}>
                   <div className="studio-info-heading" style={{ marginBottom: 0 }}>
-                    <h2 style={layout.diagramTitle}>Network diagram</h2>
+                    <h2 style={layout.diagramTitle}>{activeStep === 5 ? 'Landing Zone Diagram' : 'Network diagram'}</h2>
                     {flowLayer && <InfoButton title="Routing tables and flows"><p>Tables come from the current Blueprint Factory configuration. Dynamic DRG rows preview the routes allowed by its import distributions. Remote peering routes are expectations based on the remote CIDRs you supplied.</p><p>This is a configuration preview, not live OCI routing state. The packet follows the network connection lines and briefly highlights the rule used at each hop.</p></InfoButton>}
                   </div>
                   {viewMode === 'split' && supportsFlowTracing && flowStepReached && (
@@ -382,7 +382,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   <div><strong>{tagScope.tagName}</strong>
                     {tagScope.groups ? <>
                       <p style={{ margin: '4px 0' }}>{tagScope.message ?? (tagScope.tagName === 'tag-lz-business-unit'
-                        ? 'Studio preview: IT for shared resources and Retail for project resources. Generated tag assignments are unchanged.'
+                        ? 'Business units follow their assigned cost centers on generated resources.'
                         : tagScope.tagName === 'tag-lz-project'
                         ? 'Resources outside project areas use notapplicable. Each project area shows its project tag value.'
                         : 'The colors identify tag values on generated resources.')}</p>

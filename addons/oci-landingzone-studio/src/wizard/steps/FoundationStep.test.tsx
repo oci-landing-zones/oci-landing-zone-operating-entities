@@ -16,6 +16,30 @@ describe('foundation fields', () => {
 
 
 
+  it('starts with the shared recipient checked and a required email field', () => {
+    const html = render(emptyLzModel());
+    expect(html).toMatch(/type="checkbox"[^>]*checked/);
+    expect(html).toMatch(/id="lz-observability-default"[^>]*required/);
+    expect(html).toContain('Enter at least one notification email address.');
+    expect(html).not.toContain('id="lz-observability-cloudguard"');
+  });
+
+  it('keeps the switch above topic inputs when separate recipients are selected', () => {
+    const model = emptyLzModel();
+    model.foundation.notifications!.useSingleRecipient = false;
+    const html = render(model);
+    const recipientChoice = html.indexOf('Use the same recipients for all topics');
+    expect(recipientChoice).toBeGreaterThan(-1);
+    expect(recipientChoice).toBeLessThan(html.indexOf('id="lz-observability-cloudguard"'));
+    expect(html).not.toContain('id="lz-observability-default"');
+    expect(html.match(/<section[^>]*aria-labelledby="foundation-observability-title"[\s\S]*?<\/section>/)?.[0]).not.toMatch(/type="checkbox"[^>]*checked/);
+  });
+
+  it('clears the field error for a valid shared recipient', () => {
+    const model = emptyLzModel();
+    model.foundation.notifications!.default = 'ops@example.com';
+    expect(render(model)).not.toContain('role="alert"');
+  });
   it('keeps a custom region short name editable', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = 'fr2';
@@ -118,7 +142,7 @@ describe('foundation fields', () => {
     expect(render(model)).toContain('No Home Region environments. Hub and shared services only.');
     expect(html).not.toContain('id="lz-observability-cloudguard"');
     expect(html).not.toContain('id="lz-observability-iam"');
-    expect(html).not.toContain('id="lz-observability-network"');
+    expect(html).toContain('id="lz-observability-network"');
   });
 
 

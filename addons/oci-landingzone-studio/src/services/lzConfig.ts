@@ -217,7 +217,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
-    ...(f.stackScope !== 'regional' ? { cost_governance: costGovernanceConfig(f.costGovernance, activeProjectNames(model)) } : {}),
+    ...(f.stackScope !== 'regional' ? { cost_governance: costGovernanceConfig(f.costGovernance, activeProjectNames(model), model) } : {}),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,

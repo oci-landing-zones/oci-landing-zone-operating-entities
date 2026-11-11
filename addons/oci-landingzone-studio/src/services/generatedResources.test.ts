@@ -32,6 +32,54 @@ const artifacts = () => ({
 });
 
 describe('generated resource inventory', () => {
+  it('keeps each generated identity domain with all its own groups, including extension groups', () => {
+    const result = extractGeneratedResources({
+      'iam.json': {
+        identity_domains_configuration: { identity_domains: {
+          COMMON: { display_name: 'id_lz_common', compartment_id: null },
+          OTHER: { name: 'other domain', compartment_id: 'ROOT' },
+        } },
+        identity_domain_groups_configuration: { default_identity_domain_id: 'COMMON', groups: {
+          IAM: { name: 'grp-iam-admin' }, COST: { name: 'grp-cost-admin' },
+          OTHER_GROUP: { name: 'other group', identity_domain_id: 'OTHER' },
+        } },
+      },
+      'extension_iam.json': { identity_domain_groups_configuration: { default_identity_domain_id: 'COMMON', groups: {
+        PROJECT: { name: 'project group' }, IAM: { name: 'grp-iam-admin' },
+      } } },
+    }, compartments);
+    expect(result.groups.find((group) => group.id === 'identitydomain:COMMON')).toEqual({
+      id: 'identitydomain:COMMON', kind: 'identitydomain', compartmentKey: 'TENANCY-ROOT',
+      items: [{ key: 'COMMON', name: 'id_lz_common' }, { key: 'COST', name: 'grp-cost-admin' }, { key: 'IAM', name: 'grp-iam-admin' }, { key: 'PROJECT', name: 'project group' }],
+    });
+    expect(result.groups.find((group) => group.id === 'identitydomain:OTHER')?.items).toEqual([{ key: 'OTHER', name: 'other domain' }, { key: 'OTHER_GROUP', name: 'other group' }]);
+  });
+  it('does not invent domains for groups referring to an existing external domain', () => {
+    const result = extractGeneratedResources({ 'regional_iam.json': { identity_domain_groups_configuration: {
+      default_identity_domain_id: 'HOME-DOMAIN', groups: { GROUP: { name: 'existing domain group' } },
+    } } }, compartments);
+    expect(result.groups).toEqual([]);
+  });
+  it('includes active budgets and only shows the required-tags marker when a Tag Default requires values', () => {
+    const governance = {
+      budgets_configuration: { budgets: { BUDGET: { name: 'budget-landingzone' } } },
+      tags_configuration: { default_compartment_id: 'TENANCY-ROOT', namespaces: { COST: { name: 'cost', tags: {
+        PLATFORM: { name: 'platform', tag_defaults: { REQUIRED: { is_user_required: true, compartment_ids: ['ROOT'] } } },
+      } } } },
+    };
+    const result = extractGeneratedResources({ 'governance.json': governance }, compartments);
+    expect(result.groups.find((group) => group.kind === 'budgets')?.items).toEqual([{ key: 'BUDGET', name: 'budget-landingzone' }]);
+    expect(result.groups.find((group) => group.kind === 'requiredtags')?.items).toEqual([{ key: 'COST.PLATFORM', name: 'cost.platform' }]);
+    governance.tags_configuration.namespaces.COST.tags.PLATFORM.tag_defaults.REQUIRED.is_user_required = false;
+    expect(extractGeneratedResources({ 'governance.json': governance }, compartments).groups.some((group) => group.kind === 'requiredtags')).toBe(false);
+  });
+  it('keeps flow-log groups emitted through explicit service logs', () => {
+    const result = extractGeneratedResources({ 'observability.json': { logging_configuration: {
+      default_compartment_id: 'SECURITY', log_groups: { FLOW: { name: 'generated-flow-log-group' }, APP: { name: 'application-log-group' } },
+      flow_logs: {}, service_logs: { SUBNET: { service: 'flowlogs', category: 'subnet', log_group_id: 'FLOW' }, APP: { service: 'application', category: 'custom', log_group_id: 'APP' } },
+    } } }, compartments);
+    expect(result.groups.find((group) => group.kind === 'flowlogs')?.items).toEqual([{ key: 'FLOW', name: 'generated-flow-log-group' }]);
+  });
   it('uses canonical names, keys and owner inheritance for the six requested families', () => {
     const result = extractGeneratedResources(artifacts(), compartments);
     expect(result.compartments).toEqual([

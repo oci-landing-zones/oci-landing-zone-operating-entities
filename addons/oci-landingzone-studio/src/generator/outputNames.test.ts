@@ -19,6 +19,13 @@ describe('deploymentStages', () => {
     expect(stages[1].files).toEqual([...persistent, 'network.json', ...final, ...workloads]);
   });
 
+  it('replaces governance bootstrap with the final labelled governance without duplicate families', () => {
+    const stages = deploymentStages(['iam.json', 'governance_pre.json', 'governance.json', 'network.json', 'security_cis2_pre.json', 'security_cis2.json']);
+    expect(stages[0].files).toContain('governance_pre.json');
+    expect(stages[0].files).not.toContain('governance.json');
+    expect(stages[1].files).toContain('governance.json');
+    expect(stages[1].files).not.toContain('governance_pre.json');
+  });
   it('keeps design, guide, diagram and runtime dependency files out of both phases', () => {
     const stages = deploymentStages(['network.json', 'config.jsonnet', 'README.txt', 'design.drawio',
       'compartments_output.json', 'network_output.json']);

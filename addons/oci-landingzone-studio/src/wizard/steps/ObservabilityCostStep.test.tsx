@@ -11,6 +11,24 @@ function render(model: LzModel) {
 }
 
 describe('observability and cost settings', () => {
+  it('preselects CC12345 for IT and shows an inline error for cost centers without a business unit', () => {
+    const model = emptyLzModel();
+    expect(render(model)).toMatch(/aria-label="CC12345 for business unit IT" checked=""/);
+    model.foundation.costGovernance = addCostCenters(defaultCostGovernance(), 'CC2');
+    expect(render(model)).toContain('Cost center CC2: Assign a business unit before downloading.');
+    model.foundation.costGovernance.costCenterBusinessUnits = {};
+    const html = render(model);
+    expect(html).not.toMatch(/aria-label="CC12345 for business unit IT" checked/);
+    expect(html).toContain('Assign at least one cost center to this business unit.');
+    expect(html).toContain('Cost center CC12345: Assign a business unit before downloading.');
+  });
+  it('hides inherited budgets for business units absent from the configured LOV', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), tagValueLists: { 'tag-lz-business-unit': 'IT' } };
+    const html = render(model);
+    expect(html).not.toContain('budget-business-unit-retail');
+    expect(html).toContain('budget-business-unit-it');
+  });
   it('uses a tag value dropdown and keeps the delete action for custom budgets', () => {
     const model = emptyLzModel(); const cfg = addCostCenters(defaultCostGovernance(), 'CC12346');
     cfg.additionalBudgets!['BUDGET-CUSTOM-DRAFT-KEY'] = { name: 'budget-custom-3', amount: 500, thresholdValue: 80, recipients: '', tagName: 'tag-lz-cost-center', tagValue: '' };
@@ -42,7 +60,7 @@ describe('observability and cost settings', () => {
   it('disables cost centers already assigned to another business unit', () => {
     const model = emptyLzModel();
     model.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {},
-      tagValueLists: { 'tag-lz-cost-center': 'CC12345, CC2' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+      tagValueLists: { 'tag-lz-cost-center': 'CC12345, CC2', 'tag-lz-business-unit': 'IT, Retail' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const html = render(model);
     expect(html).toMatch(/aria-label="CC12345 for business unit IT" checked=""/);
     expect(html).toMatch(/aria-label="CC12345 for business unit Retail" disabled=""/);
@@ -72,7 +90,7 @@ describe('observability and cost settings', () => {
     expect(updated).toContain('shared, production, preprod');
     expect(updated).toMatch(/aria-label="LOV for tag-lz-project"[^>]*>notapplicable<\/textarea>/);
   });
-  it('orders Notifications, FinOps/Governance tags and Budgets as separate sections', () => {
+  it('orders FinOps/Governance tags before Budgets without Notifications', () => {
     const model = emptyLzModel();
     model.environments[0].name = 'staging-custom';
     model.projects[0].name = 'payments';
@@ -81,8 +99,7 @@ describe('observability and cost settings', () => {
     const budgets = html.match(/<section[^>]*aria-labelledby="cost-budgets-title"[\s\S]*?<\/section>/)?.[0];
     expect(tags).toBeDefined();
     expect(budgets).toBeDefined();
-    expect(html).toContain('Observability Notifications (Events &amp; alarms)');
-    expect(html.indexOf('FinOps/Governance tags')).toBeGreaterThan(html.indexOf('Observability Notifications (Events &amp; alarms)'));
+    expect(html).not.toContain('Observability Notifications (Events &amp; alarms)');
     expect(html.indexOf('id="cost-budgets-title"')).toBeGreaterThan(html.indexOf('FinOps/Governance tags'));
     for (const name of ['cost-center', 'business-unit', 'owner', 'platform', 'environment', 'project']) {
       expect(tags).toContain(`tag-lz-${name}`);
@@ -95,7 +112,7 @@ describe('observability and cost settings', () => {
     expect(tags).toContain('Owner uses one email for all resources.');
     expect(tags).toContain('LOV (List of values)');
     expect(tags).toContain('Configuration');
-    const costCenterRow = tags!.match(/<tr><td[^>]*><code>tag-lz-cost-center<\/code>[\s\S]*?<\/tr>/)![0];
+    const costCenterRow = tags!.match(/<tr><td[^>]*><button[^>]*><code>tag-lz-cost-center<\/code>[\s\S]*?<\/tr>/)![0];
     const costCenterCells = costCenterRow.match(/<td[^>]*>[\s\S]*?<\/td>/g)!;
     expect(costCenterCells[1]).toContain('Platform for cost center CC12345');
     expect(costCenterCells[1]).toContain('Add cost center');
@@ -118,16 +135,18 @@ describe('observability and cost settings', () => {
     expect(tags).toMatch(/aria-label="Cost center 1"[^>]*value="CC12345"/);
     expect(tags).toContain('Add cost center');
     expect(tags).toContain('Platform for cost center CC12345');
-    expect(tags).toMatch(/aria-label="LOV for tag-lz-platform"[^>]*>network, security<\/textarea>/);
+    expect(tags).toMatch(/aria-label="LOV for tag-lz-platform"[^>]*>[\s\S]*?iam, governance[\s\S]*?<\/textarea>/);
     expect(budgets).toContain('Add tag-based budget');
-    expect([...tags!.matchAll(/<tr><td[^>]*><code>(tag-lz-[a-z-]+)<\/code>/g)].map((match) => match[1])).toEqual([
+    expect([...tags!.matchAll(/<tr><td[^>]*><button[^>]*><code>(tag-lz-[a-z-]+)<\/code>/g)].map((match) => match[1])).toEqual([
       'tag-lz-platform', 'tag-lz-environment', 'tag-lz-project', 'tag-lz-cost-center', 'tag-lz-business-unit', 'tag-lz-owner',
     ]);
-    for (const unit of ['IT', 'Retail']) {
+    for (const unit of ['IT']) {
       expect(tags).toContain(`Cost centers for ${unit}`);
       expect(tags).toContain(`CC12345 for business unit ${unit}`);
       expect(tags).not.toContain(`Platform for business unit ${unit}`);
     }
+    expect(tags).not.toContain('Cost centers for Retail');
+    expect(budgets).not.toContain('budget-business-unit-retail');
     expect(budgets).not.toContain('budget-business-unit-finance');
     expect(budgets).toContain('budget-landingzone');
     expect(budgets).toContain('10,000');
@@ -144,36 +163,12 @@ describe('observability and cost settings', () => {
     expect(section).toContain('Tags and budgets are managed in the Home Region.');
   });
 
-  it('starts with the shared recipient checked and a required email field', () => {
-    const html = render(emptyLzModel());
-    expect(html).toMatch(/type="checkbox"[^>]*checked/);
-    expect(html).toMatch(/id="lz-observability-default"[^>]*required/);
-    expect(html).toContain('Enter at least one notification email address.');
-    expect(html).not.toContain('id="lz-observability-cloudguard"');
-  });
-
-  it('keeps the switch above topic inputs when separate recipients are selected', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.useSingleRecipient = false;
-    const html = render(model);
-    const recipientChoice = html.indexOf('Use the same recipients for all topics');
-    expect(recipientChoice).toBeGreaterThan(-1);
-    expect(recipientChoice).toBeLessThan(html.indexOf('id="lz-observability-cloudguard"'));
-    expect(html).not.toContain('id="lz-observability-default"');
-    expect(html.match(/<section[^>]*aria-labelledby="foundation-observability-title"[\s\S]*?<\/section>/)?.[0]).not.toMatch(/type="checkbox"[^>]*checked/);
-  });
-
-  it('clears the field error for a valid shared recipient', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.default = 'ops@example.com';
-    expect(render(model)).not.toContain('role="alert"');
-  });
-  it('keeps only regional notification topics and locks Home-owned cost governance in DR', () => {
+  it('locks Home-owned cost governance in DR without notification settings', () => {
     const model = emptyLzModel(); model.foundation.stackScope = 'regional';
     model.foundation.notifications!.useSingleRecipient = false;
     const html = render(model);
-    expect(html).toContain('id="lz-observability-network"');
-    expect(html).toContain('id="lz-observability-security"');
+    expect(html).not.toContain('id="lz-observability-network"');
+    expect(html).not.toContain('id="lz-observability-security"');
     expect(html).not.toContain('id="lz-observability-cloudguard"');
     expect(html).not.toContain('id="lz-observability-iam"');
     expect(html).toMatch(/<fieldset[^>]*disabled=""/);

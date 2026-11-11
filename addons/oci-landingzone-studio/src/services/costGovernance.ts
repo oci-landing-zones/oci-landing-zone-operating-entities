@@ -35,7 +35,7 @@ export function budgetDefinitions(projectNames: string[] = []): Record<string, B
 export function tagValueLists(model: LzModel): Record<string, string[]> {
   const envIds = new Set(model.environments.map((env) => env.id));
   const platforms = [
-    'network', 'security',
+    'network', 'security', 'observability', 'iam', 'governance',
     ...model.platforms.filter((platform) => platform.environments === 'all' ? envIds.size > 0 : platform.environments.some((id) => envIds.has(id)))
       .map((platform) => platform.type === 'oke_simple' ? 'oke' : platform.key.trim()).filter(Boolean),
     ...model.sharedPlatforms.map((platform) => platform.key.trim()).filter(Boolean),
@@ -43,7 +43,7 @@ export function tagValueLists(model: LzModel): Record<string, string[]> {
     ...(model.exadata.exacs.enabled ? ['exacs'] : []),
   ];
   return Object.fromEntries(costTagDefinitions.map((tag) => [tag.name, [...new Set([
-    ...(tag.name === 'tag-lz-business-unit' ? ['IT', 'Retail'] : tag.name === 'tag-lz-environment' ? ['shared'] : tag.name === 'tag-lz-project' ? ['notapplicable'] : tag.name === 'tag-lz-platform' ? platforms : tag.valid_values.filter((value) => tag.name !== 'tag-lz-cost-center' || value !== 'tobedefined')),
+    ...(tag.name === 'tag-lz-business-unit' ? ['IT'] : tag.name === 'tag-lz-environment' ? ['shared'] : tag.name === 'tag-lz-project' ? ['notapplicable'] : tag.name === 'tag-lz-platform' ? platforms : tag.valid_values.filter((value) => tag.name !== 'tag-lz-cost-center' || value !== 'tobedefined')),
     ...(tag.name === 'tag-lz-environment' ? model.environments.map((env) => env.name.trim()).filter(Boolean) : []),
     ...(tag.name === 'tag-lz-project' ? activeProjectNames(model) : []),
   ])]]));
@@ -66,7 +66,7 @@ export function syncCostCenterBudgets(cfg: CostGovernance, previousRaw: string):
   const deleted = previous.filter((value) => !current.includes(value));
   const scopes = { ...cfg.costCenterScopes };
   const filters = { ...cfg.costCenterFilters };
-  const assignments = { ...cfg.costCenterBusinessUnits };
+  const assignments = { ...(cfg.costCenterBusinessUnits ?? { CC12345: 'IT' }) };
   if (previous.length === 1 && scopes[previous[0]] === undefined) scopes[previous[0]] = 'landingzone';
   const additional = { ...cfg.additionalBudgets };
   const removed = new Set(cfg.removedBudgets ?? []);
@@ -134,7 +134,7 @@ export function removeCostCenter(cfg: CostGovernance, value: string): CostGovern
     tagValueLists: { ...cfg.tagValueLists, 'tag-lz-cost-center': remaining.join(', ') },
     additionalBudgets: Object.fromEntries(Object.entries(cfg.additionalBudgets ?? {}).filter(([key]) => !deleted.has(key))),
     removedBudgets: [...removed],
-    costCenterBusinessUnits: Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? {}).filter(([entry]) => entry !== value)),
+    costCenterBusinessUnits: Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? { CC12345: 'IT' }).filter(([entry]) => entry !== value)),
     costCenterFilters: Object.fromEntries(Object.entries(cfg.costCenterFilters ?? {}).filter(([entry]) => entry !== value)),
     costCenterScopes: Object.fromEntries(Object.entries(cfg.costCenterScopes ?? {}).filter(([entry]) => entry !== value)),
     costCenterBudgetKeys: Object.fromEntries(Object.entries(cfg.costCenterBudgetKeys ?? {}).filter(([entry, key]) => entry !== value && !deleted.has(key))),
@@ -143,17 +143,24 @@ export function removeCostCenter(cfg: CostGovernance, value: string): CostGovern
 
 export function businessUnitAssignments(cfg: Pick<CostGovernance, 'tagValueLists' | 'costCenterBusinessUnits'>): Record<string, string> {
   const centers = parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345');
-  const units = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT, Retail');
-  return Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? {}).filter(([center, unit]) => centers.includes(center) && units.includes(unit)));
+  const units = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT');
+  return Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? { CC12345: 'IT' }).filter(([center, unit]) => centers.includes(center) && units.includes(unit)));
+}
+
+export function unassignedCostCenterErrors(cfg: CostGovernance): string[] {
+  const assignments = businessUnitAssignments(cfg);
+  return parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345')
+    .filter((center) => center !== 'tobedefined' && !assignments[center])
+    .map((center) => `Cost center ${center}: Assign a business unit before downloading.`);
 }
 
 export function syncBusinessUnitAssignments(cfg: CostGovernance, previousRaw: string): CostGovernance {
-  const current = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT, Retail');
+  const current = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT');
   const previous = parseTagValues(previousRaw);
   const deleted = previous.filter((unit) => !current.includes(unit));
   const added = current.filter((unit) => !previous.includes(unit));
   const renamed = deleted.length === 1 && added.length === 1;
-  return { ...cfg, costCenterBusinessUnits: Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? {})
+  return { ...cfg, costCenterBusinessUnits: Object.fromEntries(Object.entries(cfg.costCenterBusinessUnits ?? { CC12345: 'IT' })
     .map(([center, unit]) => [center, renamed && unit === deleted[0] ? added[0] : unit])
     .filter(([, unit]) => current.includes(unit))) };
 }
@@ -161,7 +168,7 @@ export function syncBusinessUnitAssignments(cfg: CostGovernance, previousRaw: st
 export function assignCostCenterBusinessUnit(cfg: CostGovernance, center: string, unit: string | null): CostGovernance {
   const assignments = businessUnitAssignments(cfg);
   const centers = parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345');
-  const units = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT, Retail');
+  const units = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT');
   if (!centers.includes(center) || (unit !== null && (!units.includes(unit) || (assignments[center] && assignments[center] !== unit)))) return cfg;
   if (unit === null) delete assignments[center];
   else assignments[center] = unit;
@@ -231,6 +238,9 @@ export function ownerEmailError(value: string): string | null {
 
 type BudgetOverride = { name: string; amount: number; alert_rule: { threshold_value: number; recipients?: string } };
 export interface CostGovernanceConfig {
+  tag_resource_labels?: boolean;
+  cost_center_business_units?: Record<string, string>;
+  cost_center_assignments?: Record<string, BusinessUnitScope>;
   owner_email?: string;
   tag_value_lists?: Record<string, string[]>;
   additional_budgets?: Record<string, BudgetOverride & { tag_name: string; tag_value: string }>;
@@ -241,11 +251,13 @@ export interface CostGovernanceConfig {
 }
 
 export function defaultCostGovernance(projectNames: string[] = []): CostGovernance {
-  const recipients = Object.values(publishedBudgetDefinitions)[0].alert_rule.recipients;
+  const recipients = '';
   return {
+    tagValueLists: { 'tag-lz-business-unit': 'IT' },
+    costCenterBusinessUnits: { CC12345: 'IT' },
     requireTagValues: false, useSingleRecipient: true, recipients, removedBudgets: [...studioExcludedBudgetKeys],
     budgets: Object.fromEntries(Object.entries(budgetDefinitions(projectNames)).map(([key, budget]) => [key, {
-      name: budget.name, amount: budget.amount, thresholdValue: budget.alert_rule.threshold_value, recipients: budget.alert_rule.recipients,
+      name: budget.name, amount: budget.amount, thresholdValue: budget.alert_rule.threshold_value, recipients,
     }])),
   };
 }
@@ -256,7 +268,7 @@ export function normalizeBudgetRecipients(value: string): string {
 
 export function budgetRecipientError(value: string, single = false): string | null {
   const emails = normalizeBudgetRecipients(value);
-  if (!emails) return notificationEmailError('');
+  if (!emails || emails.split(',').some((email) => email.toLowerCase() === 'email.address@example.com')) return notificationEmailError('');
   if (single && emails.includes(',')) return 'Enter a single email address.';
   return notificationEmailError(emails);
 }
@@ -268,20 +280,53 @@ export function budgetFieldError(field: keyof CostBudget, value: string | number
   return typeof value === 'string' ? budgetRecipientError(value) : 'Enter valid email addresses.';
 }
 
-export function costGovernanceConfig(value: CostGovernance | undefined, projectNames: string[] = []): CostGovernanceConfig {
+type CostCenterContext = Pick<LzModel, 'environments' | 'projects'>;
+
+function exportCostCenterAssignments(cfg: CostGovernance, model: CostCenterContext): Record<string, BusinessUnitScope> {
+  const resolve = (values: string[] | null, dimension: keyof BusinessUnitScope) => {
+    if (!values?.length) return null;
+    return values.map((value) => {
+      if (dimension === 'platform') return value;
+      const entries = dimension === 'environment' ? model.environments : model.projects;
+      const entry = entries.find((item) => `${dimension}:${item.id}` === value || item.name.trim() === value);
+      if (entry) return entry.name.trim();
+      if (value === 'shared' && dimension === 'environment' || value === 'notapplicable' && dimension === 'project') return value;
+      throw new Error(`Unknown cost center ${dimension} filter: ${value}`);
+    });
+  };
+  return Object.fromEntries(parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345').filter((center) => center !== 'tobedefined').map((center) => {
+    const filter = costCenterFilter(cfg, center);
+    return [center, { platform: resolve(filter.platform, 'platform'), environment: resolve(filter.environment, 'environment'), project: resolve(filter.project, 'project') }];
+  }));
+}
+
+/** Inherited Business Unit budgets must not reintroduce values removed from the LOV. */
+export function inactiveBusinessUnitBudgetKeys(cfg: CostGovernance, projectNames: string[] = []): string[] {
+  const raw = cfg.tagValueLists?.['tag-lz-business-unit'] ?? 'IT';
+  const units = parseTagValues(raw);
+  const field = 'tagns-lz-cost-governance.tag-lz-business-unit';
+  return Object.entries(budgetDefinitions(projectNames)).filter(([, budget]) =>
+    budget.target.type === 'TAG' && budget.target.values.some((value) => value.startsWith(`${field}.`))
+    && !units.includes(budget.defined_tags[field])).map(([key]) => key);
+}
+
+export function costGovernanceConfig(value: CostGovernance | undefined, projectNames: string[] = [], model?: CostCenterContext): CostGovernanceConfig {
   const cfg = value ?? defaultCostGovernance(projectNames);
   const defaults = defaultCostGovernance(projectNames);
   const keys = [...Object.keys(defaults.budgets), ...Object.keys(cfg.additionalBudgets ?? {})];
-  const removed = [...new Set([...studioExcludedBudgetKeys, ...(cfg.removedBudgets ?? [])])].filter((key) => keys.includes(key));
+  const removed = [...new Set([...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projectNames), ...(cfg.removedBudgets ?? [])])].filter((key) => keys.includes(key));
   const activeKeys = keys.filter((key) => !removed.includes(key));
-  const editableTagLists = Object.entries(cfg.tagValueLists ?? {}).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner');
+  const editableTagLists = Object.entries({ ...cfg.tagValueLists, ...(cfg.tagValueLists?.['tag-lz-business-unit'] === undefined ? { 'tag-lz-business-unit': 'IT' } : {}) }).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner');
   return {
     require_tag_values: cfg.requireTagValues,
+    tag_resource_labels: cfg.tagResourceLabels ?? true,
+    cost_center_business_units: businessUnitAssignments(cfg),
+    ...(model ? { cost_center_assignments: exportCostCenterAssignments(cfg, model) } : {}),
     owner_email: ownerEmail(cfg),
     ...(editableTagLists.length ? { tag_value_lists: Object.fromEntries(editableTagLists.map(([tag, values]) => [tag, parseTagValues(values)])) } : {}),
     ...(cfg.additionalBudgets && Object.keys(cfg.additionalBudgets).length ? { additional_budgets: Object.fromEntries(Object.entries(cfg.additionalBudgets).map(([key, budget]) => [key, {
       tag_name: budget.tagName, tag_value: budget.tagValue.trim(), name: budget.name, amount: budget.amount,
-      alert_rule: { threshold_value: budget.thresholdValue, ...(!cfg.useSingleRecipient ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}) },
+      alert_rule: { threshold_value: budget.thresholdValue, ...(!cfg.useSingleRecipient && (!removed.includes(key) || !budgetRecipientError(budget.recipients)) ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}) },
     }])) } : {}),
     ...(removed.length ? { exclude_budgets: removed } : {}),
     ...(cfg.useSingleRecipient && activeKeys.length ? { budget_recipients: normalizeBudgetRecipients(cfg.recipients) } : {}),
@@ -291,7 +336,7 @@ export function costGovernanceConfig(value: CostGovernance | undefined, projectN
         [field, budgetFieldError(field as keyof CostBudget, value) ? defaults.budgets[key][field as keyof CostBudget] : value])) as unknown as CostBudget : current;
       return [key, { name: budget.name, amount: budget.amount, alert_rule: {
         threshold_value: budget.thresholdValue,
-        ...(!cfg.useSingleRecipient ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}),
+        ...(!cfg.useSingleRecipient && (!removed.includes(key) || !budgetRecipientError(budget.recipients)) ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}),
       } }];
     })),
   };
@@ -302,7 +347,7 @@ export function validateCostGovernance(model: LzModel): string[] {
   const projects = activeProjectNames(model);
   const defaults = defaultCostGovernance(projects);
   const cfg = model.foundation.costGovernance ?? defaults;
-  const keys = [...Object.keys(defaults.budgets).filter((key) => !studioExcludedBudgetKeys.includes(key)), ...Object.keys(cfg.additionalBudgets ?? {})];
+  const keys = [...Object.keys(defaults.budgets).filter((key) => ![...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projects)].includes(key)), ...Object.keys(cfg.additionalBudgets ?? {})];
   const sharedError = cfg.useSingleRecipient && keys.some((key) => !cfg.removedBudgets?.includes(key)) ? budgetRecipientError(cfg.recipients, true) : null;
   const fields: Array<keyof CostBudget> = ['name', 'amount', 'thresholdValue', ...(!cfg.useSingleRecipient ? ['recipients'] as const : [])];
   const tagErrors = Object.entries(cfg.tagValueLists ?? {}).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner').flatMap(([name, raw]) =>
@@ -311,7 +356,10 @@ export function validateCostGovernance(model: LzModel): string[] {
     const error = customBudgetError(budget, budgetTagValues(model, budget.tagName)); return error ? [`${budget.name}: ${error}`] : [];
   });
   const ownerError = ownerEmailError(ownerEmail(cfg));
-  return [...(ownerError ? [`tag-lz-owner: ${ownerError}`] : []), ...tagErrors, ...customErrors, ...(sharedError ? [`Budget alerts: ${sharedError}`] : []), ...keys.filter((key) => !cfg.removedBudgets?.includes(key)).flatMap((key) => {
+  const assignments = businessUnitAssignments(cfg);
+  const unitErrors = budgetTagValues(model, 'tag-lz-business-unit').filter((unit) => !Object.values(assignments).includes(unit)).map((unit) => `Business unit ${unit}: Assign at least one cost center.`);
+  const centerErrors = unassignedCostCenterErrors(cfg);
+  return [...unitErrors, ...centerErrors, ...(ownerError ? [`tag-lz-owner: ${ownerError}`] : []), ...tagErrors, ...customErrors, ...(sharedError ? [`Budget alerts: ${sharedError}`] : []), ...keys.filter((key) => !cfg.removedBudgets?.includes(key)).flatMap((key) => {
     const budget = cfg.additionalBudgets?.[key] ?? cfg.budgets[key] ?? defaults.budgets[key];
     return fields.flatMap((field) => {
       const error = budgetFieldError(field, budget[field]);
@@ -320,12 +368,16 @@ export function validateCostGovernance(model: LzModel): string[] {
   })];
 }
 
-export function importCostGovernance(value: unknown, projectNames: string[] = []): CostGovernance {
+export function importCostGovernance(value: unknown, projectNames: string[] = [], model?: CostCenterContext): CostGovernance {
   const fail = (): never => { throw new Error('Cannot import cost_governance: invalid or unsupported configuration.'); };
   const obj = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : fail();
   const cfg = obj(value);
-  if (Object.keys(cfg).some((key) => !['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'tag_value_lists', 'additional_budgets'].includes(key))) fail();
+  if (Object.keys(cfg).some((key) => !['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'tag_value_lists', 'additional_budgets', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units'].includes(key))) fail();
   const result = defaultCostGovernance(projectNames);
+  if (cfg.tag_resource_labels !== undefined) {
+    if (typeof cfg.tag_resource_labels !== 'boolean') fail();
+    result.tagResourceLabels = cfg.tag_resource_labels as boolean;
+  }
   if (cfg.owner_email !== undefined) {
     if (typeof cfg.owner_email !== 'string' || ownerEmailError(cfg.owner_email)) fail();
     result.ownerEmail = cfg.owner_email as string;
@@ -336,6 +388,40 @@ export function importCostGovernance(value: unknown, projectNames: string[] = []
       if (!costTagDefinitions.some((tag) => tag.name === name) || !Array.isArray(values) || !values.length || values.some((item) => typeof item !== 'string' || !item.trim() || item !== item.trim() || item.includes('\n') || item.includes('\r') || item.includes(','))) fail();
       result.tagValueLists[name] = (values as string[]).join(', ');
     }
+  }
+  if (cfg.cost_center_assignments !== undefined) {
+    result.costCenterFilters = {};
+    const centers = Object.keys(obj(cfg.cost_center_assignments));
+    if (result.tagValueLists?.['tag-lz-cost-center'] !== undefined || centers.length !== 1 || centers[0] !== 'CC12345') {
+      result.tagValueLists = { ...result.tagValueLists, 'tag-lz-cost-center': [...new Set([...parseTagValues(result.tagValueLists?.['tag-lz-cost-center'] ?? ''), ...centers])].join(', ') };
+    }
+    for (const [center, raw] of Object.entries(obj(cfg.cost_center_assignments))) {
+      if (!center.trim() || center !== center.trim()) fail();
+      const rule = obj(raw);
+      if (Object.keys(rule).some((key) => !['platform', 'environment', 'project'].includes(key))) fail();
+      const restore = (dimension: keyof BusinessUnitScope): string[] | null => {
+        const values = rule[dimension];
+        if (values === undefined || values === null) return null;
+        if (!Array.isArray(values) || values.some((v) => typeof v !== 'string' || !v.trim() || v !== v.trim())) return fail();
+        if (!values.length) return null;
+        return values.map((value: string) => {
+          if (dimension === 'platform') return value;
+          const entries = dimension === 'environment' ? model?.environments : model?.projects;
+          const entry = entries?.find((item) => item.name.trim() === value);
+          if (entry) return `${dimension}:${entry.id}`;
+          if (dimension === 'environment' && value === 'shared' || dimension === 'project' && value === 'notapplicable') return value;
+          return model ? fail() : value;
+        });
+      };
+      result.costCenterFilters[center] = { platform: restore('platform'), environment: restore('environment'), project: restore('project') };
+    }
+  }
+  if (cfg.cost_center_business_units !== undefined) {
+    const associations = obj(cfg.cost_center_business_units);
+    const centers = parseTagValues(result.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345');
+    const units = parseTagValues(result.tagValueLists?.['tag-lz-business-unit'] ?? 'IT');
+    if (Object.entries(associations).some(([center, unit]) => !centers.includes(center) || typeof unit !== 'string' || !units.includes(unit))) fail();
+    result.costCenterBusinessUnits = associations as Record<string, string>;
   }
   const additional = cfg.additional_budgets === undefined ? {} : obj(cfg.additional_budgets);
   result.additionalBudgets = {};

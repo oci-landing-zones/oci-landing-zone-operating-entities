@@ -2,6 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { resourceGroupLayout, resourceGroupSvg } from './resourceGroups';
 
 describe('shared resource block rendering', () => {
+  it('draws an identity domain with individual group cards that wrap into rows', () => {
+    const items = [{ key: 'COMMON', name: 'id_lz_common' }, ...Array.from({ length: 8 }, (_, i) => ({ key: `GROUP-${i}`, name: `grp-long-project-name-${i}-admin` }))];
+    const wide = resourceGroupLayout('identitydomain', items, 1100);
+    const narrow = resourceGroupLayout('identitydomain', items, 400);
+    expect(narrow.height).toBeGreaterThan(wide.height);
+    const svg = resourceGroupSvg('identitydomain', items, 1100);
+    expect(svg).toContain('Identity Domain');
+    expect(svg).toContain('id_lz_common');
+    for (const item of items.slice(1)) expect(svg).toContain(`<title>${item.name}</title>`);
+    expect(svg).toContain(`viewBox="0 0 1100 ${wide.height}"`);
+  });
   it('wraps long generated names without dropping any characters and grows to fit', () => {
     const name = 'generated-extra-long-compartment-resource-name-without-assuming-any-fixed-prefix';
     const items = [{ key: 'NEW-KEY', name }];

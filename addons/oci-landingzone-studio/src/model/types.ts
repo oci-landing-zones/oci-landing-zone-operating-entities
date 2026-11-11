@@ -50,6 +50,7 @@ export interface BusinessUnitScope {
 }
 
 export interface CostGovernance {
+  tagResourceLabels?: boolean;
   ownerEmail?: string;
   costCenterBusinessUnits?: Record<string, string>;
   costCenterFilters?: Record<string, BusinessUnitScope>;
@@ -319,7 +320,7 @@ export interface DiagramNode {
   publicSubnet?: boolean;
   /** Resource names and grouping come from the generated deployment artifacts. */
   resourceKind?: ResourceKind;
-  resourceItems?: { key: string; name: string }[];
+  resourceItems?: { key: string; name: string; scope?: { platform: string; environment: string; project: string } }[];
   /** Public connectivity topology only; authentication material never enters the diagram. */
   premises?: {
     equipmentLabel: string;

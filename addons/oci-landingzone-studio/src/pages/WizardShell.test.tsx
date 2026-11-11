@@ -23,11 +23,11 @@ beforeEach(() => {
 });
 
 describe('diagram layout error recovery', () => {
-  it('keeps Notifications, Tags and Budgets out of Foundation', () => {
+  it('shows Notifications in Foundation while keeping Tags and Budgets in Governance', () => {
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
     const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test']}><Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes></MemoryRouter>);
-    expect(html).toContain('Observability and cost');
-    expect(html).not.toContain('id="foundation-observability-title"');
+    expect(html).toContain('Governance');
+    expect(html).toContain('id="foundation-observability-title"');
     expect(html).not.toContain('id="cost-budgets-title"');
     expect(html).not.toContain('id="cost-governance-tags-title"');
   });

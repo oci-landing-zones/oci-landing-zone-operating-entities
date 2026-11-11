@@ -12,6 +12,8 @@ export const CONFIG_FILENAME = 'config.jsonnet';
 
 /** What each surfaced artifact is for, so a reviewer knows which to deploy first. */
 export const OUTPUT_BLURB: Record<string, string> = {
+  'governance_pre.json': 'Creates tag namespaces, definitions and defaults before applying tags to those definitions.',
+  'governance.json': 'Applies governance tags to the existing namespaces and definitions, retaining budgets and defaults.',
   'network.json': 'Creates the network and routing, resolving firewall and NLB targets from resource keys.',
 };
 
@@ -57,14 +59,15 @@ export function deploymentStages(availableFiles: string[], completionNetwork: 'n
     && file !== 'network_pre.json'
     && file !== 'network_backends.json'
     && !file.startsWith('security_cis')
-    && !file.startsWith('observability_cis'),
+    && !file.startsWith('observability_cis')
+    && !file.endsWith('_pre.json'),
   );
 
   return [
     {
       title: '1. Create the landing zone',
       description: 'Create the network and routing together. Files ending in _pre establish prerequisites; include complete control files when no _pre variant is generated.',
-      files: keep([...persistent, 'network.json', ...pre, ...initialCore]),
+      files: keep([...persistent.filter((file) => !available.has(file.replace(/\.json$/, '_pre.json'))), 'network.json', ...pre, ...initialCore]),
     },
     {
       title: '2. Complete controls and workloads',

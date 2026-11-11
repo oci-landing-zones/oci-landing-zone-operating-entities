@@ -10,6 +10,7 @@ import { buildRouteTables } from '../services/routeTables';
 import { setAssetLoader } from '../generator/jsonnetVm';
 import { DIAGRAM_LAYOUT, minimumOwnerWidths } from './layoutPolicy';
 import { generatorNames } from '../services/generatorNaming';
+import { complexHybridModel } from './complexHybrid.testSupport';
 
 setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') }));
 
@@ -31,6 +32,51 @@ const inventory = (): GeneratedResourceInventory => ({
 });
 
 describe('generated diagram resource groups', () => {
+  it.each([1, 5])('places a full-width identity-domain panel inside its owner at step %s', (step) => {
+    const source = inventory();
+    source.groups.push({ id: 'identitydomain:COMMON', kind: 'identitydomain', compartmentKey: 'root',
+      items: [{ key: 'COMMON', name: 'id_lz_common' }, ...Array.from({ length: 8 }, (_, index) => ({ key: `GROUP-${index}`, name: `generated-group-${index}` }))],
+    });
+    const graph = buildGraph(emptyLzModel(), step, {}, undefined, [], source);
+    const panel = graph.nodes.find((node) => node.id === 'resource-identitydomain:COMMON')!;
+    const parent = graph.nodes.find((node) => node.id === panel.parentId)!;
+    expect(parent.kind).toBe('tenancy');
+    expect(panel.resourceItems).toHaveLength(9);
+    expect(panel.width).toBe(parent.width - 2 * DIAGRAM_LAYOUT.padding);
+    expect(panel.y + panel.height).toBeLessThan(parent.height);
+    expect(panel.y + panel.height).toBeLessThan(graph.nodes.find((node) => node.id === 'landingzone')!.y);
+  });
+  it('places budgets and the required-tags marker below IAM only from Governance onward', () => {
+    const source = inventory(); source.groups = [
+      { id: 'identitydomain:COMMON', kind: 'identitydomain', compartmentKey: 'root', items: [{ key: 'COMMON', name: 'id_lz_common' }] },
+      { id: 'budgets:root', kind: 'budgets', compartmentKey: 'root', items: [{ key: 'BUDGET', name: 'budget-landingzone' }] },
+      { id: 'requiredtags:root', kind: 'requiredtags', compartmentKey: 'root', items: [{ key: 'TAG', name: 'cost.platform' }] },
+    ];
+    const foundation = buildGraph(emptyLzModel(), 1, {}, undefined, [], source);
+    expect(foundation.nodes.some((node) => node.resourceKind === 'budgets' || node.resourceKind === 'requiredtags')).toBe(false);
+    const graph = buildGraph(emptyLzModel(), 5, {}, undefined, [], source);
+    const domain = graph.nodes.find((node) => node.resourceKind === 'identitydomain')!;
+    const budgets = graph.nodes.find((node) => node.resourceKind === 'budgets')!;
+    const tags = graph.nodes.find((node) => node.resourceKind === 'requiredtags')!;
+    expect(budgets.y).toBeGreaterThan(domain.y + domain.height);
+    expect(tags.y).toBeGreaterThan(budgets.y + budgets.height);
+    expect(graph.nodes.find((node) => node.id === 'landingzone')!.y).toBeGreaterThan(tags.y + tags.height);
+  });
+  it('keeps floating hybrid resources aligned when identity groups move the landing zone down', () => {
+    const model = complexHybridModel('hub_a');
+    const source = inventory(); source.groups = [];
+    const before = buildGraph(model, 5, {}, undefined, [], source);
+    source.groups.push({ id: 'identitydomain:COMMON', kind: 'identitydomain', compartmentKey: 'root', items: [
+      { key: 'COMMON', name: 'id_lz_common' }, { key: 'GROUP', name: 'grp-iam-admin' },
+    ] });
+    const after = buildGraph(model, 5, {}, undefined, [], source);
+    const oldRects = absoluteNodeRects(before.nodes), newRects = absoluteNodeRects(after.nodes);
+    const offset = newRects.get('drg')!.y - oldRects.get('drg')!.y;
+    expect(offset).toBeGreaterThan(0);
+    const floating = before.nodes.filter((node) => !node.parentId && node.kind !== 'region');
+    expect(floating.length).toBeGreaterThan(0);
+    for (const node of floating) expect(newRects.get(node.id)!.y - oldRects.get(node.id)!.y).toBeCloseTo(offset);
+  });
   it.each([1, 5])('fits all generated groups in their real owner at step %s without overlapping', (step) => {
     const source = inventory();
     source.groups.reverse();

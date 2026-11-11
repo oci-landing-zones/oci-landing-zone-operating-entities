@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { BusinessUnitScope, CostBudget, CostGovernance, LzModel } from '../../model/types';
-import { activeProjectNames, budgetTagValues, budgetDefinitions, budgetFieldError, budgetRecipientError, costTagDefinitions, defaultCostGovernance, ownerEmail, ownerEmailError, businessUnitAssignments, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, businessUnitScopeOptions, inheritedCostTagNames, studioExcludedBudgetKeys, tagValueLists, parseTagValues, costCenterFilter, syncCostCenterBudgets, addCostCenters, removeCostCenter, customBudgetError } from '../../services/costGovernance';
+import { activeProjectNames, budgetTagValues, budgetDefinitions, budgetFieldError, budgetRecipientError, costTagDefinitions, defaultCostGovernance, ownerEmail, ownerEmailError, businessUnitAssignments, unassignedCostCenterErrors, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, businessUnitScopeOptions, inheritedCostTagNames, studioExcludedBudgetKeys, inactiveBusinessUnitBudgetKeys, tagValueLists, parseTagValues, costCenterFilter, syncCostCenterBudgets, addCostCenters, removeCostCenter, customBudgetError } from '../../services/costGovernance';
 import { fieldErrorProps } from '../../services/fieldErrors';
 import FieldError from '../../components/FieldError';
+import CostCenterCoverageNotice from '../../components/CostCenterCoverageNotice';
+import CostTagHelp from '../../components/CostTagHelp';
+import type { UncoveredCostResource } from '../../services/costCenterCoverage';
 import { createModelId } from '../../model/defaults';
 import DeleteButton from '../../components/DeleteButton';
 import { oracle } from '../../theme';
@@ -51,9 +54,10 @@ function BusinessUnitPicker({ unit, kind = 'business unit', field, options, sele
   </fieldset>;
 }
 
-export default function CostGovernanceSection({ model, regional = model.foundation.stackScope === 'regional', onChange, selectedTag = null, onTagSelect }: {
+export default function CostGovernanceSection({ model, regional = model.foundation.stackScope === 'regional', onChange, selectedTag = null, onTagSelect, uncoveredCostResources }: {
   model: LzModel; regional?: boolean; onChange: (value: CostGovernance) => void;
   selectedTag?: string | null; onTagSelect?: (tagName: string) => void;
+  uncoveredCostResources?: readonly UncoveredCostResource[];
 }) {
   const [newCostCenter, setNewCostCenter] = useState('');
   const [newCostCenterFilter, setNewCostCenterFilter] = useState<BusinessUnitScope>({ platform: null, environment: null, project: null });
@@ -75,7 +79,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
   const budgetOrder = (key: string) => key === 'BUDGET-LANDINGZONE-KEY' ? 0
     : key === 'BUDGET-COST-CENTER-CC12345-KEY' || Object.values(cfg.costCenterBudgetKeys ?? {}).includes(key) ? 1
     : cfg.additionalBudgets?.[key] ? 3 : 2;
-  const keys = Object.keys(definitions).filter((key) => !studioExcludedBudgetKeys.includes(key))
+  const keys = Object.keys(definitions).filter((key) => ![...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projects)].includes(key))
     .sort((a, b) => budgetOrder(a) - budgetOrder(b));
   const lov = tagValueLists(model);
   const businessUnits = parseTagValues(cfg.tagValueLists?.['tag-lz-business-unit'] ?? lov['tag-lz-business-unit'].join(', '));
@@ -142,7 +146,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
         <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: 13, color: oracle.ink }} aria-label="Cost governance tags">
           <thead><tr><th scope="col" style={{ ...cell, width: '30%' }}>Tag</th><th scope="col" style={{ ...cell, width: '53%' }}>LOV (List of values)</th><th scope="col" style={{ ...cell, padding: '10px 4px', textAlign: 'center', fontSize: 12, whiteSpace: 'nowrap', overflowWrap: 'normal' }}>Configuration</th></tr></thead>
           <tbody>{tags.map((tag) => <tr key={tag.name}>
-            <td style={cell}><code>{tag.name}</code></td>
+            <td style={cell}><CostTagHelp name={tag.name} /></td>
             <td style={cell}>{tag.name === 'tag-lz-cost-center' ? <div style={{ display: 'grid', gap: 14 }}>
               {costCenterRows.map((value, index) => {
                 const scope = costCenterFilter(cfg, value.trim());
@@ -194,7 +198,8 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                 </div>
               </> : <button type="button" disabled={regional} style={{ ...form.addBtn, minHeight: 44 }} onClick={() => { setEditingNewCostCenter(false); setAddingCostCenter(true); }}>Add cost center</button>}
 
-              <p style={form.help}>Preview: resources must match all active filters. Select Not apply to skip a filter.</p>
+              <p style={form.help}>Generated resources must match all active filters. Select Not apply to skip a filter.</p>
+              {!regional && <CostCenterCoverageNotice resources={uncoveredCostResources} model={model} />}
               <figure aria-label="Cost Centers to Business Unit: N:1 relationship" style={{ margin: 0, padding: 12, border: `1px solid ${oracle.border}`, borderRadius: 6, background: oracle.surfaceAlt }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 20px minmax(0, 1fr)', gap: 8, alignItems: 'center', textAlign: 'center' }}>
                   <div style={{ padding: '10px 4px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, background: oracle.surface }}>
@@ -216,7 +221,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
               <FieldError id="cost-owner-email-error" error={ownerError} />
               <p style={{ ...form.help, marginTop: 8 }}>One owner email for all resources. Per-resource owners are outside Studio’s current scope.</p>
             </div> : <><textarea disabled={regional} readOnly={inheritedCostTagNames.includes(tag.name)} aria-label={`LOV for ${tag.name}`} rows={compactTagNames.includes(tag.name) ? 2 : 3}
-              title={tag.name === 'tag-lz-environment' ? 'Inherited from Foundation' : tag.name === 'tag-lz-project' ? 'Inherited from Projects; notapplicable is fixed' : tag.name === 'tag-lz-platform' ? 'Inherited from configured platforms and workload extensions; network and security are fixed' : undefined}
+              title={tag.name === 'tag-lz-environment' ? 'Inherited from Foundation' : tag.name === 'tag-lz-project' ? 'Inherited from Projects; notapplicable is fixed' : tag.name === 'tag-lz-platform' ? 'Base classifications and platforms selected in your configuration' : undefined}
               style={{ ...form.input, minHeight: compactTagNames.includes(tag.name) ? 56 : 80, resize: inheritedCostTagNames.includes(tag.name) ? 'none' : 'vertical',
                 ...(inheritedCostTagNames.includes(tag.name) ? { color: oracle.textMuted, backgroundColor: oracle.surfaceAlt, borderColor: oracle.border } : {}) }}
               value={inheritedCostTagNames.includes(tag.name) ? lov[tag.name].join(', ') : cfg.tagValueLists?.[tag.name] ?? lov[tag.name].join(', ')}
@@ -246,9 +251,11 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                         })}
                       </div>
                     </details>
+                    {!selected.length && <p className="field-error">Assign at least one cost center to this business unit.</p>}
                   </fieldset>;
                 })}
-                <p style={form.help}>Business unit resources are inherited from its assigned cost centers. Unassign a cost center before assigning it to another business unit. Preview only.</p>
+                {!regional && <FieldError id="cost-center-business-unit-error" error={unassignedCostCenterErrors(cfg)} />}
+                <p style={form.help}>Business unit values are assigned to generated resources through their cost centers. Each business unit requires at least one cost center; each cost center belongs to one business unit.</p>
               </div>}
             </>}</td>
             <td style={{ ...cell, verticalAlign: 'middle' }}><div style={{ display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center', alignItems: 'center' }}>

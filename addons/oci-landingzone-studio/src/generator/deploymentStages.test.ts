@@ -9,6 +9,7 @@ import { newPlatform } from '../services/platforms';
 import { generateOutputs } from './generate';
 import { setAssetLoader } from './jsonnetVm';
 import { deploymentStages } from './outputNames';
+import { defaultCostGovernance } from '../services/costGovernance';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
 
@@ -26,6 +27,7 @@ describe('canonical deployment file sets', () => {
     if (regional) Object.assign(model.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
     model.network = { hubKind: hub, ...hubKindDefaults(hub) };
     if (oke) model.platforms = [newPlatform('oke_simple', [])];
+    model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const result = await generateOutputs(model);
     expect(Object.keys(result.files).filter((file) => /^(security|observability)_cis/.test(file)).sort()).toEqual([
       `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
@@ -37,7 +39,7 @@ describe('canonical deployment file sets', () => {
       const roots = stage.files.flatMap((file) => Object.keys(JSON.parse(result.files[file])));
       expect(new Set(roots).size).toBe(roots.length);
       expect(stage.files.includes('iam.json')).toBe(!regional);
-      expect(stage.files.includes('governance.json')).toBe(!regional);
+      expect(stage.files.includes('governance.json') || stage.files.includes('governance_pre.json')).toBe(!regional);
     }
     expect(stages[1].files.includes('oke.json')).toBe(oke);
     expect(stages[1].files).not.toContain('oke_clusters.json');

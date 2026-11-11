@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setAssetLoader } from '../generator/jsonnetVm';
 import { newPlatform } from './platforms';
+import { defaultCostGovernance } from './costGovernance';
 import { emptyLzModel } from '../model/defaults';
 import { createDrDraft, createDrHubNetwork } from './disasterRecoveryDesign';
 import { buildDrFileConfigs, generateDrFileBundle } from './disasterRecoveryGeneration';
@@ -11,6 +12,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function design() {
   const model = emptyLzModel();
+  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com' };
   model.foundation.notifications = { useSingleRecipient: true, default: 'home@example.com', cloudguard: '', iam: '', network: '', security: '' };
   const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', regionConfirmed: true, hubAdded: true, hubNetwork: createDrHubNetwork(model.network.hubKind) };
   draft.notifications = { ...model.foundation.notifications, default: 'dr@example.com' };

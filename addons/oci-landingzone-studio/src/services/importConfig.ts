@@ -264,11 +264,11 @@ export function importConfig(value: unknown): ImportedConfig {
     model.sharedPlatforms.push({ ...restored, type: restored.type });
   }
   const warnings: string[] = [];
-  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Observability and cost before generating a new package.');
+  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Foundation before generating a new package.');
   if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
-  if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model));
+  if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model), model);
   const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {

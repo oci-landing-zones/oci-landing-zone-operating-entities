@@ -19,7 +19,7 @@ export const WIZARD_STEPS: WizardStep[] = [
   { id: 2, label: 'Hub Network' },
   { id: 3, label: 'Projects' },
   { id: 4, label: 'Platforms' },
-  { id: 5, label: 'Observability and cost' },
+  { id: 5, label: 'Governance' },
   { id: 6, label: 'Review' },
 ];
 
