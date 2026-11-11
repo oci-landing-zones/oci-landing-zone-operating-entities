@@ -17,9 +17,23 @@ The solution runs in an OCI **parent tenancy**. The current implementation is **
 
 ### Workloads and Landing Zone integration
 
-The FinOps workload extends One-OE with an Autonomous Database in the FinOps compartment and a dedicated VCN connected to the Landing Zone hub. Private subnets and network security groups separate ADB, OAC connectivity and infrastructure access.
+The FinOps workload integrates a private ADB and OAC reporting with the existing One-OE hub and shared services.
 
-The IaC configurations provide the database, networking, administrator roles, ADB resource-principal policies and Notifications topic. A Vault and encryption key reside in shared security; an optional central Bastion provides administrative access through the hub management subnet. The solution reuses One-OE's identity domain, hub and governance tags.
+| Resource | Role | How it is provided |
+| --- | --- | --- |
+| FinOps compartment | Groups the FinOps platform resources. | IaC: [finops_iam.json](deployment/finops_iam.json). |
+| Database and OAC administrator groups | Separate service-administration responsibilities. | IaC: [finops_iam.json](deployment/finops_iam.json), using the existing identity domain. |
+| ADB Dynamic Group and IAM policies | Authorize database access to FOCUS reports and module APIs, plus administrator access to platform services. | IaC: [finops_iam.json](deployment/finops_iam.json). |
+| VCN, private subnets and network security groups | Separate ADB, OAC connectivity and infrastructure access. | IaC: [finops_network.json](deployment/finops_network.json). |
+| Service gateway and hub DRG attachment | Connect FinOps to regional OCI services and the existing Landing Zone hub. | IaC: [finops_network.json](deployment/finops_network.json); hub routing remains managed by One-OE. |
+| Autonomous Database | Hosts ingestion, processing and database reporting objects behind a private endpoint. | IaC: [finops_database.json](deployment/finops_database.json). |
+| Vault and encryption key | Provide the shared-security location for database password Secrets. | IaC: [finops_security.json](deployment/finops_security.json). |
+| Notifications topic and email subscriptions | Deliver platform operational notifications to confirmed subscribers. | IaC: [finops_observability.json](deployment/finops_observability.json). |
+| Optional central Bastion | Provides administrative access through the hub management subnet. | IaC: [finops_bastion.json](deployment/finops_bastion.json), when an existing Bastion is not reused. |
+| Database password Secrets | Store the current ADMIN password and the passwords for the FinOps owner and OAC reader. | Prepared separately after infrastructure creation; see the [setup guide](finops-setup/README.md#step-3-prepare-database-credentials-and-secrets). |
+| OAC service and private access channel | Present dashboards and connect OAC to the private ADB endpoint. | Configured separately from the IaC files. |
+
+The solution reuses One-OE's identity domain, hub and governance tags.
 
 OAC is a separate presentation service, configured outside these IaC files. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles.
 
