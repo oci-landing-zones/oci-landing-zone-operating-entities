@@ -16,9 +16,13 @@ The OCI FinOps Solution is an add-on to the OCI Operating Entities Landing Zone.
 
 The solution runs in an OCI **parent tenancy**. The current implementation is **V2**, with OCI as the provider implemented today; the modular architecture allows additional providers to be introduced.
 
-<img src="images/oac-overview.jpg" width="900" alt="OAC Overview dashboard showing cloud costs, monthly consumption, services, compartments and regions">
+<img src="images/oac-overview.png" width="900" alt="OAC Overview dashboard showing cloud costs, commitment, monthly consumption, services, compartments and regions">
 
 *Example of the OAC Overview dashboard.*
+
+<img src="images/oac-monthly-comparison.png" width="900" alt="OAC Monthly Comparison dashboard showing monthly costs, daily comparison and cost changes by service, tag, compartment and resource">
+
+*Example of the OAC Monthly Comparison dashboard.*
 
 **What is FinOps?** FinOps brings financial accountability to cloud usage through collaboration between engineering, finance and business teams, helping organizations make informed decisions about cost and value.
 
