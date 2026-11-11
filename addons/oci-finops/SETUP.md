@@ -17,7 +17,7 @@ Complete the following steps in order:
 3. [Install the FinOps database modules](#step-3-install-the-finops-database-modules) using Python or direct SQL.
 4. [Configure OAC and its reporting content](#step-4-oracle-analytics-cloud-dashboard).
 
-Infrastructure provisioning does not install the database modules or create the password Secrets. Complete the credential preparation in [Step 2](#step-2-prepare-database-credentials-and-secrets) before starting either installation route.
+Infrastructure provisioning does not create the password Secrets. Complete the credential preparation in [Step 2](#step-2-prepare-database-credentials-and-secrets) before starting either installation route.
 
 ## Step 1: Provision FinOps infrastructure and ADB
 
