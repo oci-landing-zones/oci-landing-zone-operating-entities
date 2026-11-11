@@ -220,15 +220,7 @@ For a new single-stack deployment, compose the FinOps attachment into the existi
 
 If an existing FinOps stack manages the cost-governance namespace or its tags, transfer their Terraform ownership to the One-OE stack before removing their definitions from the deployed FinOps inputs. Review both stacks' plans to ensure the existing namespace and tags are retained.
 
-Run the static IAM boundary regression checks from the repository root:
-
-```sh
-python3 -m unittest discover -s addons/oci-finops/finops-setup/deployment/tests -v
-```
-
-These checks require exactly the DB and OAC administrator groups, reject Bastion grants outside `cmp-finops` and `cmp-lz-security`, and reject Bastion lifecycle or VCN topology management. They preserve the local fixed-destination session restrictions and require shared-security session access without fixed-target conditions for the central workflow.
-
-Before deployment, validate the bootstrap and final consolidated IAM configurations against Orchestrator v2.2.0 using the actual dependency outputs. Static checks do not establish live OCI authorization or network connectivity.
+Before deployment, validate the bootstrap and final consolidated IAM configurations against Orchestrator v2.2.0 using the actual dependency outputs.
 
 The V2 files use new resource keys and current One-OE names. They are not an automatic in-place migration of the older `lzp` deployment. For an existing installation, reconcile resource ownership and Terraform state before applying; do not deploy both examples into the same address space.
 
