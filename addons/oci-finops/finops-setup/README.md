@@ -82,10 +82,6 @@ Shared-security session grants support the central SOCKS5 workflow and are not r
 
 For OAC private dashboard endpoint creation/changes, have LZ network administrators perform the network operation: Oracle documents broader network permissions than the PAC permissions granted to the OAC group here. PAC connectivity alone does not make the dashboard URL private. [Oracle: private endpoint requirements](https://docs.oracle.com/en-us/iaas/analytics-cloud/doc/control-incoming-and-outgoingtraffic-private-endpoint-ingress-and-egress.html).
 
-### Workload setup helpers
-
-The [Terraform ADB example](deployment/terraform/README.md) and [SQL ingestion scripts](deployment/sql/) are retained as workload setup helpers. They are separate from the V2 IAM/network infrastructure stack. Use the V2 compartment, subnet, and NSG outputs when configuring ADB, and keep `create_policy = false` to reuse the resource-principal configuration in `finops_iam.json`. Review and adapt the SQL scripts before execution; they are not run by the infrastructure stack.
-
 ### Existing One-OE dependencies
 
 For a separate FinOps infrastructure stack, supply the LZ dependency outputs through the Orchestrator's **Dependencies Source**:
@@ -240,9 +236,6 @@ Confirm that `CMP-FINOPS-KEY`, `SN-FRA-LZ-FINOPS-DB-KEY`, and `NSG-FRA-LZ-FINOPS
 
 - **Using the Orchestrator JSON configuration**
 Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the stack inputs. Run Terraform validation and plan, review the proposed resources, and apply only after approval.
-
-- **Using Terraform**  
-The alternative [Terraform example](deployment/terraform/) uses an existing OCI Secret through its `secret_ocid` variable. Follow that example's README and [create the secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm) before deployment. This is a separate deployment path from the Orchestrator JSON configuration.
 
 - **Using the OCI Console**  
 Alternatively, you can manually create the Autonomous Database through the OCI Console.  
