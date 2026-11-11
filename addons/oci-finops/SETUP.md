@@ -36,12 +36,12 @@ Use **Orchestrator v2.2.0**, IAM module **v0.3.5**, and networking module **v0.9
 
 | File | Resources |
 | --- | --- |
-| [finops_iam.json](deployment/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies. |
-| [finops_network.json](deployment/finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. |
-| [finops_database.json](deployment/finops_database.json) | Private Autonomous Database. |
-| [finops_security.json](deployment/finops_security.json) | Vault and encryption key in `cmp-lz-security`. |
-| [finops_observability.json](deployment/finops_observability.json) | Notifications topic and email subscriptions. |
-| [finops_bastion.json](deployment/finops_bastion.json) | Central Bastion in `cmp-lz-security`; omit this file when reusing an existing managed central Bastion there. |
+| [finops_iam.json](deployment/infrastructure/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies. |
+| [finops_network.json](deployment/infrastructure/finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. |
+| [finops_database.json](deployment/infrastructure/finops_database.json) | Private Autonomous Database. |
+| [finops_security.json](deployment/infrastructure/finops_security.json) | Vault and encryption key in `cmp-lz-security`. |
+| [finops_observability.json](deployment/infrastructure/finops_observability.json) | Notifications topic and email subscriptions. |
+| [finops_bastion.json](deployment/infrastructure/finops_bastion.json) | Central Bastion in `cmp-lz-security`; omit this file when reusing an existing managed central Bastion there. |
 
 ### Changes before deployment
 
@@ -110,7 +110,7 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Create the password Secrets
 
-The [security configuration](deployment/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, already created in Step 1, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
+The [security configuration](deployment/infrastructure/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, already created in Step 1, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
 | Secret name | Content | Purpose |
 | --- | --- | --- |
