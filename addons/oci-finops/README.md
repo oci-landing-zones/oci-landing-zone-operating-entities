@@ -44,7 +44,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | A topic and confirmed email subscriptions deliver platform operational notifications. |
 | **Bastion (Optional)** | Provides administrative access to private FinOps endpoints through a central Bastion in shared security; an existing Bastion can be reused. |
 
-The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](SETUP.md#step-1-setup-one-oe-landing-zone-with-finops-v2) for the configuration files, resource ownership and dependencies.
+The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](SETUP.md#step-1-provision-finops-infrastructure-and-adb) for the configuration files, resource ownership and dependencies.
 
 ### Inside the database
 

@@ -12,17 +12,16 @@ To deploy the OCI FinOps addon, it is recommended to start with an Oracle recomm
 
 Complete the following steps in order:
 
-1. [Provision the Landing Zone infrastructure](#step-1-setup-one-oe-landing-zone-with-finops-v2) using the JSON configurations and Terraform-based Orchestrator.
-2. [Create the Autonomous Database](#step-2-create-autonomous-database).
-3. [Change the initial ADMIN password and prepare the Secrets](#step-3-prepare-database-credentials-and-secrets).
-4. [Install the FinOps database modules](#step-4-install-the-finops-database-modules) using Python or direct SQL.
-5. [Configure OAC and its reporting content](#step-5-oracle-analytics-cloud-dashboard).
+1. [Provision the FinOps infrastructure and ADB](#step-1-provision-finops-infrastructure-and-adb) using the JSON configurations and Terraform-based Orchestrator.
+2. [Change the initial ADMIN password and prepare the Secrets](#step-2-prepare-database-credentials-and-secrets).
+3. [Install the FinOps database modules](#step-3-install-the-finops-database-modules) using Python or direct SQL.
+4. [Configure OAC and its reporting content](#step-4-oracle-analytics-cloud-dashboard).
 
-Infrastructure provisioning does not install the database modules or create the password Secrets. Complete the credential preparation in [Step 3](#step-3-prepare-database-credentials-and-secrets) before starting either installation route.
+Infrastructure provisioning does not install the database modules or create the password Secrets. Complete the credential preparation in [Step 2](#step-2-prepare-database-credentials-and-secrets) before starting either installation route.
 
-## Step 1: Setup One-OE Landing Zone with FinOps V2
+## Step 1: Provision FinOps infrastructure and ADB
 
-The core IAM and network files prepare infrastructure and access. The optional Bastion configuration adds managed access to private FinOps endpoints. Autonomous Database deployment is covered in Step 2; Oracle Analytics Cloud is configured separately.
+The JSON configurations provision the FinOps infrastructure, including the Autonomous Database, through the Terraform-based Orchestrator. The optional Bastion configuration adds managed access to private FinOps endpoints. Oracle Analytics Cloud is configured separately.
 
 Prefer OCI Resource Manager with customer-controlled private Object Storage and a pinned Orchestrator version. Terraform CLI remains a supported alternative. Review the dependencies, network integration, and validation requirements below before applying.
 
@@ -38,10 +37,20 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 | [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
 | [finops_bastion.json](deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
-| [finops_security.json](deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 3. |
-| [finops_database.json](deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared above; see Step 2. |
+| [finops_security.json](deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 2. |
+| [finops_database.json](deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared in this step; see [ADB provisioning](#autonomous-database-provisioning). |
 
-The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the central Bastion in `cmp-lz-security`, targeting the hub management subnet in `cmp-lz-network`. Both FinOps groups have shared-security session access. Restricted session grants in `cmp-finops` are retained for installations that still use the previous local Bastion.
+### Autonomous Database provisioning
+
+Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](deployment/finops_database.json) with an initial ADMIN password used for provisioning. Change it after database creation as described in Step 2. The initial password must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
+
+Keep the real password out of Git. The Autonomous Database module marks `admin_password` as sensitive to hide it in normal Terraform plan and apply output; this does not encrypt the JSON file, saved plan, or Terraform state. Restrict access to the private deployment copy, saved plans, and state.
+
+Confirm that `CMP-FINOPS-KEY`, `SN-FRA-LZ-FINOPS-DB-KEY`, and `NSG-FRA-LZ-FINOPS-ADB-KEY` resolve to the intended resources. When using a separate database stack, supply the FinOps compartment and network dependency outputs. When adding the database to the existing FinOps stack, retain its IAM, network, and any deployed security inputs.
+
+Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the infrastructure stack inputs. The Orchestrator provisions ADB as part of this step. Validate the configuration, review the Terraform plan and apply the reviewed changes.
+
+The configurations provision the infrastructure and ADB. Operations configures OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the central Bastion in `cmp-lz-security`, targeting the hub management subnet in `cmp-lz-network`. Both FinOps groups have shared-security session access. Restricted session grants in `cmp-finops` are retained for installations that still use the previous local Bastion.
 
 ### Configure the FinOps notification email before deployment
 
@@ -122,7 +131,7 @@ Do not deploy either placeholder unchanged. The IAM module does not substitute s
 
 For installations that already manage the ADB dynamic group and policy in a separate service-access Terraform state, consolidating the JSON files does **not** transfer resource ownership. Keep the deployed source copies and both states until an explicit ownership migration is prepared and reviewed. Reconcile existing policy statements, transfer management to the intended IAM stack without creating duplicates, and verify that neither plan deletes or recreates the resources. Do not apply the consolidated IAM file against a second owner or remove the resources from the original stack's inputs before that migration.
 
-Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the OCI report-read endorsement. Database Resource Principal enablement and ingestion objects belong to the FinOps module installation in Step 4, after the credential preparation in Step 3.
+Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the OCI report-read endorsement. Database Resource Principal enablement and ingestion objects belong to the FinOps module installation in Step 3, after the credential preparation in Step 2.
 
 ### Private network and optional infra subnet
 
@@ -226,31 +235,7 @@ The V2 files use new resource keys and current One-OE names. They are not an aut
 
 Validate the adapted configuration and inspect the plan for unintended replacements, missing dependencies, and unresolved placeholders. Then verify that neither FinOps group can manage shared VCN topology, use Bastions, or manage sessions in `cmp-lz-network` through these policies. Test central Bastion lifecycle as LZ administrators and shared-security session creation/list/get/delete as each FinOps role. Validate permitted and denied destinations through network controls. For the retained local Bastion, verify rejection of destinations outside the FinOps CIDR and non-port-forwarding session types. Also test DBA connection access, the absence of Database Tools grants for OAC administrators, OAC-to-ADB connectivity, FOCUS ingestion, and hub forward/return routing. Mocked plans verify configuration wiring, not live OCI IAM enforcement or network connectivity.
 
-## Step 2: Create Autonomous Database
-
-### Prerequisites
-
-Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](deployment/finops_database.json) with an initial ADMIN password used for provisioning. Change it after database creation as described in Step 3. The initial password must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
-
-Keep the real password out of Git. The Autonomous Database module marks `admin_password` as sensitive to hide it in normal Terraform plan and apply output; this does not encrypt the JSON file, saved plan, or Terraform state. Restrict access to the private deployment copy, saved plans, and state.
-
-Confirm that `CMP-FINOPS-KEY`, `SN-FRA-LZ-FINOPS-DB-KEY`, and `NSG-FRA-LZ-FINOPS-ADB-KEY` resolve to the intended resources. When using a separate database stack, supply the FinOps compartment and network dependency outputs. When adding the database to the existing FinOps stack, retain its IAM, network, and any deployed security inputs.
-
-### Deployment options
-
-- **Using the Orchestrator JSON configuration**
-Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the stack inputs. Run Terraform validation and plan, review the proposed resources, and apply only after approval.
-
-- **Using the OCI Console**  
-Alternatively, you can manually create the Autonomous Database through the OCI Console.  
-Refer the [OCI documentation](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/autonomous-provision.html) for step-by-step instructions.
-
-> [!NOTE]
-> When deploying the Autonomous Database, use the **compartment**, **VCN**, **subnet**, and **NSG** resources that were created as part of your Landing Zone setup for FinOps.  
-> Complete the final `finops_iam.json` update with the actual FinOps compartment and ADB OCIDs before relying on the ADB dynamic group and report-reading policy. Existing separately managed resources require the ownership migration described above.
-> Ensure you reuse those instead of creating new ones.
-
-## Step 3: Prepare database credentials and Secrets
+## Step 2: Prepare database credentials and Secrets
 
 ### Change the initial ADMIN password
 
@@ -276,13 +261,13 @@ Confirm the ADB and Vault are available, all three Secrets are ready, and the AD
 
 These credentials are prepared once here as part of the complete add-on setup. The Python installation guide treats their existence and naming as prerequisites.
 
-## Step 4: Install the FinOps database modules
+## Step 3: Install the FinOps database modules
 
 Follow the [FinOps platform installation guide](installation-guide/README.md) and choose its Python or direct SQL route. Python uses the Landing Zone naming and Secret conventions; direct SQL uses explicitly supplied connection details and module inputs.
 
 Both routes install the schemas and modules inside the existing ADB. They do not provision infrastructure. Use the current module sequence, including the initial OAC database reporting objects before pipeline startup; the installation guide owns those commands and their order.
 
-## Step 5: Oracle Analytics Cloud Dashboard
+## Step 4: Oracle Analytics Cloud Dashboard
 
 Use [Oracle Analytics Cloud (OAC)](https://www.oracle.com/business-analytics/analytics-cloud.html) to present the FOCUS data ingested into Autonomous Database through FinOps dashboards and reports. Configure a [private access channel](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html) to connect OAC Enterprise Edition to the private ADB endpoint, then create the database connection and reporting content in OAC.
 
