@@ -14,7 +14,7 @@ Complete the following steps in order:
 
 1. [Provision the FinOps infrastructure and ADB](#step-1-provision-finops-infrastructure-and-adb) using the JSON configurations and Terraform-based Orchestrator.
 2. [Change the initial ADMIN password and prepare the Secrets](#step-2-prepare-database-credentials-and-secrets).
-3. [Install the FinOps database modules](#step-3-install-the-finops-database-modules) using Python or direct SQL.
+3. [Install the FinOps database modules](#step-3-install-the-finops-database-modules) using Python, the default installation method.
 4. [Configure OAC and its reporting content](#step-4-oracle-analytics-cloud-dashboard).
 
 Infrastructure provisioning does not create the password Secrets. Complete the credential preparation in [Step 2](#step-2-prepare-database-credentials-and-secrets) before starting either installation route.
@@ -122,12 +122,15 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 ### Before starting the module installation
 
-- **Python:** follow the [configuration and validation procedure](installation-guide/adb/python-installation.md#configure-validate-and-install) before starting installation. Its validation checks ADMIN Secret access and a read-only connection to ADB.
-- **Direct SQL:** complete the [manual prerequisites and connection preparation](installation-guide/adb/manual-sql-installation.md#manual-prerequisites). The operator supplies the credentials; SQL does not retrieve Vault Secrets automatically.
+**Python is the default method.** Follow the [Python configuration and validation procedure](installation-guide/adb/python-installation.md#configure-validate-and-install) before installing. Validation checks ADMIN Secret access and a read-only connection to ADB.
+
+For a manual SQL installation, consult the [manual prerequisites and connection preparation](installation-guide/adb/manual-sql-installation.md#manual-prerequisites).
 
 ## Step 3: Install the FinOps database modules
 
-Follow the [database module installation guide](installation-guide/README.md#1-install-the-database-add-on-schemas). Choose Python for the Landing Zone naming/Secret conventions, or direct SQL for explicitly supplied connection details and inputs. That guide links the complete procedures for both routes.
+Use the [Python installer](installation-guide/adb/python-installation.md) as the primary and default installation method. The guide covers the Landing Zone resource and Secret conventions, installation sequence and verification.
+
+For an alternative installation method, see the [manual SQL installation guide](installation-guide/adb/manual-sql-installation.md).
 
 ## Step 4: Oracle Analytics Cloud Dashboard
 
