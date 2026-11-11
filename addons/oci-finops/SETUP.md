@@ -128,9 +128,7 @@ For a manual SQL installation, consult the [manual prerequisites and connection 
 
 ## Step 3: Install the FinOps database modules
 
-Use the [Python installer](installation-guide/database-modules/python-installation.md) as the primary and default installation method. The guide covers the Landing Zone resource and Secret conventions, installation sequence and verification.
-
-For an alternative installation method, see the [manual SQL installation guide](installation-guide/database-modules/manual-sql-installation.md).
+Follow the [FinOps installation guide](installation-guide/README.md) for the database module installation procedure and verification.
 
 ## Step 4: Oracle Analytics Cloud Dashboard
 
