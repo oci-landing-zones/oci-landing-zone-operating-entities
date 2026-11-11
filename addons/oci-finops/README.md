@@ -7,21 +7,33 @@ The solution runs in an OCI **parent tenancy**. The current implementation is **
 **Contents**
 
 - [Architecture](#architecture)
+  - [Workloads and Landing Zone integration](#workloads-and-landing-zone-integration)
+  - [Inside the database](#inside-the-database)
 - [FinOps Tagging](#finops-tagging)
 - [Installation](#installation)
 - [License](#license)
 
 ## Architecture
 
-The solution combines three layers:
+### Workloads and Landing Zone integration
 
-1. **Ingestion:** loads FOCUS reports into ADB and reconciles rejected files and rows.
-2. **Data preparation:** adds tags, account and contract context, with optional budgets, recommendations, anomalies and forecasts.
-3. **Visualization:** publishes database reporting interfaces for OAC datasets and dashboards.
+The FinOps workload extends One-OE with an Autonomous Database in the FinOps compartment and a dedicated VCN connected to the Landing Zone hub. Private subnets and network security groups separate ADB, OAC connectivity and infrastructure access.
 
-A shared Core coordinates provider processing, records execution status and sends operational notifications. The Landing Zone provides the infrastructure; database modules run inside ADB, while OAC provides the presentation service.
+The IaC configurations provide the database, networking, administrator roles, ADB resource-principal policies and Notifications topic. A Vault and encryption key reside in shared security; an optional central Bastion provides administrative access through the hub management subnet. The solution reuses One-OE's identity domain, hub and governance tags.
+
+OAC is a separate presentation service, configured outside these IaC files. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles.
 
 <img src="images/OCI_FinOps_Arch.png" width="900" alt="One-OE FinOps architecture with private Autonomous Database, Oracle Analytics Cloud, and an optional Object Storage bucket">
+
+### Inside the database
+
+The database solution combines three layers:
+
+1. **Ingestion:** uses ADB's native pipelines, through `DBMS_CLOUD_PIPELINE`, to load FOCUS report files into landing tables. Database routines reconcile rejected files and rows.
+2. **Data preparation:** adds tags, account and contract context, with optional budgets, recommendations, anomalies and forecasts.
+3. **Reporting:** publishes database views and materialized views that OAC consumes as datasets for dashboards.
+
+A shared Core coordinates provider processing, records execution status and sends operational notifications. Pipelines, processing routines and reporting objects run inside ADB.
 
 See [Design](design/README.md) for the solution's internal operation: component boundaries, data models, database objects and processing flows.
 
