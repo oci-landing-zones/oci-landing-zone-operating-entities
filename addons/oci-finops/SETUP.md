@@ -1,20 +1,22 @@
 # OCI FinOps Setup Guide
 
-Complete the setup in this order:
+This guide covers the complete setup of the OCI FinOps add-on: provisioning Landing Zone resources and ADB, preparing database credentials, installing the database modules, and configuring OAC.
 
-1. Provision the Landing Zone infrastructure from the JSON configurations through the Terraform-based Orchestrator.
-2. Create the Autonomous Database using the database configuration.
-3. Change the initial ADMIN password and create the required Vault Secrets.
-4. Install the FinOps database schemas and modules using Python or direct SQL.
-5. Configure OAC and its reporting content.
+## Prerequisites
+
+To deploy the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).
+
+## Setup steps
+
+Complete the following steps in order:
+
+1. [Provision the Landing Zone infrastructure](#step-1-setup-one-oe-landing-zone-with-finops-v2) using the JSON configurations and Terraform-based Orchestrator.
+2. [Create the Autonomous Database](#step-2-create-autonomous-database).
+3. [Change the initial ADMIN password and prepare the Secrets](#step-3-prepare-database-credentials-and-secrets).
+4. [Install the FinOps database modules](#step-4-install-the-finops-database-modules) using Python or direct SQL.
+5. [Configure OAC and its reporting content](#step-5-oracle-analytics-cloud-dashboard).
 
 Infrastructure provisioning does not install the database modules or create the password Secrets. Complete the credential preparation in [Step 3](#step-3-prepare-database-credentials-and-secrets) before starting either installation route.
-
-## Prerequisite
-
-To deploy the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).  
-
-&nbsp;
 
 ## Step 1: Setup One-OE Landing Zone with FinOps V2
 
