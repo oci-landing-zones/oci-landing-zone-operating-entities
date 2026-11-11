@@ -36,7 +36,7 @@ Use **Orchestrator v2.2.0**, IAM module **v0.3.5**, and networking module **v0.9
 
 | File | Resources |
 | --- | --- |
-| [finops_iam.json](deployment/infrastructure/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies. |
+| [finops_iam.json](deployment/infrastructure/finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies; see the [IAM policy reference](installation-guide/infrastructure/iam-policies.md). |
 | [finops_network.json](deployment/infrastructure/finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. |
 | [finops_database.json](deployment/infrastructure/finops_database.json) | Private Autonomous Database. |
 | [finops_security.json](deployment/infrastructure/finops_security.json) | Vault and encryption key in `cmp-lz-security`. |

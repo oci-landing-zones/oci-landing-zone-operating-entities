@@ -2,6 +2,8 @@
 
 This page covers the **ADB Resource Principal**, used by ingestion with either Python or direct SQL installation. Start by checking the IAM resources already supplied by the Landing Zone, then complete only the permissions missing for the chosen FOCUS source. The add-on installer does not create IAM groups or policies.
 
+For module API permissions and their scope, see the [ADB runtime policy reference](../infrastructure/iam-policies.md#adb-runtime-policies).
+
 ## Contents
 
 - [Check the Landing Zone prerequisites](#check-the-landing-zone-prerequisites)

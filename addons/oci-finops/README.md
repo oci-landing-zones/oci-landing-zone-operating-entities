@@ -42,7 +42,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | --- | --- |
 | **FinOps compartment** | Dedicated compartment for the FinOps database and platform services. |
 | **IAM Groups** | Separate database and OAC administration groups, with service permissions in the FinOps compartment and network dependencies in shared networking. |
-| **IAM Policies and ADB Dynamic Group** | Provide administrator access to the platform and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. |
+| **IAM Policies and ADB Dynamic Group** | Provide administrator access to the platform and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. See the [IAM policy reference](installation-guide/infrastructure/iam-policies.md) for grants and scope. |
 | **Autonomous Database (ADB)** | Central data store for the FinOps platform. Its private endpoint is inside the FinOps VCN; native database pipelines ingest FOCUS reports, while database modules prepare the reporting data. |
 | **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports for cost visibility, allocation and analysis. A private access channel connects OAC to the private ADB endpoint. |
 | **VCN & Subnets** | A dedicated VCN with private subnets for ADB, OAC connectivity and infrastructure access. Network security groups control access to FinOps endpoints; a service gateway provides OCI service connectivity and a DRG attachment connects the VCN to the One-OE hub. |
