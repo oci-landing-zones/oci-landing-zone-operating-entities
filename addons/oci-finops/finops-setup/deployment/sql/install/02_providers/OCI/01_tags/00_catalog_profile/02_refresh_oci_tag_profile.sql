@@ -1,0 +1,7 @@
+-- Refresh the stored specification. Explicit lists never expand automatically.
+SET DEFINE OFF ECHO OFF VERIFY OFF SERVEROUTPUT ON
+WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
+BEGIN
+  OCI_TAG_PROFILE_API.REFRESH_ACTIVE;
+END;
+/

@@ -1,0 +1,39 @@
+{
+  "database": {
+    "oci_region": "eu-frankfurt-1",
+    "oci_auth_method": "SECURITY_TOKEN",
+    "oci_profile": "DEFAULT",
+    "sqlplus": "sqlplus",
+    "adb_id": "",
+    "tns_admin": "",
+    "connect_alias": "FOCUSPLATFORM",
+    "admin_password_secret_id": "",
+    "focusplatform_password_secret_id": "",
+    "oac_reader_password_secret_id": ""
+  },
+  "focus_source": {
+    "mode": "ORACLE_MANAGED",
+    "region": "",
+    "namespace": "",
+    "bucket": "",
+    "prefix": ""
+  },
+  "settings": {
+    "first_focus_year": 2024,
+    "notifications_topic_ocid": "",
+    "scheduler_time_zone": "UTC",
+    "tag_profile_namespace": "tagns-lz-cost-governance"
+  },
+  "modules": {
+    "foundation": true,
+    "oci_ingestion": true,
+    "oci_tag_catalog_profile": true,
+    "oci_account_contracts": true,
+    "oac_cost_detail": true,
+    "oci_tag_values": false,
+    "oci_budgets": false,
+    "oci_cloud_advisor": false,
+    "oci_cost_anomalies": false,
+    "oci_forecast": false
+  }
+}

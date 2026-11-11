@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "profile_name": "CUSTOM_COST_REPORTING",
+  "mode": "NAMESPACE",
+  "namespace": "Finance"
+}

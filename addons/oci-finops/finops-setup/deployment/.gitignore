@@ -1,0 +1,8 @@
+# Local installer choices and generated runtime files.
+/config/database-install.json
+/config/finops-platform.json
+/logs/
+/work/
+.venv/
+__pycache__/
+*.py[cod]

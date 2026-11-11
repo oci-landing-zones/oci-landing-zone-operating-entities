@@ -1,0 +1,110 @@
+-- Manual, on-demand retention cleanup. This script is not called by installers.
+-- It only deletes OCI_FOCUS_REPORTS rows; FAST MV maintenance is left to its log.
+SET DEFINE ON VERIFY OFF SERVEROUTPUT ON SIZE UNLIMITED
+WHENEVER OSERROR EXIT FAILURE
+WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
+-- Historical filename retained for compatibility; both endpoints are now months.
+VARIABLE retention_start VARCHAR2(10)
+VARIABLE retention_end VARCHAR2(10)
+ACCEPT first_month CHAR PROMPT 'First month to delete, inclusive (YYYY-MM): '
+ACCEPT last_month CHAR PROMPT 'Last month to delete, inclusive (YYYY-MM): '
+
+DECLARE
+  L_START TIMESTAMP(6);
+  L_END TIMESTAMP(6);
+  L_MV VARCHAR2(128);
+  L_CAPABILITY NUMBER;
+  L_ACTIVE_PIPELINES NUMBER;
+  L_RUNNING_JOBS NUMBER;
+  L_TOTAL NUMBER;
+BEGIN
+  IF SYS_CONTEXT('USERENV','SESSION_USER') <> 'FOCUSPLATFORM' OR
+     SYS_CONTEXT('USERENV','CURRENT_SCHEMA') <> 'FOCUSPLATFORM' THEN
+    RAISE_APPLICATION_ERROR(-20940,'Connect as FOCUSPLATFORM');
+  END IF;
+  IF NOT REGEXP_LIKE('&&first_month','^[0-9]{4}-(0[1-9]|1[0-2])$') OR
+     NOT REGEXP_LIKE('&&last_month','^[0-9]{4}-(0[1-9]|1[0-2])$') THEN
+    RAISE_APPLICATION_ERROR(-20941,'Use YYYY-MM only; days are not accepted. No rows were deleted');
+  END IF;
+  L_START := TO_TIMESTAMP('&&first_month'||'-01','FXYYYY-MM-DD');
+  L_END := CAST(ADD_MONTHS(TO_DATE('&&last_month'||'-01','FXYYYY-MM-DD'),1) AS TIMESTAMP);
+  IF L_START >= L_END THEN
+    RAISE_APPLICATION_ERROR(-20941,'First month must not follow last month. No rows were deleted');
+  END IF;
+  SELECT TABLE_NAME INTO L_MV FROM USER_SYNONYMS
+   WHERE SYNONYM_NAME='OAC_OCI_FOCUS_COST_DETAIL'
+     AND TABLE_OWNER=SYS_CONTEXT('USERENV','CURRENT_USER') AND DB_LINK IS NULL;
+
+  SELECT COUNT(*) INTO L_RUNNING_JOBS FROM USER_SCHEDULER_RUNNING_JOBS
+   WHERE JOB_NAME LIKE 'PIPELINE$%';
+  IF L_RUNNING_JOBS<>0 THEN
+    RAISE_APPLICATION_ERROR(-20942,'Stop or wait for active pipeline Scheduler runs before retention cleanup');
+  END IF;
+  SELECT COUNT(*) INTO L_ACTIVE_PIPELINES FROM USER_CLOUD_PIPELINES
+   WHERE REGEXP_LIKE(PIPELINE_NAME,'^OCI_FOCUS_REPORTS_LOAD_[0-9]{4}$')
+     AND STATUS='STARTED';
+  IF L_ACTIVE_PIPELINES<>0 THEN
+    RAISE_APPLICATION_ERROR(-20943,'Stop all OCI FOCUS year pipelines before retention cleanup');
+  END IF;
+
+  DELETE FROM MV_CAPABILITIES_TABLE WHERE STATEMENT_ID='OAC_PURGE_CHECK';
+  DBMS_MVIEW.EXPLAIN_MVIEW(L_MV,'OAC_PURGE_CHECK');
+  SELECT COUNT(*) INTO L_CAPABILITY FROM MV_CAPABILITIES_TABLE
+   WHERE STATEMENT_ID='OAC_PURGE_CHECK'
+     AND CAPABILITY_NAME='REFRESH_FAST_AFTER_ONETAB_DML' AND POSSIBLE='Y';
+  COMMIT;
+  IF L_CAPABILITY=0 THEN
+    RAISE_APPLICATION_ERROR(-20944,
+      'Published MV is not verified for FAST refresh after table deletes; no landing rows were deleted');
+  END IF;
+  SELECT COUNT(*) INTO L_TOTAL FROM OCI_FOCUS_REPORTS
+   WHERE CHARGEPERIODSTART >= L_START AND CHARGEPERIODSTART < L_END;
+  DBMS_OUTPUT.PUT_LINE('UTC charge-period range: ['||TO_CHAR(L_START,'YYYY-MM-DD')||
+    ', '||TO_CHAR(L_END,'YYYY-MM-DD')||'); landing_rows_to_delete='||L_TOTAL);
+  FOR R IN (
+    SELECT TRUNC(CAST(CHARGEPERIODSTART AS DATE),'MM') MONTH_START,COUNT(*) ROWS_TO_DELETE
+      FROM OCI_FOCUS_REPORTS
+     WHERE CHARGEPERIODSTART >= L_START AND CHARGEPERIODSTART < L_END
+     GROUP BY TRUNC(CAST(CHARGEPERIODSTART AS DATE),'MM') ORDER BY 1
+  ) LOOP
+    DBMS_OUTPUT.PUT_LINE('month='||TO_CHAR(R.MONTH_START,'YYYY-MM')||
+      ' rows_to_delete='||R.ROWS_TO_DELETE);
+  END LOOP;
+  :retention_start := TO_CHAR(L_START,'YYYY-MM-DD');
+  :retention_end := TO_CHAR(L_END,'YYYY-MM-DD');
+END;
+/
+PROMPT DELETE only; COMMIT after each month. Committed months cannot be rolled back.
+PROMPT No row copies or reloads are created. Files outside these folders may contain charges in this range.
+ACCEPT confirm_purge CHAR PROMPT 'Type PURGE to delete the displayed complete months: '
+
+DECLARE
+  L_MONTH_START DATE := TO_DATE(:retention_start,'FXYYYY-MM-DD');
+  L_NEXT_BOUNDARY DATE;
+  L_ACTIVE NUMBER;
+  L_DELETED NUMBER;
+BEGIN
+  IF NVL(UPPER(TRIM('&&confirm_purge')),'CANCEL') <> 'PURGE' THEN
+    RAISE_APPLICATION_ERROR(-20941,'Cleanup cancelled; no landing rows were deleted');
+  END IF;
+  -- Check again after the operator preview. Keep all other writers quiescent.
+  SELECT COUNT(*) INTO L_ACTIVE FROM USER_CLOUD_PIPELINES
+   WHERE REGEXP_LIKE(PIPELINE_NAME,'^OCI_FOCUS_REPORTS_LOAD_[0-9]{4}$') AND STATUS='STARTED';
+  IF L_ACTIVE<>0 THEN RAISE_APPLICATION_ERROR(-20943,'Stop OCI FOCUS pipelines before cleanup'); END IF;
+  SELECT COUNT(*) INTO L_ACTIVE FROM USER_SCHEDULER_RUNNING_JOBS WHERE JOB_NAME LIKE 'PIPELINE$%';
+  IF L_ACTIVE<>0 THEN RAISE_APPLICATION_ERROR(-20942,'Wait for pipeline jobs before cleanup'); END IF;
+  WHILE CAST(L_MONTH_START AS TIMESTAMP) < TO_TIMESTAMP(:retention_end,'FXYYYY-MM-DD') LOOP
+    L_NEXT_BOUNDARY := ADD_MONTHS(L_MONTH_START,1);
+    DELETE FROM OCI_FOCUS_REPORTS
+     WHERE CHARGEPERIODSTART >= CAST(L_MONTH_START AS TIMESTAMP)
+       AND CHARGEPERIODSTART < CAST(L_NEXT_BOUNDARY AS TIMESTAMP);
+    L_DELETED := SQL%ROWCOUNT;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('month='||TO_CHAR(L_MONTH_START,'YYYY-MM')||
+      ' deleted='||L_DELETED);
+    L_MONTH_START := L_NEXT_BOUNDARY;
+  END LOOP;
+  DBMS_OUTPUT.PUT_LINE('Landing cleanup finished. The published MV is unchanged until its next successful refresh.');
+END;
+/
+UNDEFINE first_month last_month confirm_purge

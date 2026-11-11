@@ -1,0 +1,22 @@
+-- Disable common email reports without changing the coordinator job.
+SET DEFINE OFF VERIFY OFF SERVEROUTPUT ON
+WHENEVER OSERROR EXIT FAILURE
+WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
+
+DECLARE
+BEGIN
+  IF SYS_CONTEXT('USERENV','SESSION_USER') <> 'FOCUSPLATFORM' OR
+     SYS_CONTEXT('USERENV','CURRENT_SCHEMA') <> 'FOCUSPLATFORM' THEN
+    RAISE_APPLICATION_ERROR(-20920,'Connect as FOCUSPLATFORM');
+  END IF;
+  UPDATE FINOPS_CORE_NOTIFY_CONFIG
+     SET TOPIC_OCID=NULL, ENABLED='N', UPDATED_AT=SYSTIMESTAMP
+   WHERE CONFIG_ID=1;
+  IF SQL%ROWCOUNT <> 1 THEN
+    RAISE_APPLICATION_ERROR(-20922,'Expected the singleton Notifications configuration row');
+  END IF;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Notifications disabled. The common coordinator remains enabled.');
+END;
+/
+@01_core/verify/01_verify_finops_common_core.sql
