@@ -1,5 +1,15 @@
 # OCI FinOps Setup Guide
 
+Complete the setup in this order:
+
+1. Provision the Landing Zone infrastructure from the JSON configurations through the Terraform-based Orchestrator.
+2. Create the Autonomous Database using the database configuration.
+3. Change the initial ADMIN password and create the required Vault Secrets.
+4. Install the FinOps database schemas and modules using Python or direct SQL.
+5. Configure OAC and its reporting content.
+
+Infrastructure provisioning does not install the database modules or create the password Secrets. Complete the credential preparation in [Step 3](#step-3-prepare-database-credentials-and-secrets) before starting either installation route.
+
 ## Prerequisite
 
 To deploy the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).  
@@ -24,6 +34,8 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 | [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
 | [finops_bastion.json](deployment/finops_bastion.json) | Optionally create the shared-security OCI Bastion in the hub management subnet, with FQDN/SOCKS5 enabled. Replace the client IP placeholder before deployment; reuse an existing central Bastion instead of creating a duplicate. |
 | [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
+| [finops_security.json](deployment/finops_security.json) | Create the `vlt-lz-finops` Vault and its encryption key in `cmp-lz-security`. Password Secrets are created separately in Step 3. |
+| [finops_database.json](deployment/finops_database.json) | Create the private Autonomous Database using the compartment, subnet and NSG prepared above; see Step 2. |
 
 The existing One-OE Landing Zone owns the `tagns-lz-cost-governance` namespace and its six tags: `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`. Provision them through the One-OE [governance configuration](../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json) before deploying the FinOps addon. The addon reuses these tags; their definitions, allowed values, and tag defaults remain managed by One-OE.
 
@@ -110,7 +122,7 @@ Do not deploy either placeholder unchanged. The IAM module does not substitute s
 
 For installations that already manage the ADB dynamic group and policy in a separate service-access Terraform state, consolidating the JSON files does **not** transfer resource ownership. Keep the deployed source copies and both states until an explicit ownership migration is prepared and reviewed. Reconcile existing policy statements, transfer management to the intended IAM stack without creating duplicates, and verify that neither plan deletes or recreates the resources. Do not apply the consolidated IAM file against a second owner or remove the resources from the original stack's inputs before that migration.
 
-Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the preserved OCI report-read endorsement. Enable the database resource principal using [`sql/admin.sql`](deployment/sql/admin.sql), then adapt and run [`sql/finopsuser.sql`](deployment/sql/finopsuser.sql) as the FinOps database user to configure report ingestion.
+Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the OCI report-read endorsement. Database Resource Principal enablement and ingestion objects belong to the FinOps module installation in Step 4, after the credential preparation in Step 3.
 
 ### Private network and optional infra subnet
 
@@ -226,7 +238,7 @@ Validate the adapted configuration and inspect the plan for unintended replaceme
 
 ### Prerequisites
 
-Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](deployment/finops_database.json) with the ADMIN password. It must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
+Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a private deployment copy of [finops_database.json](deployment/finops_database.json) with an initial ADMIN password used for provisioning. Change it after database creation as described in Step 3. The initial password must contain 12–30 characters, including at least one uppercase letter, one lowercase letter, and one number, and must not contain double quotes or `admin` in any letter case. See the [Autonomous Database password requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password).
 
 Keep the real password out of Git. The Autonomous Database module marks `admin_password` as sensitive to hide it in normal Terraform plan and apply output; this does not encrypt the JSON file, saved plan, or Terraform state. Restrict access to the private deployment copy, saved plans, and state.
 
@@ -246,41 +258,39 @@ Refer the [OCI documentation](https://docs.oracle.com/en-us/iaas/autonomous-data
 > Complete the final `finops_iam.json` update with the actual FinOps compartment and ADB OCIDs before relying on the ADB dynamic group and report-reading policy. Existing separately managed resources require the ownership migration described above.
 > Ensure you reuse those instead of creating new ones.
 
-## Step 3: Connect to ADW and Run SQL Scripts
-### Step 3.1: Connect to ADW
-Connect to the ADW using [SQL worksheet](https://docs.oracle.com/en-us/iaas/database-tools/doc/run-sql-statement-sql-worksheet.html) available in OCI  or other SQL client tools.
+## Step 3: Prepare database credentials and Secrets
 
+### Change the initial ADMIN password
 
-### Step 3.2: Run SQL Scripts as ADMIN User
-[Resource Principal](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/resource-principal.html) is used to give access for the autonomous database. 
+After the ADB is available, change its initial ADMIN password before running the FinOps installer. Use the [Autonomous Database ADMIN password procedure](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/manage-users-create.html). Confirm that the new password works against the intended database.
 
+The creation password in the private IaC input is a bootstrap credential. Coordinate its subsequent management with the infrastructure owner so a later Terraform apply does not unintentionally restore that bootstrap value.
 
-Run the following SQL scripts [admin.sql](/addons/oci-finops/finops-setup/deployment/sql/admin.sql) using the ADMIN user.
+### Create the password Secrets
 
-### Step 3.3: Run SQL Scripts as FINOPS User
+The [security configuration](deployment/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the Vault's configured encryption key and the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
-Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup/deployment/sql/finopsuser.sql) using the newly created FINOPS user:
+| Secret name | Content | Purpose |
+| --- | --- | --- |
+| `sec-lz-finops-adb-admin` | The **new, current ADMIN password**, after the change above. | Connect to the existing ADB as ADMIN. It must match the database password, not the bootstrap value. |
+| `sec-lz-finops-adb-focus-platform` | A chosen password for `FOCUSPLATFORM`. | The module installer creates the schema owner using this password. |
+| `sec-lz-finops-adb-oac-focus-reader` | A chosen password for `OAC_FOCUS_READER`. | The module installer creates the OAC reporting account using this password. |
 
-[DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
+Store only the raw password in each Secret, not a JSON document, username or connection string. With the Console, use manual secret content entry. Each Secret must be `ACTIVE` with the intended password in its `CURRENT` version. Choose database-compatible passwords; installer inputs must not contain double quotes or line breaks. Do not create the two schema accounts manually as part of this step.
 
-> [!NOTE]
-> Replace the objectstorage url with your region objectstorage URL ,tenancy ocid and year in the placeholder in line number 71 for the set_attribute. 
+### Before starting the module installation
 
-This is used to ingest all the previous and upcoming FOCUS reports of your tenancy into ADW for that year. If you have more old files to load scale the ADW so the pipeline will run faster for the initial load and you can scale it down later.
+Confirm the ADB and Vault are available, all three Secrets are ready, and the ADMIN Secret matches the changed database password. The identity running Python must be authorized to read their current contents. A direct SQL operator supplies the corresponding passwords as session inputs; the SQL scripts do not discover or retrieve Vault Secrets automatically.
 
-Example: `https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<bucket>/o/FOCUS%20Reports/<year>`. 
+These credentials are prepared once here as part of the complete add-on setup. The Python installation guide treats their existence and naming as prerequisites.
 
-This will download all the previous reports for the year 2025 and also the new reports getting generated for that year later.
+## Step 4: Install the FinOps database modules
 
-The interval for the dbms_cloud_pipeline is set to 60 minutes in finopsuser.sql. 
+Follow the [FinOps platform installation guide](https://github.com/fillerat/finops-focus-platform/blob/feature/master-installer-design/installation-guide/README.md) and choose its Python or direct SQL route. Python uses the Landing Zone naming and Secret conventions; direct SQL uses explicitly supplied connection details and module inputs.
 
+Both routes install the schemas and modules inside the existing ADB. They do not provision infrastructure. Use the current module sequence, including the initial OAC database reporting objects before pipeline startup; the installation guide owns those commands and their order.
 
-By following these steps, you should be able to successfully deploy the FINOPS solution which will ingest FOCUS reports into Autonomous database automatically.
-
-> [!NOTE]
-> This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .
-
-## Step 4. Oracle Analytics Cloud Dashboard
+## Step 5: Oracle Analytics Cloud Dashboard
 
 Use [Oracle Analytics Cloud (OAC)](https://www.oracle.com/business-analytics/analytics-cloud.html) to present the FOCUS data ingested into Autonomous Database through FinOps dashboards and reports. Configure a [private access channel](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html) to connect OAC Enterprise Edition to the private ADB endpoint, then create the database connection and reporting content in OAC.
 
