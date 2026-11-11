@@ -21,7 +21,7 @@ Infrastructure provisioning does not create the password Secrets. Complete the c
 
 ## Step 1: Provision FinOps infrastructure and ADB
 
-The JSON configurations provision the FinOps infrastructure, including the Autonomous Database, through the Terraform-based Orchestrator. The optional Bastion configuration adds managed access to private FinOps endpoints. Oracle Analytics Cloud is configured separately.
+The JSON configurations provision the FinOps infrastructure, including the Autonomous Database, through the Terraform-based Orchestrator in a single FinOps stack. The optional Bastion configuration adds managed access to private FinOps endpoints. Oracle Analytics Cloud is configured separately.
 
 Choose where to run the Landing Zone Orchestrator:
 
@@ -51,9 +51,7 @@ Before planning the database deployment, replace `<ADB_ADMIN_PASSWORD>` in a pri
 
 Keep the real password out of Git. The Autonomous Database module marks `admin_password` as sensitive to hide it in normal Terraform plan and apply output; this does not encrypt the JSON file, saved plan, or Terraform state. Restrict access to the private deployment copy, saved plans, and state.
 
-Confirm that `CMP-FINOPS-KEY`, `SN-FRA-LZ-FINOPS-DB-KEY`, and `NSG-FRA-LZ-FINOPS-ADB-KEY` resolve to the intended resources. When using a separate database stack, supply the FinOps compartment and network dependency outputs. When adding the database to the existing FinOps stack, retain its IAM, network, and any deployed security inputs.
-
-Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the infrastructure stack inputs. The Orchestrator provisions ADB as part of this step. Validate the configuration, review the Terraform plan and apply the reviewed changes.
+Include the reviewed private copy of [finops_database.json](deployment/finops_database.json) with the other selected FinOps JSON configurations in the same stack. Its compartment, subnet and network-security-group keys reference resources defined by the IAM and network configurations; the Orchestrator resolves those references within the stack. Validate the configuration, review the Terraform plan and apply the reviewed changes.
 
 The configurations provision the infrastructure and ADB. Operations configures OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the central Bastion in `cmp-lz-security`, targeting the hub management subnet in `cmp-lz-network`. Both FinOps groups have shared-security session access. Restricted session grants in `cmp-finops` are retained for installations that still use the previous local Bastion.
 
@@ -110,7 +108,7 @@ For OAC private dashboard endpoint creation/changes, have LZ network administrat
 
 ### Existing One-OE dependencies
 
-For a separate FinOps infrastructure stack, supply the LZ dependency outputs through the Orchestrator's **Dependencies Source**:
+Supply the existing One-OE resource outputs required by the FinOps stack through the Orchestrator's **Dependencies Source**:
 
 | Dependency | Required keys |
 |---|---|
@@ -129,7 +127,7 @@ Use `finops_iam.json` and `finops_network.json` together for the infrastructure 
 
 The consolidated `finops_iam.json` includes both administrator access and ADB resource-principal access. It still requires two provisioning phases when the compartment and ADB do not yet exist:
 
-1. In a private bootstrap copy, omit `identity_domain_dynamic_groups_configuration` and only the `PCY-LZ-FINOPS-ADB-RESOURCE-PRINCIPAL` entry from `policies_configuration.supplied_policies`. Keep the compartment, both human groups and their policies. Deploy that copy with the required network inputs, then provision the ADB.
+1. In a private bootstrap copy, omit `identity_domain_dynamic_groups_configuration` and only the `PCY-LZ-FINOPS-ADB-RESOURCE-PRINCIPAL` entry from `policies_configuration.supplied_policies`. Keep the compartment, both human groups and their policies. Deploy this bootstrap IAM copy with the other selected FinOps JSON configurations, including the database configuration, in the same FinOps stack.
 2. After provisioning, restore those two entries in the same private IAM configuration and replace `<FINOPS_COMPARTMENT_OCID>` and `<FINOPS_ADB_OCID>` with the actual resource OCIDs. Keep the existing identity-domain dependency and every other stack input. Review the plan and apply the update to the same owning stack.
 
 Do not deploy either placeholder unchanged. The IAM module does not substitute symbolic keys inside dynamic-group matching rules or policy statement strings.
