@@ -18,7 +18,7 @@ The solution runs in an OCI **parent tenancy**. The current implementation is **
 
 **What is FinOps?** FinOps brings financial accountability to cloud usage through collaboration between engineering, finance and business teams, helping organizations make informed decisions about cost and value.
 
-**Why this solution?** It complements OCI Cost Analysis with reporting tailored to the organization, tag-based cost allocation, long-term cost history and dashboards that users can access without the OCI Console.
+**Why this solution?** Cloud providers offer separate cost-management tools, making a consolidated view across clouds difficult. This solution uses FOCUS as a common data model and a modular architecture designed to bring cost and usage from multiple providers into one reporting environment, with consistent cost allocation and analysis. OCI is the first implemented provider.
 
 ## Architecture
 
