@@ -63,96 +63,15 @@ The addon requires `remote_cidrs` for both routing options to prepare landing zo
 
 &nbsp;
 
-#### Example JSON configuration
+---
 
-These are the necessary blocks which are required to be included into network.json and which aligned with the architecture design above:
-
-#### 1st block: 
-Defines the Customer Premises Equipment (CPE), with respective public IP address and CPE vendor (in this example the type is "Other"): 
-
-                    "customer_premises_equipments": {
-                        "CPE-FRA-LZ-ONPREM-KEY": {
-                            "display_name"                                      : "cpe-fra-lz-onprem",
-                            "ip_address"                                        : "203.0.113.5",
-                            "cpe_device_shape_vendor_name"                      : "Other"
-                        }
-                    },
-
-#### 2nd block: 
-Defines the custom DRG routing table, which takes care of the routing of network flow which arrives from remote network and enters DRG.
-
-                                "DRGRT-FRA-LZ-HUB-HC-KEY": {
-                                    "display_name"                              : "drgrt-fra-lz-hc",
-                                    "is_ecmp_enabled"                           : false,
-
-                                    "route_rules": {
-                                        "rr-hybrid-hc-hub": {
-                                            "destination"                       : "10.0.0.0/21",
-                                            "destination_type"                  : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "rr-hybrid-hc-preprod": {
-                                            "destination"                       : "10.0.128.0/21",
-                                            "destination_type"                  : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "rr-hybrid-hc-prod": {
-                                            "destination"                       : "10.0.64.0/21",
-                                            "destination_type"                  : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
-                                        }
-                                    }
-                                },
-
-#### 3rd block: 
-Defines the IPSec connection with two tunnels and respective BGP information, and DRG routing table association to each of the tunnel:
-
-
-                    "ipsecs": {
-                        "IPSEC-FRA-LZ-ONPREM-KEY": {
-                            "display_name"                                      : "ipsec-fra-lz-onprem",
-                            "cpe_key"                                           : "CPE-FRA-LZ-ONPREM-KEY",
-                            "drg_key"                                           : "DRG-FRA-LZ-HUB-KEY",
-                            "static_routes"                                     : ["172.20.0.0/16"],
-
-                            "tunnels_management": {
-                                "tunnel_1": {
-                                    "drg_route_table_id"                        : "DRGRT-FRA-LZ-HUB-HC-KEY",
-                                    "ike_version"                               : "V2",
-                                    "routing"                                   : "BGP",
-
-                                    "bgp_session_info": {
-                                        "customer_bgp_asn"                      : "65001",
-                                        "customer_interface_ip"                 : "172.20.1.1/30",
-                                        "oracle_interface_ip"                   : "172.20.1.2/30"
-                                    }
-                                },
-
-                                "tunnel_2": {
-                                    "drg_route_table_id"                        : "DRGRT-FRA-LZ-HUB-HC-KEY",
-                                    "ike_version"                               : "V2",
-                                    "routing"                                   : "BGP",
-
-                                    "bgp_session_info": {
-                                        "customer_bgp_asn"                      : "65001",
-                                        "customer_interface_ip"                 : "172.20.1.5/30",
-                                        "oracle_interface_ip"                   : "172.20.1.6/30"
-                                    }
-                                }
-                            }
-                        }
-                    },
-
-
-#### Example JSON Configuration
+### Example JSON Configuration
 
 The following JSON configuration blocks illustrate the settings required in the `network.json` file to implement the Site-to-Site VPN connectivity described in the architecture diagram above.
 
 The example consists of three configuration blocks: Customer-Premises Equipment (CPE), a custom DRG route table, and an IPSec connection with two BGP-enabled tunnels.
 
-#### 1. Customer-Premises Equipment (CPE)
+#### Block 1: Customer-Premises Equipment (CPE)
 
 This block defines the Customer-Premises Equipment (CPE), including its display name, public IP address, and device vendor. In this example, the CPE vendor is set to `Other`.
 
@@ -166,7 +85,7 @@ This block defines the Customer-Premises Equipment (CPE), including its display 
 },
 ```
 
-#### 2. Custom DRG Route Table
+#### Block 2: Custom DRG Route Table
 
 This block defines the custom DRG route table used to control the routing of traffic entering the DRG from the remote network through the IPSec VPN tunnels.
 
@@ -201,7 +120,7 @@ Equal-Cost Multi-Path (ECMP) routing is disabled in this example.
 },
 ```
 
-#### 3. IPSec Connection and BGP Tunnel Configuration
+#### Block 3: IPSec Connection and BGP Tunnel Configuration
 
 This block defines the Site-to-Site IPSec VPN connection, including references to the previously defined CPE and the Landing Zone DRG.
 
@@ -252,27 +171,45 @@ Both tunnels reference the custom DRG route table (`DRGRT-FRA-LZ-HUB-HC-KEY`) de
 
 ---
 
-### Prepare the configuration
+### Preparing and Generating JSON Configuration Files
+
+The Site-to-Site VPN configuration can be prepared using either **OCI Landing Zone Studio** or the **OCI LZ Blueprint Factory**. Both methods generate the JSON configuration files required for subsequent Terraform deployment.
+
+The following instructions describe how to generate the deployment configuration illustrated in the example above, without manually defining the individual resource blocks in `network.json`.
+
+&nbsp;
 
 #### Option 1: Landing Zone Studio
 
+Landing Zone Studio provides a graphical interface for configuring Site-to-Site VPN connectivity as part of an OCI One-OE Landing Zone design.
+
 [![Open Landing Zone Studio](https://img.shields.io/badge/Open%20Landing%20Zone%20Studio-C74634?style=for-the-badge)](https://oci-landing-zones.github.io/oci-landing-zone-operating-entities/)
 
-1. Open your landing zone design and expand **Hub Network → VPN**.
-2. Under **Customer VPN equipment**, create a CPE entry, or select **Existing CPE OCID** when adding the VPN.
-3. Under **Site-to-Site VPN**, select the customer equipment and enter the **Remote IPv4 CIDRs**.
-4. Configure **Tunnel 1** and **Tunnel 2**, including routing, IKE version, shared secret source, and BGP settings where applicable. Set **Router identity** if the CPE sends a different IKE identifier.
-5. Review the configuration, resolve validation errors, and download the deployment files.
+1. Open an existing Landing Zone design or create a new one, selecting the required OCI region and hub network model.
+2. Navigate to **Hub Network → VPN**.
+3. Under **Customer VPN equipment**, define the Customer-Premises Equipment (CPE), including its public IPv4 address. Alternatively, reference an existing CPE using its OCID when configuring the VPN connection.
+4. Under **Site-to-Site VPN**, add a VPN connection, select the CPE, and specify the **Remote IPv4 CIDRs** representing the networks reachable through the VPN. If the CPE uses an IKE identifier different from its public IP address, configure the corresponding **Router identity**.
+5. Configure **Tunnel 1** and **Tunnel 2**, specifying the routing type (`BGP` or `STATIC`), IKE version, and shared secret settings. For BGP routing, provide the customer ASN and the customer and Oracle tunnel interface IP addresses. Configure additional IKE and IPSec parameters as required.
+6. Navigate to **Review** to validate the Landing Zone configuration and review the network and routing settings.
+7. Download the generated deployment package (ZIP), which includes the JSON configuration files, including `network.json`, required for Terraform deployment.
+
+&nbsp;
 
 #### Option 2: Blueprint Factory
 
-Add `hybrid_connectivity` to your landing zone source configuration:
+The [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) provides a configuration-driven approach for generating Landing Zone deployment files from a JSON or Jsonnet source configuration.
 
-- Use `customer_premises_equipments` to define a new CPE object.
-- Use `ipsecs` to define the VPN connection, its remote CIDRs, and both tunnels.
-- Reference the CPE using `cpe_key`, or use `cpe_id` for an existing CPE object.
+1. Add the `hybrid_connectivity` section to your Landing Zone source configuration.
+2. Define the required Site-to-Site VPN settings:
+   - **`customer_premises_equipments`**: Define the CPE, including its public IP address.
+   - **`ipsecs`**: Define the VPN connection, remote network CIDRs, and configuration of both IPSec tunnels.
+   - **`cpe_key` / `cpe_id`**: Reference a CPE defined in the configuration using `cpe_key`, or an existing OCI CPE using `cpe_id`.
+3. Generate the deployment JSON files following the [Blueprint Factory generation workflow](../oci-lz-blueprint-factory/README.md#4-generation-workflow).
+4. Review the generated `network.json` to verify the VPN settings and associated routing configuration.
 
-Generate the deployment files using the [Blueprint Factory workflow](../oci-lz-blueprint-factory/README.md#4-generation-workflow). For field definitions, see the [VPN configuration reference](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#93-vpn-connections).
+For detailed field definitions and supported configuration parameters, refer to the [VPN configuration reference](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#93-vpn-connections).
+
+&nbsp;
 
 &nbsp;
 

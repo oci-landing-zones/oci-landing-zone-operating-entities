@@ -23,7 +23,7 @@ Each option can be deployed independently. You can also deploy both and configur
 You can design and prepare the configuration using [Landing Zone Studio](../oci-landingzone-studio/README.md) or define JSON configurations with [Blueprint Factory](../oci-lz-blueprint-factory/README.md). The resulting JSON configuration is deployed with Terraform to create the OCI connectivity resources and configure the associated landing zone routing.
 
 
-**Note**: This addon configures the OCI networking resources required for hybrid connectivity. To complete the connection, the customer or network provider must separately configure the corresponding infrastructure, routing, and security controls in the remote network (on-premises or in another cloud), and coordinate service activation
+**Note**: This addon configures the OCI networking resources required for hybrid connectivity. To complete the connection, the customer or network provider must separately configure the corresponding infrastructure, routing, and security controls in the remote network (on-premises or in another cloud), and coordinate service activation.
 
 &nbsp;
 
