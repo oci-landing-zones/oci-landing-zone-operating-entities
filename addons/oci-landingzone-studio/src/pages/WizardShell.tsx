@@ -42,6 +42,7 @@ import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
 import { costTagScope } from '../diagram/tagScope';
 import finOpsGovernanceImage from '../assets/finops-governance.png';
+import { governanceTheme } from '../wizard/steps/costGovernanceStyles';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 /** First step with spoke subnets — and therefore endpoints and traceable flows. */
@@ -369,7 +370,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
         )}
 
         <div
-          style={{ ...layout.grid, gridTemplateColumns: gridCols }}
+          style={{ ...layout.grid, gridTemplateColumns: gridCols, ...(showGovernanceReference || tagsOpen ? governanceTheme : {}) }}
           className={`studio-workspace${workspaceView === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}${tagsOpen ? ' studio-workspace--tags' : ''}${showGovernanceReference ? ' studio-workspace--governance' : ''}`}
         >
             {showForm && (
@@ -386,7 +387,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   <PlatformsStep />
                 ) : activeStep === 5 ? (
                   <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag}
-                    tagConfigurationAction={tagsEnabled ? <button ref={tagConfigurationButton} type="button" className="studio-flow-button" style={{ ...layout.flowBtn, minHeight: 48, padding: '10px 12px', fontSize: 14, borderRadius: 6 }}
+                    tagConfigurationAction={tagsEnabled ? <button ref={tagConfigurationButton} type="button" className="studio-flow-button" style={{ ...layout.flowBtn, minHeight: 44, padding: '8px 10px', fontSize: 13, borderRadius: 6 }}
                       onClick={openTagConfiguration} title="Configure tags alongside the full-width diagram">
                       Show tag configuration ⤢
                     </button> : undefined}

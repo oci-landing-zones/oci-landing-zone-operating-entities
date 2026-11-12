@@ -10,13 +10,14 @@ import { createModelId } from '../../model/defaults';
 import DeleteButton from '../../components/DeleteButton';
 import { oracle } from '../../theme';
 import { s as form } from './networkEditorStyles';
+import { governanceTheme } from './costGovernanceStyles';
+import './CostGovernanceSection.css';
 
 const order = ['platform', 'environment', 'project', 'cost-center', 'business-unit', 'owner'];
 const tags = [...costTagDefinitions].sort((a, b) => order.indexOf(a.name.replace('tag-lz-', '')) - order.indexOf(b.name.replace('tag-lz-', '')));
 const compactTagNames = [...inheritedCostTagNames, 'tag-lz-business-unit'];
-const compactInput: CSSProperties = { ...form.input, minHeight: 36, padding: '6px 9px', fontSize: 13 };
-const cell: CSSProperties = { padding: '10px 8px', borderBottom: `1px solid ${oracle.border}`, textAlign: 'left', verticalAlign: 'top', overflowWrap: 'anywhere' };
-const costCenterHeader: CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 56px 44px', gap: 8, alignItems: 'center' };
+const compactInput: CSSProperties = form.input;
+const cell: CSSProperties = { padding: '12px', textAlign: 'left', verticalAlign: 'top', overflowWrap: 'anywhere' };
 const choice: CSSProperties = { display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: oracle.ink };
 const fields = [
   ['name', 'Budget name'], ['amount', 'Monthly amount'], ['thresholdValue', 'Alert threshold (%)'], ['recipients', 'Notification emails'],
@@ -24,8 +25,8 @@ const fields = [
 
 function GovernancePanel({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return <section style={form.panel} aria-labelledby={id}>
-    <div style={{ height: 3, background: oracle.red, borderRadius: '8px 8px 0 0' }} />
-    <div style={{ padding: 20 }}><h2 id={id} style={form.title}>{title}</h2>{children}</div>
+    <div style={form.accent} />
+    <div style={form.body}><h2 id={id} style={form.title}>{title}</h2>{children}</div>
   </section>;
 }
 
@@ -40,9 +41,9 @@ function BusinessUnitPicker({ unit, kind = 'business unit', field, options, sele
     <details>
       <summary aria-label={`${label} for ${kind} ${unit}`} style={{ ...compactInput, cursor: 'pointer', overflowWrap: 'anywhere' }}>{shown}</summary>
       <div style={{ padding: 8, border: `1px solid ${oracle.border}`, borderRadius: 4, marginTop: 4 }}>
-        <button type="button" style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', padding: '6px 0', fontSize: 12 }} onClick={() => onChange(null)}>Select all</button>
-        <button type="button" aria-label={`Not apply in ${label} for ${unit}`} title={`Do not restrict ${label.toLowerCase()}`} style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', padding: '6px 0', marginLeft: 12, fontSize: 12 }} onClick={() => onChange([])}>Not apply</button>
-        {options.map((option) => <label key={option.value} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '6px 0', fontSize: 13 }}>
+        <button type="button" style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', minHeight: 44, padding: '6px 0', fontSize: 12 }} onClick={() => onChange(null)}>Select all</button>
+        <button type="button" aria-label={`Not apply in ${label} for ${unit}`} title={`Do not restrict ${label.toLowerCase()}`} style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', minHeight: 44, padding: '6px 0', marginLeft: 12, fontSize: 12 }} onClick={() => onChange([])}>Not apply</button>
+        {options.map((option) => <label key={option.value} style={{ display: 'flex', gap: 6, alignItems: 'center', minHeight: 44, padding: '6px 0', fontSize: 13 }}>
           <input type="checkbox" aria-label={`${option.label} in ${label} for ${unit}`} checked={selected === null || selected.includes(option.value)}
             onChange={(event) => {
               const current = selected ?? options.map((entry) => entry.value);
@@ -138,31 +139,33 @@ export default function CostGovernanceSection({ model, regional = model.foundati
       ...(field === 'tagName' && !budgetTagValues(model, value).includes(budget.tagValue) ? { tagValue: '' } : {}) } } });
   }
 
-  return <>
+  return <div className="cost-governance" style={{ ...form.col, ...governanceTheme }}>
     <GovernancePanel id="cost-governance-tags-title" title="FinOps/Governance tags">
       {!tagsOnly && <>
-        <div style={{ display: 'grid', gridTemplateColumns: tagsEnabled && tagConfigurationAction ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)', alignItems: 'stretch', gap: 12, width: '100%', maxWidth: tagsEnabled && tagConfigurationAction ? 572 : 280, margin: '0 auto' }}>
-          <button type="button" disabled={regional} aria-pressed={tagsEnabled} aria-describedby="cost-tags-enabled-help"
-            style={{ ...form.kindBtn, ...(tagsEnabled ? form.kindBtnActive : {}), minHeight: 48 }}
-            onClick={() => onChange(setFinOpsTagsEnabled(cfg, !tagsEnabled))}>
+        <div className="cost-governance-intro">
+          <p style={{ ...form.intro, margin: 0 }}>The blueprint includes IAM role tags for tag-based access control (TBAC) in IAM policies and compartment-based budgets by default. Both remain available with or without FinOps tags.</p>
+          <p id="cost-tags-enabled-help" style={{ ...form.intro, margin: 0 }}>Select <strong>Enable FinOps tags</strong> to include six additional tags—Cost Center, Business Unit, Owner, Platform, Environment and Project—with required values and their associated tag-based budgets in generated JSON.</p>
+        </div>
+        <div className="cost-governance-actions">
+          <label style={{ ...choice, justifyContent: 'flex-start', minHeight: 44, cursor: regional ? 'default' : 'pointer' }}>
+            <input id="cost-finops-enabled" type="checkbox" disabled={regional} checked={tagsEnabled} aria-describedby="cost-tags-enabled-help"
+              onChange={(event) => onChange(setFinOpsTagsEnabled(cfg, event.target.checked))} />
             Enable FinOps tags
-          </button>
+          </label>
           {tagsEnabled && tagConfigurationAction}
         </div>
-        <p style={{ ...form.help, marginTop: 8 }}>The blueprint includes IAM role tags for tag-based access control (TBAC) in IAM policies and compartment-based budgets by default. Both remain available with or without FinOps tags.</p>
-        <p id="cost-tags-enabled-help" style={{ ...form.help, marginTop: 8 }}>Select <strong>Enable FinOps tags</strong> to include six additional tags—Cost Center, Business Unit, Owner, Platform, Environment and Project—with required values and their associated tag-based budgets in generated JSON.</p>
       </>}
       {tagsEnabled && <fieldset aria-labelledby="cost-governance-tags-title" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
         <p style={{ ...form.help, margin: '8px 0 12px' }}>Separate editable lists with commas. Platform, environment and project values are inherited. Owner uses one email for all resources. Existing tag values and defaults remain valid.</p>
-        <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: 13, color: oracle.ink }} aria-label="Cost governance tags">
-          <thead><tr><th scope="col" style={{ ...cell, width: '30%' }}>Tag</th><th scope="col" style={{ ...cell, width: tagsOnly ? '53%' : '70%' }}>LOV (List of values)</th>{tagsOnly && <th scope="col" style={{ ...cell, padding: '10px 4px', textAlign: 'center', fontSize: 12, whiteSpace: 'nowrap', overflowWrap: 'normal' }}>Configuration</th>}</tr></thead>
+        <div className="cost-governance-table-wrap" role="region" aria-label="FinOps tag configuration" tabIndex={0}><table className={`cost-governance-table${tagsOnly ? ' cost-governance-table--scopes' : ''}`} aria-label="Cost governance tags">
+          <thead><tr><th scope="col">Tag</th><th scope="col">LOV (List of values)</th>{tagsOnly && <th scope="col">Configuration</th>}</tr></thead>
           <tbody>{tags.map((tag) => <tr key={tag.name}>
             <td style={cell}><CostTagHelp name={tag.name} /></td>
             <td style={cell}>{tag.name === 'tag-lz-cost-center' ? <div style={{ display: 'grid', gap: 14 }}>
               {costCenterRows.map((value, index) => {
                 const scope = costCenterFilter(cfg, value.trim());
                 return <div key={index} style={{ display: 'grid', gap: 10, paddingBottom: 14, borderBottom: `1px solid ${oracle.border}` }}>
-                  <div style={costCenterHeader}>
+                  <div className="cost-center-actions">
                   <input aria-label={`Cost center ${index + 1}`} disabled={regional} style={{ ...form.input, minWidth: 0 }} value={value}
                     onFocus={() => { costCenterBeforeEdit.current = costCenterRaw; }}
                     onChange={(event) => updateTagValues(tag.name, costCenterRows.map((entry, position) => position === index ? event.target.value : entry).join(', '))}
@@ -186,7 +189,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
               })}
               {addingCostCenter ? <>
                 <div style={{ display: 'grid', gap: 8 }}>
-                  <div style={costCenterHeader}>
+                  <div className="cost-center-actions">
                   <input autoFocus disabled={regional} aria-label="New cost center" placeholder="New cost center" style={{ ...form.input, minWidth: 0 }} value={newCostCenter} onChange={(event) => setNewCostCenter(event.target.value)} />
                   <button type="button" disabled={regional} aria-label="Edit new cost center" aria-expanded={editingNewCostCenter} aria-controls="cost-center-advanced-new"
                     style={{ ...form.addBtn, minHeight: 44, background: oracle.surface, color: oracle.redDark, padding: '9px 0', width: '100%' }} onClick={() => setEditingNewCostCenter(!editingNewCostCenter)}>Edit</button>
@@ -248,13 +251,13 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                   return <fieldset key={unit} disabled={regional} aria-label={`Cost centers for business unit ${unit}`} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                     <strong style={{ display: 'block', marginBottom: 8 }}>{unit}</strong>
                     <details>
-                      <summary style={{ ...compactInput, cursor: 'pointer', overflowWrap: 'anywhere' }} aria-label={`Cost centers for ${unit}`}>{selected.join(', ') || 'Select cost centers'}</summary>
+                      <summary style={{ ...compactInput, cursor: 'pointer', overflowWrap: 'anywhere' }} aria-label={`Cost centers for ${unit}`} {...fieldErrorProps(`cost-business-unit-${encodeURIComponent(unit)}-error`, !selected.length ? 'Assign at least one cost center to this business unit.' : null)}>{selected.join(', ') || 'Select cost centers'}</summary>
                       <div style={{ padding: 8, border: `1px solid ${oracle.border}`, borderRadius: 4, marginTop: 4 }}>
                         {costCenters.length === 0 && <p style={form.help}>Add a cost center first.</p>}
                         {costCenters.map((center) => {
                           const owner = assignments[center];
                           const unavailable = !!owner && owner !== unit;
-                          return <label key={center} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '6px 0', fontSize: 13, color: unavailable ? oracle.textMuted : oracle.ink }}>
+                          return <label key={center} style={{ display: 'flex', gap: 6, alignItems: 'center', minHeight: 44, padding: '6px 0', fontSize: 13, color: unavailable ? oracle.textMuted : oracle.ink }}>
                             <input type="checkbox" aria-label={`${center} for business unit ${unit}`} disabled={unavailable} checked={owner === unit}
                               onChange={(event) => onChange(assignCostCenterBusinessUnit(cfg, center, event.target.checked ? unit : null))} />
                             {center}{unavailable ? ` · Assigned to ${owner}` : ''}
@@ -262,7 +265,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                         })}
                       </div>
                     </details>
-                    {!selected.length && <p className="field-error">Assign at least one cost center to this business unit.</p>}
+                    <FieldError id={`cost-business-unit-${encodeURIComponent(unit)}-error`} error={!selected.length ? 'Assign at least one cost center to this business unit.' : null} />
                   </fieldset>;
                 })}
                 {!regional && <FieldError id="cost-center-business-unit-error" error={unassignedCostCenterErrors(cfg)} />}
@@ -279,7 +282,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
 
             </div></td>}
           </tr>)}</tbody>
-        </table>
+        </table></div>
       </fieldset>}
     </GovernancePanel>
     {!tagsOnly && <GovernancePanel id="cost-budgets-title" title="Budgets">
@@ -305,45 +308,56 @@ export default function CostGovernanceSection({ model, regional = model.foundati
           const targetValues = custom ? budgetTagValues(model, custom.tagName) : [];
           const targetError = custom ? customBudgetError(custom, targetValues) : null;
           const definition = definitions[key];
-          return <details key={key} open={newBudgetKey === key} style={{ borderTop: `1px solid ${oracle.border}`, marginTop: 10 }}>
-            <summary className="cost-budget-summary" style={{ cursor: 'pointer', padding: '14px 0', minHeight: 44, fontSize: 13, overflowWrap: 'anywhere', color: oracle.ink }}>
-              <span style={{ float: 'right', marginLeft: 10 }} onClick={(event) => { event.preventDefault(); event.stopPropagation(); }}>
-                <DeleteButton label={`Remove budget ${budget.name}`} style={{ width: 44, height: 44 }} onClick={() => removeBudget(key)} />
-              </span>
-              <strong>{budget.name || definition.name}</strong><span style={{ color: oracle.textMuted }}> · {Number.isFinite(budget.amount) ? budget.amount.toLocaleString('en-US') : 'Enter amount'} / month</span>
-            </summary>
-            <p style={{ ...form.help, margin: '0 0 14px' }}>{definition.description.replace(/^Monthly budget for /, 'Target: ')}</p>
-            {custom && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 18 }}>
-              <div><label style={form.label} htmlFor={`budget-tag-${key}`}>Tag</label>
-                <select id={`budget-tag-${key}`} style={form.input} value={custom.tagName} onChange={(event) => updateTarget(key, 'tagName', event.target.value)}>
-                  {tags.map((tag) => <option key={tag.name} value={tag.name}>{tag.name}</option>)}
-                </select></div>
-              <div><label style={form.label} htmlFor={`budget-tag-value-${key}`}>Tag value</label>
-                <select id={`budget-tag-value-${key}`} style={form.input} value={targetValues.includes(custom.tagValue) ? custom.tagValue : ''} onChange={(event) => updateTarget(key, 'tagValue', event.target.value)}
-                  {...fieldErrorProps(`budget-tag-value-${key}-error`, targetError)}>
-                  <option value="">Choose a defined tag value</option>
-                  {targetValues.map((value) => <option key={value} value={value}>{value}</option>)}
-                </select>
-                <FieldError id={`budget-tag-value-${key}-error`} error={targetError} /></div>
-            </div>}
-            <div className="cost-budget-fields" style={{ display: 'grid', gap: 14, alignItems: 'end', marginBottom: 18 }}>
-              {fields.filter(([field]) => field !== 'recipients' || !cfg.useSingleRecipient).map(([field, label]) => {
-                const id = `cost-budget-${key}-${field}`;
-                const numeric = field === 'amount' || field === 'thresholdValue';
-                const error = budgetFieldError(field, budget[field]);
-                return <div key={field} className={`cost-budget-field--${field}`}>
-                  <label style={form.label} htmlFor={id}>{label}</label>
-                  <input id={id} aria-label={`${label} for ${definition.name}`} type={numeric ? 'number' : 'text'} style={form.input}
-                    value={numeric && !Number.isFinite(budget[field]) ? '' : budget[field]}
-                    {...(field === 'amount' ? { min: 1, max: 999999999999, step: 1 } : field === 'thresholdValue' ? { min: 0.01, max: 10000, step: 0.01 } : {})}
-                    {...(field === 'recipients' ? { inputMode: 'email' as const, required: true, placeholder: 'Enter at least one notification email address.' } : {})}
-                    onChange={(event) => updateBudget(key, field, numeric ? event.target.valueAsNumber : event.target.value)}
-                    {...fieldErrorProps(`${id}-error`, error)} aria-invalid={!!error} />
-                  <FieldError id={`${id}-error`} error={error} />
-                </div>;
-              })}
-            </div>
-          </details>;
+          const issueCount = fields.filter(([field]) => field !== 'recipients' || !cfg.useSingleRecipient)
+            .filter(([field]) => budgetFieldError(field, budget[field])).length + (targetError ? 1 : 0);
+          return <div key={key} className="cost-budget-card">
+            <details open={newBudgetKey === key}>
+              <summary className="cost-budget-summary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m6 4 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="cost-budget-heading">
+                  <strong>{budget.name || definition.name}</strong>
+                  <span className="cost-budget-amount">{Number.isFinite(budget.amount) ? budget.amount.toLocaleString('en-US') : 'Enter amount'} / month</span>
+                  {issueCount > 0 && <span className="cost-budget-issues">{issueCount} {issueCount === 1 ? 'field needs' : 'fields need'} attention</span>}
+                </span>
+              </summary>
+              <div className="cost-budget-editor">
+              <p style={{ ...form.help, margin: '0 0 14px' }}>{definition.description.replace(/^Monthly budget for /, 'Target: ')}</p>
+              {custom && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 18 }}>
+                <div><label style={form.label} htmlFor={`budget-tag-${key}`}>Tag</label>
+                  <select id={`budget-tag-${key}`} style={form.input} value={custom.tagName} onChange={(event) => updateTarget(key, 'tagName', event.target.value)}>
+                    {tags.map((tag) => <option key={tag.name} value={tag.name}>{tag.name}</option>)}
+                  </select></div>
+                <div><label style={form.label} htmlFor={`budget-tag-value-${key}`}>Tag value</label>
+                  <select id={`budget-tag-value-${key}`} style={form.input} value={targetValues.includes(custom.tagValue) ? custom.tagValue : ''} onChange={(event) => updateTarget(key, 'tagValue', event.target.value)}
+                    {...fieldErrorProps(`budget-tag-value-${key}-error`, targetError)}>
+                    <option value="">Choose a defined tag value</option>
+                    {targetValues.map((value) => <option key={value} value={value}>{value}</option>)}
+                  </select>
+                  <FieldError id={`budget-tag-value-${key}-error`} error={targetError} /></div>
+              </div>}
+              <div className="cost-budget-fields" style={{ display: 'grid', gap: 14, alignItems: 'end', marginBottom: 18 }}>
+                {fields.filter(([field]) => field !== 'recipients' || !cfg.useSingleRecipient).map(([field, label]) => {
+                  const id = `cost-budget-${key}-${field}`;
+                  const numeric = field === 'amount' || field === 'thresholdValue';
+                  const error = budgetFieldError(field, budget[field]);
+                  return <div key={field} className={`cost-budget-field--${field}`}>
+                    <label style={form.label} htmlFor={id}>{label}</label>
+                    <input id={id} aria-label={`${label} for ${definition.name}`} type={numeric ? 'number' : 'text'} style={form.input}
+                      value={numeric && !Number.isFinite(budget[field]) ? '' : budget[field]}
+                      {...(field === 'amount' ? { min: 1, max: 999999999999, step: 1 } : field === 'thresholdValue' ? { min: 0.01, max: 10000, step: 0.01 } : {})}
+                      {...(field === 'recipients' ? { inputMode: 'email' as const, required: true, placeholder: 'Enter at least one notification email address.' } : {})}
+                      onChange={(event) => updateBudget(key, field, numeric ? event.target.valueAsNumber : event.target.value)}
+                      {...fieldErrorProps(`${id}-error`, error)} aria-invalid={!!error} />
+                    <FieldError id={`${id}-error`} error={error} />
+                  </div>;
+                })}
+              </div>
+              </div>
+            </details>
+            <DeleteButton label={`Remove budget ${budget.name}`} style={{ width: 44, height: 44, position: 'absolute', top: 12, right: 12 }} onClick={() => removeBudget(key)} />
+          </div>;
         })}
         {tagsEnabled && <button type="button" style={{ ...form.addBtn, minHeight: 44, marginTop: 16 }} onClick={addBudget}>Add tag-based budget</button>}
         {restorable.length > 0 && <details style={{ marginTop: 14 }}>
@@ -355,5 +369,5 @@ export default function CostGovernanceSection({ model, regional = model.foundati
         </details>}
       </fieldset>
     </GovernancePanel>}
-  </>;
+  </div>;
 }

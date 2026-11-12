@@ -134,7 +134,7 @@ describe('observability and cost settings', () => {
     for (const field of ['Platform', 'Environment', 'Project']) expect(costCenterCells[1]).toMatch(new RegExp(`aria-label="${field} for cost center CC12345"[^>]*>All</summary>`));
     expect(costCenterCells).toHaveLength(2);
     expect(tags).not.toContain('aria-label="Show scope of tag-lz-');
-    expect(tags).toContain('aria-pressed="true"');
+    expect(tags).toMatch(/<input[^>]*id="cost-finops-enabled"[^>]*checked=""/);
     expect(tags).toContain('<textarea');
     expect(tags).toMatch(/aria-label="Cost center 1"[^>]*value="CC12345"/);
     expect(tags).toContain('Add cost center');
@@ -193,9 +193,14 @@ it('keeps IAM role tags and compartment budgets explained when FinOps tags are d
   expect(html).not.toContain('budget-cost-center-cc12345');
 });
 
-it('shows an unpressed Enable FinOps tags button and no tag editor for a new design', () => {
+it('starts with FinOps tags unchecked and shared budget alerts checked', () => {
   const html = render(emptyLzModel());
-  expect(html).toMatch(/<button[^>]*aria-pressed="false"[^>]*>Enable FinOps tags<\/button>/);
+  const checkbox = html.match(/<input[^>]*id="cost-finops-enabled"[^>]*>/)?.[0];
+  expect(checkbox).toContain('type="checkbox"');
+  expect(checkbox).not.toContain('checked=""');
+  expect(html).toMatch(/<label[^>]*><input[^>]*checked=""[^>]*\/>Use one email for all budget alerts<\/label>/);
+  expect(html).not.toContain('id="cost-budget-BUDGET-LANDINGZONE-KEY-recipients"');
+  expect(html).toMatch(/<label[^>]*>[\s\S]*?id="cost-finops-enabled"[^>]*\/>Enable FinOps tags<\/label>/);
   expect(html).not.toContain('aria-label="Cost governance tags"');
   expect(html).not.toContain('Add tag-based budget');
 });
@@ -254,4 +259,29 @@ it.each([false, true])('shows the tag configuration action only alongside enable
   const html = renderToStaticMarkup(<WizardProvider initialModel={model}><ObservabilityCostStep tagConfigurationAction={<button type="button">Show tag configuration</button>} /></WizardProvider>);
   expect(html.includes('Show tag configuration')).toBe(enabled);
   if (enabled) expect(html.indexOf('Show tag configuration')).toBeGreaterThan(html.indexOf('Enable FinOps tags'));
+});
+
+it('keeps budget errors visible while the editor is collapsed and separates the remove action', () => {
+  const model = emptyLzModel();
+  const cfg = model.foundation.costGovernance!;
+  cfg.recipients = 'finops@example.com';
+  cfg.budgets['BUDGET-LANDINGZONE-KEY'].amount = 0;
+  const html = render(model);
+  const summary = html.match(/<summary class="cost-budget-summary"[\s\S]*?<\/summary>/)?.[0];
+  expect(summary).toBeDefined();
+  expect(summary).toContain('1 field needs attention');
+  expect(summary).not.toContain('<button');
+  expect(html).toContain('aria-label="Remove budget budget-landingzone"');
+  cfg.budgets['BUDGET-LANDINGZONE-KEY'].amount = 10000;
+  expect(render(model)).not.toContain('field needs attention');
+});
+
+it('associates missing business-unit assignments with their cost-center selector', () => {
+  const model = taggedModel();
+  model.foundation.costGovernance!.costCenterBusinessUnits = {};
+  const html = render(model);
+  const selector = html.match(/<summary[^>]*aria-label="Cost centers for IT"[^>]*>/)?.[0];
+  expect(selector).toContain('aria-invalid="true"');
+  expect(selector).toContain('aria-describedby="cost-business-unit-IT-error"');
+  expect(html).toContain('id="cost-business-unit-IT-error"');
 });

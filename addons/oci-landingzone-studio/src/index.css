@@ -247,12 +247,6 @@ a:focus:not(:focus-visible) {
   grid-template-columns: minmax(0, 2.2fr) minmax(84px, 0.8fr) minmax(96px, 0.8fr);
 }
 
-.cost-budget-summary::after {
-  content: '';
-  display: block;
-  clear: both;
-}
-
 .cost-budget-field--recipients {
   grid-column: 1 / -1;
 }

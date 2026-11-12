@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import ObservabilityCostStep from '../wizard/steps/ObservabilityCostStep';
+import { governanceTheme } from '../wizard/steps/costGovernanceStyles';
 import type { UncoveredCostResource } from '../services/costCenterCoverage';
 
 export default function TagConfigurationSidebar({ selectedTag, onTagSelect, onClose, uncoveredCostResources }: {
@@ -10,7 +11,7 @@ export default function TagConfigurationSidebar({ selectedTag, onTagSelect, onCl
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); }, []);
-  return <aside className="studio-tag-sidebar" aria-labelledby="tag-configuration-title">
+  return <aside style={governanceTheme} className="studio-tag-sidebar" aria-labelledby="tag-configuration-title">
     <div className="studio-tag-sidebar-header">
       <h2 id="tag-configuration-title" ref={heading} tabIndex={-1}>Tag configuration</h2>
       <button type="button" onClick={onClose}>Back to Governance</button>
