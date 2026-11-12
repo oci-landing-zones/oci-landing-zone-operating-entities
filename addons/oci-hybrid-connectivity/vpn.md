@@ -6,8 +6,7 @@
 The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an OCI One-OE Landing Zone. It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using Landing Zone Studio or the Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
 
 &nbsp;
-
-#### Architecture and routing
+### Architecture and routing
 
 This architecture diagram illustrates **Site-to-Site VPN connectivity** to an **OCI One-OE Landing Zone with Hub A**. The VPN connection uses **BGP dynamic routing**, and the diagram shows the IPv4 addresses assigned to both ends of each IPSec tunnel.
 
@@ -16,16 +15,15 @@ Both VPN tunnel attachments are associated with the `drgrt-fra-lz-hc` DRG route 
 
 This routing and inspection model applies to **One-OE Landing Zone deployments with Hubs A, B, and C** models. For **Hub E**, which does not include a network firewall, traffic between the remote network and spoke VCNs can be routed directly through the DRG.
 
+&nbsp;
 <img src="./images/oneoe-vpn.png" width="1100" alt="Site-to-Site VPN connected to a One-OE Landing Zone with Hub A and production and preproduction spoke VCNs">
 
 &nbsp;
-
 > [!NOTE]
 > With the routing configuration shown, traffic between the remote network and the Hub VCN’s private subnets (`sn-fra-lz-hub-mgmt`, `sn-fra-lz-hub-mon`, and `sn-fra-lz-hub-dns`) does not pass through the internal network firewall. If these flows also require inspection, update the relevant routing rules in both directions to maintain symmetric routing through the firewall.
 
 
 &nbsp;
-
 #### Main components
 
 | Resource&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Purpose |
@@ -35,7 +33,6 @@ This routing and inspection model applies to **One-OE Landing Zone deployments w
 | **DRG Route Table** | Custom route table `drgrt-fra-lz-hc`, which directs traffic to the appropriate next hop based on the deployed hub model. |
 
 &nbsp;
-
 #### VPN Routing types
 
 | Option&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Configuration |
@@ -48,7 +45,6 @@ For BGP, each inside-tunnel pair must use different host addresses in the same `
 The addon requires `remote_cidrs` for both routing options to prepare landing zone routes. With BGP, the actual remote routes must also be advertised by the peer; `remote_cidrs` does not configure BGP advertisements or prefix filters.
 
 &nbsp;
-
 #### Configuration requirements
 
 | Input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Requirement |
@@ -192,7 +188,6 @@ Landing Zone Studio provides a graphical interface for configuring Site-to-Site 
 7. Download the generated deployment package (ZIP), which includes the JSON configuration files, including `network.json`, required for Terraform deployment.
 
 &nbsp;
-
 #### Option 2: Blueprint Factory
 
 The [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) provides a configuration-driven approach for generating Landing Zone deployment files from a JSON or Jsonnet source configuration.
