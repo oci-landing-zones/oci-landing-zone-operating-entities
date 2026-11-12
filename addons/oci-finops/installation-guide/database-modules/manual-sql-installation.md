@@ -2,7 +2,7 @@
 
 Use this route with your own compatible ADB, credentials and connection. It installs the same module SQL without the Python configurator's resource-name discovery.
 
-The [common deployment prerequisites](../README.md#common-database-prerequisites) apply to this route.
+The [common deployment prerequisites](../configuration.md#common-database-prerequisites) apply to this route.
 
 ## Contents
 

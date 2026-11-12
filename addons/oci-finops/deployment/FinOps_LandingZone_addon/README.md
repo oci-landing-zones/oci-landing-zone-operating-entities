@@ -30,12 +30,12 @@ The FinOps deployment uses the JSON files below. Before deployment, edit private
 | --- | --- | --- |
 | [finops_iam.json](finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies; see the [IAM policy reference](../../installation-guide/infrastructure/iam-policies.md). | Confirm `COMMON-DOMAIN`, domain/compartment names in policy strings and the FinOps CIDR condition. Follow the two-phase IAM sequence in [Deploy and verify](#deploy-and-verify). |
 | [finops_network.json](finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. | Review regional names/keys, non-overlapping VCN/subnet CIDRs, `hub_mgmt_*` source CIDRs and hub DRG/route-table references. Complete hub routing and attachment imports following the [One-OE integration reference](../../installation-guide/infrastructure/one-oe-integration.md). |
-| [finops_database.json](finops_database.json) | Private Autonomous Database. | Replace `<ADB_ADMIN_PASSWORD>` in `admin_password` with a password meeting the [ADB requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password). Review sizing and networking. Follow the [credential preparation steps](../../installation-guide/README.md#step-1-prepare-database-credentials-and-secrets) after creation. |
+| [finops_database.json](finops_database.json) | Private Autonomous Database. | Replace `<ADB_ADMIN_PASSWORD>` in `admin_password` with a password meeting the [ADB requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password). Review sizing and networking. Follow the [credential preparation steps](../../installation-guide/configuration.md#step-1-prepare-database-credentials-and-secrets) after creation. |
 | [finops_security.json](finops_security.json) | Vault and encryption key in `cmp-lz-security`. | Keep the Vault/key in `CMP-LZ-SECURITY-KEY` and the `vlt-lz-finops` name expected by Python discovery. Reuse existing managed resources through their owner. |
 | [finops_observability.json](finops_observability.json) | Notifications topic and email subscriptions. | Replace `email.address@example.com` in `subscriptions[].values` with the operational recipients. |
 | [finops_bastion.json](finops_bastion.json) | Central Bastion in `cmp-lz-security`. | Replace `<YOUR_IP>/32` in `cidr_block_allow_list` with approved source IPs/CIDRs. Confirm the existing hub management subnet. Keep `default_compartment_id=CMP-LZ-SECURITY-KEY`; the compartment is not a deployment choice. |
 
-**Tags — all selected files:** Replace `tobedefined` and verify every tag value, including `shared`, `finops`, `security` and `notapply`, belongs to the organization's controlled lists. Update both defaults and any per-resource `defined_tags` overrides.
+**Tags — all selected files:** Replace `tobedefined` and verify every tag value, including `shared`, `finops`, `security` and `notapplicable`, belongs to the organization's controlled lists. Update both defaults and any per-resource `defined_tags` overrides.
 
 ### Deployment methods
 
@@ -97,7 +97,7 @@ Follow [Deploy and verify](#deploy-and-verify) for the deployment sequence and f
 
 ## Next steps
 
-The IaC deployment automates the core infrastructure required by FinOps, including ADB, IAM, networking, Vault/key and notifications. Complete the remaining setup through the [FinOps configuration guide](../../installation-guide/README.md#step-1-prepare-database-credentials-and-secrets):
+The IaC deployment automates the core infrastructure required by FinOps, including ADB, IAM, networking, Vault/key and notifications. Complete the remaining setup through the [FinOps configuration guide](../../installation-guide/configuration.md#step-1-prepare-database-credentials-and-secrets):
 
 1. **Prepare database credentials and Secrets.** Change the initial ADMIN password and manually create the three password Secrets in the provisioned Vault.
 2. **Install the database modules.** Run the Python installer, the default method, or the direct SQL installation. This separate step creates the FinOps schemas and installs the ingestion, processing and reporting modules.

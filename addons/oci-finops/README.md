@@ -77,7 +77,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
 | **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](deployment/FinOps_LandingZone_addon/README.md) for the configuration files, resource ownership and dependencies.
+See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/configuration.md) for database credentials, Secrets, database modules and OAC setup.
 
 ### Database processing and reporting
 
@@ -126,9 +126,7 @@ Set up the solution in three stages. The FinOps add-on extends an existing Landi
 
 2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/FinOps_LandingZone_addon/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
 
-3. **Configure FinOps — prepare the platform and reporting.** [Change the initial ADMIN password and prepare the password Secrets](installation-guide/README.md#step-1-prepare-database-credentials-and-secrets), then [install the database modules](installation-guide/README.md#step-2-install-the-finops-database-modules) using the default Python installer or the direct SQL alternative. Finally, [configure OAC connectivity, import the workbook and set up user access](installation-guide/README.md#step-3-oracle-analytics-cloud-dashboard).
-
-The [complete FinOps setup guide](installation-guide/README.md) provides the prerequisites, configuration files and validation steps for stages 2 and 3.
+3. **Configure FinOps — prepare the platform and reporting.** Follow the [FinOps configuration guide](installation-guide/configuration.md) to prepare credentials and Secrets, install the database modules using Python or SQL, and configure OAC reporting and user access.
 
 ## Maintenance backlog
 
