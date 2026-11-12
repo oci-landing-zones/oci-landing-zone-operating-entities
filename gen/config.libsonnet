@@ -5,6 +5,7 @@ local cidrs = import 'lib/cidrs.libsonnet';
 local collections = import 'lib/collections.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
+local cost_governance = import 'lib/cost_governance.libsonnet';
 local hybrid_contract = import 'addons/oci-hybrid-connectivity/config.libsonnet';
 
 {
@@ -479,6 +480,7 @@ local hybrid_contract = import 'addons/oci-hybrid-connectivity/config.libsonnet'
     );
 
     config {
+      [if std.objectHas(config, 'cost_governance') then 'cost_governance']: cost_governance.normalize(config.cost_governance, projects=cost_governance.project_names({ environments: norm_envs })),
       [if std.objectHas(config, 'hybrid_connectivity') then 'hybrid_connectivity']: hybrid,
       region: region,
       region_short_name: region_short_name,

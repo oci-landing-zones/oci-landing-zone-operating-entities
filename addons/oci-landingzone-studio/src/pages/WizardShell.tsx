@@ -15,6 +15,7 @@ import { legacyRegionalModel } from '../services/regionalDeployment';
 import type { DiagramOptions, LzModel } from '../model/types';
 import WizardStepper, { WIZARD_STEPS } from '../wizard/WizardStepper';
 import FoundationStep from '../wizard/steps/FoundationStep';
+import ObservabilityCostStep from '../wizard/steps/ObservabilityCostStep';
 import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformsStep from '../wizard/steps/PlatformsStep';
@@ -29,6 +30,7 @@ import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import { flowPickerEnvironments } from '../services/flowNetworks';
 import FlowSidebar from '../components/FlowSidebar';
+import TagConfigurationSidebar from '../components/TagConfigurationSidebar';
 import { hasHubLoadBalancer } from '../services/hubKinds';
 import type { FlowFocus } from '../diagram/FlowOverlay';
 import TopBar from '../components/TopBar';
@@ -38,17 +40,21 @@ import FieldError, { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
 import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
+import { costTagScope } from '../diagram/tagScope';
+import finOpsGovernanceImage from '../assets/finops-governance.png';
+import { governanceTheme } from '../wizard/steps/costGovernanceStyles';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 /** First step with spoke subnets — and therefore endpoints and traceable flows. */
 const FLOW_STEP = 3;
 
 const STEP_PROGRESS_LABELS: Record<number, string> = {
-  1: 'Set deployment type, location and environments',
+  1: 'Set deployment type, location, environments and notifications',
   2: 'Set up the shared network',
   3: 'Organize projects and configure environment networks',
   4: 'Add shared services and workload platforms',
-  5: 'Review and download your files',
+  5: 'Configure cost tags and budgets',
+  6: 'Review and download your files',
 };
 
 const layout = {
@@ -97,6 +103,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
   const [flowFocus, setFlowFocus] = React.useState<FlowFocus | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
+  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
+  const [diagramWorkspace, setDiagramWorkspace] = React.useState<'overview' | 'flows' | 'tags'>('overview');
+  const tagConfigurationButton = React.useRef<HTMLButtonElement>(null);
+  const diagramPanel = React.useRef<HTMLElement>(null);
   const [debugMode, setDebugMode] = React.useState(false);
   const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
   const [diagramOpts, setDiagramOpts] = React.useState<DiagramOptions>({});
@@ -128,8 +138,41 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     formPanel.current?.scrollTo({ top: 0 });
   }, [activeStep]);
 
-  const showForm = viewMode === 'split' || viewMode === 'form';
-  const showDiagram = viewMode === 'split' || viewMode === 'diagram';
+  const tagsEnabled = (homeSource?.model ?? model).foundation.costGovernance?.tagsEnabled !== false;
+  const tagsOpen = activeStep === 5 && tagsEnabled && viewMode === 'diagram' && diagramWorkspace === 'tags';
+  const governanceForm = activeStep === 5 && !tagsOpen;
+  const showGovernanceReference = governanceForm && tagsEnabled;
+  const workspaceView = governanceForm ? 'form' : viewMode;
+  const showForm = workspaceView === 'split' || workspaceView === 'form';
+  const showDiagram = workspaceView === 'split' || workspaceView === 'diagram';
+  function changeStep(step: number) {
+    setDiagramWorkspace('overview');
+    setActiveStep(step);
+  }
+  function changeView(mode: ViewMode) {
+    setDiagramWorkspace('overview');
+    setViewMode(mode);
+  }
+  function openTagConfiguration() {
+    setDiagramWorkspace('tags');
+    setViewMode('diagram');
+  }
+  function closeTagConfiguration() {
+    setDiagramWorkspace('overview');
+    setViewMode('split');
+    requestAnimationFrame(() => tagConfigurationButton.current?.focus());
+  }
+  const editorInputHandlers: React.HTMLAttributes<HTMLDivElement> = {
+    onChangeCapture: (event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(true); },
+    onBlurCapture: (event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(false); },
+    onKeyDownCapture: (event) => {
+      if (event.key === 'Enter' && !event.nativeEvent.isComposing && isDiagramTextControl(event.target)
+        && (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        event.target.blur();
+      }
+    },
+  };
   const routing = useDiagramPreview(model, editingDiagramInput);
   const snapshot = routing.snapshot;
   const renderedModel = snapshot?.model ?? model;
@@ -147,8 +190,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   // spoke subnets, so the layer starts at step 3 (Projects); earlier steps only
   // point there. Review downloads retain the layers chosen in diagram mode.
   const diagramOnly = viewMode === 'diagram';
-  const flowStepReached = activeStep >= FLOW_STEP;
-  const flowLayer = diagramOnly && flowStepReached;
+  const flowStepReached = activeStep >= FLOW_STEP && activeStep !== 5;
+  const flowLayer = diagramOnly && flowStepReached && !tagsOpen;
   const chosenOpts = useMemo<DiagramOptions>(
     () => {
       // Hidden flows draw nothing, so their traces cannot keep the route tables open;
@@ -182,6 +225,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   // Split view has no room for the picker: one click switches to diagram-only
   // with the picker open. Before step 3 the diagram points at step 3 instead.
   function openFlows() {
+    setDiagramWorkspace('flows');
     setDiagramOpts((o) => ({ ...o, showFlows: true }));
     setFlowsCollapsed(false);
     setViewMode('diagram');
@@ -189,21 +233,32 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const flowHint = supportsFlowTracing && activeStep === 2
     ? { label: 'Endpoints and traffic flows appear in step 3', action: 'Go to step 3 →', onClick: () => setActiveStep(FLOW_STEP) }
     : undefined;
-  const gridCols = viewMode === 'split'
+  const gridCols = showGovernanceReference ? 'minmax(0, 1fr) minmax(0, 1fr)' : workspaceView === 'split'
     ? '1fr 1fr'
+    : tagsOpen
+      ? 'minmax(0, 1fr) minmax(440px, 560px)'
     : flowsOpen
       ? (flowsCollapsed ? '1fr 52px' : '1fr 320px')
       : '1fr';
   const getDiagram = useMemo(() => snapshot ? createDiagramGraph(snapshot.model, snapshot.preview) : undefined, [snapshot]);
   const diagramResult = useMemo(() => {
-    if (!getDiagram) return {};
+    if (!getDiagram || !showDiagram) return {};
     try {
       return { diagram: getDiagram(flowLayer ? WIZARD_STEPS.length : activeStep, effectiveOpts) };
     } catch (error) {
       return { error: error instanceof Error && error.message ? error.message : 'The diagram layout could not be prepared.' };
     }
-  }, [getDiagram, activeStep, flowLayer, effectiveOpts]);
+  }, [getDiagram, activeStep, flowLayer, effectiveOpts, showDiagram]);
   const diagram = diagramResult.diagram;
+  const tagScope = useMemo(() => diagram && activeStep === 5 && tagsEnabled ? costTagScope(diagram, selectedTag, renderedModel) : null, [diagram, activeStep, selectedTag, renderedModel, tagsEnabled]);
+  function selectTag(tagName: string) {
+    setSelectedTag((previous) => previous === tagName ? null : tagName);
+    if (viewMode === 'form') setViewMode('split');
+    // On stacked layouts, bring the diagram into view after it has mounted.
+    if (window.matchMedia('(max-width: 1100px)').matches) requestAnimationFrame(() => {
+      diagramPanel.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
   const diagramError = diagramResult.error ?? routing.error;
   const diagramStatus = diagramResult.error ? 'error' : routing.status;
   function exportDiagram() {
@@ -214,12 +269,12 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   // the same traces via buildGraph). Only meaningful in diagram-only mode.
   const flowTraces = useMemo(
     () => {
-      if (!diagramOnly || !snapshot) return [];
+      if (!flowLayer || !snapshot) return [];
       return effectiveOpts.allFlows
         ? buildFlowTraces(snapshot.model, allFlowIds(snapshot.model), 'kind', snapshot.preview.tables)
         : buildFlowTraces(snapshot.model, effectiveOpts.activeFlows ?? [], 'flow', snapshot.preview.tables);
     },
-    [diagramOnly, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot],
+    [flowLayer, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot],
   );
   // Manual packet stepping: null = auto-play, a number = that 0-based hop.
   function onFlowStep(id: string, action: 'prev' | 'next' | 'play' | 'goto', hop?: number) {
@@ -263,7 +318,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
           style={{ ...layout.secondary, justifySelf: 'start', gridColumn: 1 }}
           className="wizard-prev-button"
           aria-label={`Back to step ${prevStep.id}: ${prevStep.label}`}
-          onClick={() => setActiveStep(prevStep.id)}
+          onClick={() => changeStep(prevStep.id)}
         >
           ← Back: {prevStep.label}
         </button>
@@ -275,7 +330,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
           style={{ ...layout.primary, justifySelf: 'end', gridColumn: 3 }}
           className="wizard-next-button"
           aria-label={`Continue to step ${nextStep.id}: ${nextStep.label}`}
-          onClick={() => setActiveStep(nextStep.id)}
+          onClick={() => changeStep(nextStep.id)}
         >
           Next: {nextStep.label} →
         </button>
@@ -288,7 +343,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     <div style={layout.app}>
       <TopBar
         onEmptySpaceClick={registerTopBarDebugClick}
-        center={<ViewModeToggle mode={viewMode} onChange={setViewMode} />}
+        center={activeStep !== 5 || tagsOpen ? <ViewModeToggle mode={workspaceView} onChange={changeView} /> : undefined}
         right={(
           <>
             <span role="status" className="studio-save-status" style={{ ...layout.saveState, color: saveState === 'error' ? '#ffd1cc' : '#dff4df' }}>
@@ -311,26 +366,18 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
               </div>
             </div>
 
-            <WizardStepper active={activeStep} onSelect={setActiveStep} />
+            <WizardStepper active={activeStep} onSelect={changeStep} />
           </>
         )}
 
         <div
-          style={{ ...layout.grid, gridTemplateColumns: gridCols }}
-          className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}`}
+          style={{ ...layout.grid, gridTemplateColumns: gridCols, ...(showGovernanceReference || tagsOpen ? governanceTheme : {}) }}
+          className={`studio-workspace${workspaceView === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}${tagsOpen ? ' studio-workspace--tags' : ''}${showGovernanceReference ? ' studio-workspace--governance' : ''}`}
         >
             {showForm && (
-              <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={viewMode === 'split' ? 0 : undefined}
-                onChangeCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(true); }}
-                onBlurCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(false); }}
-                onKeyDownCapture={(event) => {
-                  if (event.key === 'Enter' && !event.nativeEvent.isComposing && isDiagramTextControl(event.target)
-                    && (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey)) {
-                    event.preventDefault();
-                    event.target.blur();
-                  }
-                }}
-                style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
+              <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={workspaceView === 'split' ? 0 : undefined}
+                {...editorInputHandlers}
+                style={{ display: 'grid', gap: 14, alignContent: 'start', ...(governanceForm ? { maxWidth: 720, width: '100%' } : {}) }}>
                 {activeStep === 1 ? (
                   <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
                 ) : activeStep === 2 ? (
@@ -340,7 +387,14 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 4 ? (
                   <PlatformsStep />
                 ) : activeStep === 5 ? (
-                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} />
+                  <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag}
+                    tagConfigurationAction={tagsEnabled ? <button ref={tagConfigurationButton} type="button" className="studio-flow-button" style={{ ...layout.flowBtn, minHeight: 44, padding: '8px 10px', fontSize: 13, borderRadius: 6 }}
+                      onClick={openTagConfiguration} title="Configure tags alongside the full-width diagram">
+                      Show tag configuration ⤢
+                    </button> : undefined}
+                    uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
+                ) : activeStep === 6 ? (
+                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
                 ) : null}
                 {previewError}
               </div>
@@ -348,20 +402,38 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
             {showDiagram && (
               <ReactFlowProvider>
-              <section className="studio-diagram-panel" style={layout.panel}>
+              <section ref={diagramPanel} className="studio-diagram-panel" style={layout.panel}>
                 <div style={layout.panelAccent} />
                 <div style={layout.diagramHeader}>
                   <div className="studio-info-heading" style={{ marginBottom: 0 }}>
-                    <h2 style={layout.diagramTitle}>Network diagram</h2>
+                    <h2 style={layout.diagramTitle}>{activeStep === 5 ? 'Landing Zone Diagram' : 'Network diagram'}</h2>
                     {flowLayer && <InfoButton title="Routing tables and flows"><p>Tables come from the current Blueprint Factory configuration. Dynamic DRG rows preview the routes allowed by its import distributions. Remote peering routes are expectations based on the remote CIDRs you supplied.</p><p>This is a configuration preview, not live OCI routing state. The packet follows the network connection lines and briefly highlights the rule used at each hop.</p></InfoButton>}
                   </div>
-                  {viewMode === 'split' && supportsFlowTracing && flowStepReached && (
+                  {(viewMode === 'split' || tagsOpen) && supportsFlowTracing && flowStepReached && (
                     <button type="button" className="studio-flow-button" style={layout.flowBtn} onClick={openFlows} title="Show network flows in the full-width diagram">
                       Show network flows ⤢
                     </button>
                   )}
                   <DiagramZoomControls disabled={!diagram || routing.pending} />
                 </div>
+                {tagScope && <div className="cost-tag-scope-notice" role="status">
+                  <div><strong>{tagScope.tagName}</strong>
+                    {tagScope.groups ? <>
+                      <p style={{ margin: '4px 0' }}>{tagScope.message ?? (tagScope.tagName === 'tag-lz-business-unit'
+                        ? 'Business units follow their assigned cost centers on generated resources.'
+                        : tagScope.tagName === 'tag-lz-project'
+                        ? 'Resources outside project areas use notapplicable. Each project area shows its project tag value.'
+                        : 'The colors identify tag values on generated resources.')}</p>
+                      <div className="cost-tag-scope-legend" aria-label={tagScope.tagName === 'tag-lz-platform' ? 'Platform tag legend' : tagScope.tagName === 'tag-lz-cost-center' ? 'Cost center tag legend' : tagScope.tagName === 'tag-lz-business-unit' ? 'Business unit tag legend' : tagScope.tagName === 'tag-lz-project' ? 'Project tag legend' : 'Environment tag legend'}>
+                        {tagScope.groups.map((group) => <span key={group.id}>
+                          <i aria-hidden="true" className={`cost-tag-scope-swatch${group.color ? '' : ` cost-tag-scope-swatch--${group.id}`}`} style={group.color ? { border: `3px solid ${group.color}` } : undefined} />
+                          {tagScope.tagName === 'tag-lz-owner' && `${group.label}: `}<code>{group.id}</code>
+                        </span>)}
+                      </div>
+                    </> : <><br />All landing zone: the tag default is inherited by child compartments. Explicit resource values can override it.</>}
+                  </div>
+                  <button type="button" onClick={() => setSelectedTag(null)}>Clear tag highlight</button>
+                </div>}
                 {!showForm && previewError}
                 {!!diagram?.flowErrors?.length && <div style={{ margin: '0 20px 12px' }}>
                   <ErrorNotice title="Flow preview unavailable">{diagram.flowErrors.map((message) => <div key={message}>{message}</div>)}</ErrorNotice>
@@ -369,7 +441,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 <div className="studio-diagram-canvas" aria-busy={routing.pending} data-preview-state={diagramStatus}
                   style={layout.diagramCanvas}>
                   {diagram ? <div style={{ height: '100%' }} inert={routing.pending || undefined}>
-                      <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
+                      <LzDiagram diagram={diagram} tagScope={tagScope} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
                         onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </div> : <div role="status" style={{ height: '100%', display: 'grid', placeItems: 'center', color: oracle.textMuted, fontSize: 13 }}>
                     {diagramStatus === 'error' ? 'Diagram unavailable' : routing.deferred ? 'Complete the network fields to prepare the diagram.' : 'Preparing diagram…'}
@@ -381,6 +453,18 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
               </section>
               </ReactFlowProvider>
             )}
+
+            {showGovernanceReference && <figure className={`studio-governance-reference${tagsEnabled ? '' : ' studio-governance-reference--compact'}`}>
+              <a href={finOpsGovernanceImage} target="_blank" rel="noreferrer" aria-label="Open FinOps tagging example at full size">
+                <img src={finOpsGovernanceImage} width={1127} height={939} alt="Example of FinOps cost tags applied to network, security, platform and project resources, with compartment-based and tag-based budgets." />
+              </a>
+              <figcaption>FinOps tagging and budgets: reference example. Open the image to view it at full size.</figcaption>
+            </figure>}
+
+            {tagsOpen && <div className="studio-tag-sidebar-container" {...editorInputHandlers}>
+              <TagConfigurationSidebar selectedTag={selectedTag} onTagSelect={selectTag} onClose={closeTagConfiguration}
+                uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
+            </div>}
 
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>

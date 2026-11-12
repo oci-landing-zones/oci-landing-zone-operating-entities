@@ -5,6 +5,7 @@ import { additionalEnvironmentCidr, oneOeEnvironmentCidrs, SHARED_EXACS_CIDR } f
 import { formatIp, parseCidr } from '../services/cidr';
 import { splitOkePlacements } from '../services/okePlacements';
 import { reconcileExadata } from '../services/exadata';
+import { defaultCostGovernance } from '../services/costGovernance';
 
 export const LZ_MODEL_VERSION = '0.20.0';
 
@@ -47,6 +48,7 @@ export function emptyLzModel(): LzModel {
       region: region?.id ?? 'eu-frankfurt-1',
       regionShortName: region?.shortName ?? 'fra',
       cisLevel: 2,
+      costGovernance: { ...defaultCostGovernance(), tagsEnabled: false },
       notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
     environments: [

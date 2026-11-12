@@ -1,5 +1,5 @@
 /**
- * WizardStepper — navigation across the five-step wizard.
+ * WizardStepper — navigation across the six-step wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */
@@ -19,7 +19,8 @@ export const WIZARD_STEPS: WizardStep[] = [
   { id: 2, label: 'Hub Network' },
   { id: 3, label: 'Projects' },
   { id: 4, label: 'Platforms' },
-  { id: 5, label: 'Review' },
+  { id: 5, label: 'Governance' },
+  { id: 6, label: 'Review' },
 ];
 
 const css = {
@@ -28,7 +29,7 @@ const css = {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     padding: '11px 14px', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
     border: `1px solid ${oracle.border}`, borderRadius: 8, background: oracle.surface,
-    color: oracle.textMuted, cursor: 'pointer', whiteSpace: 'nowrap',
+    color: oracle.textMuted, cursor: 'pointer', whiteSpace: 'nowrap', minWidth: 'max-content',
     transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease',
   } as React.CSSProperties,
   num: {

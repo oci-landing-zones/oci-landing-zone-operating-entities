@@ -149,7 +149,7 @@ The generator adds RPC route tables, route distributions, attachments, import st
 
 Generation produces the core One-OE configuration files: `governance.json`, `iam.json`, `network.json`, the selected `security_cis1.json` or `security_cis2.json`, and the corresponding `observability_cis1.json` or `observability_cis2.json`.
 
-Generation also produces the selected `security_cis1_pre.json` or `security_cis2_pre.json`, and the corresponding `observability_cis1_pre.json` or `observability_cis2_pre.json`. Hub C deployments can additionally produce `network_backends.json`, and registered extensions can add their own `.json` output files.
+Generation also produces the selected `security_cis1_pre.json` or `security_cis2_pre.json` for staged security controls. Include the complete observability file from the initial apply; Flow Logs reference each stack's declared regional VCNs and subnets. Hub C deployments can additionally produce `network_backends.json`, and registered extensions can add their own `.json` output files.
 
 Review all generated files before deployment. Keep the source configurations and generated output directories separate.
 

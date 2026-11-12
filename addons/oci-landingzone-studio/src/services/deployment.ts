@@ -25,7 +25,7 @@ export function expectedDeploymentFiles(config: LzConfig): string[] {
   return [
     ...(config.stack_scope === 'regional' ? [] : ['iam.json', 'governance.json']), 'network.json',
     `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
-    `observability_cis${cis}_pre.json`, `observability_cis${cis}.json`,
+    `observability_cis${cis}.json`,
     ...(config.hub.kind === 'hub_c' ? ['network_backends.json'] : []),
     ...(hasOke ? ['oke.json'] : []),
   ];
@@ -137,7 +137,7 @@ export function deploymentReadme(config: LzConfig, files: string[]): string {
     '',
     '3. Update and apply phase 2',
     ...(config.hub.kind === 'hub_c' ? HUB_C_BACKEND_STEPS : []),
-    'In the same stack, edit the variables. Replace oci_configuration_objects with exactly these phase 2 files. The final security and observability files replace their _pre counterparts:',
+    'In the same stack, edit the variables. Replace oci_configuration_objects with exactly these phase 2 files. Retain complete control files and replace each _pre file with its final counterpart:',
     ...second.files.map((file) => `  ${file}`),
     UPDATE_STEP,
     ...deploymentOutputs(config),

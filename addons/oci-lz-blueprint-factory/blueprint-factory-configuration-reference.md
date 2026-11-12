@@ -133,8 +133,54 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
 | `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |
+| `cost_governance` | object | No | Omitted | Opts the complete Home stack into One-OE cost Tag Defaults and its eight inherited budgets, with optional overrides. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
+
+### Cost tags and inherited budgets
+
+Studio's **Governance** uses the same `cost_governance` contract as Blueprint Factory:
+
+```jsonnet
+cost_governance: {
+  require_tag_values: true,
+  enable_tags: true,
+  tag_resource_labels: true,
+  owner_email: 'owner@example.com',
+  cost_center_assignments: {
+    CC12345: { platform: ['network', 'security'], environment: ['prod'], project: null },
+  },
+  budget_recipients: 'finops@example.com',
+  budgets: {
+    'BUDGET-LANDINGZONE-KEY': {
+      name: 'budget-platform',
+      amount: 12000,
+      alert_rule: { threshold_value: 90 },
+    },
+  },
+},
+```
+
+Providing this object inherits the eight [One-OE budget defaults](../../gen/lib/cost_budgets.libsonnet) and all six cost Tag Defaults. Omit `cost_governance` to preserve the existing factory behavior without these additional resources. Studio includes the object for Home designs; DR reuses Home governance and does not emit `governance.json`. Regional inputs include `enable_tags: false` when Home disables FinOps tags.
+
+- `enable_tags` defaults to `true`. Set it to `false` to omit the six FinOps tag definitions, defaults, resource assignments and tag-based budgets. IAM role tags and compartment-based budgets are retained. New Studio designs start with FinOps tags disabled. **Enable FinOps tags** in Governance enables them with `require_tag_values: true`; linked DR designs inherit the Home selection.
+- `tag_resource_labels` defaults to `false` in Factory inputs and is enabled by Studio. When enabled, Home exports `governance_pre.json` for phase 1 (untagged definitions) and `governance.json` for phase 2 (namespaces and tag definitions labelled `platform=governance`, `environment=shared`, `project=notapplicable`, plus Owner and applicable Cost Center/Business Unit). Replace the pre file with the final file in the same stack; never include both together. This avoids references to cost tags before they exist. DR emits neither file.
+- `cost_center_business_units` maps each cost-center value to one Business Unit. Matching generated resources receive the unit associated with their assigned cost center, including governance tag definitions in phase 2. Each configured Business Unit must have at least one cost center; several centers may belong to the same unit. Omit the map to preserve previous Factory assignments. Studio exports the selected associations and validates missing assignments.
+- `require_tag_values` defaults to `false`. Set it to `true` to set `is_user_required` on all six cost Tag Defaults, retaining their `default_value`. Explicit placeholder values still satisfy this requirement; it does not enforce business-specific values. Access-control tags are unchanged.
+- Budget resources use `tag-lz-platform=governance` and `tag-lz-environment=shared`, independently of their spend target. IAM groups also use `environment=shared` while retaining project values and policy scopes. General IAM resources and structural compartments use `iam`; network, security and workload compartments retain their specific platform classifications. Both values are included in the generated Platform LOV.
+- `owner_email` is one email address used for `tag-lz-owner` on every emitted resource tag map and on the landing-zone Owner Tag Default. When provided, it overrides existing Owner assignments and is included in the Owner LOV. Studio exposes one global Owner email; per-resource Owner customization is outside its current scope. Omitting this field preserves existing Factory Owner behavior.
+- `budget_recipients` applies its email string to all active budget alerts and takes precedence over individual recipients. Studio's shared-email control accepts one address; configuration files can also supply a comma-separated list. An empty string keeps the alert rules without email notifications in Factory configuration files. Studio requires a valid notification email for active budgets.
+- `budgets` contains overrides keyed by the original budget keys. Keys and target filters remain stable. Each override accepts `name`, `amount`, and `alert_rule.threshold_value` or `alert_rule.recipients`. Omitted fields inherit One-OE values. Changing a budget name does not change its compartment or tag target.
+- Inherited Business Unit budgets are omitted when their target is absent from an explicit `tag_value_lists['tag-lz-business-unit']` list. Removing Retail in Studio therefore removes its inherited budget and prevents that budget from adding Retail back to the generated LOV. Existing budget edits remain saved for reuse if the value is added again.
+- `tag_value_lists` maps one of the six cost tag names to an array of allowed strings. Studio's editable **LOV (List of values)** accepts comma-separated values; Owner uses a single email input instead. Generated lists retain values used by the landing zone, active budgets and Tag Defaults. The **Configuration** column shows the landing-zone scope inherited by child compartments.
+- Studio creates an additional tag-based budget when a cost center is added. Factory input must include the corresponding `additional_budgets` entry; adding a value to `tag_value_lists` alone does not create a budget. Business Unit associations are exported through `cost_center_business_units` and applied to generated resources.
+- `cost_center_assignments` maps cost-center values to `platform`, `environment` and `project` filters using their inherited names. All active filters must match the resource's generated tags; multiple values within one filter are alternatives. Omitted, `null` or empty filters are inactive (**Not apply**). Studio exports these rules, including an unfiltered `CC12345` rule for its default **All LZ** scope. Matching generated resource tag maps receive the cost center instead of `tobedefined`; existing explicit cost-center tags, including budget targets, are preserved. A resource matching multiple cost centers fails generation rather than receiving an arbitrary value. Assigned cost centers are retained in the generated LOV. These rules do not create compartment Tag Defaults for future resources; existing Tag Defaults and tag definitions remain unchanged. Omit the field to preserve previous Factory assignments.
+- Each additional project assigned to an environment gets one monthly tag-based budget (default amount `500`, threshold `80`), shared across its environments. Its key is `BUDGET-PROJECT-<PROJECT>-KEY` (uppercase, unsupported characters replaced with hyphens).
+- `exclude_budgets` lists inherited, project or custom keys to omit from generated governance. Studio retains inherited overrides in source config so restoring a removed budget after import keeps its settings.
+- `additional_budgets` defines new budgets for the six FinOps/Governance tags. Keys use `BUDGET-CUSTOM-<ID>-KEY`; each entry requires `name`, `amount`, `tag_name` (for example `tag-lz-cost-center`) and `tag_value`, with optional `alert_rule.threshold_value` and `alert_rule.recipients`. Targets use the `tagns-lz-cost-governance` namespace. Studio exposes **Add tag-based budget**; custom budgets can be deleted, while inherited budgets can be restored. Shared recipients apply to custom budgets too.
+- Amounts must be integers from `1` through `999999999999`. Percentage thresholds must be greater than `0` and at most `10000`, with up to two decimals. Names use letters, numbers, hyphens or underscores and cannot start with a number. Recipients are strings, not arrays. Alert names and messages follow the configured budget name and threshold.
+
+The [cost governance guide](../../blueprints/one-oe/runtime/one-stack/cost-governance.md) describes the defaults and the effects of requiring tag values.
 
 `security_targets` can contain only names defined under `environments`. Omit it to apply the default targeting to every configured environment.
 

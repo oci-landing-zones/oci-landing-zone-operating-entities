@@ -134,7 +134,7 @@ Before granting Kubernetes Service permissions, review the shared [operational a
 
 ## **4. Configuration Files**
 
-The initial deployment uses the four core JSON files plus the `_pre` security and observability files for the selected CIS profile. After the initial apply creates the Landing Zone compartments and dependencies, replace both `_pre` inputs with their full versions and apply the stack again.
+The initial deployment uses the four core JSON files, the `_pre` security file, and the complete observability file for the selected CIS profile. After the initial apply creates the Landing Zone compartments and dependencies, replace only the security input with its full version and apply the stack again.
 
 | File | Purpose  |
 | --- | --- |
@@ -143,11 +143,11 @@ The initial deployment uses the four core JSON files plus the `_pre` security an
 | `oke_governance.json` | Tag namespaces and governance definitions |
 | `oke.json` | Consolidated OKE clusters and managed worker pools |
 | `oke_security_cis1_pre.json` or `oke_security_cis2_pre.json` | Initial CIS-aligned security configuration |
-| `oke_observability_cis1_pre.json` or `oke_observability_cis2_pre.json` | Initial CIS-aligned observability configuration |
+| `oke_observability_cis1.json` or `oke_observability_cis2.json` | Initial CIS-aligned observability configuration |
 
-### Staged Security and Observability Files <!-- omit from toc -->
+### Security and Observability Files <!-- omit from toc -->
 
-The security and observability files are paired. Use the `_pre` files for the first apply, then replace them with the corresponding full files of the same CIS level and apply again.
+Select the same CIS level for security and observability. Only security uses a staged replacement. Observability includes explicit VCN and subnet Flow Logs from the initial apply.
 
 | File | Purpose |
 | --- | --- |
@@ -156,9 +156,7 @@ The security and observability files are paired. Use the `_pre` files for the fi
 | `oke_security_cis2.json` | Baseline security controls (CIS profile 2) |
 | `oke_security_cis2_pre.json` | Pre-requisites for `oke_security_cis2.json` |
 | `oke_observability_cis1.json` | Observability settings (CIS profile 1) |
-| `oke_observability_cis1_pre.json` | Pre-requisites for `oke_observability_cis1.json` |
 | `oke_observability_cis2.json` | Observability settings (CIS profile 2) |
-| `oke_observability_cis2_pre.json` | Pre-requisites for `oke_observability_cis2.json` |
 
 &nbsp;
 
@@ -183,7 +181,7 @@ The security and observability files are paired. Use the `_pre` files for the fi
    Use Orchestrator `v2.4.1` with CIS OKE `v0.3.0` and set the working directory to `rms-facade`. Prefer ORM with configuration files staged in a customer-controlled private OCI Object Storage bucket.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke.json`, and the `_pre` security and observability files matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke.json`, the `_pre` security file, and the complete observability file matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
 
 3. **Review Configuration** (Optional Customization)
 
@@ -207,9 +205,8 @@ The security and observability files are paired. Use the `_pre` files for the fi
    - Deployment takes approximately **20-30 minutes**
    - Monitor progress in the logs
 
-6. **Apply Full Security and Observability Configuration**
+6. **Apply Full Security Configuration**
    - Replace the `_pre` security input with `oke_security_cis1.json` or `oke_security_cis2.json`, preserving the selected CIS level.
-   - Replace the `_pre` observability input with `oke_observability_cis1.json` or `oke_observability_cis2.json`.
    - Run **Plan**, review the replacement, and run **Apply** again.
 
 #### Step 3: Verify Deployment <!-- omit from toc -->
@@ -251,7 +248,7 @@ cp /path/to/workload-extensions/oke/simple/single-stack/*.json \
    /path/to/terraform-oci-modules-orchestrator/
 ```
 
-For the first plan, configure Orchestrator to load the five core files and only the `_pre` security and observability files for the selected CIS level. Do not load a `_pre` file and its full replacement in the same plan.
+For the first plan, configure Orchestrator to load the five core files, the `_pre` security file, and the complete observability file for the selected CIS level. Do not load both security phases in the same plan.
 
 #### Step 3: Configure Provider <!-- omit from toc -->
 
@@ -270,7 +267,7 @@ terraform plan -out=tfplan
 terraform apply tfplan
 ```
 
-After the initial apply, replace the two `_pre` input references with the corresponding full security and observability files, then run and review a second plan and apply.
+After the initial apply, replace the `_pre` security input reference with the corresponding full security file, then run and review a second plan and apply.
 
 &nbsp;
 

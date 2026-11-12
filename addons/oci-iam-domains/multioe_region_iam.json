@@ -1,438 +1,935 @@
 {
     "compartments_configuration": {
-        "enable_delete"                                                  : "true",
+        "enable_delete"                                                                            : "true",
 
         "compartments": {
             "CMP-LANDINGZONE-KEY": {
-                "name"                                                   : "cmp-landingzone",
-                "description"                                            : "Enclosing Landing Zone Compartment",
+                "name"                                                                             : "cmp-landingzone",
+                "description"                                                                      : "Enclosing Landing Zone Compartment",
 
                 "children": {
                     "CMP-LZ-EU-KEY": {
-                        "name"                                           : "cmp-lz-eu",
-                        "description"                                    : "EU compartment",
+                        "name"                                                                     : "cmp-lz-eu",
+                        "description"                                                              : "EU compartment",
 
                         "children": {
                             "CMP-LZ-EU-NETWORK-KEY": {
-                                "name"                                   : "cmp-lz-eu-network",
-                                "description"                            : "EU Shared Network Compartment",
+                                "name"                                                             : "cmp-lz-eu-network",
+                                "description"                                                      : "EU Shared Network Compartment",
 
                                 "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role"          : "lz-network-admin"
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "network",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable",
+                                    "tagns-lz-role.tag-lz-role"                                    : "lz-network-admin"
                                 }
                             },
 
                             "CMP-LZ-EU-PLATFORM-KEY": {
-                                "name"                                   : "cmp-lz-eu-platform",
-                                "description"                            : "EU Shared Platform Compartment"
+                                "name"                                                             : "cmp-lz-eu-platform",
+                                "description"                                                      : "EU Shared Platform Compartment",
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
+                                }
                             },
 
                             "CMP-LZ-EU-PREPROD-KEY": {
-                                "name"                                   : "cmp-lz-eu-preprod",
-                                "description"                            : "EU Pre-Production Environment Compartment",
+                                "name"                                                             : "cmp-lz-eu-preprod",
+                                "description"                                                      : "EU Pre-Production Environment Compartment",
 
                                 "children": {
                                     "CMP-LZ-EU-PREPROD-NETWORK-KEY": {
-                                        "name"                           : "cmp-lz-eu-preprod-network",
-                                        "description"                    : "EU Pre-Production Workload Environment, Common Network Compartment",
+                                        "name"                                                     : "cmp-lz-eu-preprod-network",
+                                        "description"                                              : "EU Pre-Production Workload Environment, Common Network Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-network-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "network",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-network-admin"
                                         }
                                     },
 
                                     "CMP-LZ-EU-PREPROD-PLATFORM-KEY": {
-                                        "name"                           : "cmp-lz-eu-preprod-platform",
-                                        "description"                    : "EU Pre-Production Workload Environment, Common Platform Compartment"
+                                        "name"                                                     : "cmp-lz-eu-preprod-platform",
+                                        "description"                                              : "EU Pre-Production Workload Environment, Common Platform Compartment",
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+                                        }
                                     },
 
                                     "CMP-LZ-EU-PREPROD-PROJECTS-KEY": {
-                                        "name"                           : "cmp-lz-eu-preprod-projects",
-                                        "description"                    : "EU Pre-Production Workload Environment, Common Projects Compartment",
+                                        "name"                                                     : "cmp-lz-eu-preprod-projects",
+                                        "description"                                              : "EU Pre-Production Workload Environment, Common Projects Compartment",
 
                                         "children": {
                                             "CMP-LZ-EU-PREPROD-PROJ1-KEY": {
-                                                "name"                   : "cmp-lz-eu-preprod-proj1",
-                                                "description"            : "EU Pre-Production environment, Project 1 compartment"
+                                                "name"                                             : "cmp-lz-eu-preprod-proj1",
+                                                "description"                                      : "EU Pre-Production environment, Project 1 compartment",
+
+                                                "defined_tags": {
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                                                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                                                }
                                             }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                                         }
                                     },
 
                                     "CMP-LZ-EU-PREPROD-SECURITY-KEY": {
-                                        "name"                           : "cmp-lz-eu-preprod-security",
-                                        "description"                    : "EU Pre-Production Workload Environment, Common Security Compartment",
+                                        "name"                                                     : "cmp-lz-eu-preprod-security",
+                                        "description"                                              : "EU Pre-Production Workload Environment, Common Security Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-security-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-security-admin"
                                         }
                                     }
+                                },
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "preprod",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
                                 }
                             },
 
                             "CMP-LZ-EU-PROD-KEY": {
-                                "name"                                   : "cmp-lz-eu-prod",
-                                "description"                            : "EU Production Environment Compartment",
+                                "name"                                                             : "cmp-lz-eu-prod",
+                                "description"                                                      : "EU Production Environment Compartment",
 
                                 "children": {
                                     "CMP-LZ-EU-PROD-NETWORK-KEY": {
-                                        "name"                           : "cmp-lz-eu-prod-network",
-                                        "description"                    : "EU Prod Workload Environment, Common Network Compartment",
+                                        "name"                                                     : "cmp-lz-eu-prod-network",
+                                        "description"                                              : "EU Prod Workload Environment, Common Network Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-network-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "network",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-network-admin"
                                         }
                                     },
 
                                     "CMP-LZ-EU-PROD-PLATFORM-KEY": {
-                                        "name"                           : "cmp-lz-eu-prod-platform",
-                                        "description"                    : "EU Production Workload Environment, Common Platform Compartment"
+                                        "name"                                                     : "cmp-lz-eu-prod-platform",
+                                        "description"                                              : "EU Production Workload Environment, Common Platform Compartment",
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+                                        }
                                     },
 
                                     "CMP-LZ-EU-PROD-PROJECTS-KEY": {
-                                        "name"                           : "cmp-lz-eu-prod-projects",
-                                        "description"                    : "EU Production Workload Environment, Common Projects Compartment",
+                                        "name"                                                     : "cmp-lz-eu-prod-projects",
+                                        "description"                                              : "EU Production Workload Environment, Common Projects Compartment",
 
                                         "children": {
                                             "CMP-LZ-EU-PROD-PROJ1-KEY": {
-                                                "name"                   : "cmp-lz-eu-prod-proj1",
-                                                "description"            : "EU Production environment, Project 1 compartment"
+                                                "name"                                             : "cmp-lz-eu-prod-proj1",
+                                                "description"                                      : "EU Production environment, Project 1 compartment",
+
+                                                "defined_tags": {
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                                                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                                                }
                                             }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                                         }
                                     },
 
                                     "CMP-LZ-EU-PROD-SECURITY-KEY": {
-                                        "name"                           : "cmp-lz-eu-prod-security",
-                                        "description"                    : "EU Production Workload Environment, Common Security Compartment",
+                                        "name"                                                     : "cmp-lz-eu-prod-security",
+                                        "description"                                              : "EU Production Workload Environment, Common Security Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-security-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-security-admin"
                                         }
                                     }
+                                },
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "prod",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
                                 }
                             },
 
                             "CMP-LZ-EU-SECURITY-KEY": {
-                                "name"                                   : "cmp-lz-eu-security",
-                                "description"                            : "EU Shared Security Compartment",
+                                "name"                                                             : "cmp-lz-eu-security",
+                                "description"                                                      : "EU Shared Security Compartment",
 
                                 "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role"          : "lz-security-admin"
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "security",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable",
+                                    "tagns-lz-role.tag-lz-role"                                    : "lz-security-admin"
                                 }
                             }
+                        },
+
+                        "defined_tags": {
+                            "tagns-lz-cost-governance.tag-lz-business-unit"                        : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"                          : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-environment"                          : "shared",
+                            "tagns-lz-cost-governance.tag-lz-owner"                                : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform"                             : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-project"                              : "notapplicable"
                         }
                     },
 
                     "CMP-LZ-NETWORK-KEY": {
-                        "name"                                           : "cmp-lz-network",
-                        "description"                                    : "Shared Network Compartment",
+                        "name"                                                                     : "cmp-lz-network",
+                        "description"                                                              : "Shared Network Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role"                  : "lz-network-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit"                        : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"                          : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-environment"                          : "shared",
+                            "tagns-lz-cost-governance.tag-lz-owner"                                : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform"                             : "network",
+                            "tagns-lz-cost-governance.tag-lz-project"                              : "notapplicable",
+                            "tagns-lz-role.tag-lz-role"                                            : "lz-network-admin"
                         }
                     },
 
                     "CMP-LZ-PLATFORM-KEY": {
-                        "name"                                           : "cmp-lz-platform",
-                        "description"                                    : "Shared Platform Compartment"
+                        "name"                                                                     : "cmp-lz-platform",
+                        "description"                                                              : "Shared Platform Compartment",
+
+                        "defined_tags": {
+                            "tagns-lz-cost-governance.tag-lz-business-unit"                        : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"                          : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-environment"                          : "shared",
+                            "tagns-lz-cost-governance.tag-lz-owner"                                : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform"                             : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-project"                              : "notapplicable"
+                        }
                     },
 
                     "CMP-LZ-SECURITY-KEY": {
-                        "name"                                           : "cmp-lz-security",
-                        "description"                                    : "Shared Security Compartment",
+                        "name"                                                                     : "cmp-lz-security",
+                        "description"                                                              : "Shared Security Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role"                  : "lz-security-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit"                        : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"                          : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-environment"                          : "shared",
+                            "tagns-lz-cost-governance.tag-lz-owner"                                : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform"                             : "security",
+                            "tagns-lz-cost-governance.tag-lz-project"                              : "notapplicable",
+                            "tagns-lz-role.tag-lz-role"                                            : "lz-security-admin"
                         }
                     },
 
                     "CMP-LZ-US-KEY": {
-                        "name"                                           : "cmp-lz-us",
-                        "description"                                    : "US compartment",
+                        "name"                                                                     : "cmp-lz-us",
+                        "description"                                                              : "US compartment",
 
                         "children": {
                             "CMP-LZ-US-NETWORK-KEY": {
-                                "name"                                   : "cmp-lz-us-network",
-                                "description"                            : "US Shared Network Compartment",
+                                "name"                                                             : "cmp-lz-us-network",
+                                "description"                                                      : "US Shared Network Compartment",
 
                                 "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role"          : "lz-network-admin"
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "network",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable",
+                                    "tagns-lz-role.tag-lz-role"                                    : "lz-network-admin"
                                 }
                             },
 
                             "CMP-LZ-US-PLATFORM-KEY": {
-                                "name"                                   : "cmp-lz-us-platform",
-                                "description"                            : "US Shared Platform Compartment"
+                                "name"                                                             : "cmp-lz-us-platform",
+                                "description"                                                      : "US Shared Platform Compartment",
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
+                                }
                             },
 
                             "CMP-LZ-US-PREPROD-KEY": {
-                                "name"                                   : "cmp-lz-us-preprod",
-                                "description"                            : "US Pre-Production Environment Compartment",
+                                "name"                                                             : "cmp-lz-us-preprod",
+                                "description"                                                      : "US Pre-Production Environment Compartment",
 
                                 "children": {
                                     "CMP-LZ-US-PREPROD-NETWORK-KEY": {
-                                        "name"                           : "cmp-lz-us-preprod-network",
-                                        "description"                    : "US Pre-Production Workload Environment, Common Network Compartment",
+                                        "name"                                                     : "cmp-lz-us-preprod-network",
+                                        "description"                                              : "US Pre-Production Workload Environment, Common Network Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-network-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "network",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-network-admin"
                                         }
                                     },
 
                                     "CMP-LZ-US-PREPROD-PLATFORM-KEY": {
-                                        "name"                           : "cmp-lz-us-preprod-platform",
-                                        "description"                    : "US Pre-Production Workload Environment, Common Platform Compartment"
+                                        "name"                                                     : "cmp-lz-us-preprod-platform",
+                                        "description"                                              : "US Pre-Production Workload Environment, Common Platform Compartment",
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+                                        }
                                     },
 
                                     "CMP-LZ-US-PREPROD-PROJECTS-KEY": {
-                                        "name"                           : "cmp-lz-us-preprod-projects",
-                                        "description"                    : "US Pre-Production Workload Environment, Common Projects Compartment",
+                                        "name"                                                     : "cmp-lz-us-preprod-projects",
+                                        "description"                                              : "US Pre-Production Workload Environment, Common Projects Compartment",
 
                                         "children": {
                                             "CMP-LZ-US-PREPROD-PROJ1-KEY": {
-                                                "name"                   : "cmp-lz-us-preprod-proj1",
-                                                "description"            : "US Pre-Production environment, Project 1 compartment"
+                                                "name"                                             : "cmp-lz-us-preprod-proj1",
+                                                "description"                                      : "US Pre-Production environment, Project 1 compartment",
+
+                                                "defined_tags": {
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                                                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                                                }
                                             }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                                         }
                                     },
 
                                     "CMP-LZ-US-PREPROD-SECURITY-KEY": {
-                                        "name"                           : "cmp-lz-us-preprod-security",
-                                        "description"                    : "US Pre-Production Workload Environment, Common Security Compartment",
+                                        "name"                                                     : "cmp-lz-us-preprod-security",
+                                        "description"                                              : "US Pre-Production Workload Environment, Common Security Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-security-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-security-admin"
                                         }
                                     }
+                                },
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "preprod",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
                                 }
                             },
 
                             "CMP-LZ-US-PROD-KEY": {
-                                "name"                                   : "cmp-lz-us-prod",
-                                "description"                            : "US Production Environment Compartment",
+                                "name"                                                             : "cmp-lz-us-prod",
+                                "description"                                                      : "US Production Environment Compartment",
 
                                 "children": {
                                     "CMP-LZ-US-PROD-NETWORK-KEY": {
-                                        "name"                           : "cmp-lz-us-prod-network",
-                                        "description"                    : "US Prod Workload Environment, Common Network Compartment",
+                                        "name"                                                     : "cmp-lz-us-prod-network",
+                                        "description"                                              : "US Prod Workload Environment, Common Network Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-network-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "network",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-network-admin"
                                         }
                                     },
 
                                     "CMP-LZ-US-PROD-PLATFORM-KEY": {
-                                        "name"                           : "cmp-lz-us-prod-platform",
-                                        "description"                    : "US Production Workload Environment, Common Platform Compartment"
+                                        "name"                                                     : "cmp-lz-us-prod-platform",
+                                        "description"                                              : "US Production Workload Environment, Common Platform Compartment",
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+                                        }
                                     },
 
                                     "CMP-LZ-US-PROD-PROJECTS-KEY": {
-                                        "name"                           : "cmp-lz-us-prod-projects",
-                                        "description"                    : "US Production Workload Environment, Common Projects Compartment",
+                                        "name"                                                     : "cmp-lz-us-prod-projects",
+                                        "description"                                              : "US Production Workload Environment, Common Projects Compartment",
 
                                         "children": {
                                             "CMP-LZ-US-PROD-PROJ1-KEY": {
-                                                "name"                   : "cmp-lz-us-prod-proj1",
-                                                "description"            : "US Production environment, Project 1 compartment"
+                                                "name"                                             : "cmp-lz-us-prod-proj1",
+                                                "description"                                      : "US Production environment, Project 1 compartment",
+
+                                                "defined_tags": {
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                                                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                                                }
                                             }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
                                         }
                                     },
 
                                     "CMP-LZ-US-PROD-SECURITY-KEY": {
-                                        "name"                           : "cmp-lz-us-prod-security",
-                                        "description"                    : "US Production Workload Environment, Common Security Compartment",
+                                        "name"                                                     : "cmp-lz-us-prod-security",
+                                        "description"                                              : "US Production Workload Environment, Common Security Compartment",
 
                                         "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"  : "lz-security-admin"
+                                            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                                            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+                                            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable",
+                                            "tagns-lz-role.tag-lz-role"                            : "lz-security-admin"
                                         }
                                     }
+                                },
+
+                                "defined_tags": {
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "prod",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable"
                                 }
                             },
 
                             "CMP-LZ-US-SECURITY-KEY": {
-                                "name"                                   : "cmp-lz-us-security",
-                                "description"                            : "US Shared Security Compartment",
+                                "name"                                                             : "cmp-lz-us-security",
+                                "description"                                                      : "US Shared Security Compartment",
 
                                 "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role"          : "lz-security-admin"
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"                : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"                  : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+                                    "tagns-lz-cost-governance.tag-lz-owner"                        : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform"                     : "security",
+                                    "tagns-lz-cost-governance.tag-lz-project"                      : "notapplicable",
+                                    "tagns-lz-role.tag-lz-role"                                    : "lz-security-admin"
                                 }
                             }
+                        },
+
+                        "defined_tags": {
+                            "tagns-lz-cost-governance.tag-lz-business-unit"                        : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"                          : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-environment"                          : "shared",
+                            "tagns-lz-cost-governance.tag-lz-owner"                                : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform"                             : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-project"                              : "notapplicable"
                         }
                     }
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"                                        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"                                          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"                                          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                                                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"                                             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"                                              : "notapplicable"
+        }
+    },
+
+    "identity_domain_groups_configuration": {
+        "default_identity_domain_id"                                                               : "COMMON-DOMAIN",
+        "ignore_external_membership_updates"                                                       : true,
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"                                        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"                                          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"                                          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                                                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"                                             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"                                              : "notapplicable"
+        },
+
+        "groups": {
+            "GRP-AUDITORS-ADMIN-KEY": {
+                "name"                                                                             : "grp-auditors-admin",
+                "description"                                                                      : "Tenancy-scoped audit and read-only access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-COST-ADMIN-KEY": {
+                "name"                                                                             : "grp-cost-admin",
+                "description"                                                                      : "Tenancy-scoped cost management access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-IAM-ADMIN-KEY": {
+                "name"                                                                             : "grp-iam-admin",
+                "description"                                                                      : "Tenancy-scoped IAM administration access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-EU-IAM-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-eu-iam-admin",
+                "description"                                                                      : "Landing Zone EU IAM administration access group.",
+                "identity_domain_id"                                                               : "EU-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-EU-NETWORK-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-eu-network-admin",
+                "description"                                                                      : "Landing Zone EU network administration access group.",
+                "identity_domain_id"                                                               : "EU-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-EU-PREPROD-PROJ1-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-eu-preprod-proj1-admin",
+                "description"                                                                      : "Landing Zone EU PreProduction environment, Project 1 administration access group.",
+                "identity_domain_id"                                                               : "EU-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                }
+            },
+
+            "GRP-LZ-EU-PROD-PROJ1-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-eu-prod-proj1-admin",
+                "description"                                                                      : "Landing Zone EU Production environment, Project 1 administration access group.",
+                "identity_domain_id"                                                               : "EU-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                }
+            },
+
+            "GRP-LZ-EU-SECURITY-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-eu-security-admin",
+                "description"                                                                      : "Landing Zone EU security administration access group.",
+                "identity_domain_id"                                                               : "EU-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-NETWORK-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-network-admin",
+                "description"                                                                      : "Landing Zone shared network administration access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-SECURITY-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-security-admin",
+                "description"                                                                      : "Landing Zone shared security administration access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-US-IAM-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-us-iam-admin",
+                "description"                                                                      : "Landing Zone US IAM administration access group.",
+                "identity_domain_id"                                                               : "US-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-US-NETWORK-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-us-network-admin",
+                "description"                                                                      : "Landing Zone US network administration access group.",
+                "identity_domain_id"                                                               : "US-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-LZ-US-PREPROD-PROJ1-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-us-preprod-proj1-admin",
+                "description"                                                                      : "Landing Zone US PreProduction environment, Project 1 administration access group.",
+                "identity_domain_id"                                                               : "US-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                }
+            },
+
+            "GRP-LZ-US-PROD-PROJ1-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-us-prod-proj1-admin",
+                "description"                                                                      : "Landing Zone US Production environment, Project 1 administration access group.",
+                "identity_domain_id"                                                               : "US-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                }
+            },
+
+            "GRP-LZ-US-SECURITY-ADMIN-KEY": {
+                "name"                                                                             : "grp-lz-us-security-admin",
+                "description"                                                                      : "Landing Zone US security administration access group.",
+                "identity_domain_id"                                                               : "US-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
+            },
+
+            "GRP-SECURITY-ADMIN-KEY": {
+                "name"                                                                             : "grp-security-admin",
+                "description"                                                                      : "Tenancy-scoped security service administration access group.",
+                "identity_domain_id"                                                               : "COMMON-DOMAIN",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
                 }
             }
         }
     },
 
-    "identity_domain_groups_configuration": {
-        "default_identity_domain_id"                                     : "COMMON-DOMAIN",
-        "ignore_external_membership_updates"                             : true,
-
-        "groups": {
-            "GRP-AUDITORS-ADMIN-KEY": {
-                "name"                                                   : "grp-auditors-admin",
-                "description"                                            : "Tenancy-scoped audit and read-only access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            },
-
-            "GRP-COST-ADMIN-KEY": {
-                "name"                                                   : "grp-cost-admin",
-                "description"                                            : "Tenancy-scoped cost management access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            },
-
-            "GRP-IAM-ADMIN-KEY": {
-                "name"                                                   : "grp-iam-admin",
-                "description"                                            : "Tenancy-scoped IAM administration access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            },
-
-            "GRP-LZ-EU-IAM-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-eu-iam-admin",
-                "description"                                            : "Landing Zone EU IAM administration access group.",
-                "identity_domain_id"                                     : "EU-DOMAIN"
-            },
-
-            "GRP-LZ-EU-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-eu-network-admin",
-                "description"                                            : "Landing Zone EU network administration access group.",
-                "identity_domain_id"                                     : "EU-DOMAIN"
-            },
-
-            "GRP-LZ-EU-PREPROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-eu-preprod-proj1-admin",
-                "description"                                            : "Landing Zone EU PreProduction environment, Project 1 administration access group.",
-                "identity_domain_id"                                     : "EU-DOMAIN"
-            },
-
-            "GRP-LZ-EU-PROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-eu-prod-proj1-admin",
-                "description"                                            : "Landing Zone EU Production environment, Project 1 administration access group.",
-                "identity_domain_id"                                     : "EU-DOMAIN"
-            },
-
-            "GRP-LZ-EU-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-eu-security-admin",
-                "description"                                            : "Landing Zone EU security administration access group.",
-                "identity_domain_id"                                     : "EU-DOMAIN"
-            },
-
-            "GRP-LZ-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-network-admin",
-                "description"                                            : "Landing Zone shared network administration access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            },
-
-            "GRP-LZ-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-security-admin",
-                "description"                                            : "Landing Zone shared security administration access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            },
-
-            "GRP-LZ-US-IAM-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-us-iam-admin",
-                "description"                                            : "Landing Zone US IAM administration access group.",
-                "identity_domain_id"                                     : "US-DOMAIN"
-            },
-
-            "GRP-LZ-US-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-us-network-admin",
-                "description"                                            : "Landing Zone US network administration access group.",
-                "identity_domain_id"                                     : "US-DOMAIN"
-            },
-
-            "GRP-LZ-US-PREPROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-us-preprod-proj1-admin",
-                "description"                                            : "Landing Zone US PreProduction environment, Project 1 administration access group.",
-                "identity_domain_id"                                     : "US-DOMAIN"
-            },
-
-            "GRP-LZ-US-PROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-us-prod-proj1-admin",
-                "description"                                            : "Landing Zone US Production environment, Project 1 administration access group.",
-                "identity_domain_id"                                     : "US-DOMAIN"
-            },
-
-            "GRP-LZ-US-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "grp-lz-us-security-admin",
-                "description"                                            : "Landing Zone US security administration access group.",
-                "identity_domain_id"                                     : "US-DOMAIN"
-            },
-
-            "GRP-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "grp-security-admin",
-                "description"                                            : "Tenancy-scoped security service administration access group.",
-                "identity_domain_id"                                     : "COMMON-DOMAIN"
-            }
-        }
-    },
-
     "identity_domains_configuration": {
-        "default_compartment_id"                                         : null,
-        "default_defined_tags"                                           : null,
-        "default_freeform_tags"                                          : null,
+        "default_compartment_id"                                                                   : null,
+        "default_freeform_tags"                                                                    : null,
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"                                        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"                                          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"                                          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                                                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"                                             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"                                              : "notapplicable"
+        },
 
         "identity_domains": {
             "COMMON-DOMAIN": {
-                "display_name"                                           : "id_lz_common",
-                "description"                                            : "Multi-OE LZ common Identity Domain",
-                "compartment_id"                                         : null,
-                "admin_email"                                            : null,
-                "admin_first_name"                                       : null,
-                "admin_last_name"                                        : null,
-                "admin_user_name"                                        : null,
-                "allow_signing_cert_public_access"                       : false,
-                "home_region"                                            : null,
-                "is_hidden_on_login"                                     : false,
-                "is_notification_bypassed"                               : false,
-                "is_primary_email_required"                              : false,
-                "license_type"                                           : "free",
-                "replica_region"                                         : null
+                "display_name"                                                                     : "id_lz_common",
+                "description"                                                                      : "Multi-OE LZ common Identity Domain",
+                "compartment_id"                                                                   : null,
+                "admin_email"                                                                      : null,
+                "admin_first_name"                                                                 : null,
+                "admin_last_name"                                                                  : null,
+                "admin_user_name"                                                                  : null,
+                "allow_signing_cert_public_access"                                                 : false,
+                "home_region"                                                                      : null,
+                "is_hidden_on_login"                                                               : false,
+                "is_notification_bypassed"                                                         : false,
+                "is_primary_email_required"                                                        : false,
+                "license_type"                                                                     : "free",
+                "replica_region"                                                                   : null,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
             },
 
             "EU-DOMAIN": {
-                "display_name"                                           : "id_lz_eu",
-                "description"                                            : "Multi-OE LZ EU Identity Domain",
-                "compartment_id"                                         : null,
-                "admin_email"                                            : null,
-                "admin_first_name"                                       : null,
-                "admin_last_name"                                        : null,
-                "admin_user_name"                                        : null,
-                "allow_signing_cert_public_access"                       : false,
-                "home_region"                                            : null,
-                "is_hidden_on_login"                                     : false,
-                "is_notification_bypassed"                               : false,
-                "is_primary_email_required"                              : false,
-                "license_type"                                           : "free",
-                "replica_region"                                         : null
+                "display_name"                                                                     : "id_lz_eu",
+                "description"                                                                      : "Multi-OE LZ EU Identity Domain",
+                "compartment_id"                                                                   : null,
+                "admin_email"                                                                      : null,
+                "admin_first_name"                                                                 : null,
+                "admin_last_name"                                                                  : null,
+                "admin_user_name"                                                                  : null,
+                "allow_signing_cert_public_access"                                                 : false,
+                "home_region"                                                                      : null,
+                "is_hidden_on_login"                                                               : false,
+                "is_notification_bypassed"                                                         : false,
+                "is_primary_email_required"                                                        : false,
+                "license_type"                                                                     : "free",
+                "replica_region"                                                                   : null,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
             },
 
             "US-DOMAIN": {
-                "display_name"                                           : "id_lz_us",
-                "description"                                            : "Multi-OE LZ US Identity Domain",
-                "compartment_id"                                         : null,
-                "admin_email"                                            : null,
-                "admin_first_name"                                       : null,
-                "admin_last_name"                                        : null,
-                "admin_user_name"                                        : null,
-                "allow_signing_cert_public_access"                       : false,
-                "home_region"                                            : null,
-                "is_hidden_on_login"                                     : false,
-                "is_notification_bypassed"                               : false,
-                "is_primary_email_required"                              : false,
-                "license_type"                                           : "free",
-                "replica_region"                                         : "us-ashburn-1"
+                "display_name"                                                                     : "id_lz_us",
+                "description"                                                                      : "Multi-OE LZ US Identity Domain",
+                "compartment_id"                                                                   : null,
+                "admin_email"                                                                      : null,
+                "admin_first_name"                                                                 : null,
+                "admin_last_name"                                                                  : null,
+                "admin_user_name"                                                                  : null,
+                "allow_signing_cert_public_access"                                                 : false,
+                "home_region"                                                                      : null,
+                "is_hidden_on_login"                                                               : false,
+                "is_notification_bypassed"                                                         : false,
+                "is_primary_email_required"                                                        : false,
+                "license_type"                                                                     : "free",
+                "replica_region"                                                                   : "us-ashburn-1",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                }
             }
         }
     },
 
     "policies_configuration": {
-        "enable_cis_benchmark_checks"                                    : "false",
+        "enable_cis_benchmark_checks"                                                              : "false",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"                                        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"                                          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"                                          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                                                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"                                             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"                                              : "notapplicable"
+        },
 
         "supplied_policies": {
             "PCY-AUDITING-ADMIN-KEY": {
-                "name"                                                   : "pcy-auditing-admin",
-                "description"                                            : "Grants grp-auditors-admin read-only audit access in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-auditing-admin",
+                "description"                                                                      : "Grants grp-auditors-admin read-only audit access in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-auditors-admin' to inspect all-resources in tenancy",
@@ -461,9 +958,18 @@
             },
 
             "PCY-COST-ADMIN-KEY": {
-                "name"                                                   : "pcy-cost-admin",
-                "description"                                            : "Grants grp-cost-admin budget and usage report management access in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-cost-admin",
+                "description"                                                                      : "Grants grp-cost-admin budget and usage report management access in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "define tenancy usage-report as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
@@ -474,9 +980,18 @@
             },
 
             "PCY-GENERIC-ADMIN-KEY": {
-                "name"                                                   : "pcy-generic-admin",
-                "description"                                            : "Grants defined administration groups shared service usage in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-generic-admin",
+                "description"                                                                      : "Grants defined administration groups shared service usage in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to use cloud-shell in tenancy",
@@ -489,9 +1004,18 @@
             },
 
             "PCY-IAM-ADMIN-KEY": {
-                "name"                                                   : "pcy-iam-admin",
-                "description"                                            : "Grants grp-iam-admin IAM administration access in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-iam-admin",
+                "description"                                                                      : "Grants grp-iam-admin IAM administration access in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin' to manage policies in tenancy",
@@ -511,9 +1035,18 @@
             },
 
             "PCY-LZ-EU-IAM-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-eu-iam-admin",
-                "description"                                            : "Grants grp-lz-eu-iam-admin IAM administration access in the EU domain.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-lz-eu-iam-admin",
+                "description"                                                                      : "Grants grp-lz-eu-iam-admin IAM administration access in the EU domain.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-iam-admin' to manage users in tenancy where target.resource.domain.name = 'id_lz_eu'",
@@ -524,9 +1057,18 @@
             },
 
             "PCY-LZ-EU-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-eu-network-admin",
-                "description"                                            : "Grants grp-lz-eu-network-admin network administration access in Landing Zone EU child compartments tagged for network administration.",
-                "compartment_id"                                         : "CMP-LZ-EU-KEY",
+                "name"                                                                             : "pcy-lz-eu-network-admin",
+                "description"                                                                      : "Grants grp-lz-eu-network-admin network administration access in Landing Zone EU child compartments tagged for network administration.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-network-admin' to read all-resources in compartment cmp-lz-eu where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -561,9 +1103,18 @@
             },
 
             "PCY-LZ-EU-PREPROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-eu-preprod-proj1-admin",
-                "description"                                            : "Grants grp-lz-eu-preprod-proj1-admin administration access in the Project 1 compartment in the EU Pre-Production environment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PREPROD-PROJ1-KEY",
+                "name"                                                                             : "pcy-lz-eu-preprod-proj1-admin",
+                "description"                                                                      : "Grants grp-lz-eu-preprod-proj1-admin administration access in the Project 1 compartment in the EU Pre-Production environment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PREPROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-preprod-proj1-admin' to read all-resources in compartment cmp-lz-eu-preprod-proj1",
@@ -601,9 +1152,18 @@
             },
 
             "PCY-LZ-EU-PREPROD-PROJ1-ADMIN-NET-KEY": {
-                "name"                                                   : "pcy-lz-eu-preprod-proj1-admin-net",
-                "description"                                            : "Grants grp-lz-eu-preprod-proj1-admin shared network resource usage in the EU Pre-Production environment network compartment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PREPROD-NETWORK-KEY",
+                "name"                                                                             : "pcy-lz-eu-preprod-proj1-admin-net",
+                "description"                                                                      : "Grants grp-lz-eu-preprod-proj1-admin shared network resource usage in the EU Pre-Production environment network compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PREPROD-NETWORK-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-eu-preprod-network",
@@ -614,9 +1174,18 @@
             },
 
             "PCY-LZ-EU-PREPROD-PROJ1-ADMIN-SEC-KEY": {
-                "name"                                                   : "pcy-lz-eu-preprod-proj1-admin-sec",
-                "description"                                            : "Grants grp-lz-eu-preprod-proj1-admin shared security resource usage in the EU Pre-Production environment security compartment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PREPROD-SECURITY-KEY",
+                "name"                                                                             : "pcy-lz-eu-preprod-proj1-admin-sec",
+                "description"                                                                      : "Grants grp-lz-eu-preprod-proj1-admin shared security resource usage in the EU Pre-Production environment security compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-eu-preprod-security",
@@ -629,9 +1198,18 @@
             },
 
             "PCY-LZ-EU-PROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-eu-prod-proj1-admin",
-                "description"                                            : "Grants grp-lz-eu-prod-proj1-admin administration access in the Project 1 compartment in the EU Production environment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PROD-PROJ1-KEY",
+                "name"                                                                             : "pcy-lz-eu-prod-proj1-admin",
+                "description"                                                                      : "Grants grp-lz-eu-prod-proj1-admin administration access in the Project 1 compartment in the EU Production environment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-prod-proj1-admin' to read all-resources in compartment cmp-lz-eu-prod-proj1",
@@ -669,9 +1247,18 @@
             },
 
             "PCY-LZ-EU-PROD-PROJ1-ADMIN-NET-KEY": {
-                "name"                                                   : "pcy-lz-eu-prod-proj1-admin-net",
-                "description"                                            : "Grants grp-lz-eu-prod-proj1-admin shared network resource usage in the EU Production environment network compartment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PROD-NETWORK-KEY",
+                "name"                                                                             : "pcy-lz-eu-prod-proj1-admin-net",
+                "description"                                                                      : "Grants grp-lz-eu-prod-proj1-admin shared network resource usage in the EU Production environment network compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PROD-NETWORK-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-eu-prod-network",
@@ -682,9 +1269,18 @@
             },
 
             "PCY-LZ-EU-PROD-PROJ1-ADMIN-SEC-KEY": {
-                "name"                                                   : "pcy-lz-eu-prod-proj1-admin-sec",
-                "description"                                            : "Grants grp-lz-eu-prod-proj1-admin shared security resource usage in the EU Production environment security compartment.",
-                "compartment_id"                                         : "CMP-LZ-EU-PROD-SECURITY-KEY",
+                "name"                                                                             : "pcy-lz-eu-prod-proj1-admin-sec",
+                "description"                                                                      : "Grants grp-lz-eu-prod-proj1-admin shared security resource usage in the EU Production environment security compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-PROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-prod-proj1-admin' to read ons-topics in compartment cmp-lz-eu-prod-security",
@@ -697,9 +1293,18 @@
             },
 
             "PCY-LZ-EU-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-eu-security-admin",
-                "description"                                            : "Grants grp-lz-eu-security-admin security administration access in Landing Zone EU child compartments tagged for security administration.",
-                "compartment_id"                                         : "CMP-LZ-EU-KEY",
+                "name"                                                                             : "pcy-lz-eu-security-admin",
+                "description"                                                                      : "Grants grp-lz-eu-security-admin security administration access in Landing Zone EU child compartments tagged for security administration.",
+                "compartment_id"                                                                   : "CMP-LZ-EU-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_eu'/'grp-lz-eu-security-admin' to manage tag-namespaces in compartment cmp-lz-eu where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -746,9 +1351,18 @@
             },
 
             "PCY-LZ-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-network-admin",
-                "description"                                            : "Grants grp-lz-network-admin network administration access in Landing Zone child compartments tagged for network administration.",
-                "compartment_id"                                         : "CMP-LANDINGZONE-KEY",
+                "name"                                                                             : "pcy-lz-network-admin",
+                "description"                                                                      : "Grants grp-lz-network-admin network administration access in Landing Zone child compartments tagged for network administration.",
+                "compartment_id"                                                                   : "CMP-LANDINGZONE-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -783,9 +1397,18 @@
             },
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-security-admin",
-                "description"                                            : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
-                "compartment_id"                                         : "CMP-LANDINGZONE-KEY",
+                "name"                                                                             : "pcy-lz-security-admin",
+                "description"                                                                      : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
+                "compartment_id"                                                                   : "CMP-LANDINGZONE-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -832,9 +1455,18 @@
             },
 
             "PCY-LZ-US-IAM-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-us-iam-admin",
-                "description"                                            : "Grants grp-lz-us-iam-admin IAM administration access in the US domain.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-lz-us-iam-admin",
+                "description"                                                                      : "Grants grp-lz-us-iam-admin IAM administration access in the US domain.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-iam-admin' to manage users in tenancy where target.resource.domain.name = 'id_lz_us'",
@@ -845,9 +1477,18 @@
             },
 
             "PCY-LZ-US-NETWORK-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-us-network-admin",
-                "description"                                            : "Grants grp-lz-us-network-admin network administration access in Landing Zone US child compartments tagged for network administration.",
-                "compartment_id"                                         : "CMP-LZ-US-KEY",
+                "name"                                                                             : "pcy-lz-us-network-admin",
+                "description"                                                                      : "Grants grp-lz-us-network-admin network administration access in Landing Zone US child compartments tagged for network administration.",
+                "compartment_id"                                                                   : "CMP-LZ-US-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-network-admin' to read all-resources in compartment cmp-lz-us where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -882,9 +1523,18 @@
             },
 
             "PCY-LZ-US-PREPROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-us-preprod-proj1-admin",
-                "description"                                            : "Grants grp-lz-us-preprod-proj1-admin administration access in the Project 1 compartment in the US Pre-Production environment.",
-                "compartment_id"                                         : "CMP-LZ-US-PREPROD-PROJ1-KEY",
+                "name"                                                                             : "pcy-lz-us-preprod-proj1-admin",
+                "description"                                                                      : "Grants grp-lz-us-preprod-proj1-admin administration access in the Project 1 compartment in the US Pre-Production environment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PREPROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-preprod-proj1-admin' to read all-resources in compartment cmp-lz-us-preprod-proj1",
@@ -922,9 +1572,18 @@
             },
 
             "PCY-LZ-US-PREPROD-PROJ1-ADMIN-NET-KEY": {
-                "name"                                                   : "pcy-lz-us-preprod-proj1-admin-net",
-                "description"                                            : "Grants grp-lz-us-preprod-proj1-admin shared network resource usage in the US Pre-Production environment network compartment.",
-                "compartment_id"                                         : "CMP-LZ-US-PREPROD-NETWORK-KEY",
+                "name"                                                                             : "pcy-lz-us-preprod-proj1-admin-net",
+                "description"                                                                      : "Grants grp-lz-us-preprod-proj1-admin shared network resource usage in the US Pre-Production environment network compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PREPROD-NETWORK-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-us-preprod-network",
@@ -935,9 +1594,18 @@
             },
 
             "PCY-LZ-US-PREPROD-PROJ1-ADMIN-SEC-KEY": {
-                "name"                                                   : "pcy-lz-us-preprod-proj1-admin-sec",
-                "description"                                            : "Grants grp-lz-us-preprod-proj1-admin shared security resource usage in the US Pre-Production environment security compartment.",
-                "compartment_id"                                         : "CMP-LZ-US-PREPROD-SECURITY-KEY",
+                "name"                                                                             : "pcy-lz-us-preprod-proj1-admin-sec",
+                "description"                                                                      : "Grants grp-lz-us-preprod-proj1-admin shared security resource usage in the US Pre-Production environment security compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-us-preprod-security",
@@ -950,9 +1618,18 @@
             },
 
             "PCY-LZ-US-PROD-PROJ1-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-us-prod-proj1-admin",
-                "description"                                            : "Grants grp-lz-us-prod-proj1-admin administration access in the Project 1 compartment in the US Production environment.",
-                "compartment_id"                                         : "CMP-LZ-US-PROD-PROJ1-KEY",
+                "name"                                                                             : "pcy-lz-us-prod-proj1-admin",
+                "description"                                                                      : "Grants grp-lz-us-prod-proj1-admin administration access in the Project 1 compartment in the US Production environment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-prod-proj1-admin' to read all-resources in compartment cmp-lz-us-prod-proj1",
@@ -990,9 +1667,18 @@
             },
 
             "PCY-LZ-US-PROD-PROJ1-ADMIN-NET-KEY": {
-                "name"                                                   : "pcy-lz-us-prod-proj1-admin-net",
-                "description"                                            : "Grants grp-lz-us-prod-proj1-admin shared network resource usage in the US Production environment network compartment.",
-                "compartment_id"                                         : "CMP-LZ-US-PROD-NETWORK-KEY",
+                "name"                                                                             : "pcy-lz-us-prod-proj1-admin-net",
+                "description"                                                                      : "Grants grp-lz-us-prod-proj1-admin shared network resource usage in the US Production environment network compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PROD-NETWORK-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-us-prod-network",
@@ -1003,9 +1689,18 @@
             },
 
             "PCY-LZ-US-PROD-PROJ1-ADMIN-SEC-KEY": {
-                "name"                                                   : "pcy-lz-us-prod-proj1-admin-sec",
-                "description"                                            : "Grants grp-lz-us-prod-proj1-admin shared security resource usage in the US Production environment security compartment.",
-                "compartment_id"                                         : "CMP-LZ-US-PROD-SECURITY-KEY",
+                "name"                                                                             : "pcy-lz-us-prod-proj1-admin-sec",
+                "description"                                                                      : "Grants grp-lz-us-prod-proj1-admin shared security resource usage in the US Production environment security compartment.",
+                "compartment_id"                                                                   : "CMP-LZ-US-PROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-prod-proj1-admin' to read ons-topics in compartment cmp-lz-us-prod-security",
@@ -1018,9 +1713,18 @@
             },
 
             "PCY-LZ-US-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "pcy-lz-us-security-admin",
-                "description"                                            : "Grants grp-lz-us-security-admin security administration access in Landing Zone US child compartments tagged for security administration.",
-                "compartment_id"                                         : "CMP-LZ-US-KEY",
+                "name"                                                                             : "pcy-lz-us-security-admin",
+                "description"                                                                      : "Grants grp-lz-us-security-admin security administration access in Landing Zone US child compartments tagged for security administration.",
+                "compartment_id"                                                                   : "CMP-LZ-US-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_us'/'grp-lz-us-security-admin' to manage tag-namespaces in compartment cmp-lz-us where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -1067,9 +1771,18 @@
             },
 
             "PCY-SECURITY-ADMIN-KEY": {
-                "name"                                                   : "pcy-security-admin",
-                "description"                                            : "Grants grp-security-admin security service administration access in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-security-admin",
+                "description"                                                                      : "Grants grp-security-admin security service administration access in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
@@ -1079,9 +1792,18 @@
             },
 
             "PCY-SERVICES-ADMIN-KEY": {
-                "name"                                                   : "pcy-services-admin",
-                "description"                                            : "Grants supported OCI services required Landing Zone service access in the tenancy.",
-                "compartment_id"                                         : "TENANCY-ROOT",
+                "name"                                                                             : "pcy-services-admin",
+                "description"                                                                      : "Grants supported OCI services required Landing Zone service access in the tenancy.",
+                "compartment_id"                                                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"                                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"                                  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"                                  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"                                        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"                                     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"                                      : "notapplicable"
+                },
 
                 "statements": [
                     "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",

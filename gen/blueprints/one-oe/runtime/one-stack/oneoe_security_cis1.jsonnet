@@ -1,3 +1,3 @@
 local profiles = import './profiles.libsonnet';
-local lz = import '../../../../landing_zone.libsonnet';
-lz(profiles.hub_a.config).security_cis1
+local output = import './output_builder.libsonnet';
+output(profiles.hub_a).security_cis1

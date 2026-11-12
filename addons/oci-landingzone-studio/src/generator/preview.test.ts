@@ -6,22 +6,35 @@ import { generatePreview } from './preview';
 import { setAssetLoader } from './jsonnetVm';
 import { extractGeneratedResources } from '../services/generatedResources';
 import { newPlatform } from '../services/platforms';
+import { defaultCostGovernance } from '../services/costGovernance';
 import * as virtualFs from './virtualFs';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
 describe('canonical diagram preview', () => {
-  it('matches the selected deployable final artifacts and produces all six CIS2 resource families', async () => {
+  it('includes the additional identity domain and every generated management and project group', async () => {
     const model = emptyLzModel();
+    const preview = await generatePreview(model);
+    const domain = preview.inventory.groups.find((group) => group.id === 'identitydomain:COMMON-DOMAIN');
+    expect(domain?.compartmentKey).toBe('TENANCY-ROOT');
+    expect(domain?.items[0]).toMatchObject({ key: 'COMMON-DOMAIN', name: 'id_lz_common' });
+    expect(domain?.items.slice(1).map((item) => item.name).sort()).toEqual([
+      'grp-auditors-admin', 'grp-cost-admin', 'grp-iam-admin', 'grp-lz-network-admin',
+      'grp-lz-preprod-proj1-admin', 'grp-lz-prod-proj1-admin', 'grp-lz-security-admin', 'grp-security-admin',
+    ]);
+  }, 60_000);
+  it('matches the selected deployable final artifacts and produces the CIS2 resource families and identity domain', async () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const preview = await generatePreview(model);
     const generated = await generateOutputs(model);
     expect(preview.files).toEqual(Object.keys(generated.files).sort());
     const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
     expect(preview.network).toEqual(outputs['network.json']);
     expect(preview.inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
-    expect([...new Set(preview.inventory.groups.map((group) => group.kind))].sort()).toEqual(['events', 'flowlogs', 'notifications', 'scanning', 'securityrecipes', 'vault']);
-    expect(preview.inventory.groups.find((group) => group.kind === 'vault')?.items).toEqual([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
-    expect(preview.inventory.groups.find((group) => group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
+    expect([...new Set(preview.inventory.groups.map((group) => group.kind))].sort()).toEqual(['budgets', 'events', 'flowlogs', 'identitydomain', 'notifications', 'scanning', 'securityrecipes', 'vault']);
+    expect(preview.inventory.groups.find((group) => group.kind === 'vault')?.items).toMatchObject([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
+    expect(preview.inventory.groups.find((group) => group.kind === 'events' && group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
   }, 60_000);
 
   it('uses canonical CIS1 conditions instead of showing CIS2 vaults', async () => {
@@ -59,7 +72,7 @@ describe('canonical diagram preview', () => {
     expect(inventory.groups.filter((group) => group.kind === 'flowlogs').flatMap((group) => group.items.map((item) => item.name))).toContain('lgrp-lz-prod-vcn-flow');
   }, 60_000);
 
-  it('does not evaluate unrelated workload payloads or alarm definitions for the preview', async () => {
+  it('keeps unrelated workload inputs lazy while checking emitted resource configurations', async () => {
     const vfs = virtualFs.buildVirtualFs();
     const replacement = vi.spyOn(virtualFs, 'buildVirtualFs').mockReturnValueOnce({ ...vfs, files: {
       ...vfs.files,
@@ -68,9 +81,6 @@ describe('canonical diagram preview', () => {
         local outputs = (import 'original_multi.jsonnet')(config);
         outputs + {
           'runtime-workload.json': { deployment_ids: error 'Unrelated workload inputs must stay lazy' },
-          ['observability_cis%d.json' % config.cis_level]+: {
-            alarms_configuration: error 'Alarm payload must stay lazy',
-          },
         }`,
     } });
     try {

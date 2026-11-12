@@ -1,57 +1,137 @@
 {
     "compartments_configuration": {
-        "default_parent_id"                           : "CMP-LANDINGZONE-KEY",
-        "enable_delete"                               : "true",
+        "default_parent_id"                                        : "CMP-LANDINGZONE-KEY",
+        "enable_delete"                                            : "true",
 
         "compartments": {
             "CMP-LZ-MONITORING-KEY": {
-                "name"                                : "cmp-lz-monitoring",
-                "description"                         : "Observability Platform Compartment",
-                "parent_id"                           : "CMP-LZ-PLATFORM-KEY"
+                "name"                                             : "cmp-lz-monitoring",
+                "description"                                      : "Observability Platform Compartment",
+                "parent_id"                                        : "CMP-LZ-PLATFORM-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                }
             }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
         }
     },
 
     "identity_domain_dynamic_groups_configuration": {
-        "default_defined_tags"                        : null,
-        "default_freeform_tags"                       : null,
-        "default_identity_domain_id"                  : "COMMON-DOMAIN",
+        "default_freeform_tags"                                    : null,
+        "default_identity_domain_id"                               : "COMMON-DOMAIN",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+        },
 
         "dynamic_groups": {
             "DG-LZ-MON": {
-                "name"                                : "dg-lz-mon-dynamic-group",
-                "description"                         : "dynamic group for security functions execution, required for Logging Analytics",
-                "matching_rule"                       : "ALL {resource.type='managementagent'}"
+                "name"                                             : "dg-lz-mon-dynamic-group",
+                "description"                                      : "dynamic group for security functions execution, required for Logging Analytics",
+                "matching_rule"                                    : "ALL {resource.type='managementagent'}",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                }
             },
 
             "DG-LZ-MON-CREDENTIAL": {
-                "name"                                : "dg-lz-mon-credential-dynamic-group",
-                "description"                         : "Dynamic group for certificate authority resource principals used by Observability agent credential operations.",
-                "matching_rule"                       : "ALL {resource.type='certificateauthority'}"
+                "name"                                             : "dg-lz-mon-credential-dynamic-group",
+                "description"                                      : "Dynamic group for certificate authority resource principals used by Observability agent credential operations.",
+                "matching_rule"                                    : "ALL {resource.type='certificateauthority'}",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                }
             }
         }
     },
 
     "identity_domain_groups_configuration": {
-        "default_identity_domain_id"                  : "COMMON-DOMAIN",
-        "ignore_external_membership_updates"          : true,
+        "default_identity_domain_id"                               : "COMMON-DOMAIN",
+        "ignore_external_membership_updates"                       : true,
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+        },
 
         "groups": {
             "GRP-EXACC-OBS-ADMINS": {
-                "name"                                : "grp-lz-exacc-mon-admin",
-                "description"                         : "Exacc Observability administrator group."
+                "name"                                             : "grp-lz-exacc-mon-admin",
+                "description"                                      : "Exacc Observability administrator group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                }
             }
         }
     },
 
     "policies_configuration": {
-        "enable_cis_benchmark_checks"                 : "false",
+        "enable_cis_benchmark_checks"                              : "false",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+        },
 
         "supplied_policies": {
             "PCY-MON-AGENT-CERTIFICATE-DYNAMIC-GROUP": {
-                "name"                                : "pcy-mon-agent-cert-dynamic-group",
-                "description"                         : "Policy to allow Observability management agents and certificate authority resource principals to manage certificate, vault, and key operations.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                             : "pcy-mon-agent-cert-dynamic-group",
+                "description"                                      : "Policy to allow Observability management agents and certificate authority resource principals to manage certificate, vault, and key operations.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-credential-dynamic-group' to use certificate-authority-delegates in tenancy",
@@ -70,9 +150,18 @@
             },
 
             "PCY-MON-DYNAMIC-GROUP": {
-                "name"                                : "pcy-mon-dynamic-group",
-                "description"                         : "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                             : "pcy-mon-dynamic-group",
+                "description"                                      : "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
@@ -81,9 +170,18 @@
             },
 
             "PCY-MON-SERVICES": {
-                "name"                                : "pcy-mon-services",
-                "description"                         : "Policy to allow usage of Observability services in tenancy.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                             : "pcy-mon-services",
+                "description"                                      : "Policy to allow usage of Observability services in tenancy.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "Allow service operations-insights to use ons-topics in tenancy",
@@ -95,9 +193,18 @@
             },
 
             "PCY-PLATFORM-MON-ADMINISTRATION": {
-                "name"                                : "pcy-platform-mon-admin",
-                "description"                         : "Policy to allow grp-lz-platform-mon-admin group users to manage Observability services/resources in tenancy.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                             : "pcy-platform-mon-admin",
+                "description"                                      : "Policy to allow grp-lz-platform-mon-admin group users to manage Observability services/resources in tenancy.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to inspect all-resources in tenancy",
@@ -123,9 +230,18 @@
             },
 
             "PCY-PLATFORM-MON-SECURITY-ADMINISTRATION": {
-                "name"                                : "pcy-platform-mon-security-admin",
-                "description"                         : "Policy to allow grp-lz-platform-mon-admin group users to manage platform Observability security resources.",
-                "compartment_id"                      : "CMP-LANDINGZONE-KEY",
+                "name"                                             : "pcy-platform-mon-security-admin",
+                "description"                                      : "Policy to allow grp-lz-platform-mon-admin group users to manage platform Observability security resources.",
+                "compartment_id"                                   : "CMP-LANDINGZONE-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -135,9 +251,18 @@
             },
 
             "PCY-SHARED-EXACC-MON-ADMINISTRATION": {
-                "name"                                : "pcy-shared-exacc-mon-admin",
-                "description"                         : "Policy to allow monitoring groups to manage ExaDB-C@C observability resources in the shared ExaDB-C@C database compartment.",
-                "compartment_id"                      : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "name"                                             : "pcy-shared-exacc-mon-admin",
+                "description"                                      : "Policy to allow monitoring groups to manage ExaDB-C@C observability resources in the shared ExaDB-C@C database compartment.",
+                "compartment_id"                                   : "CMP-LZ-SHARED-EXACC-DB-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage dbmgmt-family in compartment cmp-lz-shared-exacc-db",

@@ -2,6 +2,7 @@
 import { emptyLzModel } from '../model/defaults';
 import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
 import { buildConfig } from './lzConfig';
+import { activeProjectNames, importCostGovernance } from './costGovernance';
 import { exadataNotificationSource } from './exadata';
 
 type ObjectValue = Record<string, unknown>;
@@ -267,6 +268,8 @@ export function importConfig(value: unknown): ImportedConfig {
   if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
+  if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model), model);
+  else delete model.foundation.costGovernance;
   const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {
@@ -283,7 +286,8 @@ export function importConfig(value: unknown): ImportedConfig {
     }));
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
-  const diff = difference(expected, buildConfig(model));
+  const canonical = buildConfig(model);
+  const diff = difference({ ...expected, ...(canonical.cost_governance ? { cost_governance: canonical.cost_governance } : {}) }, canonical);
   if (diff) invalid(diff);
   return { model, warnings };
 }

@@ -25,7 +25,6 @@
     "iam.json",
     "network.json",
     "observability_cis2.json",
-    "observability_cis2_pre.json",
     "oke.json",
     "security_cis2.json",
     "security_cis2_pre.json"

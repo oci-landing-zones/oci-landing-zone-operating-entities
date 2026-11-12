@@ -6,6 +6,11 @@ import { newPlatform } from './platforms';
 import { emptyHybridConnectivity, newVpn } from './hybridConnectivity';
 
 describe('default deployment settings', () => {
+  it('expects complete observability without an obsolete pre file', () => {
+    const files = expectedDeploymentFiles(buildConfig(emptyLzModel()));
+    expect(files).toContain('observability_cis2.json');
+    expect(files).not.toContain('observability_cis2_pre.json');
+  });
   it('presents preparation, phase 1 inputs and apply, then phase 2 inputs and apply in execution order', () => {
     const config = buildConfig(emptyLzModel());
     const guide = deploymentReadme(config, expectedDeploymentFiles(config));

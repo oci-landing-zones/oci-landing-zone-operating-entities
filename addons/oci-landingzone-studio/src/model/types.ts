@@ -14,6 +14,7 @@ import type { ResourceKind } from '../services/generatedResources';
 import type { HybridConnectivity } from './hybridConnectivity';
 
 export interface FoundationConfig {
+  costGovernance?: CostGovernance;
   stackScope?: 'complete' | 'regional';
   /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
   homeRegion?: string;
@@ -28,6 +29,43 @@ export interface FoundationConfig {
   cisLevel: 1 | 2;
   /** One-OE notification topic recipients; blank fields keep the published placeholder. */
   notifications?: OneOeNotifications;
+}
+
+export interface CostBudget {
+  name: string;
+  amount: number;
+  thresholdValue: number;
+  recipients: string;
+}
+
+export interface TagCostBudget extends CostBudget {
+  tagName: string;
+  tagValue: string;
+}
+
+export interface BusinessUnitScope {
+  platform: string[] | null;
+  environment: string[] | null;
+  project: string[] | null;
+}
+
+export interface CostGovernance {
+  tagsEnabled?: boolean;
+  tagResourceLabels?: boolean;
+  ownerEmail?: string;
+  costCenterBusinessUnits?: Record<string, string>;
+  costCenterFilters?: Record<string, BusinessUnitScope>;
+  businessUnitScopes?: Record<string, BusinessUnitScope>;
+  costCenterScopes?: Record<string, string>;
+  costCenterCustomScopes?: { id: string; name: string; target: string }[];
+  costCenterBudgetKeys?: Record<string, string>;
+  tagValueLists?: Record<string, string>;
+  additionalBudgets?: Record<string, TagCostBudget>;
+  removedBudgets?: string[];
+  requireTagValues: boolean;
+  useSingleRecipient: boolean;
+  recipients: string;
+  budgets: Record<string, CostBudget>;
 }
 
 export interface OneOeNotifications {
@@ -283,7 +321,7 @@ export interface DiagramNode {
   publicSubnet?: boolean;
   /** Resource names and grouping come from the generated deployment artifacts. */
   resourceKind?: ResourceKind;
-  resourceItems?: { key: string; name: string }[];
+  resourceItems?: { key: string; name: string; scope?: { platform: string; environment: string; project: string } }[];
   /** Public connectivity topology only; authentication material never enters the diagram. */
   premises?: {
     equipmentLabel: string;

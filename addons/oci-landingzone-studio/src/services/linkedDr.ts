@@ -1,4 +1,5 @@
 import type { LzModel } from '../model/types';
+import { defaultCostGovernance } from './costGovernance';
 import { configuredVcnCidrs, reconcileExadata } from './exadata';
 import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv, customDefaultSubnets } from './platforms';
 import { environmentPlatformCidr } from './oneOeCidrs';
@@ -18,7 +19,9 @@ export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
   const next: LzModel = {
     ...source,
     foundation: { ...source.foundation, stackScope: 'regional', realm: home.foundation.realm,
-      homeRegion: home.foundation.region, drRegion: undefined },
+      homeRegion: home.foundation.region, drRegion: undefined,
+      ...(home.foundation.costGovernance?.tagsEnabled === false || source.foundation.costGovernance?.tagsEnabled === false
+        ? { costGovernance: { ...(source.foundation.costGovernance ?? defaultCostGovernance()), tagsEnabled: home.foundation.costGovernance?.tagsEnabled !== false } } : {}) },
     environments,
     projects: source.projects.map((project) => project.environments === 'all' ? project : {
       ...project, environments: project.environments.filter((id) => ids.has(id)),

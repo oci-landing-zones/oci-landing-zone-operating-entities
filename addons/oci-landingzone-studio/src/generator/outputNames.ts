@@ -12,15 +12,19 @@ export const CONFIG_FILENAME = 'config.jsonnet';
 
 /** What each surfaced artifact is for, so a reviewer knows which to deploy first. */
 export const OUTPUT_BLURB: Record<string, string> = {
+  'governance_pre.json': 'Creates tag namespaces, definitions and defaults before applying tags to those definitions.',
+  'governance.json': 'Applies governance tags to the existing namespaces and definitions, retaining budgets and defaults.',
   'network.json': 'Creates the network and routing, resolving firewall and NLB targets from resource keys.',
 };
 
-/** Old staged-network bundles must be regenerated even when their config matches. */
+/** Obsolete network, observability or OKE bundles must be regenerated even when their config matches. */
 export function isCurrentOutputSet(output: { config: string; files: Record<string, string> } | null, config: string): boolean {
   return output !== null
     && output.config === config
     && Object.hasOwn(output.files, 'network.json')
     && !Object.hasOwn(output.files, 'network_pre.json')
+    && !Object.hasOwn(output.files, 'observability_cis1_pre.json')
+    && !Object.hasOwn(output.files, 'observability_cis2_pre.json')
     && !Object.hasOwn(output.files, 'oke_clusters.json')
     && !Object.hasOwn(output.files, 'oke_workers.json');
 }
@@ -48,24 +52,26 @@ export function deploymentStages(availableFiles: string[], completionNetwork: 'n
     (file.startsWith('security_cis') || file.startsWith('observability_cis'))
     && !file.endsWith('_pre.json'),
   );
+  const initialCore = finalCore.filter((file) => !available.has(file.replace(/\.json$/, '_pre.json')));
   const extensionFiles = deployable.filter((file) =>
     !persistent.includes(file)
     && file !== 'network.json'
     && file !== 'network_pre.json'
     && file !== 'network_backends.json'
     && !file.startsWith('security_cis')
-    && !file.startsWith('observability_cis'),
+    && !file.startsWith('observability_cis')
+    && !file.endsWith('_pre.json'),
   );
 
   return [
     {
       title: '1. Create the landing zone',
-      description: 'Create the network and routing together. Security and observability files ending in _pre establish prerequisites before their dependent resources exist.',
-      files: keep([...persistent, 'network.json', ...pre]),
+      description: 'Create the network and routing together. Files ending in _pre establish prerequisites; include complete control files when no _pre variant is generated.',
+      files: keep([...persistent.filter((file) => !available.has(file.replace(/\.json$/, '_pre.json'))), 'network.json', ...pre, ...initialCore]),
     },
     {
       title: '2. Complete controls and workloads',
-      description: 'Update the same stack: retain the network file, replace each security and observability _pre file with its final counterpart, and add workload files. Plan and apply again.',
+      description: 'Update the same stack: retain the network and complete control files, replace each _pre file with its final counterpart, and add workload files. Plan and apply again.',
       files: keep([...persistent, completionNetwork, ...finalCore, ...extensionFiles]),
     },
   ];

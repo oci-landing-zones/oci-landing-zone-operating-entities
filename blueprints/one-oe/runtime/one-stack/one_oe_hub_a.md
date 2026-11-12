@@ -4,8 +4,6 @@
  ### Overview
  This document provides a detailed overview of the One-OE Landing Zone with [**Hub A addon**](/addons/oci-hub-models/hub_a/readme.md), including its components and deployment guidance.
 
-&nbsp; 
-
  ### Deployment diagram
 
 The diagram provides a comprehensive visual representation of the key OCI resources - such as Identity Domains, groups, compartments, IP CIDR ranges, and route table configurations - including their exact naming conventions, as defined in the One-OE JSON configurations.
@@ -22,6 +20,16 @@ The diagram provides a comprehensive visual representation of the key OCI resour
 
 &nbsp;
 
+### Cost-governance tags
+
+One-OE includes six cost-governance tags: cost center, business unit, owner, platform, environment, and project. These tags support FinOps objectives by enabling consistent cost allocation, clear ownership, and spending analysis across business units, platforms, environments, and projects.
+
+All six Tag Defaults use `is_user_required: false` by default. They automatically apply default values to new taggable resources in `cmp-landingzone` and its child compartments. To require users to supply all six values, change `is_user_required` to `true` in each of the six `tag_defaults` entries in your deployment copy of [oneoe_governance.json](oneoe_governance.json) before deploying. This flag controls whether values are user-required; it does not enable or disable the tags. Include the same tags when adding workloads or add-ons.
+
+See [Cost governance tags](cost-governance.md) for configuration and deployment details.
+
+### CIS security level
+
 Two deployment options are available: One-Stack deployment with **CIS Level 1** and **CIS Level 2** security controls.
 
 - **CIS Level 1** is recommended in scenarios where:
@@ -36,26 +44,37 @@ Two deployment options are available: One-Stack deployment with **CIS Level 1** 
 
 For details on the Security Zone policies included in each deployment option, see [Security Zones - CIS Level 1](./sz_recipes_cis1.md) and [Security Zones - CIS Level 2](./sz_recipes_cis2.md).
 
-&nbsp; 
 
----
+## Deployment
 
- ### Input configurations for **CIS Level 1** 
+### Prerequisites
+
+Before deployment, review and update the configuration files:
+
+1. **Cost-governance tags:** update the tag values in the deployment configurations to match your organization. Tag Defaults use `is_user_required: false` by default. If you want users to supply all six values, set it to `true` in all six `tag_defaults` entries in your deployment copy of `oneoe_governance.json` before deploying. Use only values from each tag’s approved List of Values (LOV); free-text values are not allowed. See [Tag values](cost-governance.md#tag-values).
+2. **Budget notifications:** replace `email.address@example.com` in each budget's `alert_rule.recipients` in [oneoe_governance.json](oneoe_governance.json) with the intended recipients. Review the budget amounts and targets as described in [Monthly budgets](cost-governance.md#monthly-budgets).
+3. **Observability notifications:** replace `email.address@example.com` in each topic's `EMAIL` subscriptions with the email addresses of the teams responsible for receiving its notifications. Use the complete file for the selected CIS level: [CIS 1](oneoe_observability_cis1.json) or [CIS 2](oneoe_observability_cis2.json). Each file includes VCN and subnet Flow Logs for the initial deployment.
+
+Use the reviewed configuration files when creating or updating the ORM stack.
+
+### CIS Level 1
+
+#### Input configurations
 
 | JSON configurations | Configuration-defined components | 
 |:-|:-|
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
-| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespace </br> • Tag key definition|
+| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six automatic cost-governance Tag Defaults (user-required values optional) </br> • Eight monthly budgets with 80% alerts |
 | **Network configuration**: [oneoe_network_hub_a.json](oneoe_network_hub_a.json) | • [Hub A](/addons/oci-hub-models/hub_a/readme.md) VCN with associated subnets </br> • OCI Network Firewalls (DMZ and Internal) and network firewall policies </br> • Internet, NAT and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs). For detailed configuration information, see [Security Lists and Network Security Groups](./one_oe_hub_a_sl_nsg.md) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
 | **Security configuration** for </br> **Step 1**: [oneoe_security_cis1_pre.json](oneoe_security_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis1.json](oneoe_security_cis1.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 1)](./sz_recipes_cis1.md)</br> • Vulnerability Scanning |
-| **Observability configuration** for</br> **Step 1**: [oneoe_observability_cis1_pre.json](oneoe_observability_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_observability_cis1.json](oneoe_observability_cis1.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications |
+| **Observability configuration**</br> [oneoe_observability_cis1.json](oneoe_observability_cis1.json) | • Events</br> • Alarms</br> • Logging, including VCN and subnet Flow Logs</br> • Notifications |
 
 &nbsp;
 
-### Deploy with OCI Resource Manager (ORM) - **CIS Level 1**
+#### Deploy with OCI Resource Manager (ORM)
 
-#### Step 1: 
-  Click &nbsp; [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.2.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_governance.json"})</br>
+##### Step 1:
+  Click &nbsp; [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.4.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_governance.json"})</br>
 
 And follow these steps:
   1. Accept terms, wait for the configuration to load.
@@ -65,8 +84,8 @@ And follow these steps:
   5. Accept the default files. Click Next. Optionally, replace with your json/yaml config files.
   6. Un-check run apply. Click Create.
   
-#### Step 2: 
-  The following updates, or only those relevant to your deployment - should be performed after the **Step 1** stack and all Landing Zone components have been deployed. This phase updates the **Step 1** ORM stack to add additional Security Zone Recipes and enable Network Flow Logs. Keep the final network configuration selected in Step 1. All required updates can be applied in a single operation by replacing the corresponding configuration files as described below.
+##### Step 2:
+  The following updates, or only those relevant to your deployment - should be performed after the **Step 1** stack and all Landing Zone components have been deployed. This phase updates the **Step 1** ORM stack to add additional Security Zone Recipes and Vulnerability Scanning targets. Observability, including Flow Logs, is already configured in Step 1. Keep the final network configuration selected in Step 1. All required updates can be applied in a single operation by replacing the corresponding configuration files as described below.
   
 
   1. **Security - Security Zones, Vulnerability Scanning Service**:</br></br>
@@ -74,33 +93,31 @@ And follow these steps:
       - Security Zone Targets to apply more restrictive Security Zone Recipes to the following compartments: Hub network compartment and Production compartment.</br>
       - Vulnerability Scanning on all Host targets within the Landing Zone enclosing compartment.
     
-  2. **Observability - Flow Logs**:</br>
-     - Use the configuration [oneoe_observability_cis1.json](oneoe_observability_cis1.json) to enable flow logs for your VCNs and Subnets.</br> Note that by default, VCN and Subnet flow logs are not deployed. The first 10 GB of log storage per month is free. This configuration creates a log group for the shared network and for each network environment. Actual log storage usage will depend on the amount of traffic in your VCNs and subnets, which may exceed the free monthly quota.
-
 &nbsp; 
 
 Once all required updates are applied, rerun the ORM stack.
 
 &nbsp;
 
----
 
- ### Input configurations for **CIS Level 2** 
+### CIS Level 2
+
+#### Input configurations
 
 | JSON configurations | Configuration-defined components | 
 |:-|:-|
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
-| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespace </br> • Tag key definition|
+| **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespaces and definitions </br> • Six automatic cost-governance Tag Defaults (user-required values optional) </br> • Eight monthly budgets with 80% alerts |
 | **Network configuration**: [oneoe_network_hub_a.json](oneoe_network_hub_a.json) | • [Hub A](/addons/oci-hub-models/hub_a/readme.md) VCN with associated subnets </br> • OCI Network Firewalls (DMZ and Internal) and network firewall policies </br> • Internet, NAT and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs). For detailed configuration information, see [Security Lists and Network Security Groups](./one_oe_hub_a_sl_nsg.md) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
 | **Security configuration** for </br> **Step 1**: [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis2.json](oneoe_security_cis2.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 2)](./sz_recipes_cis2.md)</br> • Vulnerability Scanning</br> • Vault and Software Key |
-| **Observability configuration** for</br> **Step 1**: [oneoe_observability_cis2_pre.json](oneoe_observability_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_observability_cis2.json](oneoe_observability_cis2.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications |
+| **Observability configuration**</br> [oneoe_observability_cis2.json](oneoe_observability_cis2.json) | • Events</br> • Alarms</br> • Logging, including VCN and subnet Flow Logs</br> • Notifications |
 
 &nbsp;
 
-### Deploy with OCI Resource Manager (ORM) - **CIS Level 2**
+#### Deploy with OCI Resource Manager (ORM)
 
-#### Step 1: 
-  Click &nbsp; [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.2.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_security_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_governance.json"})</br>
+##### Step 1:
+  Click &nbsp; [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.4.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_security_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_governance.json"})</br>
 
 And follow these steps:
   1. Accept terms, wait for the configuration to load.
@@ -110,11 +127,10 @@ And follow these steps:
   5. Accept the default files. Click Next. Optionally, replace with your json/yaml config files.
   6. Un-check run apply. Click Create.
 
-#### Step 2: 
+##### Step 2:
 Follow the same procedure described in [Deploy with OCI Resource Manager (ORM) - CIS Level 1: Step 2](#step-2), using the JSON configuration files specific to CIS Level 2.
 
 
----
 
 &nbsp;
 

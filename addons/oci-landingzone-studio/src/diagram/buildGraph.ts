@@ -206,22 +206,45 @@ function pushGeneratedResources(nodes: DiagramNode[], inventory: GeneratedResour
     const owner = ensureOwner(key);
     owner.container = true;
     const available = owner.width - 2 * PAD;
-    const columns = Math.min(DIAGRAM_LAYOUT.maxResourceColumns, unordered.length, Math.max(1, Math.floor((available + COMP_GAP) / (DIAGRAM_LAYOUT.resourceMinWidth + COMP_GAP))));
-    const width = Math.min(280, (available - (columns - 1) * COMP_GAP) / columns);
-    const groups = unordered.map((group) => ({ group, layout: resourceGroupLayout(group.kind, group.items, width) }))
-      .sort((a, b) => b.layout.height - a.layout.height || a.group.id.localeCompare(b.group.id));
-    const top = Math.max(TITLE + PAD, owner.height - PAD, ...children(owner.id).map((child) => child.y + child.height + COMP_GAP));
-    const bottoms = Array<number>(columns).fill(top);
-    for (const { group, layout } of groups) {
-      const column = bottoms.indexOf(Math.min(...bottoms));
+    const regular = unordered.filter((group) => !['identitydomain', 'budgets', 'requiredtags'].includes(group.kind));
+    if (regular.length) {
+      const columns = Math.min(DIAGRAM_LAYOUT.maxResourceColumns, regular.length, Math.max(1, Math.floor((available + COMP_GAP) / (DIAGRAM_LAYOUT.resourceMinWidth + COMP_GAP))));
+      const width = Math.min(280, (available - (columns - 1) * COMP_GAP) / columns);
+      const groups = regular.map((group) => ({ group, layout: resourceGroupLayout(group.kind, group.items, width) }))
+        .sort((a, b) => b.layout.height - a.layout.height || a.group.id.localeCompare(b.group.id));
+      const top = Math.max(TITLE + PAD, owner.height - PAD, ...children(owner.id).map((child) => child.y + child.height + COMP_GAP));
+      const bottoms = Array<number>(columns).fill(top);
+      for (const { group, layout } of groups) {
+        const column = bottoms.indexOf(Math.min(...bottoms));
+        nodes.push({
+          id: `resource-${group.id}`, kind: 'resourcegroup', label: layout.label, resourceKind: group.kind,
+          resourceItems: group.items.map((item) => ({ ...item })), parentId: owner.id,
+          x: PAD + column * (width + COMP_GAP), y: bottoms[column], width, height: layout.height,
+        });
+        bottoms[column] += layout.height + COMP_GAP;
+      }
+      grow(owner, Math.max(...bottoms) - COMP_GAP + PAD);
+    }
+    let domainTop = TITLE + PAD;
+    for (const group of unordered.filter((group) => ['identitydomain', 'budgets', 'requiredtags'].includes(group.kind)).sort((a, b) => ['identitydomain', 'budgets', 'requiredtags'].indexOf(a.kind) - ['identitydomain', 'budgets', 'requiredtags'].indexOf(b.kind))) {
+      const panelWidth = group.kind === 'requiredtags' ? Math.min(280, available) : available;
+      const layout = resourceGroupLayout(group.kind, group.items, panelWidth);
+      const growth = layout.height + COMP_GAP;
+      for (const child of children(owner.id)) {
+        if (child.y >= domainTop) child.y += growth;
+      }
+      // Keep the floating hybrid endpoints aligned when the tenancy content moves down.
+      if (owner.kind === 'tenancy') {
+        for (const node of nodes.filter((node) => !node.parentId && node.kind !== 'region')) node.y += growth;
+      }
       nodes.push({
         id: `resource-${group.id}`, kind: 'resourcegroup', label: layout.label, resourceKind: group.kind,
         resourceItems: group.items.map((item) => ({ ...item })), parentId: owner.id,
-        x: PAD + column * (width + COMP_GAP), y: bottoms[column], width, height: layout.height,
+        x: PAD, y: domainTop, width: panelWidth, height: layout.height,
       });
-      bottoms[column] += layout.height + COMP_GAP;
+      grow(owner, owner.height + growth);
+      domainTop += growth;
     }
-    grow(owner, Math.max(...bottoms) - COMP_GAP + PAD);
   }
 }
 
@@ -313,6 +336,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   projectEnvironmentIds?: string[];
   environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
 }, routeTables: RouteTable[] = [], inventory?: GeneratedResourceInventory): DiagramModel {
+  if (inventory && upToStep < 5) inventory = { ...inventory, groups: inventory.groups.filter((group) => !['budgets', 'requiredtags'].includes(group.kind)) };
   const hybrid = upToStep >= 2 ? hybridRoutes(model) : [];
   const vpns = hybrid.filter((connection) => connection.type === 'VPN');
   const circuits = hybrid.filter((connection) => connection.type === 'FastConnect');

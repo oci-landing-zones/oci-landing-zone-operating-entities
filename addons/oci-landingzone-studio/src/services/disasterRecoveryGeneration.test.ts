@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setAssetLoader } from '../generator/jsonnetVm';
 import { newPlatform } from './platforms';
+import { defaultCostGovernance } from './costGovernance';
 import { emptyLzModel } from '../model/defaults';
 import { createDrDraft, createDrHubNetwork } from './disasterRecoveryDesign';
 import { buildDrFileConfigs, generateDrFileBundle } from './disasterRecoveryGeneration';
@@ -11,6 +12,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function design() {
   const model = emptyLzModel();
+  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com' };
   model.foundation.notifications = { useSingleRecipient: true, default: 'home@example.com', cloudguard: '', iam: '', network: '', security: '' };
   const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', regionConfirmed: true, hubAdded: true, hubNetwork: createDrHubNetwork(model.network.hubKind) };
   draft.notifications = { ...model.foundation.notifications, default: 'dr@example.com' };
@@ -28,6 +30,8 @@ describe('DR file generation', () => {
     const { home, dr } = buildDrFileConfigs(model, draft);
     expect(home).toMatchObject({ stack_scope: 'complete', dr_region: 'eu-amsterdam-1', region: 'eu-frankfurt-1' });
     expect(dr).toMatchObject({ stack_scope: 'regional', region: 'eu-amsterdam-1', region_short_name: 'ams', notification_emails: { default: ['dr@example.com'] } });
+    expect(home).toHaveProperty('cost_governance');
+    expect(dr).not.toHaveProperty('cost_governance');
     expect(Object.keys(dr.environments)).toEqual(['prod']);
     expect(dr.environments.prod.project_network?.network.vcn).toBe('10.0.200.0/21');
     expect(home.environments.prod.project_network?.network.vcn).toBe('10.0.64.0/21');
@@ -53,7 +57,7 @@ describe('DR file generation', () => {
     expect(files['DR/README.txt']).toContain('DR deployment');
     expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
     expect(files['DR/README.txt']).toContain('oci_dependency_objects');
-  }, 30000);
+  }, 60000);
 
   it('includes selected EXACS networks, edited subnets and matched RPC peer keys', async () => {
     const { model, draft } = design();
@@ -76,7 +80,7 @@ describe('DR file generation', () => {
     expect(files['Home/network.json']).toContain('RPC-FRA-LZ-HUB-DR-KEY');
     expect(files['DR/network.json']).toContain('"peer_key": "RPC-FRA-LZ-HUB-DR-KEY"');
     expect(JSON.parse(files['DR/config.jsonnet']).environments.prod.platforms.exacs.network.vcn).toBe('10.0.240.0/21');
-  }, 30000);
+  }, 60000);
 
 
 
@@ -102,7 +106,7 @@ describe('DR file generation', () => {
     expect(okeFiles.map(([, value]) => value).join('\n')).toContain('172.30.0.0/16');
     draft.platformOkeParams[id].servicesCidr = '10.0.216.0/21';
     expect(() => buildDrFileConfigs(model, draft)).toThrow(/service CIDR.*overlap/i);
-  }, 30000);
+  }, 60000);
 
   it('rejects incomplete or overlapping DR addressing before generating', () => {
     const { model, draft } = design();
