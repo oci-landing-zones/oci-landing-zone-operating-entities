@@ -63,15 +63,96 @@ The addon requires `remote_cidrs` for both routing options to prepare landing zo
 
 &nbsp;
 
-#### Tunnel authentication and IKE settings
+#### Example JSON configuration
 
-For each tunnel, use an OCI-generated shared secret, provide a shared secret, or reference an existing OCI Vault secret. Referenced secrets must exist and be readable by the deployment principal before deployment.
+These are the necessary blocks which are required to be included into network.json and which aligned with the architecture design above:
+
+#### 1st block: 
+Defines the Customer Premises Equipment (CPE), with respective public IP address and CPE vendor (in this example the type is "Other"): 
+
+                    "customer_premises_equipments": {
+                        "CPE-FRA-LZ-ONPREM-KEY": {
+                            "display_name"                                      : "cpe-fra-lz-onprem",
+                            "ip_address"                                        : "203.0.113.5",
+                            "cpe_device_shape_vendor_name"                      : "Other"
+                        }
+                    },
+
+#### 2nd block: 
+Defines the custom DRG routing table, which takes care of the routing of network flow which arrives from remote network and enters DRG.
+
+                                "DRGRT-FRA-LZ-HUB-HC-KEY": {
+                                    "display_name"                              : "drgrt-fra-lz-hc",
+                                    "is_ecmp_enabled"                           : false,
+
+                                    "route_rules": {
+                                        "rr-hybrid-hc-hub": {
+                                            "destination"                       : "10.0.0.0/21",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        },
+
+                                        "rr-hybrid-hc-preprod": {
+                                            "destination"                       : "10.0.128.0/21",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        },
+
+                                        "rr-hybrid-hc-prod": {
+                                            "destination"                       : "10.0.64.0/21",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                },
+
+#### 3rd block: 
+Defines the IPSec connection with two tunnels and respective BGP information, and DRG routing table association to each of the tunnel:
+
+
+                    "ipsecs": {
+                        "IPSEC-FRA-LZ-ONPREM-KEY": {
+                            "display_name"                                      : "ipsec-fra-lz-onprem",
+                            "cpe_key"                                           : "CPE-FRA-LZ-ONPREM-KEY",
+                            "drg_key"                                           : "DRG-FRA-LZ-HUB-KEY",
+                            "static_routes"                                     : ["172.20.0.0/16"],
+
+                            "tunnels_management": {
+                                "tunnel_1": {
+                                    "drg_route_table_id"                        : "DRGRT-FRA-LZ-HUB-HC-KEY",
+                                    "ike_version"                               : "V2",
+                                    "routing"                                   : "BGP",
+
+                                    "bgp_session_info": {
+                                        "customer_bgp_asn"                      : "65001",
+                                        "customer_interface_ip"                 : "172.20.1.1/30",
+                                        "oracle_interface_ip"                   : "172.20.1.2/30"
+                                    }
+                                },
+
+                                "tunnel_2": {
+                                    "drg_route_table_id"                        : "DRGRT-FRA-LZ-HUB-HC-KEY",
+                                    "ike_version"                               : "V2",
+                                    "routing"                                   : "BGP",
+
+                                    "bgp_session_info": {
+                                        "customer_bgp_asn"                      : "65001",
+                                        "customer_interface_ip"                 : "172.20.1.5/30",
+                                        "oracle_interface_ip"                   : "172.20.1.6/30"
+                                    }
+                                }
+                            }
+                        }
+                    },
+
 
 &nbsp;
 
-## Prepare the configuration
+---
 
-### Option 1: Landing Zone Studio
+### Prepare the configuration
+
+#### Option 1: Landing Zone Studio
 
 [![Open Landing Zone Studio](https://img.shields.io/badge/Open%20Landing%20Zone%20Studio-C74634?style=for-the-badge)](https://oci-landing-zones.github.io/oci-landing-zone-operating-entities/)
 
@@ -81,7 +162,7 @@ For each tunnel, use an OCI-generated shared secret, provide a shared secret, or
 4. Configure **Tunnel 1** and **Tunnel 2**, including routing, IKE version, shared secret source, and BGP settings where applicable. Set **Router identity** if the CPE sends a different IKE identifier.
 5. Review the configuration, resolve validation errors, and download the deployment files.
 
-### Option 2: Blueprint Factory
+#### Option 2: Blueprint Factory
 
 Add `hybrid_connectivity` to your landing zone source configuration:
 
