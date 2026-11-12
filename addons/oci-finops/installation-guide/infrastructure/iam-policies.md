@@ -1,6 +1,6 @@
 # FinOps IAM policies
 
-Reference for the policies currently defined in [finops_iam.json](../../deployment/infrastructure/finops_iam.json). Provision them through [SETUP](../README.md#step-1-provision-finops-infrastructure-and-adb); the Python/SQL installers do not create IAM policies.
+Reference for the policies currently defined in [finops_iam.json](../../deployment/FinOps_LandingZone_addon/finops_iam.json). Provision them through [the deployment guide](../../deployment/FinOps_LandingZone_addon/README.md); the Python/SQL installers do not create IAM policies.
 
 ## Contents
 
@@ -41,7 +41,7 @@ The API grants use this statement pattern:
 Allow dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to read <resource-type> in tenancy where request.principal.id = '<FINOPS_ADB_OCID>'
 ```
 
-Populate the OCIDs using the [same-stack provisioning sequence](../README.md#deploy-and-verify). The endorsement and Notifications statements do not contain that per-ADB condition.
+Populate the OCIDs using the [same-stack provisioning sequence](../../deployment/FinOps_LandingZone_addon/README.md#deploy-and-verify). The endorsement and Notifications statements do not contain that per-ADB condition.
 
 The JSON includes grants for optional collectors even if those SQL modules are not selected. For a customer-owned report bucket, use the [source-specific ingestion policy](../database-modules/oci-resource-principal-iam.md#2-choose-the-source-policy); that bucket grant is not defined by this Oracle-managed report endorsement.
 

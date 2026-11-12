@@ -1,61 +1,85 @@
 # OCI FinOps Add-on
+## An OCI Open LZ Add-on for Cloud Cost Visibility, Allocation and Optimization
+
+&nbsp;
 
 **Contents**
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-  - [Workloads and Landing Zone integration](#workloads-and-landing-zone-integration)
-  - [Inside the database](#inside-the-database)
-- [FinOps Tagging](#finops-tagging)
-- [Installation](#installation)
-- [Maintenance backlog](#maintenance-backlog)
-- [License](#license)
+- [OCI FinOps Add-on](#oci-finops-add-on)
+  - [An OCI Open LZ Add-on for Cloud Cost Visibility, Allocation and Optimization](#an-oci-open-lz-add-on-for-cloud-cost-visibility-allocation-and-optimization)
+  - [Overview](#overview)
+    - [Example dashboards](#example-dashboards)
+  - [Architecture](#architecture)
+    - [Infrastructure and Landing Zone integration](#infrastructure-and-landing-zone-integration)
+    - [Database processing and reporting](#database-processing-and-reporting)
+  - [FinOps Tagging](#finops-tagging)
+  - [Installation](#installation)
+  - [Maintenance backlog](#maintenance-backlog)
+  - [License](#license)
 
 ## Overview
 
-The OCI FinOps Add-on extends the OCI Operating Entities Landing Zone. It provides cost visibility, financial allocation and optimization insights by bringing FOCUS reports into Oracle Autonomous Database (ADB) and presenting them through Oracle Analytics Cloud (OAC).
+The **OCI FinOps Add-on** extends the OCI Operating Entities Landing Zone with cloud cost visibility, allocation and optimization insights. It helps engineering, finance and business teams understand cloud spending, assign costs to business units, projects and environments, and identify opportunities to improve resource usage.
 
-The solution runs in an OCI **parent tenancy**. The current implementation is **V2**, with OCI as the provider implemented today; the modular architecture allows additional providers to be introduced.
+The solution centralizes OCI cost and usage data from FOCUS reports in **Oracle Autonomous Database (ADB)** and provides dashboards and reporting through **Oracle Analytics Cloud (OAC)**. It integrates with the Landing Zone’s existing identity domain, governance tags and shared network services.
 
-<img src="images/oac-overview.png" width="900" alt="OAC Overview dashboard showing cloud costs, commitment, monthly consumption, services, compartments and regions">
+**What is FinOps?** FinOps is a collaborative practice that brings engineering, finance and business teams together to understand cloud spending, take ownership of costs and maximize the business value of cloud investments.
 
-*Example of the OAC Overview dashboard.*
+**Why this solution?** Understanding cloud spending requires connecting cost and usage data with business ownership and operational context. This add-on combines OCI FOCUS reports with Landing Zone tags and account information to help teams assign costs consistently, investigate spending and identify optimization opportunities.
 
-<img src="images/oac-monthly-comparison.png" width="900" alt="OAC Monthly Comparison dashboard showing monthly costs, daily comparison and cost changes by service, tag, compartment and resource">
+### Example dashboards
 
-*Example of the OAC Monthly Comparison dashboard.*
+<p align="center">
+  <a href="images/oac-overview.png">
+    <img src="images/oac-overview.png" width="650" alt="OAC Overview dashboard showing cloud costs, commitment, monthly consumption, services, compartments and regions">
+  </a>
+  <br>
+  <em>Overview — spending by tenancy, region and service.</em>
+</p>
 
-**What is FinOps?** FinOps brings financial accountability to cloud usage through collaboration between engineering, finance and business teams, helping organizations make informed decisions about cost and value.
+<p align="center">
+  <a href="images/oac-monthly-comparison.png">
+    <img src="images/oac-monthly-comparison.png" width="650" alt="OAC Monthly Comparison dashboard showing monthly costs, daily comparison and cost changes by service, tag, compartment and resource">
+  </a>
+  <br>
+  <em>Monthly comparison — cost changes between periods.</em>
+</p>
 
-**Why this solution?** Cloud providers offer separate cost-management tools, making a consolidated view across clouds difficult. This solution uses FOCUS as a common data model and a modular architecture designed to bring cost and usage from multiple providers into one reporting environment, with consistent cost allocation and analysis. OCI is the first implemented provider.
+Select an image to view it at full size.
 
 ## Architecture
 
-### Workloads and Landing Zone integration
+The OCI FinOps Add-on extends the Landing Zone foundation deployed in an OCI **parent tenancy** using the [**One-OE blueprint templates**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its architecture combines dedicated FinOps infrastructure, shared Landing Zone services and database modules that prepare cost and usage data for reporting.
 
-The FinOps workload integrates a private ADB and OAC reporting with the existing One-OE hub and shared services. Its dedicated VCN connects to the hub, with private subnets and network security groups separating database, OAC connectivity and infrastructure access.
+The following sections describe how the add-on integrates with the Landing Zone and how data flows through the platform.
 
-OAC is a separate presentation service. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles. The solution uses One-OE's existing identity domain and governance tags, and connects its dedicated FinOps VCN to the Landing Zone hub.
+### Infrastructure and Landing Zone integration
+
+A dedicated FinOps VCN connects to the existing One-OE hub. Private subnets and network security groups separate database, OAC connectivity and infrastructure access. The add-on reuses One-OE's identity domain and governance tags.
+
+OAC is a separate presentation service. Its private access channel connects to the private ADB endpoint; dashboard access is controlled separately through OAC endpoint configuration and application roles.
 
 <img src="images/OCI_FinOps_Arch.png" width="900" alt="One-OE FinOps architecture with private Autonomous Database, Oracle Analytics Cloud, and an optional Object Storage bucket">
 
-| **Resource** | **Description** |
-| --- | --- |
-| **FinOps compartment** | Dedicated compartment for the FinOps database and platform services. |
-| **IAM Groups** | Separate database and OAC administration groups, with service permissions in the FinOps compartment and network dependencies in shared networking. |
-| **IAM Policies and ADB Dynamic Group** | Provide administrator access to the platform and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. See the [IAM policy reference](installation-guide/infrastructure/iam-policies.md) for grants and scope. |
-| **Autonomous Database (ADB)** | Central data store for the FinOps platform. Its private endpoint is inside the FinOps VCN; native database pipelines ingest FOCUS reports, while database modules prepare the reporting data. |
-| **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports for cost visibility, allocation and analysis. A private access channel connects OAC to the private ADB endpoint. |
-| **VCN & Subnets** | A dedicated VCN with private subnets for ADB, OAC connectivity and infrastructure access. Network security groups control access to FinOps endpoints; a service gateway provides OCI service connectivity and a DRG attachment connects the VCN to the One-OE hub. |
-| **Tags** | Reuses One-OE's `tagns-lz-cost-governance` namespace for financial ownership and cost-allocation metadata. See [FinOps Tagging](#finops-tagging) for the six tags and their meaning. |
-| **Object Storage Bucket (Optional)** | Provides a customer-managed source for OCI FOCUS report files as an alternative to Oracle-managed report storage. The bucket is supplied separately from the current IaC configurations. |
-| **Vault, encryption key and Secrets** | The Vault and key provide secure storage for database credentials. The ADMIN, FinOps schema-owner and OAC-reader password Secrets are prepared separately after infrastructure creation. |
-| **Notifications** | A topic and confirmed email subscriptions deliver platform operational notifications. |
-| **Bastion (Optional)** | Provides administrative access to private FinOps endpoints through a central Bastion in shared security; an existing Bastion can be reused. |
+| Resource | Purpose | Provisioning |
+| --- | --- | --- |
+| **FinOps compartment** | Dedicated compartment for the FinOps database and platform services. | Created by the add-on IaC. |
+| **Identity domain** | Hosts the FinOps administration groups and ADB dynamic group. | Reused from One-OE. |
+| **IAM groups** | Separate database and OAC administration groups. | Created by the add-on IaC in the existing identity domain. |
+| **IAM policies and ADB dynamic group** | Provide administrator access and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. See the [IAM policy reference](installation-guide/infrastructure/iam-policies.md). | Created by the add-on IaC. |
+| **Autonomous Database (ADB)** | Private data store where pipelines ingest FOCUS reports and database modules prepare reporting data. | Created by the add-on IaC; database modules are installed separately. |
+| **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports, using a private access channel to connect to ADB. | Created or reused separately; connectivity, datasets and dashboards are configured after infrastructure provisioning. |
+| **VCN and subnets** | Private networking for ADB, OAC connectivity and infrastructure access, with network security groups, a service gateway and a DRG attachment to the One-OE hub. | Created by the add-on IaC, using existing hub dependencies. |
+| **Tags** | Financial ownership and cost-allocation metadata in `tagns-lz-cost-governance`. See [FinOps Tagging](#finops-tagging). | Namespace, definitions and defaults reused from One-OE. |
+| **Object Storage bucket (optional)** | Customer-managed source for FOCUS reports, as an alternative to Oracle-managed report storage. | Supplied separately from the add-on IaC. |
+| **Vault and encryption key** | The Vault stores the password Secrets; the key encrypts them. | Created by the add-on IaC in the shared security compartment. |
+| **Password Secrets** | Store the ADMIN, FinOps schema-owner and OAC-reader passwords. | Prepared separately after infrastructure provisioning. |
+| **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
+| **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](installation-guide/README.md#step-1-provision-finops-infrastructure-and-adb) for the configuration files, resource ownership and dependencies.
+The IaC configurations provision the supporting infrastructure and ADB. Password Secrets and OAC are prepared separately. See the [infrastructure setup guide](deployment/FinOps_LandingZone_addon/README.md) for the configuration files, resource ownership and dependencies.
 
-### Inside the database
+### Database processing and reporting
 
 The database solution combines three layers:
 
@@ -84,13 +108,27 @@ All six tags are **mandatory** and use **controlled lists of values defined in a
 | `tag-lz-owner` | Email address of the responsible owner. |
 | `tag-lz-project` | Project to which the resource and its costs are assigned. |
 
+<p align="center">
+  <a href="images/FinOps_tags.png">
+    <img src="images/FinOps_tags.png" width="900" alt="Illustrative One-OE compartment hierarchy showing six financial ownership tags across shared services, platforms and projects, with compartment-based and tag-based budget examples">
+  </a>
+  <br>
+  <em>Illustrative One-OE tag allocation and budget scopes. Labels and values are examples.</em>
+</p>
+
 The namespace, tag definitions, controlled values and defaults belong to One-OE and must be prepared before deploying the add-on. FinOps consumes these existing tags for cost allocation and reporting. See the [tag catalog and reporting-profile design](design/02-oci-tags.md) for their use inside the platform.
 
 ## Installation
 
-Follow the [complete FinOps setup guide](installation-guide/README.md), from provisioning infrastructure and ADB with IaC, through changing the ADMIN password and preparing Secrets, to installing database modules with Python or SQL and configuring OAC.
+Set up the solution in three stages. The FinOps add-on extends an existing Landing Zone; it does not deploy the One-OE foundation.
 
-The guide defines the sequence and links to the detailed procedures.
+1. **Prerequisite — deploy the One-OE Landing Zone.** Deploy the base Landing Zone in the OCI parent tenancy using the [One-OE blueprint templates](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its shared compartments, identity domain, hub network and governance tags must be ready before deploying FinOps.
+
+2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/FinOps_LandingZone_addon/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
+
+3. **Configure FinOps — prepare the platform and reporting.** [Change the initial ADMIN password and prepare the password Secrets](installation-guide/README.md#step-1-prepare-database-credentials-and-secrets), then [install the database modules](installation-guide/README.md#step-2-install-the-finops-database-modules) using the default Python installer or the direct SQL alternative. Finally, [configure OAC connectivity, import the workbook and set up user access](installation-guide/README.md#step-3-oracle-analytics-cloud-dashboard).
+
+The [complete FinOps setup guide](installation-guide/README.md) provides the prerequisites, configuration files and validation steps for stages 2 and 3.
 
 ## Maintenance backlog
 

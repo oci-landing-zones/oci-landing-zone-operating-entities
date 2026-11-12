@@ -1,6 +1,6 @@
 # One-OE network and access integration
 
-Technical reference for [Step 1 of the FinOps setup](../README.md#step-1-provision-finops-infrastructure-and-adb). A One-OE Landing Zone is already deployed.
+Technical reference for [FinOps Landing Zone Add-on deployment](../../deployment/FinOps_LandingZone_addon/README.md). A One-OE Landing Zone is already deployed.
 
 ## Contents
 
@@ -147,6 +147,6 @@ The FinOps stack owns the attachment; the existing hub stack owns its route tabl
 | Bastion | Verify source allowlist, session creation/list/get/delete, DNS, endpoint access, denied destinations and expiry. |
 | Network | Verify forward/return routing, security rules and firewall inspection for the selected hub. |
 | Database | Verify ADB private connectivity and Database Tools connection access where configured. |
-| OAC | Verify PAC and dashboard access separately when OAC is configured in Step 4. |
+| OAC | Verify PAC and dashboard access separately during [OAC configuration](../README.md#step-3-oracle-analytics-cloud-dashboard). |
 
 Static configuration and Terraform plans do not establish live OCI authorization or network connectivity.

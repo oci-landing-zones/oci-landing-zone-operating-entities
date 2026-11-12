@@ -47,3 +47,11 @@ Start with the [OCI provider overview](02-oci-provider.md) for the architecture 
 ## Jobs and schedules
 
 See the [cross-module job reference](jobs-and-schedules.md) for recurring and one-time jobs, initial enabled/disabled states, local launch times and frequency.
+
+## License
+
+Copyright (c) 2026 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](/LICENSE.txt) for more details.
