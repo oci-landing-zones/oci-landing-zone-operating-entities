@@ -322,7 +322,7 @@ The factory always emits `network.json`, `iam.json`, `governance.json`, and the 
 
 Use `hybrid_connectivity` at the top level alongside `hub` and `environments`. It is optional; omitting it leaves existing landing zone generation unchanged. All four resource maps default to `{}`. Configure either service independently, or both for redundant private connectivity.
 
-This section documents the factory input, not the full downstream networking-module schema. Resource display names, compartments, DRG references, static VPN routes and attachment route-table assignments are generated. Do not add module-only fields such as `drg_id`, `gateway_key`, `static_routes`, `display_name` or `default_drg_route_tables` to these input objects.
+This section documents the factory input, not the full downstream networking-module schema. Resource display names, compartments, DRG references, static VPN routes and attachment route-table assignments are generated. Do not add module-only fields such as `drg_id`, `gateway_key`, `static_routes`, `display_name` or `drg_route_table_id` to these input objects.
 
 VPN tunnel and private FastConnect attachments share the generated `hc` (Hybrid Connectivity) DRG ingress table. Its local routes preserve the hub's inspection policy, providing the same ingress routing on either connection.
 
@@ -467,7 +467,7 @@ Create the physical group/ports first, complete cabling and activation, then add
 - The factory assigns tables to managed attachments. It does not change DRG-wide defaults for future attachments outside this configuration. ECMP is disabled; actual BGP advertisements and OCI route selection decide the active path.
 - VPN `shared_secret` accepts a literal key or existing secret OCID. Literal VPN keys use letters, digits and spaces. BGP MD5 keys are literal values only. There is no separate secrets file or automatic copy into the LZ Vault.
 - In Studio, entered keys are session-only and masked in previews; exports contain the actual values. Saved designs require key re-entry, and secret-bearing outputs are not cached.
-- Use the same pinned Orchestrator v2.2.0 `rms-facade` workflow as the rest of the landing zone, with Networking v0.9.0. Resource Manager with a private configuration source is the default; Terraform CLI with the facade's local file source remains an alternative. Follow the [Studio deployment workflow](../oci-landingzone-studio/README.md#4-review-and-deployment) for phase selection. Existing secret references and physical connections must be ready before their connectivity apply.
+- Use the same pinned Orchestrator `rms-facade` workflow as the rest of the landing zone. Resource Manager with a private configuration source is the default; Terraform CLI with the facade's local file source remains an alternative. Follow the [Studio deployment workflow](../oci-landingzone-studio/README.md#4-review-and-deployment) for phase selection. Existing secret references and physical connections must be ready before their connectivity apply.
 
 **Manual post-deployment configuration required:** configure peer equipment and advertisements, complete carrier work, and permit approved traffic in firewall policy, NSGs and security lists. The customer owns those resources' lifecycle, drift management and compliance review.
 

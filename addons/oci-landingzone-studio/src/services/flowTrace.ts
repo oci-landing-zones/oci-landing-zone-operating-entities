@@ -116,6 +116,9 @@ function buildTopo(model: LzModel, tables: RouteTable[]) {
   const connections = hybridRoutes(model);
   const externalEndpoints = new Map(connections.map((connection) => [connection.id, connection.type === 'VPN'
     ? vpnCpeNodeId(model.hybridConnectivity!.ipsecs[connection.name]) : connection.id + ':router']));
+  for (const connection of connections.filter((entry) => entry.type === 'VPN')) for (const tunnel of [1, 2]) {
+    externalEndpoints.set(connection.id + ':tunnel-' + tunnel, externalEndpoints.get(connection.id)!);
+  }
   const tablesFor = (node: string, kind: RouteTable['associations'][number]['kind']) =>
     tables.filter((table) => table.associations.some((binding) => binding.nodeId === node && binding.kind === kind));
   const tableFor = (node: string, kind: RouteTable['associations'][number]['kind']) => {
@@ -307,8 +310,7 @@ function walk(topo: Topo, acc: Acc, start: { node: string; dest: string; zone: n
       case 'external': {
         const target = rule.targetNodeId ?? rule.flowTarget;
         if (!target) { acc.ok = false; return; }
-        if (target.startsWith('hybrid-vpn-')) pushVisual(acc, target + ':tunnel-1');
-        else pushVisual(acc, target);
+        pushVisual(acc, target);
         const endpoint = topo.externalEndpoints.get(target) ?? target;
         pushVisual(acc, endpoint);
         hop(acc, endpoint, `→ ${topo.human(endpoint)} (expected path; deployed routes are unavailable)`);
@@ -338,7 +340,10 @@ export function traceFlow(model: LzModel, spec: FlowSpec, tables: RouteTable[] =
       || !flowRoleAllowed(source, local.role, `${spec.kind}@${connection.id}`)) return finish(spec, { ...acc, ok: false }, label);
     if (spec.kind === 'hybrid-in') {
       pushVisual(acc, topo.externalEndpoints.get(connection.id)!);
-      const ingress = connection.type === 'VPN' ? connection.id + ':tunnel-1' : connection.id;
+      const ingress = connection.type === 'VPN'
+        ? [1, 2].map((tunnel) => connection.id + ':tunnel-' + tunnel).find((node) => topo.tableFor(node, 'drg-attachment'))
+        : connection.id;
+      if (!ingress) return finish(spec, { ...acc, ok: false }, label);
       pushVisual(acc, ingress);
       pushVisual(acc, 'drg');
       walk(topo, acc, { node: ingress, kind: 'drg-attachment', dest: host32(local.cidr), zone: 'hub' }, local.node);

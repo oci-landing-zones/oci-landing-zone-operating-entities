@@ -1,4 +1,4 @@
-// Validates the released Networking v0.9.0 hybrid connectivity input surface.
+// Validates Blueprint Factory's hybrid connectivity input surface.
 // normalize(raw) -> normalized connectivity; remote_cidrs(config) -> unique routes.
 local v = import '../../lib/validation.libsonnet';
 local cidrs = import '../../lib/cidrs.libsonnet';
