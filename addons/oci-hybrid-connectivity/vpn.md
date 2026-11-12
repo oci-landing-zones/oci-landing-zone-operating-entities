@@ -3,16 +3,13 @@
 &nbsp;
 
 ### Overview
+The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an OCI One-OE Landing Zone. It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using Landing Zone Studio or the Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
 
-[OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) connects your remote network (on-premises, other cloud service provider) to OCI using encrypted IPSec tunnels over the internet. 
-
-The Hybrid Connectivity addon creates the OCI VPN resources, connects them to the One-Oe Landing Zone’s DRG, and configures the associated routing. It supports static routing and BGP dynamic routing for Site-to-Site VPN.
-
-
+&nbsp;
 
 #### Main components
 
-| Resource | Purpose |
+| Resource&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Purpose |
 |---|---|
 | **CPE object** | The OCI representation of the remote VPN device, including its public IP address. |
 | **IPSec connection** | Connects the CPE object to the Landing Zone’s DRG and contains two redundant IPSec tunnels. |
@@ -24,9 +21,10 @@ The Hybrid Connectivity addon creates the OCI VPN resources, connects them to th
 
 This architecture diagram illustrates **Site-to-Site VPN connectivity** to an **OCI One-OE Landing Zone with Hub A**. The VPN connection uses **BGP dynamic routing**, and the diagram shows the IPv4 addresses assigned to both ends of each IPSec tunnel.
 
-Both VPN tunnel attachments are associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the hub and spoke VCNs through the hub attachment. Traffic between the remote network and spoke VCNs passes through the internal network firewall for inspection in both directions.
 
-This routing and inspection model applies to **One-OE Landing Zone deployments with Hubs A, B, and C**. For **Hub E**, traffic between the remote network and spoke VCNs is routed directly through the DRG without traversing the hub VCN, as Hub E does not include a network firewall.
+Both VPN tunnel attachments are associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the hub and spoke VCNs through the hub attachment. With the routing configuration illustrated, traffic between the remote network and spoke VCNs traverses the internal network firewall for inspection in both directions.
+
+This routing and inspection model applies to **One-OE Landing Zone deployments with Hubs A, B, and C** models. For **Hub E**, which does not include a network firewall, traffic between the remote network and spoke VCNs can be routed directly through the DRG.
 
 <img src="./images/oneoe-vpn.png" width="1100" alt="Site-to-Site VPN connected to a One-OE Landing Zone with Hub A and production and preproduction spoke VCNs">
 
@@ -40,7 +38,7 @@ This routing and inspection model applies to **One-OE Landing Zone deployments w
 
 #### Configuration requirements
 
-| Input | Requirement |
+| Input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Requirement |
 |---|---|
 | **CPE public IP address** | The remote VPN gateway’s public IPv4 address, or its translated public address when behind NAT. Alternatively, provide an existing CPE object OCID. |
 | **Remote network CIDRs** | Networks reachable through the VPN. These must not overlap the connected OCI networks. |
@@ -52,7 +50,7 @@ This routing and inspection model applies to **One-OE Landing Zone deployments w
 
 #### VPN Routing types
 
-| Option | Configuration |
+| Option&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Configuration |
 |---|---|
 | **Static routing** | Specify the remote network CIDRs. Configure corresponding routes to the OCI networks on the remote gateway. |
 | **BGP dynamic routing** | Configure the customer ASN and inside-tunnel IP addresses, then establish BGP sessions and advertise the required networks on the remote gateway. |
@@ -134,7 +132,7 @@ Both tunnels reference the custom DRG route table (`DRGRT-FRA-LZ-HUB-HC-KEY`) de
         "display_name": "ipsec-fra-lz-onprem",
         "cpe_key": "CPE-FRA-LZ-ONPREM-KEY",
         "drg_key": "DRG-FRA-LZ-HUB-KEY",
-        "static_routes": ["172.20.0.0/16"],
+        "static_routes": ["192.168.0.0/16"],
 
         "tunnels_management": {
             "tunnel_1": {
