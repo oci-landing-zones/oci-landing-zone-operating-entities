@@ -103,8 +103,35 @@ local token(text, word) =
   std.length(std.findSubstr('-' + std.asciiUpper(std.strReplace(word, '_', '-')) + '-',
                             '-' + std.asciiUpper(std.strReplace(std.strReplace(text, '/', '-'), '_', '-')) + '-')) > 0;
 
+local without_cost_tags(value) =
+  local prefix = 'tagns-lz-cost-governance.';
+  local fields = ['defined_tags', 'default_defined_tags', 'node_defined_tags'];
+  local filtered_tags(tags) = { [key]: tags[key] for key in std.objectFields(tags) if !std.startsWith(key, prefix) };
+  if std.type(value) == 'array' then [without_cost_tags(item) for item in value]
+  else if std.type(value) != 'object' then value
+  else {
+    [key]:
+      local child = value[key];
+      if std.member(fields, key) && std.type(child) == 'object' then filtered_tags(child)
+      else if key == 'namespaces' && std.type(child) == 'object' then {
+        [name]: without_cost_tags(child[name])
+        for name in std.objectFields(child)
+        if !std.objectHas(child[name], 'name') || child[name].name != 'tagns-lz-cost-governance'
+      }
+      else if key == 'budgets' && std.type(child) == 'object' then {
+        [name]: without_cost_tags(child[name])
+        for name in std.objectFields(child)
+        if !std.objectHas(child[name], 'target') || child[name].target.type != 'TAG' ||
+           std.length([target for target in child[name].target.values if std.startsWith(target, prefix)]) == 0
+      }
+      else without_cost_tags(child)
+    for key in std.objectFields(value)
+    if !(std.member(fields, key) && std.type(value[key]) == 'object' && std.length(std.objectFields(filtered_tags(value[key]))) == 0)
+  };
+
 {
   apply(doc, config)::
+    if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'enable_tags') && !config.cost_governance.enable_tags then without_cost_tags(doc) else
     local namespace = 'tagns-lz-cost-governance.tag-lz-';
     local owner = if std.objectHas(config, 'cost_governance') && std.objectHas(config.cost_governance, 'owner_email') then config.cost_governance.owner_email else null;
     local owner_tags = if owner != null then { [namespace + 'owner']: owner } else {};

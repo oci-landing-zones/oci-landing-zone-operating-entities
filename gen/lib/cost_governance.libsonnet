@@ -38,7 +38,9 @@ local name(value, label) =
 
   normalize(raw, projects=[])::
     local label = 'config.cost_governance';
-    local cfg = validation.allowed_keys(validation.object(raw, label), label, ['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'additional_budgets', 'tag_value_lists', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units']);
+    local cfg = validation.allowed_keys(validation.object(raw, label), label, ['enable_tags', 'require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'additional_budgets', 'tag_value_lists', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units']);
+    local tags_enabled = if std.objectHas(cfg, 'enable_tags') then cfg.enable_tags else true;
+    assert std.type(tags_enabled) == 'boolean' : label + '.enable_tags must be a boolean';
     local assignments = validation.object(if std.objectHas(cfg, 'cost_center_assignments') then cfg.cost_center_assignments else {}, label + '.cost_center_assignments');
     local label_resources = if std.objectHas(cfg, 'tag_resource_labels') then cfg.tag_resource_labels else false;
     assert std.type(label_resources) == 'boolean' : label + '.tag_resource_labels must be a boolean';
@@ -77,8 +79,9 @@ local name(value, label) =
       for key in std.objectFields(additional)
     };
     {
+      enable_tags: tags_enabled,
       require_tag_values: required,
-      tag_resource_labels: label_resources,
+      tag_resource_labels: tags_enabled && label_resources,
       cost_center_business_units: unit_assignments,
       cost_center_assignments: {
         [center]:

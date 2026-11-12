@@ -3,8 +3,9 @@ import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 
 describe('cost governance configuration', () => {
-  it('inherits One-OE tags and budgets but requires the shared recipient to be entered', () => {
+  it('omits FinOps tags by default but keeps the compartment budget recipient required', () => {
     const config = buildConfig(emptyLzModel());
+    expect(config).toHaveProperty('cost_governance.enable_tags', false);
     expect(config).toHaveProperty('cost_governance.require_tag_values', false);
     expect(config).toHaveProperty('cost_governance.budget_recipients', '');
     expect(config).toHaveProperty('cost_governance.budgets.BUDGET-LANDINGZONE-KEY.amount', 10000);
@@ -12,6 +13,8 @@ describe('cost governance configuration', () => {
   });
   it('keeps cost governance in the Home stack', () => {
     const model = emptyLzModel(); model.foundation.stackScope = 'regional';
+    expect(buildConfig(model)).toHaveProperty('cost_governance.enable_tags', false);
+    model.foundation.costGovernance!.tagsEnabled = true;
     expect(buildConfig(model)).not.toHaveProperty('cost_governance');
   });
 });

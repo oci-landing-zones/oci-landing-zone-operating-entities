@@ -144,6 +144,7 @@ Studio's **Governance** uses the same `cost_governance` contract as Blueprint Fa
 ```jsonnet
 cost_governance: {
   require_tag_values: true,
+  enable_tags: true,
   tag_resource_labels: true,
   owner_email: 'owner@example.com',
   cost_center_assignments: {
@@ -160,8 +161,9 @@ cost_governance: {
 },
 ```
 
-Providing this object inherits the eight [One-OE budget defaults](../../gen/lib/cost_budgets.libsonnet) and all six cost Tag Defaults. Omit `cost_governance` to preserve the existing factory behavior without these additional resources. Studio includes the object for Home designs; DR reuses Home governance and does not emit `governance.json`.
+Providing this object inherits the eight [One-OE budget defaults](../../gen/lib/cost_budgets.libsonnet) and all six cost Tag Defaults. Omit `cost_governance` to preserve the existing factory behavior without these additional resources. Studio includes the object for Home designs; DR reuses Home governance and does not emit `governance.json`. Regional inputs include `enable_tags: false` when Home disables FinOps tags.
 
+- `enable_tags` defaults to `true`. Set it to `false` to omit the six FinOps tag definitions, defaults, resource assignments and tag-based budgets. IAM role tags and compartment-based budgets are retained. New Studio designs start with FinOps tags disabled. **Enable FinOps tags** in Governance enables them with `require_tag_values: true`; linked DR designs inherit the Home selection.
 - `tag_resource_labels` defaults to `false` in Factory inputs and is enabled by Studio. When enabled, Home exports `governance_pre.json` for phase 1 (untagged definitions) and `governance.json` for phase 2 (namespaces and tag definitions labelled `platform=governance`, `environment=shared`, `project=notapplicable`, plus Owner and applicable Cost Center/Business Unit). Replace the pre file with the final file in the same stack; never include both together. This avoids references to cost tags before they exist. DR emits neither file.
 - `cost_center_business_units` maps each cost-center value to one Business Unit. Matching generated resources receive the unit associated with their assigned cost center, including governance tag definitions in phase 2. Each configured Business Unit must have at least one cost center; several centers may belong to the same unit. Omit the map to preserve previous Factory assignments. Studio exports the selected associations and validates missing assignments.
 - `require_tag_values` defaults to `false`. Set it to `true` to set `is_user_required` on all six cost Tag Defaults, retaining their `default_value`. Explicit placeholder values still satisfy this requirement; it does not enforce business-specific values. Access-control tags are unchanged.

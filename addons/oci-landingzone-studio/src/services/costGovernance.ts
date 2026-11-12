@@ -238,6 +238,7 @@ export function ownerEmailError(value: string): string | null {
 
 type BudgetOverride = { name: string; amount: number; alert_rule: { threshold_value: number; recipients?: string } };
 export interface CostGovernanceConfig {
+  enable_tags?: boolean;
   tag_resource_labels?: boolean;
   cost_center_business_units?: Record<string, string>;
   cost_center_assignments?: Record<string, BusinessUnitScope>;
@@ -260,6 +261,10 @@ export function defaultCostGovernance(projectNames: string[] = []): CostGovernan
       name: budget.name, amount: budget.amount, thresholdValue: budget.alert_rule.threshold_value, recipients,
     }])),
   };
+}
+
+export function setFinOpsTagsEnabled(cfg: CostGovernance, enabled: boolean): CostGovernance {
+  return { ...cfg, tagsEnabled: enabled, requireTagValues: enabled };
 }
 
 export function normalizeBudgetRecipients(value: string): string {
@@ -313,21 +318,25 @@ export function inactiveBusinessUnitBudgetKeys(cfg: CostGovernance, projectNames
 export function costGovernanceConfig(value: CostGovernance | undefined, projectNames: string[] = [], model?: CostCenterContext): CostGovernanceConfig {
   const cfg = value ?? defaultCostGovernance(projectNames);
   const defaults = defaultCostGovernance(projectNames);
-  const keys = [...Object.keys(defaults.budgets), ...Object.keys(cfg.additionalBudgets ?? {})];
+  const tagsEnabled = cfg.tagsEnabled !== false;
+  const keys = tagsEnabled ? [...Object.keys(defaults.budgets), ...Object.keys(cfg.additionalBudgets ?? {})]
+    : Object.keys(budgetDefinitions(projectNames)).filter((key) => budgetDefinitions(projectNames)[key].target.type === 'COMPARTMENT');
   const removed = [...new Set([...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projectNames), ...(cfg.removedBudgets ?? [])])].filter((key) => keys.includes(key));
   const activeKeys = keys.filter((key) => !removed.includes(key));
   const editableTagLists = Object.entries({ ...cfg.tagValueLists, ...(cfg.tagValueLists?.['tag-lz-business-unit'] === undefined ? { 'tag-lz-business-unit': 'IT' } : {}) }).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner');
   return {
-    require_tag_values: cfg.requireTagValues,
-    tag_resource_labels: cfg.tagResourceLabels ?? true,
-    cost_center_business_units: businessUnitAssignments(cfg),
-    ...(model ? { cost_center_assignments: exportCostCenterAssignments(cfg, model) } : {}),
-    owner_email: ownerEmail(cfg),
-    ...(editableTagLists.length ? { tag_value_lists: Object.fromEntries(editableTagLists.map(([tag, values]) => [tag, parseTagValues(values)])) } : {}),
-    ...(cfg.additionalBudgets && Object.keys(cfg.additionalBudgets).length ? { additional_budgets: Object.fromEntries(Object.entries(cfg.additionalBudgets).map(([key, budget]) => [key, {
-      tag_name: budget.tagName, tag_value: budget.tagValue.trim(), name: budget.name, amount: budget.amount,
-      alert_rule: { threshold_value: budget.thresholdValue, ...(!cfg.useSingleRecipient && (!removed.includes(key) || !budgetRecipientError(budget.recipients)) ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}) },
-    }])) } : {}),
+    ...(tagsEnabled ? {
+      require_tag_values: cfg.requireTagValues,
+      tag_resource_labels: cfg.tagResourceLabels ?? true,
+      cost_center_business_units: businessUnitAssignments(cfg),
+      ...(model ? { cost_center_assignments: exportCostCenterAssignments(cfg, model) } : {}),
+      owner_email: ownerEmail(cfg),
+      ...(editableTagLists.length ? { tag_value_lists: Object.fromEntries(editableTagLists.map(([tag, values]) => [tag, parseTagValues(values)])) } : {}),
+      ...(cfg.additionalBudgets && Object.keys(cfg.additionalBudgets).length ? { additional_budgets: Object.fromEntries(Object.entries(cfg.additionalBudgets).map(([key, budget]) => [key, {
+        tag_name: budget.tagName, tag_value: budget.tagValue.trim(), name: budget.name, amount: budget.amount,
+        alert_rule: { threshold_value: budget.thresholdValue, ...(!cfg.useSingleRecipient && (!removed.includes(key) || !budgetRecipientError(budget.recipients)) ? { recipients: normalizeBudgetRecipients(budget.recipients) } : {}) },
+      }])) } : {}),
+    } : { enable_tags: false, require_tag_values: false, tag_resource_labels: false }),
     ...(removed.length ? { exclude_budgets: removed } : {}),
     ...(cfg.useSingleRecipient && activeKeys.length ? { budget_recipients: normalizeBudgetRecipients(cfg.recipients) } : {}),
     budgets: Object.fromEntries(keys.filter((key) => !cfg.additionalBudgets?.[key]).map((key) => {
@@ -347,18 +356,20 @@ export function validateCostGovernance(model: LzModel): string[] {
   const projects = activeProjectNames(model);
   const defaults = defaultCostGovernance(projects);
   const cfg = model.foundation.costGovernance ?? defaults;
-  const keys = [...Object.keys(defaults.budgets).filter((key) => ![...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projects)].includes(key)), ...Object.keys(cfg.additionalBudgets ?? {})];
+  const tagsEnabled = cfg.tagsEnabled !== false;
+  const keys = tagsEnabled ? [...Object.keys(defaults.budgets).filter((key) => ![...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projects)].includes(key)), ...Object.keys(cfg.additionalBudgets ?? {})]
+    : Object.keys(budgetDefinitions(projects)).filter((key) => budgetDefinitions(projects)[key].target.type === 'COMPARTMENT');
   const sharedError = cfg.useSingleRecipient && keys.some((key) => !cfg.removedBudgets?.includes(key)) ? budgetRecipientError(cfg.recipients, true) : null;
   const fields: Array<keyof CostBudget> = ['name', 'amount', 'thresholdValue', ...(!cfg.useSingleRecipient ? ['recipients'] as const : [])];
-  const tagErrors = Object.entries(cfg.tagValueLists ?? {}).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner').flatMap(([name, raw]) =>
+  const tagErrors = !tagsEnabled ? [] : Object.entries(cfg.tagValueLists ?? {}).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner').flatMap(([name, raw]) =>
     !costTagDefinitions.some((tag) => tag.name === name) || !parseTagValues(raw).length ? [`${name}: Enter at least one tag value.`] : []);
-  const customErrors = Object.entries(cfg.additionalBudgets ?? {}).filter(([key]) => !cfg.removedBudgets?.includes(key)).flatMap(([, budget]) => {
+  const customErrors = !tagsEnabled ? [] : Object.entries(cfg.additionalBudgets ?? {}).filter(([key]) => !cfg.removedBudgets?.includes(key)).flatMap(([, budget]) => {
     const error = customBudgetError(budget, budgetTagValues(model, budget.tagName)); return error ? [`${budget.name}: ${error}`] : [];
   });
-  const ownerError = ownerEmailError(ownerEmail(cfg));
+  const ownerError = tagsEnabled ? ownerEmailError(ownerEmail(cfg)) : null;
   const assignments = businessUnitAssignments(cfg);
-  const unitErrors = budgetTagValues(model, 'tag-lz-business-unit').filter((unit) => !Object.values(assignments).includes(unit)).map((unit) => `Business unit ${unit}: Assign at least one cost center.`);
-  const centerErrors = unassignedCostCenterErrors(cfg);
+  const unitErrors = !tagsEnabled ? [] : budgetTagValues(model, 'tag-lz-business-unit').filter((unit) => !Object.values(assignments).includes(unit)).map((unit) => `Business unit ${unit}: Assign at least one cost center.`);
+  const centerErrors = tagsEnabled ? unassignedCostCenterErrors(cfg) : [];
   return [...unitErrors, ...centerErrors, ...(ownerError ? [`tag-lz-owner: ${ownerError}`] : []), ...tagErrors, ...customErrors, ...(sharedError ? [`Budget alerts: ${sharedError}`] : []), ...keys.filter((key) => !cfg.removedBudgets?.includes(key)).flatMap((key) => {
     const budget = cfg.additionalBudgets?.[key] ?? cfg.budgets[key] ?? defaults.budgets[key];
     return fields.flatMap((field) => {
@@ -372,8 +383,12 @@ export function importCostGovernance(value: unknown, projectNames: string[] = []
   const fail = (): never => { throw new Error('Cannot import cost_governance: invalid or unsupported configuration.'); };
   const obj = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : fail();
   const cfg = obj(value);
-  if (Object.keys(cfg).some((key) => !['require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'tag_value_lists', 'additional_budgets', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units'].includes(key))) fail();
+  if (Object.keys(cfg).some((key) => !['enable_tags', 'require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'tag_value_lists', 'additional_budgets', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units'].includes(key))) fail();
   const result = defaultCostGovernance(projectNames);
+  if (cfg.enable_tags !== undefined) {
+    if (typeof cfg.enable_tags !== 'boolean') fail();
+    result.tagsEnabled = cfg.enable_tags as boolean;
+  }
   if (cfg.tag_resource_labels !== undefined) {
     if (typeof cfg.tag_resource_labels !== 'boolean') fail();
     result.tagResourceLabels = cfg.tag_resource_labels as boolean;

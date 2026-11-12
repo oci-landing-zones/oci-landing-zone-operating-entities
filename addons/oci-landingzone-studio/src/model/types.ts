@@ -50,6 +50,7 @@ export interface BusinessUnitScope {
 }
 
 export interface CostGovernance {
+  tagsEnabled?: boolean;
   tagResourceLabels?: boolean;
   ownerEmail?: string;
   costCenterBusinessUnits?: Record<string, string>;

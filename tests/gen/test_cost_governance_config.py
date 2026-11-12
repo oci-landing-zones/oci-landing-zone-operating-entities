@@ -12,6 +12,26 @@ class CostGovernanceConfigTests(unittest.TestCase):
         return json.loads(run_cmd([jsonnet_command(), '-e',
             "(import 'gen/landing_zone.libsonnet')(%s).governance" % json.dumps(config)]).stdout)
 
+    def test_disabled_tags_keep_role_tags_and_compartment_budget(self):
+        doc = self.render({'enable_tags': False})
+        self.assertNotIn('tagns-lz-cost-governance', json.dumps(doc))
+        self.assertIn('TAGNS-LZ-ROLE-KEY', doc['tags_configuration']['namespaces'])
+        self.assertEqual(['BUDGET-LANDINGZONE-KEY'], list(doc['budgets_configuration']['budgets']))
+
+    def test_disabled_tags_strip_nested_workload_assignments_only(self):
+        cost = 'tagns-lz-cost-governance.tag-lz-owner'
+        role = 'tagns-lz-role.tag-lz-role'
+        tags = {cost: 'owner@example.com', role: 'admin', 'customer.team': 'platform'}
+        doc = {'oke_configuration': {'worker_pools': {'POOL': {'node_defined_tags': tags}},
+            'clusters': {'CLUSTER': {'options': {'persistent_volume_config': {'defined_tags': tags}}}},
+            'default_defined_tags': {cost: 'owner@example.com'}}}
+        code = "(import 'gen/lib/cost_tags.libsonnet').apply(%s, {cost_governance: {enable_tags: false}})" % json.dumps(doc)
+        rendered = json.loads(run_cmd([jsonnet_command(), '-e', code]).stdout)['oke_configuration']
+        self.assertNotIn('default_defined_tags', rendered)
+        for actual in [rendered['worker_pools']['POOL']['node_defined_tags'],
+                       rendered['clusters']['CLUSTER']['options']['persistent_volume_config']['defined_tags']]:
+            self.assertEqual({role: 'admin', 'customer.team': 'platform'}, actual)
+
     def test_removed_business_unit_does_not_return_through_an_inherited_budget(self):
         doc = self.render({'tag_value_lists': {'tag-lz-business-unit': ['IT']}})
         budgets = doc['budgets_configuration']['budgets']
@@ -129,6 +149,7 @@ class CostGovernanceConfigTests(unittest.TestCase):
     def test_invalid_settings_fail_before_generation(self):
         for settings in [
             {'require_tag_values': 'true'},
+            {'enable_tags': 'false'},
             {'budget_recipients': 'a@.'},
             {'budget_recipients': 'a@b..com'},
             {'budgets': None},

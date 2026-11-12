@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeAll, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
-import { defaultCostGovernance, syncCostCenterBudgets, parseTagValues, businessUnitAssignments } from '../services/costGovernance';
+import { defaultCostGovernance, setFinOpsTagsEnabled, syncCostCenterBudgets, parseTagValues, businessUnitAssignments } from '../services/costGovernance';
 import { hubKindDefaults } from '../services/hubKinds';
 import { generateOutputs, generateFromConfigCode } from './generate';
 import { serializeConfig } from '../services/lzConfig';
@@ -13,6 +13,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function ready(model: ReturnType<typeof emptyLzModel>) {
   const cfg = model.foundation.costGovernance ?? defaultCostGovernance();
+  cfg.tagsEnabled = true;
   if (!cfg.recipients) cfg.recipients = 'finops@example.com';
   if (!cfg.useSingleRecipient) for (const budget of [...Object.values(cfg.budgets), ...Object.values(cfg.additionalBudgets ?? {})]) {
     if (!budget.recipients) budget.recipients = 'finops@example.com';
@@ -29,8 +30,7 @@ function ready(model: ReturnType<typeof emptyLzModel>) {
 it('generates user-required tags and edited inherited budgets from Studio with one shared email', async () => {
   const model = emptyLzModel(); model.environments = []; model.projects = [];
   model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
-  model.foundation.costGovernance = defaultCostGovernance();
-  model.foundation.costGovernance.requireTagValues = true;
+  model.foundation.costGovernance = setFinOpsTagsEnabled(model.foundation.costGovernance!, true);
   model.foundation.costGovernance.recipients = 'finops@example.com';
   Object.assign(model.foundation.costGovernance.budgets['BUDGET-LANDINGZONE-KEY'], { name: 'budget-team', amount: 12500, thresholdValue: 90 });
   const output = await generateOutputs(ready(model));
@@ -227,3 +227,26 @@ it('blocks JSON generation when notification emails are missing or still contain
   model.foundation.costGovernance.useSingleRecipient = false;
   await expect(generateOutputs(model)).rejects.toThrow('budget-landingzone (recipients): Enter at least one notification email address.');
 });
+
+it('omits FinOps tags and tag budgets by default while retaining role tags', async () => {
+  const model = emptyLzModel();
+  model.foundation.costGovernance!.recipients = 'finops@example.com'; model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  const output = await generateOutputs(model);
+  const gov = JSON.parse(output.files['governance.json']);
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY']).toBeUndefined();
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-ROLE-KEY']).toBeDefined();
+  expect(Object.keys(gov.budgets_configuration.budgets)).toEqual(['BUDGET-LANDINGZONE-KEY']);
+  expect(output.files['governance_pre.json']).toBeUndefined();
+  for (const text of Object.values(output.files)) expect(text).not.toContain('tagns-lz-cost-governance');
+  expect(output.files['iam.json']).toContain('tagns-lz-role.tag-lz-role');
+}, 60_000);
+
+it('omits FinOps tags from regional JSON when Home tagging is disabled', async () => {
+  const model = ready(emptyLzModel());
+  model.foundation.stackScope = 'regional'; model.foundation.region = 'eu-amsterdam-1'; model.foundation.regionShortName = 'ams'; model.foundation.homeRegion = 'eu-frankfurt-1';
+  Object.assign(model.foundation.costGovernance!, { tagsEnabled: false });
+  const output = await generateOutputs(model);
+  expect(output.files['governance.json']).toBeUndefined();
+  for (const text of Object.values(output.files)) expect(text).not.toContain('tagns-lz-cost-governance');
+}, 60_000);

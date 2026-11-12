@@ -269,6 +269,7 @@ export function importConfig(value: unknown): ImportedConfig {
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
   if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model), model);
+  else delete model.foundation.costGovernance;
   const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {
