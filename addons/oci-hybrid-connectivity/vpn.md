@@ -146,6 +146,108 @@ Defines the IPSec connection with two tunnels and respective BGP information, an
                     },
 
 
+#### Example JSON Configuration
+
+The following JSON configuration blocks illustrate the settings required in the `network.json` file to implement the Site-to-Site VPN connectivity described in the architecture diagram above.
+
+The example consists of three configuration blocks: Customer-Premises Equipment (CPE), a custom DRG route table, and an IPSec connection with two BGP-enabled tunnels.
+
+#### 1. Customer-Premises Equipment (CPE)
+
+This block defines the Customer-Premises Equipment (CPE), including its display name, public IP address, and device vendor. In this example, the CPE vendor is set to `Other`.
+
+```json
+"customer_premises_equipments": {
+    "CPE-FRA-LZ-ONPREM-KEY": {
+        "display_name": "cpe-fra-lz-onprem",
+        "ip_address": "203.0.113.5",
+        "cpe_device_shape_vendor_name": "Other"
+    }
+},
+```
+
+#### 2. Custom DRG Route Table
+
+This block defines the custom DRG route table used to control the routing of traffic entering the DRG from the remote network through the IPSec VPN tunnels.
+
+The route table, `drgrt-fra-lz-hc`, contains route rules that direct traffic destined for the hub, pre-production, and production VCN CIDR blocks to the hub VCN attachment (`DRGATT-FRA-LZ-HUB-VCN-KEY`), allowing traffic to follow the hub's routing and firewall inspection path.
+
+Equal-Cost Multi-Path (ECMP) routing is disabled in this example.
+
+```json
+"DRGRT-FRA-LZ-HUB-HC-KEY": {
+    "display_name": "drgrt-fra-lz-hc",
+    "is_ecmp_enabled": false,
+
+    "route_rules": {
+        "rr-hybrid-hc-hub": {
+            "destination": "10.0.0.0/21",
+            "destination_type": "CIDR_BLOCK",
+            "next_hop_drg_attachment_key": "DRGATT-FRA-LZ-HUB-VCN-KEY"
+        },
+
+        "rr-hybrid-hc-preprod": {
+            "destination": "10.0.128.0/21",
+            "destination_type": "CIDR_BLOCK",
+            "next_hop_drg_attachment_key": "DRGATT-FRA-LZ-HUB-VCN-KEY"
+        },
+
+        "rr-hybrid-hc-prod": {
+            "destination": "10.0.64.0/21",
+            "destination_type": "CIDR_BLOCK",
+            "next_hop_drg_attachment_key": "DRGATT-FRA-LZ-HUB-VCN-KEY"
+        }
+    }
+},
+```
+
+#### 3. IPSec Connection and BGP Tunnel Configuration
+
+This block defines the Site-to-Site IPSec VPN connection, including references to the previously defined CPE and the Landing Zone DRG.
+
+The connection includes two IPSec tunnels, both configured with **IKEv2** and **BGP dynamic routing**. Each tunnel specifies the customer BGP Autonomous System Number (ASN) and the IPv4 interface addresses used to establish the BGP session between OCI and the remote network.
+
+Both tunnels reference the custom DRG route table (`DRGRT-FRA-LZ-HUB-HC-KEY`) defined in the previous block, ensuring that traffic entering the DRG through either tunnel follows the specified routing rules.
+
+```json
+"ipsecs": {
+    "IPSEC-FRA-LZ-ONPREM-KEY": {
+        "display_name": "ipsec-fra-lz-onprem",
+        "cpe_key": "CPE-FRA-LZ-ONPREM-KEY",
+        "drg_key": "DRG-FRA-LZ-HUB-KEY",
+        "static_routes": ["172.20.0.0/16"],
+
+        "tunnels_management": {
+            "tunnel_1": {
+                "drg_route_table_id": "DRGRT-FRA-LZ-HUB-HC-KEY",
+                "ike_version": "V2",
+                "routing": "BGP",
+
+                "bgp_session_info": {
+                    "customer_bgp_asn": "65001",
+                    "customer_interface_ip": "172.20.1.1/30",
+                    "oracle_interface_ip": "172.20.1.2/30"
+                }
+            },
+
+            "tunnel_2": {
+                "drg_route_table_id": "DRGRT-FRA-LZ-HUB-HC-KEY",
+                "ike_version": "V2",
+                "routing": "BGP",
+
+                "bgp_session_info": {
+                    "customer_bgp_asn": "65001",
+                    "customer_interface_ip": "172.20.1.5/30",
+                    "oracle_interface_ip": "172.20.1.6/30"
+                }
+            }
+        }
+    }
+},
+```
+
+**Note:** The configuration values shown above are examples based on the reference architecture. Update the CPE public IP address, BGP parameters, network CIDR blocks, and resource references to match your environment. The configuration blocks must be included in their corresponding sections of the `network.json` file before being used for Terraform deployment.
+
 &nbsp;
 
 ---
