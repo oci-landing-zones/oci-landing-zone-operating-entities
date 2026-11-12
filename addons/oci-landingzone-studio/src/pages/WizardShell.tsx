@@ -140,8 +140,9 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
   const tagsEnabled = (homeSource?.model ?? model).foundation.costGovernance?.tagsEnabled !== false;
   const tagsOpen = activeStep === 5 && tagsEnabled && viewMode === 'diagram' && diagramWorkspace === 'tags';
-  const showGovernanceReference = activeStep === 5 && !tagsOpen;
-  const workspaceView = showGovernanceReference ? 'form' : viewMode;
+  const governanceForm = activeStep === 5 && !tagsOpen;
+  const showGovernanceReference = governanceForm && tagsEnabled;
+  const workspaceView = governanceForm ? 'form' : viewMode;
   const showForm = workspaceView === 'split' || workspaceView === 'form';
   const showDiagram = workspaceView === 'split' || workspaceView === 'diagram';
   function changeStep(step: number) {
@@ -376,7 +377,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {showForm && (
               <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={workspaceView === 'split' ? 0 : undefined}
                 {...editorInputHandlers}
-                style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
+                style={{ display: 'grid', gap: 14, alignContent: 'start', ...(governanceForm ? { maxWidth: 720, width: '100%' } : {}) }}>
                 {activeStep === 1 ? (
                   <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
                 ) : activeStep === 2 ? (
