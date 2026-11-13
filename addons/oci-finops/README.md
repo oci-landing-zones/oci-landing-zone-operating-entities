@@ -129,10 +129,12 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 4. **Create OAC and configure reporting.**
 
-   - **A.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service.
-   - **B.** [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md).
-   - **C.** [Configure consumer access](installation-guide/oac/oac-user-onboarding.md).
-   - **D. Optional:** [Index datasets and enable AI Assistant](installation-guide/oac/oac-ai-assistant-consumers.md).
+   <ol type="A">
+     <li><a href="installation-guide/oac/oac-service-setup.md">Create the OAC instance manually and prepare ADB connectivity</a>, or reuse an existing service.</li>
+     <li><a href="installation-guide/oac/oac-workbook-import.md">Import the workbook and configure its database connection</a>.</li>
+     <li><a href="installation-guide/oac/oac-user-onboarding.md">Configure consumer access</a>.</li>
+     <li><strong>Optional:</strong> <a href="installation-guide/oac/oac-ai-assistant-consumers.md">Index datasets and enable AI Assistant</a>.</li>
+   </ol>
 
 ## License
 
