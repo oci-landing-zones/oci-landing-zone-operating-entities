@@ -65,7 +65,7 @@ Allow dynamic-group <ADB_DYNAMIC_GROUP> to inspect tenancies in tenancy
 
 The permission mapping is documented in Oracle's [IAM API reference](https://docs.oracle.com/en-us/iaas/Content/Identity/policyreference/iampolicyreference.htm). The source uses namespace `bling`, the customer tenancy OCID as the report bucket name and the home region; see Oracle's [report storage description](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/download-cost-usage-report.htm).
 
-**Realm scope:** verify the actual tenancy realm. This example covers OC1 only. The current installer has no realm-selection setting and constructs `oraclecloud.com` endpoints; do not reuse the OC1 reporting-tenancy identifier for another realm or assume that this guide establishes support for it.
+**Realm scope:** verify the actual tenancy realm. This example covers OC1 only. The bucket configurator resolves the endpoint domain for the authenticated tenancy realm. For another realm, obtain and validate its reporting-tenancy endorsement; do not reuse the OC1 reporting-tenancy identifier. Realm-aware bucket URLs do not establish compatibility of every module API in that realm.
 
 ### 2.2 Customer-owned report bucket
 

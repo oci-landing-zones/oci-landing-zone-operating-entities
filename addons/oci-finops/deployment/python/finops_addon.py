@@ -189,6 +189,112 @@ def verify_customer_bucket(oci_module, sdk_config: dict, signer, source: dict) -
         ) from exc
 
 
+
+def tenancy_identity(sdk_config: dict, signer) -> tuple[str, str]:
+    tenancy = sdk_config.get("tenancy") or getattr(signer, "tenancy_id", None)
+    match = re.fullmatch(r"ocid1[.]tenancy[.](oc[0-9]+)[.][A-Za-z0-9._-]+", str(tenancy or ""))
+    if not match:
+        raise DeploymentError("Could not determine the authenticated tenancy OCID.")
+    return tenancy, match.group(1)
+
+
+def resolve_bucket_region(oci_module, region: str, tenancy_realm: str) -> str:
+    region = resolve_oci_region(oci_module, region)
+    if oci_module.regions.get_realm_from_region(region) != tenancy_realm:
+        raise DeploymentError("The bucket region must belong to the authenticated tenancy's realm.")
+    return region
+
+
+def discover_focus_bucket_defaults(oci_module, sdk_config: dict, signer) -> dict:
+    tenancy, realm = tenancy_identity(sdk_config, signer)
+    try:
+        client = (oci_module.identity.IdentityClient(sdk_config, signer=signer)
+                  if signer else oci_module.identity.IdentityClient(sdk_config))
+        homes = [r.region_name for r in client.list_region_subscriptions(tenancy).data
+                 if r.is_home_region]
+        if len(homes) != 1:
+            raise DeploymentError("Could not determine exactly one tenancy home region.")
+        region = resolve_bucket_region(oci_module, homes[0], realm)
+        domain = oci_module.regions.REALMS[realm]
+    except DeploymentError:
+        raise
+    except Exception as exc:
+        raise DeploymentError("Could not discover the report defaults; check tenancy/region read access.") from exc
+    return {"region": region, "namespace": "bling", "bucket": tenancy,
+            "prefix": "FOCUS Reports", "realm_domain": domain}
+
+
+def verify_focus_bucket(oci_module, sdk_config: dict, signer, source: dict) -> None:
+    if source["namespace"] != "bling":
+        verify_customer_bucket(oci_module, sdk_config, signer, source)
+        return
+    bucket_config = dict(sdk_config, region=source["region"])
+    try:
+        client = (oci_module.object_storage.ObjectStorageClient(bucket_config, signer=signer)
+                  if signer else oci_module.object_storage.ObjectStorageClient(bucket_config))
+        # Oracle reporting access grants object reads, not bucket metadata reads.
+        client.list_objects(source["namespace"], source["bucket"],
+                            prefix=source["prefix"].strip("/") + "/" if source["prefix"] else "",
+                            limit=1)
+    except Exception as exc:
+        raise DeploymentError("Could not list the report bucket; check its location and operator object-read permission.") from exc
+
+
+def configure_focus_source(oci_module, sdk_config: dict, signer) -> dict:
+    defaults = discover_focus_bucket_defaults(oci_module, sdk_config, signer)
+    _, realm = tenancy_identity(sdk_config, signer)
+    print("\n3. FOCUS report bucket")
+    print("Defaults: Oracle-managed reports. Edit for your own bucket.")
+    print("Expected layout: <prefix>/<year>/.../*.csv.gz")
+    while True:
+        source = {
+            "region": prompt_validated_value(
+                "Bucket region", lambda v: resolve_bucket_region(oci_module, v, realm), defaults["region"]),
+            "namespace": prompt_validated_value(
+                "Object Storage namespace", lambda v: require_pattern(
+                    v, r"[A-Za-z0-9][A-Za-z0-9.-]{0,254}", "enter a valid namespace."),
+                defaults["namespace"]),
+            "bucket": prompt_validated_value(
+                "Bucket name", lambda v: require_pattern(
+                    v, r"[A-Za-z0-9][A-Za-z0-9._-]{0,254}", "enter a valid bucket name."),
+                defaults["bucket"]),
+            "prefix": prompt_validated_value(
+                "Reports prefix (/ for bucket root)", validate_bucket_prefix,
+                defaults["prefix"], required=False),
+            "realm_domain": defaults["realm_domain"],
+        }
+        source["mode"] = "ORACLE_MANAGED" if source["namespace"] == "bling" else "CUSTOM_BUCKET"
+        try:
+            verify_focus_bucket(oci_module, sdk_config, signer, source)
+            print("Bucket access verified. ADB access is checked during installation.")
+            return source
+        except DeploymentError as exc:
+            print(exc)
+            if not prompt_yes_no("Re-enter bucket settings?", True):
+                raise
+            defaults.update(source)
+
+
+def resolved_focus_source(config: dict) -> dict:
+    """Resolve legacy defaults and derive the endpoint domain from the OCI SDK."""
+    source = dict(config["focus_source"])
+    db = config["database"]
+    oci_module, sdk_config, signer = load_oci_sdk(
+        db["oci_auth_method"], db.get("oci_profile", ""), db["oci_region"])
+    _, realm = tenancy_identity(sdk_config, signer)
+    if source.get("mode") == "ORACLE_MANAGED" and not all(
+            source.get(k) for k in ("region", "namespace", "bucket")):
+        defaults = discover_focus_bucket_defaults(oci_module, sdk_config, signer)
+        for key, value in defaults.items():
+            if not source.get(key):
+                source[key] = value
+    source["region"] = resolve_bucket_region(oci_module, source["region"], realm)
+    source["realm_domain"] = oci_module.regions.REALMS[realm]
+    source["mode"] = "ORACLE_MANAGED" if source["namespace"] == "bling" else "CUSTOM_BUCKET"
+    source["prefix"] = validate_bucket_prefix(source.get("prefix", ""))
+    return source
+
+
 def verify_notifications_topic(oci_module, sdk_config: dict, signer, topic_id: str) -> str:
     match = re.fullmatch(r"ocid1\.onstopic\.oc1\.([a-z0-9-]+)\.[A-Za-z0-9_-]+", topic_id)
     if not match:
@@ -233,7 +339,6 @@ def configure_interactive(path: Path) -> dict:
         raise DeploymentError(f"Could not load the database configuration template: {exc}") from exc
 
     db = config["database"]
-    source = config["focus_source"]
     settings = config["settings"]
     print("FinOps Platform database installer")
     print("This installer installs the FinOps add-on in an existing ADB supplied by the Landing Zone.")
@@ -310,50 +415,7 @@ def configure_interactive(path: Path) -> dict:
         "The installer does not change the descriptor or test database connectivity."
     )
 
-    print("\n3. FOCUS Reports source")
-    print("  1. Oracle-managed FOCUS Reports bucket (automatic discovery)")
-    print("  2. Customer Object Storage bucket")
-    source_selection = prompt_validated_value(
-        "Select the FOCUS report source",
-        lambda value: require_choice(value, ("1", "2"), "choose 1 or 2."),
-        "1",
-    )
-    source["mode"] = "ORACLE_MANAGED" if source_selection == "1" else "CUSTOM_BUCKET"
-    if source["mode"] == "CUSTOM_BUCKET":
-        while True:
-            source["region"] = prompt_validated_value(
-                "Customer bucket Object Storage region (full region name or short key)",
-                lambda value: resolve_oci_region(oci_module, value),
-                db["oci_region"],
-            )
-            source["namespace"] = prompt_validated_value(
-                "Customer bucket Object Storage namespace",
-                lambda value: require_pattern(
-                    value, r"[A-Za-z0-9][A-Za-z0-9.-]{0,254}", "enter a valid Object Storage namespace."
-                ),
-            )
-            source["bucket"] = prompt_validated_value(
-                "Customer bucket name",
-                lambda value: require_pattern(
-                    value, r"[A-Za-z0-9][A-Za-z0-9._-]{0,254}", "enter a valid bucket name."
-                ),
-            )
-            source["prefix"] = prompt_validated_value(
-                "Optional base prefix (leave blank for bucket root)",
-                validate_bucket_prefix,
-                "",
-                required=False,
-            )
-            try:
-                verify_customer_bucket(oci_module, sdk_config, signer, source)
-                print("Customer bucket exists and is accessible. The optional prefix may be empty or not yet populated.")
-                break
-            except DeploymentError as exc:
-                print(exc)
-                if not prompt_yes_no("Re-enter the customer bucket settings?", True):
-                    raise DeploymentError("Customer bucket configuration was not verified; no configuration was saved.") from exc
-    else:
-        source.update({"region": "", "namespace": "", "bucket": "", "prefix": ""})
+    config["focus_source"] = configure_focus_source(oci_module, sdk_config, signer)
     settings["first_focus_year"] = prompt_integer(
         "First FOCUS year to load", settings["first_focus_year"], 2024, datetime.now(timezone.utc).year
     )
@@ -794,7 +856,7 @@ def validate_database_config(config: dict) -> list[str]:
     source_mode = str(source.get("mode", "")).upper()
     if source_mode not in ("ORACLE_MANAGED", "CUSTOM_BUCKET"):
         errors.append("focus_source.mode must be ORACLE_MANAGED or CUSTOM_BUCKET.")
-    elif source_mode == "CUSTOM_BUCKET":
+    elif source_mode == "CUSTOM_BUCKET" or any(source.get(k) for k in ("region", "namespace", "bucket")):
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)+", str(source.get("region", "")), re.IGNORECASE):
             errors.append("focus_source.region must be an OCI region name.")
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]{0,254}", str(source.get("namespace", ""))):
@@ -906,7 +968,7 @@ def build_runtime_config(config: dict) -> dict:
             "tns_admin": db["tns_admin"],
             "focusplatform_secret_id": db["focusplatform_password_secret_id"],
             "oac_reader_secret_id": db["oac_reader_password_secret_id"],
-            "oci_focus_source": config["focus_source"],
+            "oci_focus_source": resolved_focus_source(config),
             "first_focus_year": settings["first_focus_year"],
             "notifications_topic_ocid": settings.get("notifications_topic_ocid", ""),
             "scheduler_time_zone": settings["scheduler_time_zone"],
@@ -1029,84 +1091,35 @@ def build_focus_object_storage_probe_sql(source: dict) -> str:
     def sql_literal(value: str) -> str:
         return "'" + str(value).replace("'", "''") + "'"
 
-    mode = str(source.get("mode", "")).upper()
-    if mode not in ("ORACLE_MANAGED", "CUSTOM_BUCKET"):
-        raise DeploymentError("FOCUS source mode must be ORACLE_MANAGED or CUSTOM_BUCKET.")
-    source_region = sql_literal(source.get("region", ""))
-    namespace = sql_literal(source.get("namespace", ""))
-    bucket = sql_literal(source.get("bucket", ""))
-    prefix = sql_literal(source.get("prefix", ""))
+    for key in ("region", "namespace", "bucket", "realm_domain"):
+        if not source.get(key):
+            raise DeploymentError(f"Missing resolved FOCUS bucket field: {key}.")
+    if not re.fullmatch(r"[a-z0-9]+(?:[.-][a-z0-9]+)*", source["realm_domain"]):
+        raise DeploymentError("Invalid Object Storage realm domain.")
     return f"""SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER OSERROR EXIT FAILURE
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 DECLARE
-  L_MODE VARCHAR2(30) := {sql_literal(mode)};
-  L_REGION VARCHAR2(64) := {source_region};
-  L_NAMESPACE VARCHAR2(255) := {namespace};
-  L_BUCKET VARCHAR2(256) := {bucket};
-  L_PREFIX_URI VARCHAR2(1000) := {prefix};
-  L_PREFIX VARCHAR2(1000);
-  L_TENANCY VARCHAR2(512);
-  L_ADB_REGION VARCHAR2(64);
-  L_HOME_REGION VARCHAR2(64);
-  L_HOME_COUNT NUMBER;
-  L_BODY CLOB;
+  L_REGION VARCHAR2(64) := {sql_literal(source["region"])};
+  L_NAMESPACE VARCHAR2(255) := {sql_literal(source["namespace"])};
+  L_BUCKET VARCHAR2(256) := {sql_literal(source["bucket"])};
+  L_DOMAIN VARCHAR2(255) := {sql_literal(source["realm_domain"])};
+  L_PREFIX VARCHAR2(1000) := {sql_literal(source.get("prefix", "").strip("/"))};
   L_URI VARCHAR2(4000);
   L_RESPONSE DBMS_CLOUD_TYPES.RESP;
 BEGIN
-  SELECT LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.TENANT_OCID')),
-         LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.REGION'))
-    INTO L_TENANCY,L_ADB_REGION FROM V$PDBS
-   WHERE CON_ID=TO_NUMBER(SYS_CONTEXT('USERENV','CON_ID'));
-  IF NOT REGEXP_LIKE(L_TENANCY,'^ocid1\\.tenancy\\.') OR
-     NOT REGEXP_LIKE(L_ADB_REGION,'^[a-z0-9]+(-[a-z0-9]+)+$') THEN
-    RAISE_APPLICATION_ERROR(-20880,'ADB tenancy identity is unavailable');
-  END IF;
-  IF L_MODE='ORACLE_MANAGED' THEN
-    L_RESPONSE:=DBMS_CLOUD.SEND_REQUEST(
-      CREDENTIAL_NAME=>'OCI$RESOURCE_PRINCIPAL',
-      URI=>'https://identity.'||L_ADB_REGION||
-        '.oci.oraclecloud.com/20160918/tenancies/'||L_TENANCY||
-        '/regionSubscriptions',
-      METHOD=>DBMS_CLOUD.METHOD_GET,TIMEOUT=>120);
-    IF DBMS_CLOUD.GET_RESPONSE_STATUS_CODE(L_RESPONSE)<>200 THEN
-      RAISE_APPLICATION_ERROR(-20881,'Identity region-subscription API HTTP '||
-        DBMS_CLOUD.GET_RESPONSE_STATUS_CODE(L_RESPONSE));
-    END IF;
-    L_BODY:=DBMS_CLOUD.GET_RESPONSE_TEXT(L_RESPONSE);
-    SELECT COUNT(*),MAX(REGION_NAME) INTO L_HOME_COUNT,L_HOME_REGION
-      FROM JSON_TABLE(L_BODY,'$[*]' COLUMNS (
-        IS_HOME VARCHAR2(5) PATH '$.isHomeRegion',
-        REGION_NAME VARCHAR2(64) PATH '$.regionName'))
-     WHERE LOWER(IS_HOME)='true';
-    IF L_HOME_COUNT<>1 OR L_HOME_REGION IS NULL THEN
-      RAISE_APPLICATION_ERROR(-20882,'Could not determine the tenancy home region');
-    END IF;
-    L_REGION:=LOWER(L_HOME_REGION);
-    L_NAMESPACE:='bling';
-    L_BUCKET:=L_TENANCY;
-    L_PREFIX:='FOCUS Reports';
-  ELSE
-    IF NOT REGEXP_LIKE(L_REGION,'^[a-z0-9]+(-[a-z0-9]+)+$') OR
-       NOT REGEXP_LIKE(L_NAMESPACE,'^[A-Za-z0-9][A-Za-z0-9.-]{{0,254}}$') OR
-       NOT REGEXP_LIKE(L_BUCKET,'^[A-Za-z0-9][A-Za-z0-9._-]{{0,254}}$') THEN
-      RAISE_APPLICATION_ERROR(-20883,'Configured FOCUS bucket details are invalid');
-    END IF;
-    IF TRIM(L_PREFIX_URI) IS NOT NULL THEN
-      L_PREFIX:=UTL_URL.UNESCAPE(L_PREFIX_URI,'AL32UTF8');
-    END IF;
-  END IF;
-  L_URI:='https://objectstorage.'||L_REGION||
-    '.oraclecloud.com/n/'||L_NAMESPACE||'/b/'||L_BUCKET||'/o?';
+  L_URI := 'https://objectstorage.' || L_REGION || '.' || L_DOMAIN ||
+    '/n/' || L_NAMESPACE || '/b/' || L_BUCKET || '/o?';
   IF L_PREFIX IS NOT NULL THEN
-    L_URI:=L_URI||'prefix='||UTL_URL.ESCAPE(L_PREFIX,TRUE,'AL32UTF8')||'&';
+    L_URI := L_URI || 'prefix=' ||
+      UTL_URL.ESCAPE(L_PREFIX || '/', TRUE, 'AL32UTF8') || CHR(38);
   END IF;
-  L_URI:=L_URI||'delimiter=%2F&limit=1';
-  L_RESPONSE:=DBMS_CLOUD.SEND_REQUEST(
-    CREDENTIAL_NAME=>'OCI$RESOURCE_PRINCIPAL',URI=>L_URI,
-    METHOD=>DBMS_CLOUD.METHOD_GET,TIMEOUT=>120);
+  L_URI := L_URI || 'delimiter=%2F' || CHR(38) || 'limit=1';
+  L_RESPONSE := DBMS_CLOUD.SEND_REQUEST(
+    CREDENTIAL_NAME=>'OCI$RESOURCE_PRINCIPAL', URI=>L_URI,
+    METHOD=>DBMS_CLOUD.METHOD_GET, TIMEOUT=>120);
   IF DBMS_CLOUD.GET_RESPONSE_STATUS_CODE(L_RESPONSE)<>200 THEN
-    RAISE_APPLICATION_ERROR(-20884,'FOCUS Object Storage ListObjects HTTP '||
+    RAISE_APPLICATION_ERROR(-20884, 'FOCUS Object Storage ListObjects HTTP ' ||
       DBMS_CLOUD.GET_RESPONSE_STATUS_CODE(L_RESPONSE));
   END IF;
   DBMS_OUTPUT.PUT_LINE('FOCUS Object Storage preflight passed (HTTP 200)');

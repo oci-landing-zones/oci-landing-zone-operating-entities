@@ -14,9 +14,9 @@
   "focus_source": {
     "mode": "ORACLE_MANAGED",
     "region": "",
-    "namespace": "",
+    "namespace": "bling",
     "bucket": "",
-    "prefix": ""
+    "prefix": "FOCUS Reports"
   },
   "settings": {
     "first_focus_year": 2024,

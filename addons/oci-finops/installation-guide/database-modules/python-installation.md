@@ -10,7 +10,8 @@ Complete the [database prerequisites](../configuration.md#database-prerequisites
 - [Wallet and files prepared by Python](#wallet-and-files-prepared-by-python)
 - [Installation host requirements](#installation-host-requirements)
 - [Supported Python authentication](#supported-python-authentication)
-- [Customer bucket metadata access](#customer-bucket-metadata-access)
+- [FOCUS report source](#focus-report-source)
+- [Bucket access for the installation operator](#bucket-access-for-the-installation-operator)
 - [Configure, validate and install](#configure-validate-and-install)
 - [Verify installation and read-only status](#verify-installation-and-read-only-status)
   - [Module verification and background results](#module-verification-and-background-results)
@@ -89,15 +90,46 @@ Choose one supported OCI authentication method in the configurator. Prepare its 
 
 These methods authenticate the Python process. The ADB Resource Principal used by installed SQL is separate and still needs its own IAM authorization. Passwords, signing keys, session tokens and wallets stay outside the repository.
 
-## Customer bucket metadata access
+## FOCUS report source
 
-Only when selecting a customer-owned FOCUS bucket, Python `configure` calls `GetBucket` with the installation operator's identity. Check that identity has bucket-metadata access, separately from the ADB's object-read permission. For a user-group identity, an example scoped to that bucket is:
+The configurator uses one editable form for both Oracle-managed reports and your own bucket. Defaults point to Oracle-managed FOCUS reports:
+
+| Field | Default | Can be changed? |
+| --- | --- | --- |
+| Bucket region | Authenticated tenancy's home region, discovered through Identity | Yes, to another region in the same realm. |
+| Object Storage namespace | `bling` | Yes, for your own bucket. |
+| Bucket name | Authenticated tenancy OCID | Yes. |
+| Reports prefix | `FOCUS Reports/` | Yes; enter `/` for the bucket root. |
+
+Enter prefixes as plain text, not URL-encoded text. The installer encodes them when building URLs. The OCI SDK resolves the realm domain from the region; no realm question is required. The operator needs access to list the tenancy's region subscriptions to discover its home region. Existing configurations using empty Oracle-managed defaults are resolved before execution.
+
+The `bling` namespace selects the Oracle-managed year/month/day layout. Oracle documents the default namespace, bucket and [FOCUS report structure](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/list-cost-usage-report.htm). Confirm the selected prefix actually contains FOCUS reports; a successful empty listing does not establish report availability.
+
+### Required layout for your own bucket
+
+Place four-digit year folders immediately below the chosen prefix, or at the bucket root when no prefix is selected:
+
+```text
+<optional-prefix>/
+└── 2026/
+    ├── report.csv.gz
+    └── optional-subfolders/
+        └── another-report.csv.gz
+```
+
+Files must be gzip-compressed CSVs compatible with this module's OCI FOCUS column order and timestamp formats; see the [ingestion contract](../../design/02-oci-ingestion.md). Arbitrary CSVs or another provider's FOCUS variant are not automatically mapped. At least one year folder must be discoverable before installation. Subfolders below the year are optional for your own bucket.
+
+One pipeline is created per selected year, preventing different yearly pipelines from selecting the same object. For Oracle-managed reports, its location ends in `/<prefix>/<year>/*/*/*.csv.gz`. For your own bucket, it uses `/<prefix>/<year>/.*[.]csv[.]gz` with `regexuri=true` to match compressed CSVs at any depth below that year. The prefix is omitted from either pattern when it is empty.
+
+## Bucket access for the installation operator
+
+Python checks the location with the operator's identity. For Oracle-managed reports it calls `ListObjects`; no `GetBucket` permission is required. For your own bucket it calls `GetBucket` to verify metadata access. For a user-group identity, an example scoped to that bucket is:
 
 ```text
 Allow group <INSTALLER_USER_GROUP> to read buckets in compartment id <BUCKET_COMPARTMENT_OCID> where target.bucket.name = '<BUCKET_NAME>'
 ```
 
-For Instance Principal, use the installation Compute instance's authorized dynamic group instead. Reuse existing equivalent permissions. This operator-side check does not establish ADB report access. See Oracle's [Object Storage API permission mapping](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm).
+For Instance Principal, use the installation Compute instance's authorized dynamic group instead. Reuse existing equivalent permissions. These checks do not establish ADB report access: installation separately checks listing with the ADB Resource Principal and discovers year folders. See Oracle's [Object Storage API permission mapping](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm).
 
 ## Configure, validate and install
 
@@ -112,7 +144,7 @@ python deployment/python/finops_addon.py install
 
 | Command | Result |
 | --- | --- |
-| `configure` | Discovers named resources, prepares wallet/alias, collects FOCUS source/first year, optional Notifications topic, scheduler time zone and optional modules, then saves local choices. |
+| `configure` | Discovers named resources, prepares wallet/alias, collects the report bucket/first year, optional Notifications topic, scheduler time zone and optional modules, then saves local choices. |
 | `validate` | Reads the ADMIN Secret and checks a read-only SQL*Plus connection through the alias. Complete private connectivity first. |
 | `install` | Confirms before DDL, creates schema/reader, checks Resource Principal APIs and runs mandatory plus selected optional module SQL. |
 

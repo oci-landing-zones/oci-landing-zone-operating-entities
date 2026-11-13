@@ -124,6 +124,7 @@ VARIABLE source_location_base VARCHAR2(4000)
 DECLARE
   L_SOURCE_MODE VARCHAR2(30) := UPPER(JSON_VALUE(:fp_install_config,'$.focus_source.mode' ERROR ON ERROR));
   L_SOURCE_REGION VARCHAR2(64);
+  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.focus_source.realm_domain' ERROR ON ERROR);
   L_SOURCE_NAMESPACE VARCHAR2(255);
   L_SOURCE_BUCKET VARCHAR2(256);
   L_SOURCE_PREFIX_REGEX VARCHAR2(3000);
@@ -171,8 +172,19 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20983,
       'Invalid REGION or TENANT_OCID in V$PDBS.CLOUD_IDENTITY');
   END IF;
-  IF L_SOURCE_MODE = 'ORACLE_MANAGED' THEN
-    -- Preserve the current Oracle-managed bucket discovery and URL.
+  IF L_REALM_DOMAIN IS NULL THEN
+    IF REGEXP_SUBSTR(L_TENANCY_OCID, '[^.]+', 1, 3) <> 'oc1' THEN
+      RAISE_APPLICATION_ERROR(-20990,
+        'Resolve the source realm domain with the Python installer before ingestion');
+    END IF;
+    L_REALM_DOMAIN := 'oraclecloud.com';
+  END IF;
+  IF NOT REGEXP_LIKE(L_REALM_DOMAIN, '^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
+    RAISE_APPLICATION_ERROR(-20990, 'Invalid source realm domain');
+  END IF;
+  IF L_SOURCE_MODE = 'ORACLE_MANAGED' AND
+     JSON_VALUE(:fp_install_config,'$.focus_source.region' ERROR ON ERROR) IS NULL THEN
+    -- Legacy configuration: discover the original Oracle-managed defaults.
     L_SOURCE_NAMESPACE := 'bling';
     L_SOURCE_BUCKET := L_TENANCY_OCID;
     L_SOURCE_PREFIX_RAW := 'FOCUS Reports';
@@ -182,7 +194,7 @@ BEGIN
     L_RESPONSE := DBMS_CLOUD.SEND_REQUEST(
       CREDENTIAL_NAME => 'OCI' || CHR(36) || 'RESOURCE_PRINCIPAL',
       URI => 'https://identity.' || L_ADB_REGION ||
-        '.oci.oraclecloud.com/20160918/tenancies/' || L_TENANCY_OCID ||
+        '.oci.' || L_REALM_DOMAIN || '/20160918/tenancies/' || L_TENANCY_OCID ||
         '/regionSubscriptions',
       METHOD => DBMS_CLOUD.METHOD_GET,
       TIMEOUT => 120);
@@ -209,7 +221,8 @@ BEGIN
     L_SOURCE_NAMESPACE := JSON_VALUE(:fp_install_config,'$.focus_source.namespace' ERROR ON ERROR);
     L_SOURCE_BUCKET := JSON_VALUE(:fp_install_config,'$.focus_source.bucket' ERROR ON ERROR);
     L_SOURCE_PREFIX_URI := NVL(JSON_VALUE(:fp_install_config,'$.focus_source.prefix' ERROR ON ERROR),'NONE');
-    IF UPPER(L_SOURCE_REGION) = 'NONE' OR
+    IF L_SOURCE_REGION IS NULL OR L_SOURCE_NAMESPACE IS NULL OR L_SOURCE_BUCKET IS NULL OR
+       UPPER(L_SOURCE_REGION) = 'NONE' OR
        NOT REGEXP_LIKE(L_SOURCE_REGION, '^[a-z0-9]+(-[a-z0-9]+)+$') OR
        UPPER(L_SOURCE_NAMESPACE) = 'NONE' OR
        NOT REGEXP_LIKE(L_SOURCE_NAMESPACE, '^[A-Za-z0-9][A-Za-z0-9.-]{0,254}$') OR
@@ -220,7 +233,7 @@ BEGIN
          NOT REGEXP_LIKE(L_SOURCE_PREFIX_URI,
            '^([A-Za-z0-9._~/-]|%[0-9A-Fa-f][0-9A-Fa-f])*$'))) THEN
       RAISE_APPLICATION_ERROR(-20990,
-        'Customer bucket settings are invalid; use a region, namespace, bucket, and URL-encoded prefix');
+        'FOCUS bucket settings are invalid; use a region, namespace, bucket, and URL-encoded prefix');
     END IF;
     IF UPPER(L_SOURCE_PREFIX_URI) = 'NONE' THEN
       L_SOURCE_PREFIX_URI := NULL;
@@ -232,10 +245,13 @@ BEGIN
   END IF;
 
   L_LISTING_BASE_URI := 'https://objectstorage.' || L_SOURCE_REGION ||
-    '.oraclecloud.com/n/' || L_SOURCE_NAMESPACE || '/b/' || L_SOURCE_BUCKET || '/o';
+    '.' || L_REALM_DOMAIN || '/n/' || L_SOURCE_NAMESPACE || '/b/' || L_SOURCE_BUCKET || '/o';
   IF L_SOURCE_MODE = 'ORACLE_MANAGED' THEN
-    L_SOURCE_LOCATION_BASE := L_LISTING_BASE_URI || '/FOCUS%20Reports/';
-    L_LIST_PREFIX := 'FOCUS%20Reports%2F';
+    L_SOURCE_LOCATION_BASE := L_LISTING_BASE_URI || '/' ||
+      CASE WHEN L_SOURCE_PREFIX_URI IS NOT NULL THEN L_SOURCE_PREFIX_URI || '/' END;
+    IF L_SOURCE_PREFIX_URI IS NOT NULL THEN
+      L_LIST_PREFIX := REPLACE(L_SOURCE_PREFIX_URI, '/', '%2F') || '%2F';
+    END IF;
   ELSE
     L_SOURCE_LOCATION_BASE := L_LISTING_BASE_URI;
     IF L_SOURCE_PREFIX_URI IS NOT NULL THEN
