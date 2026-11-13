@@ -69,7 +69,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **FinOps compartment** | Dedicated compartment for the FinOps database and platform services. | Created by the add-on IaC. |
 | **Identity domain** | Hosts the FinOps administration groups and ADB dynamic group. | Reused from One-OE. |
 | **IAM groups** | Separate database and OAC administration groups. | Created by the add-on IaC in the existing identity domain. |
-| **IAM policies and ADB dynamic group** | Provide administrator access and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. See the [IAM policy reference](installation-guide/infrastructure/iam-policies.md). | Created by the add-on IaC. |
+| **IAM policies and ADB dynamic group** | Provide administrator access and resource-principal permissions for ADB to read FOCUS reports, query module APIs and publish operational notifications. See the [IAM policy reference](deployment/landing-zone-extension/iam-policies.md). | Created by the add-on IaC. |
 | **Autonomous Database (ADB)** | Private data store where pipelines ingest FOCUS reports and database modules prepare reporting data. | Created by the add-on IaC; database modules are installed separately. |
 | **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports, using a private access channel to connect to ADB. | Created or reused separately; connectivity, datasets and dashboards are configured after infrastructure provisioning. |
 | **VCN and subnets** | Private networking for ADB, OAC connectivity and infrastructure access, with network security groups, a service gateway and a DRG attachment to the One-OE hub. | Created by the add-on IaC, using existing hub dependencies. |
@@ -80,7 +80,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
 | **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets and database module installation.
+See the [Landing Zone extension deployment guide](deployment/landing-zone-extension/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets and database module installation.
 
 ### Database processing and reporting
 
@@ -127,7 +127,7 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 1. **Prerequisite — deploy the One-OE Landing Zone.** Deploy the base Landing Zone in the OCI parent tenancy using the [One-OE blueprint templates](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its shared compartments, identity domain, hub network and governance tags must be ready before deploying FinOps.
 
-2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/FinOps_LandingZone_addon/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
+2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/landing-zone-extension/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
 
 3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 

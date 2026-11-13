@@ -13,7 +13,7 @@ Create or reuse Oracle Analytics Cloud (OAC), then connect it to the Landing Zon
 - ADB and the FinOps database modules are ready.
 - You have permission to create/manage OAC and use its network resources.
 - Confirm the compartment, region, identity domain, capacity, license and user access path. For private user access, prepare client routing and DNS; this is separate from OAC's database connection.
-- Use Enterprise Edition for a Private Access Channel (PAC). See the [network requirements](../infrastructure/one-oe-integration.md#private-network).
+- Use Enterprise Edition for a Private Access Channel (PAC). See the [network requirements](../../deployment/landing-zone-extension/one-oe-integration.md#private-network).
 
 ## Create the service if needed
 
