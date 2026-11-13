@@ -25,7 +25,7 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Create the password Secrets
 
-The [security configuration](../landing-zone-extension/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, created during infrastructure deployment, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
+The [security configuration](../landing-zone-extension/config/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, created during infrastructure deployment, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
 | Secret name | Content | Purpose |
 | --- | --- | --- |

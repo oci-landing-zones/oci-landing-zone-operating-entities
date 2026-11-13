@@ -1,6 +1,6 @@
 # FinOps IAM policies
 
-Reference for the policies currently defined in [finops_iam.json](finops_iam.json). Provision them through [the deployment guide](README.md); the Python installer does not create IAM policies.
+Reference for the policies currently defined in [finops_iam.json](config/finops_iam.json). Provision them through [the deployment guide](README.md); the Python installer does not create IAM policies.
 
 ## Contents
 
