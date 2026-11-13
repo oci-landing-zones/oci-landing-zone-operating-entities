@@ -1,6 +1,6 @@
-# OCI FinOps Configuration Guide
+# OCI FinOps Database Configuration Guide
 
-This guide configures FinOps after the Landing Zone add-on infrastructure has been deployed. It covers database credentials and Secrets, installation of the FinOps database modules, and OAC connectivity, dashboards and user access.
+This guide configures FinOps after the Landing Zone add-on infrastructure has been deployed. It covers database credentials and Secrets, and installation of the FinOps database modules using Python.
 
 ## Prerequisites
 
@@ -12,7 +12,6 @@ Complete the following steps in order:
 
 1. [Prepare database credentials and Secrets](#step-1-prepare-database-credentials-and-secrets).
 2. [Install the FinOps database modules](#step-2-install-the-finops-database-modules).
-3. [Configure OAC and its reporting content](#step-3-oracle-analytics-cloud-dashboard).
 
 Infrastructure provisioning does not create the password Secrets. Complete Step 1 before installing the database modules.
 
@@ -49,15 +48,6 @@ The ADB, compartments, Vault, Secrets and tags must match the [installer prerequ
 Follow the [Python installation guide](database-modules/python-installation.md). Run configuration, validation and installation in that order. Validation checks ADMIN Secret access and a read-only connection to ADB; installation checks the required source/module access before proceeding.
 
 After installation, use [ADB maintenance and diagnostics](database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
-
-## Step 3: Oracle Analytics Cloud Dashboard
-
-OAC service creation is a separate administration step, performed manually in OCI Console. Use the existing OAC service if your environment already provides one.
-
-1. [Create the OAC service and prepare its ADB connectivity](oac/oac-service-setup.md) when needed.
-2. [Import the workbook and configure its database connection](oac/oac-workbook-import.md) using the dedicated OAC reader created with the schemas.
-3. [Configure consumer access](oac/oac-user-onboarding.md) before sharing the workbook.
-4. Optional: [Index datasets and enable AI Assistant for workbook users](oac/oac-ai-assistant-consumers.md).
 
 ## License
 

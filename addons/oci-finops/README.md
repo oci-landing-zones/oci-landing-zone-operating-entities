@@ -76,7 +76,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
 | **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets, database modules and OAC setup.
+See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets and database module installation.
 
 ### Database processing and reporting
 
@@ -127,7 +127,7 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 
-4. **Create OAC and import the workbook.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md), then complete [consumer access and optional AI Assistant setup](installation-guide/README.md#step-3-oracle-analytics-cloud-dashboard).
+4. **Create OAC and import the workbook.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md), then [configure consumer access](installation-guide/oac/oac-user-onboarding.md). Optionally, [index datasets and enable AI Assistant](installation-guide/oac/oac-ai-assistant-consumers.md).
 
 ## License
 
