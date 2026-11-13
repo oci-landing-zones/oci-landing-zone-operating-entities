@@ -28,6 +28,8 @@ from finops_sql import (
     prompt_value,
     prompt_yes_no,
     read_password_from_vault,
+    validate_database_password,
+    redact_passwords,
     run_sqlplus,
     selected_database_scripts,
     sql_parameter_commands,
@@ -900,8 +902,7 @@ def validate_admin_database_access(config: dict) -> None:
     if not sqlplus:
         raise DeploymentError("SQL*Plus was not found on PATH.")
     alias = db["connect_alias"]
-    if any(character in admin_password for character in ('"', "\n", "\r")):
-        raise DeploymentError("The ADMIN Secret contains characters unsupported by the SQL*Plus bootstrap.")
+    validate_database_password(admin_password, "ADMIN")
 
     success_marker = "FINOPS_ADB_VALIDATE_OK"
     commands = [
@@ -941,10 +942,11 @@ def validate_admin_database_access(config: dict) -> None:
     except OSError as exc:
         raise DeploymentError("Could not start SQL*Plus for the read-only ADMIN connection check.") from exc
 
-    if result.returncode != 0 or success_marker not in result.stdout:
+    safe_output = redact_passwords(result.stdout or "", [admin_password])
+    if result.returncode != 0 or success_marker not in safe_output:
         oracle_errors = [
             line.strip()
-            for line in result.stdout.splitlines()
+            for line in safe_output.splitlines()
             if re.search(r"\b(?:ORA|TNS|SP2)-\d{5}\b", line, re.IGNORECASE)
         ]
         detail = f" Oracle reported: {'; '.join(oracle_errors)}" if oracle_errors else ""
@@ -1130,7 +1132,7 @@ EXIT SUCCESS
 
 
 def extract_preflight_error(output: str, password: str) -> str:
-    safe_output = (output or "").replace(password, "[REDACTED]")
+    safe_output = redact_passwords(output or "", [password])
     lines = safe_output.splitlines()
     for index, line in enumerate(lines):
         if re.search(r"\b(?:ORA|TNS|SP2)-\d{5}\b|HTTP \d{3}|preflight failed", line, re.I):
@@ -1148,6 +1150,7 @@ def run_resource_preflight_probe(
     success_marker: str,
     label: str,
 ) -> dict:
+    validate_database_password(password, "FOCUSPLATFORM")
     settings = runtime["deployment"]
     sqlplus = shutil.which(settings.get("sqlplus", "sqlplus"))
     if not sqlplus:
@@ -1181,7 +1184,7 @@ def run_resource_preflight_probe(
         return {"label": label, "status": "ERROR", "detail": "Timed out after 360 seconds"}
     except OSError:
         return {"label": label, "status": "ERROR", "detail": "Could not start SQL*Plus"}
-    output = result.stdout or ""
+    output = redact_passwords(result.stdout or "", [password])
     if result.returncode == 0 and success_marker in output:
         detail = next(
             (line.strip() for line in output.splitlines() if success_marker in line),
@@ -1418,6 +1421,7 @@ def classify_admin_bootstrap_state(
 
 
 def inspect_admin_bootstrap_state(runtime: dict, admin_password: str, tns_admin: Path) -> str:
+    validate_database_password(admin_password, "ADMIN")
     settings = runtime["deployment"]
     sqlplus = shutil.which(settings.get("sqlplus", "sqlplus"))
     if not sqlplus:
@@ -1462,7 +1466,7 @@ EXIT SUCCESS
         )
     except (subprocess.TimeoutExpired, OSError) as exc:
         raise DeploymentError("Could not inspect the existing ADMIN schema bootstrap state.") from exc
-    output = (result.stdout or "").replace(admin_password, "[REDACTED]")
+    output = redact_passwords(result.stdout or "", [admin_password])
     if result.returncode != 0:
         raise DeploymentError("Could not safely inspect the existing schema; no installation SQL was run.")
     values = {}
@@ -1504,7 +1508,7 @@ EXIT SUCCESS
         )
     except (subprocess.TimeoutExpired, OSError) as exc:
         raise DeploymentError("Could not verify the existing empty schema for a safe retry.") from exc
-    verify_output = (verification.stdout or "").replace(admin_password, "[REDACTED]")
+    verify_output = redact_passwords(verification.stdout or "", [admin_password])
     if verification.returncode != 0 or "FOCUSPLATFORM SCHEMA VERIFICATION PASS" not in verify_output:
         raise DeploymentError(
             "Existing database users do not pass the schema verifier; inspect them before retrying."
@@ -1531,8 +1535,7 @@ def run_admin_schema_bootstrap(
         ("FOCUSPLATFORM", focus_password),
         ("OAC_FOCUS_READER", reader_password),
     ):
-        if not password or any(character in password for character in ('"', "\n", "\r", "&")):
-            raise DeploymentError(f"The {purpose} Secret is empty or contains characters unsupported by SQL*Plus.")
+        validate_database_password(password, purpose)
 
     def bind_sqlplus_value(name: str, value: str) -> str:
         escaped_value = value.replace("'", "''")
@@ -1572,8 +1575,7 @@ def run_admin_schema_bootstrap(
         raise DeploymentError("Could not start SQL*Plus for the ADMIN schema bootstrap.") from exc
 
     output = result.stdout or ""
-    for password in (admin_password, focus_password, reader_password):
-        output = output.replace(password, "[REDACTED]")
+    output = redact_passwords(output, [admin_password, focus_password, reader_password])
     log_dir = DEPLOYMENT_DIR / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}-database-admin.log"
@@ -1640,8 +1642,7 @@ def status_database(config: dict, module_ids: list[str], detail: str = 'LONG') -
         raise DeploymentError('SQL*Plus was not found on PATH.')
     oci, sdk_config, signer = load_oci_sdk(db['oci_auth_method'],db.get('oci_profile',''),db['oci_region'])
     password = read_password_from_vault(db['focusplatform_password_secret_id'],'FOCUSPLATFORM',oci,sdk_config,signer)
-    if any(ch in password for ch in ('"','\n','\r')):
-        raise DeploymentError('Unsupported password characters for SQL*Plus connection.')
+    validate_database_password(password, "FOCUSPLATFORM")
     if not re.fullmatch(r'[A-Za-z0-9_.-]+',db['connect_alias']):
         raise DeploymentError('Unsupported TNS alias.')
     payload = json.dumps(module_ids)
@@ -1661,7 +1662,7 @@ def status_database(config: dict, module_ids: list[str], detail: str = 'LONG') -
             env=env,cwd=SQL_INSTALL_DIR,timeout=180,check=False)
     except (OSError,subprocess.TimeoutExpired) as exc:
         raise DeploymentError('Could not complete the read-only status report; check SQL*Plus and the Bastion connection.') from exc
-    output = (result.stdout or '').replace(password,'[REDACTED]')
+    output = redact_passwords(result.stdout or '', [password])
     visible_output = '\n'.join(line for line in output.splitlines() if line.strip() not in ('FINOPS_STATUS_REPORT_COMPLETE','PL/SQL procedure successfully completed.'))
     print(visible_output)
     # Oracle errors inside stored job/source history are findings, not failures

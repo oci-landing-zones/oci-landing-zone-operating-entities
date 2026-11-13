@@ -47,6 +47,27 @@ OPTIONAL_MODULE_LABELS = {
 }
 
 
+def validate_database_password(password: str, purpose: str = "database") -> str:
+    """Preserve the password; Oracle enforces the account's password profile."""
+    if not isinstance(password, str) or not password:
+        raise DeploymentError(f"The {purpose} password must not be empty.")
+    if any(character in password for character in ('"', '\r', '\n')):
+        raise DeploymentError(
+            f"The {purpose} password contains a double quote or return character, "
+            "which Oracle password syntax does not allow."
+        )
+    return password
+
+
+def redact_passwords(output: str, passwords: list[str]) -> str:
+    """Mask both raw credentials and the escaped literals SQL*Plus may echo."""
+    values = {form for password in passwords if password
+              for form in (password, password.replace("'", "''"))}
+    for value in sorted(values, key=len, reverse=True):
+        output = output.replace(value, "[REDACTED]")
+    return output
+
+
 def prompt_value(label: str, default: str | None = None, required: bool = True) -> str:
     suffix = f" [{default}]" if default not in (None, "") else ""
     while True:
@@ -94,11 +115,12 @@ def make_log_path(prefix: str) -> Path:
     return LOG_DIR / f"{stamp}-{prefix}.log"
 
 
-def stream_to_console_and_log(proc: subprocess.Popen, log_path: Path) -> int:
+def stream_to_console_and_log(proc: subprocess.Popen, log_path: Path, passwords: list[str] | None = None) -> int:
     with log_path.open("w", encoding="utf-8") as log:
         if proc.stdout is None:
             raise DeploymentError("Could not capture process output.")
         for line in proc.stdout:
+            line = redact_passwords(line, passwords or [])
             sys.stdout.write(line)
             sys.stdout.flush()
             log.write(line)
@@ -189,8 +211,7 @@ def run_sqlplus(
         alias = settings[alias_key]
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", alias):
         raise DeploymentError(f"SQL*Plus alias '{alias}' contains unsupported characters.")
-    if any(ch in password for ch in ('"', "\n", "\r")):
-        raise DeploymentError("The password cannot contain double quotes or line breaks because of SQL*Plus connection syntax.")
+    validate_database_password(password)
     # Module inputs are binds; leave substitution disabled throughout.
     commands = [
         "SET ECHO OFF",
@@ -204,6 +225,7 @@ def run_sqlplus(
             if len(prompts) != 2:
                 raise DeploymentError("Schema bootstrap requires two password inputs.")
             for bind, value in zip(("fp_focus_password", "fp_reader_password"), prompts):
+                validate_database_password(value, bind)
                 literal = value.replace("'", "''")
                 commands.extend([f"BEGIN :{bind} := '{literal}'; END;", "/"])
         elif prompts:
@@ -232,7 +254,8 @@ def run_sqlplus(
         proc.stdin.close()
     except BrokenPipeError:
         pass
-    result = stream_to_console_and_log(proc, log_path)
+    passwords = [password] + [value for _, prompts in steps for value in prompts]
+    result = stream_to_console_and_log(proc, log_path, passwords)
     print(f"Local log: {log_path.relative_to(REPO_ROOT)}")
     if result:
         raise DeploymentError(f"SQL*Plus exited with code {result}; fix the error before continuing.")
@@ -325,6 +348,4 @@ def read_password_from_vault(secret_id: str, purpose: str, oci_module, sdk_confi
         raise DeploymentError(
             f"Could not read the OCI Vault Secret for {purpose}; check the OCID, region, and IAM permissions."
         ) from exc
-    if not password or any(ch in password for ch in ('"', "\n", "\r", "&")):
-        raise DeploymentError(f"The Secret for {purpose} is empty or contains characters unsupported by the SQL*Plus bootstrap.")
-    return password
+    return validate_database_password(password, purpose)

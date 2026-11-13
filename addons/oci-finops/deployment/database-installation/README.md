@@ -25,11 +25,11 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Password requirements
 
-Use passwords compatible with the database's active password policy. Under the [default ADB password rules](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/manage-users-create.html), passwords are 12–30 characters long, include uppercase and lowercase letters and a number, and must not contain the account's username; password-history and reuse restrictions also apply.
+Follow the database account's active password policy. Under the [default ADB rules](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/manage-users-create.html), passwords are 12–30 characters long, include uppercase and lowercase letters and a number, and must not contain the account's username; password-history and reuse restrictions also apply.
 
-- **First character:** for this deployment, prefer a letter, uppercase or lowercase. This is a naming convention for the supplied passwords, not a first-character check enforced by the installer.
-- **Installer restrictions:** the current Vault password reader rejects double quotes (`"`), ampersands (`&`), carriage returns and line feeds. These restrictions apply to all three password Secrets below.
-- Store only the raw password, and keep each Secret synchronized with its database account.
+Oracle [password syntax](https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/CREATE-USER.html) excludes double quotes and return characters. The installer adds no first-letter or initial-uppercase requirement and accepts ampersands and other Oracle-permitted special characters. Database password-profile validation remains with ADB.
+
+Store each password exactly as supplied, without trimming or adding a line break. Python reads the existing Vault Secrets and passes credentials through SQL*Plus stdin with substitution disabled; passwords are not passed as process arguments or saved in the installation configuration. Captured output masks raw passwords and their SQL-escaped forms.
 
 ### Create the password Secrets
 
