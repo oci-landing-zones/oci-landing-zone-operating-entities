@@ -6,9 +6,7 @@
 
 The OCI Hybrid Connectivity add-on provides guidance and configuration options for integrating [OCI FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm) with an OCI One-OE Landing Zone. FastConnect provides a dedicated, private connection between your network and OCI. 
 
-FastConnect supports both **Private peering** for access to VCNs and **Public peering** for access to supported public OCI services. This guide describes **IPv4 Private peering** with the landing zone’s DRG. Landing Zone Studio and the Blueprint Factory currently generate private virtual circuits only.
-
-The underlying [Networking module](https://github.com/oci-landing-zones/terraform-oci-modules-networking/blob/v0.9.0/variables.tf) also exposes public virtual circuit settings for manually authored deployment configurations. Public peering requires a separate configuration; changing `type` to `PUBLIC` does not adapt the DRG-based design shown here. See [FastConnect peering options](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm).
+FastConnect supports both **Private peering** for access to VCNs and **Public peering** for access to supported public OCI services. This guide describes **IPv4 Private peering** with the One-OE Landing Zone.
 
 The required OCI configurations can be generated using Landing Zone Studio or the Blueprint Factory and used for subsequent Terraform deployment.
 
@@ -18,10 +16,10 @@ The required OCI configurations can be generated using Landing Zone Studio or th
 
 This architecture diagram illustrates **FastConnect connectivity** to an **OCI One-OE Landing Zone with Hub A**. It shows a private virtual circuit connecting the remote network (`192.168.0.0/16`) to the landing zone’s DRG, with BGP peering addresses `172.20.2.1/30` on the customer side and `172.20.2.2/30` on the Oracle side.
 
-The virtual circuit attachment is associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the hub and spoke VCNs through the hub attachment. Traffic between the remote network and spoke VCNs passes through the internal network firewall for inspection in both directions:
+The virtual circuit attachment is associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the Hub and Spoke VCNs through the hub attachment. Traffic between the remote network and spoke VCNs passes through the internal network firewall for inspection in both directions:
 
 
-This routing and inspection model applies to **Hubs A, B, and C**. For **Hub E**, traffic between the remote network and spoke VCNs is routed directly through the DRG without traversing the hub VCN.
+This routing and inspection model applies to **Hubs A, B**, and **C**. For **Hub E**, traffic between the remote network and spoke VCNs is routed directly through the DRG without traversing the hub VCN.
 
 &nbsp;
 
