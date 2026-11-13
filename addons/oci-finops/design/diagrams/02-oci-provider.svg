@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1500" viewBox="0 0 1600 1500" role="img" aria-labelledby="title desc">
 <title id="title">FinOps platform: shared foundation, OCI provider and OAC</title>
-<desc id="desc">FinOps V2 architecture. Shared schema and Common Core support all database modules. OCI includes the mandatory ingestion, tag catalog/profile and account context baseline, plus optional tag values, Budgets, Cloud Advisor, Anomalies and Forecast. The OAC database reporting module publishes costs and selected tags. The separate OAC service consumes that reporting interface and OCI module datasets. All arrows use the same style and show V2 data consumption, not installation order.</desc>
+<desc id="desc">FinOps architecture. Shared schema and Common Core support all database modules. OCI includes the mandatory ingestion, tag catalog/profile and account context baseline, plus optional tag values, Budgets, Cloud Advisor, Anomalies and Forecast. The OAC database reporting module publishes costs and selected tags. The separate OAC service consumes that reporting interface and OCI module datasets. All arrows use the same style and show data consumption, not installation order.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#52617a"/></marker></defs>
 <rect width="1600" height="1500" fill="white"/>
 <g font-family="Arial, sans-serif" fill="#202b42">
@@ -108,6 +108,6 @@
 <text x="800" y="1314" text-anchor="middle" font-size="18">OCI module datasets</text>
 <text x="800" y="1338" text-anchor="middle" font-size="18">Account context | Budgets | Advisor | Anomalies | Forecast | Tag values</text>
 </g>
-<text x="800" y="1430" text-anchor="middle" font-size="18">Workbook V2: costs, selected tags and datasets from every installed OCI module.</text>
+<text x="800" y="1430" text-anchor="middle" font-size="18">Workbook: costs, selected tags and datasets from every installed OCI module.</text>
 <text x="800" y="1460" text-anchor="middle" font-size="17">Arrows show data consumption, not installation order.</text>
 </g></svg>

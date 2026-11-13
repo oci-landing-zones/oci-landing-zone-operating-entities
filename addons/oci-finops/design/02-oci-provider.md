@@ -6,7 +6,7 @@ The OCI provider has three mandatory components for the complete solution: FOCUS
 
 ## Functional architecture and data dependencies
 
-The groups show membership and required versus optional status. Arrows show data consumption in the V2 architecture, not the installation sequence. Shared schema/core prerequisites apply to every component and are omitted from the arrows for clarity. The separate OAC database module is shown to make its consumption of FOCUS and the tag profile explicit.
+The groups show membership and required versus optional status. Arrows show data consumption in the architecture, not the installation sequence. Shared schema/core prerequisites apply to every component and are omitted from the arrows for clarity. The separate OAC database module is shown to make its consumption of FOCUS and the tag profile explicit.
 
 See the [platform architecture diagram](README.md#architecture) for the shared foundation, OCI modules and separate OAC service.
 
@@ -36,9 +36,9 @@ This page defines component boundaries and data dependencies. Each linked compon
 | Part | Decision | What it provides | Design |
 | --- | --- | --- | --- |
 | FOCUS ingestion and remediation | Required | One OCI landing across years, year pipelines, failed-file detection, row remediation, and core registration. | [Model and workflow](02-oci-ingestion.md) |
-| Tag definitions and FinOps reporting profile (01a) | Required for V2 reporting | Reads OCI namespace/tag definitions and selects a versioned profile; requires the existing `tagns-lz-cost-governance` namespace and six governance tags. Does not extract row values. | [Catalog and profiles](02-oci-tags.md) |
+| Tag definitions and FinOps reporting profile (01a) | Required for reporting | Reads OCI namespace/tag definitions and selects a versioned profile; requires the existing `tagns-lz-cost-governance` namespace and six governance tags. Does not extract row values. | [Catalog and profiles](02-oci-tags.md) |
 | All defined-tag values by FOCUS row (01b) | Optional; skip for a smaller repository | Long-form values for all nonblank cataloged defined tags on FOCUS rows, including tags outside the active profile. If skipped, raw `TAGS` JSON and active-profile columns remain available. | [Value extraction](02-oci-tag-values.md) |
-| Account context and contracts (02) | Required for the complete V2 baseline | Tenancy, compartments, regions, subscriptions, services, and commitments, with separate daily and monthly syncs. Independent of OCI 01b. | [Account and contract model](02-oci-account-contracts.md) |
+| Account context and contracts (02) | Required for the complete baseline | Tenancy, compartments, regions, subscriptions, services, and commitments, with separate daily and monthly syncs. Independent of OCI 01b. | [Account and contract model](02-oci-account-contracts.md) |
 | OCI Budgets (03) | Optional | OCI budget definitions, source spend metrics and alert rules. FOCUS comparison is withheld until target, cycle and currency can be aligned. | [Budget model](02-oci-budgets.md) |
 | Cloud Advisor (04) | Optional | OCI recommendations and resource actions. Skipping it leaves out Advisor datasets. | [Cloud Advisor](02-oci-cloud-advisor.md) |
 | Cost Anomalies (05) | Optional | OCI anomaly monitors and events. Skipping it leaves out native anomaly datasets. | [Cost Anomalies](02-oci-cost-anomalies.md) |
@@ -48,4 +48,4 @@ Deployment commands and verification markers are defined once in the [installati
 
 ## Visualization boundary
 
-[Module 03 / OAC](03-oac-oci-focus-cost-detail.md) creates the database cost-detail interface from the OCI landing and active tag profile. OAC connections, datasets, workbooks, and dashboards are configured in the OAC service. The V2 visualization layer combines this reporting interface with datasets from every installed OCI module: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Those module datasets are separate from the cost-detail MV. Their connections, datasets and workbook content are configured in OAC; the database installers create the underlying database objects.
+[Module 03 / OAC](03-oac-oci-focus-cost-detail.md) creates the database cost-detail interface from the OCI landing and active tag profile. OAC connections, datasets, workbooks, and dashboards are configured in the OAC service. The visualization layer combines this reporting interface with datasets from every installed OCI module: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Those module datasets are separate from the cost-detail MV. Their connections, datasets and workbook content are configured in OAC; the database installers create the underlying database objects.

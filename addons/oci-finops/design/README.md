@@ -4,7 +4,7 @@ This guide describes the platform architecture and links to each module's data m
 
 ## Architecture
 
-FinOps FOCUS Platform V2 is designed to run in an OCI **parent tenancy**. Its database modules run in an existing Oracle Autonomous Database (ADB) in that tenancy. A shared foundation supports the provider and visualization modules: Module 00 creates the platform schema and access grants; Module 01 installs the provider-neutral Common Core, which registers providers, coordinates scheduled work, records execution results and sends optional operational notifications.
+FinOps FOCUS Platform is designed to run in an OCI **parent tenancy**. Its database modules run in an existing Oracle Autonomous Database (ADB) in that tenancy. A shared foundation supports the provider and visualization modules: Module 00 creates the platform schema and access grants; Module 01 installs the provider-neutral Common Core, which registers providers, coordinates scheduled work, records execution results and sends optional operational notifications.
 
 Provider modules own their source formats, landing data, remediation and analytical context. OCI is the only implemented provider. Its [design overview](02-oci-provider.md) defines the mandatory baseline, optional components and actual data dependencies. The architecture allows other cloud providers to be added through separate modules.
 
@@ -14,7 +14,7 @@ Visualization modules publish database reporting interfaces independently of the
 
 [Open the full-size architecture diagram](diagrams/02-oci-provider.svg).
 
-Arrows represent data consumption in the V2 architecture. OAC reads costs and selected tags through the database reporting interface and combines them with datasets from the installed OCI modules: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Shared foundation prerequisites apply to all database modules; the [installation guide](../installation-guide/README.md) defines installation order. Each concrete module design lists its database objects, table columns and Oracle types; Module 00 creates schemas and grants without application tables.
+Arrows represent data consumption in the architecture. OAC reads costs and selected tags through the database reporting interface and combines them with datasets from the installed OCI modules: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Shared foundation prerequisites apply to all database modules; the [installation guide](../installation-guide/README.md) defines installation order. Each concrete module design lists its database objects, table columns and Oracle types; Module 00 creates schemas and grants without application tables.
 
 ## Foundation
 

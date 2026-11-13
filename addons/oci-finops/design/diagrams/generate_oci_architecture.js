@@ -6,7 +6,7 @@ const escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const parts = [
   '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1500" viewBox="0 0 1600 1500" role="img" aria-labelledby="title desc">',
   '<title id="title">FinOps platform: shared foundation, OCI provider and OAC</title>',
-  '<desc id="desc">FinOps V2 architecture. Shared schema and Common Core support all database modules. OCI includes the mandatory ingestion, tag catalog/profile and account context baseline, plus optional tag values, Budgets, Cloud Advisor, Anomalies and Forecast. The OAC database reporting module publishes costs and selected tags. The separate OAC service consumes that reporting interface and OCI module datasets. All arrows use the same style and show V2 data consumption, not installation order.</desc>',
+  '<desc id="desc">FinOps architecture. Shared schema and Common Core support all database modules. OCI includes the mandatory ingestion, tag catalog/profile and account context baseline, plus optional tag values, Budgets, Cloud Advisor, Anomalies and Forecast. The OAC database reporting module publishes costs and selected tags. The separate OAC service consumes that reporting interface and OCI module datasets. All arrows use the same style and show data consumption, not installation order.</desc>',
   '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#52617a"/></marker></defs>',
   '<rect width="1600" height="1500" fill="white"/>',
   '<g font-family="Arial, sans-serif" fill="#202b42">',
@@ -86,7 +86,7 @@ optional.forEach(([id, lines], i) => node(id, optionalLeft + i * (optionalWidth 
 node('COST', 520, 930, 560, 70, ['Cost detail with selected tag values'], true);
 node('OAC_COST', 350, 1180, 900, 60, ['Cost and selected-tag datasets', 'Reporting interface'], true);
 node('OAC_MODULES', 350, 1290, 900, 60, ['OCI module datasets', 'Account context | Budgets | Advisor | Anomalies | Forecast | Tag values'], true);
-text(800, 1430, 'Workbook V2: costs, selected tags and datasets from every installed OCI module.', 18);
+text(800, 1430, 'Workbook: costs, selected tags and datasets from every installed OCI module.', 18);
 text(800, 1460, 'Arrows show data consumption, not installation order.', 17);
 parts.push('</g></svg>');
 fs.writeFileSync(path.join(__dirname, '02-oci-provider.svg'), parts.join('\n') + '\n');

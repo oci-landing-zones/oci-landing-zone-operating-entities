@@ -92,7 +92,7 @@ The database solution combines three layers:
 
 A shared Core coordinates provider processing, records execution status and sends operational notifications. Pipelines, processing routines and reporting objects run inside ADB.
 
-The platform separates a provider-neutral shared Core, cloud-provider modules and visualization modules, allowing them to evolve independently while respecting their dependencies. OAC is the default visualization tool for V2.
+The platform separates a provider-neutral shared Core, cloud-provider modules and visualization modules, allowing them to evolve independently while respecting their dependencies. OAC is the default visualization tool.
 
 See [Design](design/README.md) for the solution's internal operation: component boundaries, data models, database objects and processing flows.
 
