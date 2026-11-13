@@ -8,6 +8,7 @@ Enable the Assistant after [workbook import](oac-workbook-import.md) and [consum
 - [Configure dataset indexing](#configure-dataset-indexing)
 - [Enable the consumer presentation](#enable-the-consumer-presentation)
 - [Verify from a consumer account](#verify-from-a-consumer-account)
+- [Example questions (pending validation)](#example-questions-pending-validation)
 - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
@@ -44,6 +45,19 @@ The panel does not grant data access. See Oracle's [Insights Panel settings](htt
 3. Compare the result with the workbook using identical filters, including the correct tag-slot meanings. Use a fresh conversation for an independent question.
 
 Confirm no owner's session or database password is needed.
+
+## Example questions (pending validation)
+
+**Pending:** validate these illustrative questions in OAC and add screenshots of the Assistant and its results. They are examples, not verified outputs.
+
+Replace the placeholders below with periods, currencies and indexed field labels available in your dataset. For business-unit questions, use the published tag-slot mapping to identify the corresponding field.
+
+1. What is the total billed cost by service for `<month>` in `<currency>`?
+2. Compare total billed cost for `<month A>` and `<month B>` in `<currency>`.
+3. Which ten compartments have the highest billed cost for `<month>` in `<currency>`?
+4. Show total billed cost by `<business-unit tag field>` for `<month>` in `<currency>`.
+
+Check each result against the workbook with the same filters before using it for financial analysis.
 
 ## Troubleshooting
 
