@@ -1,6 +1,6 @@
 # Import the FOCUSPLATFORM OAC workbook
 
-This guide explains how to import the complete Oracle Analytics Cloud (OAC) workbook into another OAC instance and connect it to that deployment's `FOCUSPLATFORM` schema.
+Import the supplied workbook, configure its destination database connection and check the results.
 
 ## Contents
 
@@ -10,75 +10,59 @@ This guide explains how to import the complete Oracle Analytics Cloud (OAC) work
 - [Check the database reader if connection access fails](#check-the-database-reader-if-connection-access-fails)
 - [After reporting profile changes](#after-reporting-profile-changes)
 - [Updating the package](#updating-the-package)
-- [Oracle references](#oracle-references)
 
 ## Package contents and prerequisites
 
-The repository package is [`installation-guide/oac/export/FOCUSPLATFORM_OAC_FINOPS_DASHBOARDS.dva`](export/FOCUSPLATFORM_OAC_FINOPS_DASHBOARDS.dva). It contains the complete eight-canvas workbook, 41 visualizations, and their dependent dataset definitions. **Include Data** and **Include Connection Credentials** are off: the package has no cost-data snapshot or saved database credentials, and it does not require an import password. The included connection is named `conn_focus_prd_adb`; configure it for the destination ADB after import.
+Download [FOCUSPLATFORM_OAC_FINOPS_DASHBOARDS.dva](export/FOCUSPLATFORM_OAC_FINOPS_DASHBOARDS.dva). It includes eight canvases, 41 visualizations and their datasets. It contains no exported cost data or connection credentials and requires no import password. Its connection definition, `conn_focus_prd_adb`, must be configured for the destination.
 
 Before importing, confirm:
 
-- The destination is Oracle Analytics Cloud at the same update level as the source or a later update. Oracle does not recommend importing a workbook exported from a newer update into an older OAC update.
-- The destination OAC has network access to the target Autonomous Database.
-- The FOCUSPLATFORM database installation is complete, including the OCI landing, an active tag profile, the OAC cost-detail module, and the OCI Cloud Advisor module.
-- The database account used by OAC can query `FOCUSPLATFORM.OAC_OCI_FOCUS_COST_DETAIL`, `FOCUSPLATFORM.OAC_OCI_FOCUS_TAG_SLOT_V`, `FOCUSPLATFORM.OCI_ADVISOR_ACTIONS_V`, `FOCUSPLATFORM.OCI_ADVISOR_RECOMMENDATIONS_V`, and `FOCUSPLATFORM.OCI_ADVISOR_SYNC_RUN`.
-- The importing OAC user has permission to import workbooks and create or use the required database connection.
+- OAC is at the source update level or later; avoid importing from a newer update into an older one.
+- [OAC-to-ADB connectivity](oac-service-setup.md) is ready, and you can import content and configure connections.
+- The database installation includes the landing, active tag profile, published OAC cost-detail source and Cloud Advisor module required by this package.
+- The reporting account can query these `FOCUSPLATFORM` objects: `OAC_OCI_FOCUS_COST_DETAIL`, `OAC_OCI_FOCUS_TAG_SLOT_V`, `OCI_ADVISOR_ACTIONS_V`, `OCI_ADVISOR_RECOMMENDATIONS_V` and `OCI_ADVISOR_SYNC_RUN`.
 
-The cost datasets use the stable database synonym `OAC_OCI_FOCUS_COST_DETAIL`; the synonym points to the currently published, versioned materialized view. This workbook is configured for the six generic slots `TAG_1` through `TAG_6`. Their meanings are available from `OAC_OCI_FOCUS_TAG_SLOT_V` and can change when the selected tag profile is replaced; workbook headings remain generic so a different tag name does not break a chart. A destination with fewer than six published slots must remove the charts and formulas for absent slots. A destination with more than six slots can use the workbook for its first six slots; additional slot visualizations require workbook edits. The Advisor dataset uses the destination OCI provider's current action and recommendation views.
+The workbook uses six generic columns, `TAG_1` to `TAG_6`. Resolve their meanings through `OAC_OCI_FOCUS_TAG_SLOT_V`. Fewer slots require removing affected charts/formulas; more slots require additional visuals to expose them.
 
 ## Import steps
 
-1. Sign in to the destination OAC.
-2. Open **Home → Page Menu → Import Workbook/Flow**.
-3. Select `FOCUSPLATFORM_OAC_FINOPS_DASHBOARDS.dva` and choose **Import**. The package has no password-protected data or credentials, so no package password is expected.
-4. Wait for **Import Successful**, then open the imported workbook.
-5. Confirm that all eight canvases are present: **Overview**, **Month-To-Date Comparison**, **Details by TAG_4**, **Tag Analysis**, **Forecast**, **Advisor**, **Anomalies**, and **Cost Detail**.
-6. In OAC **Navigator → Data → Connections**, open the imported connection's **Actions → Inspect** page and configure `conn_focus_prd_adb` for the destination ADB and its approved [reporting account](../../design/00-schema-bootstrap.md#created-objects-and-access). Test and save the connection. Do not reuse the source environment's credentials. The Console's semantic-model database-connection administration is a different connection surface.
-7. In the workbook, refresh dataset metadata and workbook data. If OAC reports a missing connection, select the configured `conn_focus_prd_adb` connection for the affected datasets; keep the `FOCUSPLATFORM` schema and the dataset column names unchanged.
-8. Check that cost rows load, `TAG_1`…`TAG_6` are available, and the Advisor canvas returns rows from the destination's OCI Advisor module.
-9. For team use, save the workbook in the approved **Shared Folders** team folder and verify every dependent dataset and connection. Follow the [OAC user onboarding runbook](oac-user-onboarding.md) for the exact identity, role, catalog access, and viewer acceptance steps. A workbook and datasets in Shared Folders can still fail with HTTP 403 if `conn_focus_prd_adb` remains private in **My Folders**.
+1. Sign in to OAC. For team use, select the approved **Shared Folders** destination in Catalog before importing. Importing from Home places content in **My Folders**.
+2. Choose **Import Workbook/Flow**, select the downloaded DVA and import. No package password is expected. Avoid replacing an existing workbook unintentionally.
+3. Wait for **Import Successful** and open the workbook.
+4. In **Navigator → Data → Connections**, open `conn_focus_prd_adb` → **Actions → Inspect**. Set the destination ADB endpoint, required wallet/connection settings and `OAC_FOCUS_READER` credentials. Test and save. Do not use the source environment's credentials.
+5. Refresh dataset metadata and workbook data. If a dataset reports a missing connection, bind it to the configured connection, retaining `FOCUSPLATFORM` and the existing column names.
+6. Complete the acceptance checks below, then [share the workbook and its dependencies](oac-user-onboarding.md). Do not create a separate connection for every viewer.
 
-Importing from the OAC home page places the workbook and included dependent artifacts in the importing user's **My Folders**. To import into a shared catalog folder, select that folder in Catalog before importing. Avoid importing over an existing workbook unless replacement is intended.
-
-Import success is not consumer-access acceptance. Confirm the actual location and access list of the connection after import, even if the workbook and datasets were moved to a shared folder. New viewers normally reuse that connection; do not create one connection per viewer when saved credentials are the intended authentication mode.
+Use the Data connection referenced by the imported datasets, rather than the separate semantic-model connection administration. See Oracle's [workbook import procedure](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acubi/import-workbook-file.html).
 
 ## Acceptance checks
 
-- All eight canvases open without missing-dataset or connection errors.
-- The service-cost visualization returns rows from the destination database.
-- The cost summary value agrees with a query against the destination synonym using the same reporting filters.
-- The tag page shows `TAG_1` through `TAG_6`; use `OAC_OCI_FOCUS_TAG_SLOT_V` to confirm each slot's current namespace and tag label.
-- The Advisor page returns data from the destination `FOCUSPLATFORM` views.
-- No data extract or credentials were imported from the package; results are live queries to the destination ADB.
-
-Check tag coverage and cost aggregation against destination data before production use; distinguish missing tag values from missing data or an incorrect slot mapping.
+- All eight canvases open: **Overview**, **Month-To-Date Comparison**, **Details by TAG_4**, **Tag Analysis**, **Forecast**, **Advisor**, **Anomalies** and **Cost Detail**.
+- Cost totals agree with the destination database for the same period, currency and filters.
+- Tag slots have the expected meanings and coverage; Advisor queries the destination's views.
+- There are no missing-dataset/connection errors. Test the imported datasets against the destination rather than treating import success as proof of fresh data.
+- An intended viewer can use the workbook in their own session after [consumer access setup](oac-user-onboarding.md).
 
 ## Check the database reader if connection access fails
 
-Module 00 already creates and authorizes `OAC_FOCUS_READER`; a fresh installation needs no additional reader-grant step. Check that the OAC connection uses that account and targets the intended ADB. Once the cost-detail source exists, test the connection with:
+Module 00 creates `OAC_FOCUS_READER` and its grants. Check the connection targets the correct ADB and uses that account. Test as the reader:
 
 ```sql
 SELECT COUNT(*) FROM FOCUSPLATFORM.OAC_OCI_FOCUS_COST_DETAIL;
 ```
 
-If database authorization fails, have the database administrator compare the installed reader grants with the [schema access contract](../../design/00-schema-bootstrap.md#created-objects-and-access) and run the existing [reader grant verifier/repair script](../../deployment/sql/install/00_schema/01_grant_oac_reader_access.sql) when appropriate. Catalog HTTP 403 errors are a separate OAC access check covered by the user-onboarding guide.
+For database authorization failures, have the DBA compare the [access contract](../../design/00-schema-bootstrap.md#created-objects-and-access) and use the [reader grant verification/repair script](../../deployment/sql/install/00_schema/01_grant_oac_reader_access.sql) when appropriate. OAC metadata HTTP 403 errors instead require checking [dataset and connection sharing](oac-user-onboarding.md#troubleshooting).
 
 ## After reporting profile changes
 
-Apply the profile, build and explicitly publish its validated candidate using the [Python profile-management procedure](../database-modules/python-installation.md#change-a-tag-profile). Then align workbook metadata and presentation with the published column contract:
+[Apply the profile, build and explicitly publish its candidate with Python](../database-modules/python-installation.md#change-a-tag-profile), then refresh OAC dataset metadata and review presentation:
 
-| Profile change | MV column contract | OAC effect |
-| --- | --- | --- |
-| Add tags to the active profile | Existing `TAG_n` assignments keep their slot numbers; new tags append slots and columns. | Existing field bindings remain valid. Refresh dataset metadata and add visuals for new slots if needed. |
-| Select a different profile name | A new candidate follows that profile's highest reserved slot. A slot can represent a different tag. | Refresh dataset metadata if the number of slots changes; review filters, titles, and calculations because slot meanings can change. |
-| Select tags with the same tag name in different namespaces | Each profile item retains its namespace ID and a distinct slot; the MV reads `<namespace>.<tag>` from JSON. | `TAG_n` names do not collide. Use `OAC_OCI_FOCUS_TAG_SLOT_V` to display the published namespace and tag label. |
+| Change | Required review |
+| --- | --- |
+| Add tags to the current profile | Existing slots remain stable; add visuals for new slots if required. |
+| Select another profile | Slot meanings/counts can change; review filters, labels, calculations and missing columns. |
+| Same tag name in different namespaces | Distinct slots remain separate; use `OAC_OCI_FOCUS_TAG_SLOT_V` for the namespace and label. |
 
 ## Updating the package
 
-When the workbook changes, export it again from OAC as a `.dva` package. Keep **Include Data** and **Include Connection Credentials** off for a deployment template. The package contains dataset metadata and a connection definition, but each destination must configure its own ADB endpoint and credentials.
-
-## Oracle references
-
-- [Import and Export Workbooks in Oracle Analytics](https://docs.oracle.com/en/cloud/paas/analytics-cloud/tutorial-import-export-projects/)
-- [Import a Workbook File](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acubi/import-workbook-file.html)
-- [FAQs: Export Items in DVA Format](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acubi/faqs-export-items-dva-format.html)
+Re-export the workbook as DVA with **Include Data** and **Include Connection Credentials** off. Keep dataset metadata and the connection definition; each destination supplies its endpoint and credentials. See Oracle's [DVA export guidance](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acubi/faqs-export-items-dva-format.html).
