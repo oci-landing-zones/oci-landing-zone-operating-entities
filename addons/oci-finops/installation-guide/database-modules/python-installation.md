@@ -6,23 +6,29 @@ Complete the [database prerequisites](../README.md#database-prerequisites) befor
 
 ## Contents
 
-- [Resources that must already exist](#resources-that-must-already-exist)
-- [Wallet and files prepared by Python](#wallet-and-files-prepared-by-python)
-- [Installation host requirements](#installation-host-requirements)
-- [Supported Python authentication](#supported-python-authentication)
-- [FOCUS report source](#focus-report-source)
-- [Bucket access for the installation operator](#bucket-access-for-the-installation-operator)
-- [Configure, validate and install](#configure-validate-and-install)
-- [Verify installation and read-only status](#verify-installation-and-read-only-status)
-  - [Module verification and background results](#module-verification-and-background-results)
-- [Install optional modules later](#install-optional-modules-later)
-- [Change a tag profile](#change-a-tag-profile)
-  - [Tag specification](#tag-specification)
-- [Compatibility limits](#compatibility-limits)
-- [OAC connection](#oac-connection)
-- [Failed or interrupted installation](#failed-or-interrupted-installation)
+- [Prerequisites](#prerequisites)
+  - [Resources that must already exist](#resources-that-must-already-exist)
+  - [Wallet and files prepared by Python](#wallet-and-files-prepared-by-python)
+  - [Installation host requirements](#installation-host-requirements)
+  - [Supported Python authentication](#supported-python-authentication)
+  - [FOCUS report source](#focus-report-source)
+    - [Required layout for your own bucket](#required-layout-for-your-own-bucket)
+  - [Bucket access for the installation operator](#bucket-access-for-the-installation-operator)
+- [Installation](#installation)
+  - [Configure, validate and install](#configure-validate-and-install)
+  - [Verify installation and read-only status](#verify-installation-and-read-only-status)
+    - [Module verification and background results](#module-verification-and-background-results)
+  - [OAC connection](#oac-connection)
+- [Other operations](#other-operations)
+  - [Install optional modules later](#install-optional-modules-later)
+  - [Change a tag profile](#change-a-tag-profile)
+    - [Tag specification](#tag-specification)
+  - [Compatibility limits](#compatibility-limits)
+  - [Failed or interrupted installation](#failed-or-interrupted-installation)
 
-## Resources that must already exist
+## Prerequisites
+
+### Resources that must already exist
 
 These are discovery requirements in `deployment/python/finops_addon.py`, not suggested example names. Each named compartment must be active and visible exactly once. Vault, Secrets and ADB must each have exactly one eligible match in the stated scope.
 
@@ -48,7 +54,7 @@ Secrets contain raw passwords, not JSON. New-user passwords must satisfy ADB rul
 
 **Resource names and credential-storage conventions must match this table.** The installer does not discover arbitrary naming conventions. Resolve mismatches with the infrastructure owner before proceeding; do not rename existing customer resources blindly.
 
-## Wallet and files prepared by Python
+### Wallet and files prepared by Python
 
 A pre-existing ZIP with a particular wallet filename is **not** required. Python downloads the ADB wallet when the local copy is absent, or reuses the existing files under the derived directory.
 
@@ -62,7 +68,7 @@ A pre-existing ZIP with a particular wallet filename is **not** required. Python
 
 The wallet does not create private connectivity. The configurator prints its exact `tnsnames.ora` path; make environment-specific descriptor edits before validation. Inspect a reused wallet/conflicting alias rather than overwriting it blindly.
 
-## Installation host requirements
+### Installation host requirements
 
 Prepare a host with the following tools and access before running the installer. Use the supported operating system and software installation method appropriate to your environment.
 
@@ -78,7 +84,7 @@ Prepare a host with the following tools and access before running the installer.
 
 Run Python commands from the add-on directory, `addons/oci-finops/`, using the prepared Python environment. Paths starting with `deployment/` in this guide are relative to that directory.
 
-## Supported Python authentication
+### Supported Python authentication
 
 Choose one supported OCI authentication method in the configurator. Prepare its credentials and IAM permissions using your organization's normal process.
 
@@ -90,7 +96,7 @@ Choose one supported OCI authentication method in the configurator. Prepare its 
 
 These methods authenticate the Python process. The ADB Resource Principal used by installed SQL is separate and still needs its own IAM authorization. Passwords, signing keys, session tokens and wallets stay outside the repository.
 
-## FOCUS report source
+### FOCUS report source
 
 The configurator uses one editable form for both Oracle-managed reports and your own bucket. Defaults point to Oracle-managed FOCUS reports:
 
@@ -105,7 +111,7 @@ Enter prefixes as plain text, not URL-encoded text. The installer encodes them w
 
 The `bling` namespace selects the Oracle-managed year/month/day layout. Oracle documents the default namespace, bucket and [FOCUS report structure](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/list-cost-usage-report.htm). Confirm the selected prefix actually contains FOCUS reports; a successful empty listing does not establish report availability.
 
-### Required layout for your own bucket
+#### Required layout for your own bucket
 
 Place four-digit year folders immediately below the chosen prefix, or at the bucket root when no prefix is selected:
 
@@ -121,7 +127,7 @@ Files must be gzip-compressed CSVs compatible with this module's OCI FOCUS colum
 
 One pipeline is created per selected year, preventing different yearly pipelines from selecting the same object. For Oracle-managed reports, its location ends in `/<prefix>/<year>/*/*/*.csv.gz`. For your own bucket, it uses `/<prefix>/<year>/.*[.]csv[.]gz` with `regexuri=true` to match compressed CSVs at any depth below that year. The prefix is omitted from either pattern when it is empty.
 
-## Bucket access for the installation operator
+### Bucket access for the installation operator
 
 Python checks the location with the operator's identity. For Oracle-managed reports it calls `ListObjects`; no `GetBucket` permission is required. For your own bucket it calls `GetBucket` to verify metadata access. For a user-group identity, an example scoped to that bucket is:
 
@@ -131,7 +137,9 @@ Allow group <INSTALLER_USER_GROUP> to read buckets in compartment id <BUCKET_COM
 
 For Instance Principal, use the installation Compute instance's authorized dynamic group instead. Reuse existing equivalent permissions. These checks do not establish ADB report access: installation separately checks listing with the ADB Resource Principal and discovers year folders. See Oracle's [Object Storage API permission mapping](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm).
 
-## Configure, validate and install
+## Installation
+
+### Configure, validate and install
 
 With the environment prepared, enter the add-on directory from the root of your checkout and run:
 
@@ -152,7 +160,7 @@ The mandatory set is schema, shared core, OCI ingestion, governed tag catalog/pr
 
 Year pipelines are created stopped. After OAC's initial empty COMPLETE MV build, ingestion starts. A background gate enables recurring OAC refresh after initial catch-up and a successful FAST refresh. Structural PASS alone does not establish completion or source coverage.
 
-## Verify installation and read-only status
+### Verify installation and read-only status
 
 ```text
 python deployment/python/finops_addon.py status --short
@@ -174,7 +182,7 @@ The report separates missing/partial/invalid/installed objects, job enablement v
 
 `status` reads the FOCUSPLATFORM password Secret and queries the database; it does not probe source APIs, repair, refresh or start jobs. Exit zero means the report ran, not that source coverage is complete. Current connection/SQL/check errors return nonzero; historical job failures remain report findings. For SQL diagnostic reports, see [maintenance and diagnostics](maintenance-and-diagnostics.md).
 
-### Module verification and background results
+#### Module verification and background results
 
 Python runs the module installers and their verifiers in dependency order. The following markers describe structural checks, not complete source coverage:
 
@@ -207,7 +215,13 @@ Source preflight runs before module DDL. It establishes API access for that atte
 
 The module's `verify/` scripts provide its structural and source-result checks. [Shared diagnostics](maintenance-and-diagnostics.md#installation-inventory-and-dependencies) report whole-solution inventory without replacing module-specific checks.
 
-## Install optional modules later
+### OAC connection
+
+When schema/source checks pass, continue with [OAC service preparation](../oac/oac-service-setup.md) and [workbook import and connection](../oac/oac-workbook-import.md). Those guides own the OAC service/catalog steps.
+
+## Other operations
+
+### Install optional modules later
 
 ```text
 python deployment/python/finops_addon.py preflight --module oci_budgets,oci_cloud_advisor
@@ -218,7 +232,7 @@ Valid IDs: `oci_tag_values`, `oci_budgets`, `oci_cloud_advisor`, `oci_cost_anoma
 
 `install-module` confirms the list and completes selected prechecks before DDL. It does not recreate the schema or baseline. Optional modules must be absent; installed/partial objects cause a safety stop. A later runtime error can leave earlier selected modules committed: inspect their verifiers before retrying.
 
-## Change a tag profile
+### Change a tag profile
 
 Save a [tag specification](#tag-specification) as a local JSON file. With the existing database configuration and credentials:
 
@@ -233,7 +247,7 @@ Replace `123` with the specific validated READY candidate. Publication is explic
 
 See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) for slot/version rules and the [compatibility limits](#compatibility-limits) for existing schemas.
 
-### Tag specification
+#### Tag specification
 
 `schema_version`, `profile_name` and `mode` are required. Profile names are 1–128 uppercase letters/digits/underscores, beginning with a letter. Namespaces and tag names are case-sensitive existing names, not ordinals. Use exactly one of the following:
 
@@ -261,17 +275,13 @@ See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) 
 
 See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) for stable slots, retired tags and immutable revisions.
 
-## Compatibility limits
+### Compatibility limits
 
 Fresh installations create the profile `SPEC_JSON` and item `IS_ACTIVE` columns and allow mixed-profile header namespaces. Existing databases need a reviewed migration preserving profile revisions, published mappings and slot identities. Do not run create-only installers over populated modules or expect the old mixed-profile delegate to upgrade them. Review automation that depended on prompts or dense renumbering.
 
 Before production use, validate Oracle compilation, grants, FAST refresh with retired typed-NULL columns, concurrent profile behavior and any existing-schema migration in a disposable Oracle environment.
 
-## OAC connection
-
-When schema/source checks pass, continue with [OAC service preparation](../oac/oac-service-setup.md) and [workbook import and connection](../oac/oac-workbook-import.md). Those guides own the OAC service/catalog steps.
-
-## Failed or interrupted installation
+### Failed or interrupted installation
 
 DDL may already be committed. Inspect local logs and the affected module's verifier before retrying. After a Resource Principal preflight stop, Python can reuse bootstrap only when both users are open, expected grants/ADMIN credential exist, FOCUSPLATFORM has no objects and schema verification passes. Other existing states stop for inspection; do not delete/reset schemas to bypass this gate.
 
