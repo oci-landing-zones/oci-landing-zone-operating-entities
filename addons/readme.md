@@ -19,6 +19,8 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-tbac/content/tbac_icon.svg" height="45" align="center"> | **[OCI TBAC](./oci-tbac/README.md)**| Use roles to manage IAM permissions for projects onboarding with **Tag-Based Access Controls**.|
 | <img src="oci-finops/images/finops_icon.png" height="30" align="center"> | **[OCI FinOps](./oci-finops/README.md)**| A set of **OCI FinOps** configurations with FOCUS to enable cost visibility, governance, and optimization. |
 |  | **[OCI LZ BCDR](./oci-lz-dr/README.md)** | Deployable **Business Continuity and Disaster Recovery** patterns and configuration guidance for OCI Landing Zones. |
+| <img src="oci-bastion/images/bastion-icon.svg" alt="OCI Bastion" height="30" align="center"> | **[OCI Bastion Access](./oci-bastion/README.md)** | Enable native OCI Bastion service and use dynamic SOCKS5 sessions for private web interface and VM access. Including macOS and Windows guides. |
+
 
 &nbsp; 
 

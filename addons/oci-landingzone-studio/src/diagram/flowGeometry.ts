@@ -78,7 +78,7 @@ export function flowAnchorPoint(rect: FlowRect): FlowPoint {
 const obstacleKind = (node: DiagramNode) =>
   node.kind === 'premises' || node.kind === 'vpn' || node.kind === 'vpntunnel' || node.kind === 'fastconnect' || node.kind === 'customerrouter' ||
   node.kind === 'subnet' || node.kind === 'gateway' || node.kind === 'attachment' ||
-  node.kind === 'drg' || node.kind === 'routetable' || node.kind === 'project' ||
+  node.kind === 'drg' || node.kind === 'routetable' || node.kind === 'project' || node.kind === 'operator' ||
   node.kind === 'resourcegroup' || node.kind === 'vcn' || node.kind === 'compartment' || node.kind === 'rtdot';
 
 interface Obstacle { id: string; left: number; right: number; top: number; bottom: number }

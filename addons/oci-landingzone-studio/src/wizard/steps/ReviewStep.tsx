@@ -31,6 +31,7 @@ import { exadataReadiness, platformReadiness } from '../../services/platformRead
 import { validateNotificationEmails } from '../../services/notificationEmails';
 import { validateRemotePeering } from '../../services/remotePeering';
 import { validateRegionalDeployment } from '../../services/regionalDeployment';
+import { BASTION_DOCUMENTATION_URL, validateBastion } from '../../services/bastion';
 import { regionShortNameError } from '../../services/regions';
 import {
   APPLY_STEP, DEPLOY_TO_OCI_URL, EXISTING_DEPLOYMENT_STEP, HUB_C_BACKEND_STEPS, ORCHESTRATOR_VERSION, UPDATE_STEP,
@@ -125,6 +126,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     return [...new Set([
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
+      ...validateBastion(model),
       ...validateNotificationEmails(model.foundation.notifications, regional),
       ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
       ...platformReadiness(model, 'oke_simple').errors,
@@ -231,6 +233,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               ['Region', model.foundation.region],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
               ['Hub', hub?.label ?? model.network.hubKind],
+              ['OCI Bastion', model.bastion?.enabled ? 'Hub management subnet' : 'Off'],
             ].map(([label, value]) => (
               <div key={label} style={local.sumCell}>
                 <dt style={local.sumLabel}>{label}</dt>
@@ -324,6 +327,12 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             <ul className="deployment-list">{handover.map((step) => <li key={step}>{step}</li>)}</ul>
             {Object.keys(model.hybridConnectivity?.ipsecs ?? {}).length > 0 && <p><a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm" target="_blank" rel="noreferrer">Oracle VPN setup</a></p>}
             {(Object.values(model.hybridConnectivity?.fast_connect_virtual_circuits ?? {}).some((circuit) => circuit.provision_fc_virtual_circuit !== false) || Object.keys(model.hybridConnectivity?.cross_connect_groups ?? {}).length > 0) && <p><a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm" target="_blank" rel="noreferrer">Oracle FastConnect setup</a></p>}
+          </div>}
+          {model.bastion?.enabled && <div style={local.guide}>
+            <h3 style={local.guideTitle}>After deployment</h3>
+            <p>Use a temporary access session to open a private database web interface or connect to a virtual machine. Follow the{' '}
+              <a className="guide-link" href={BASTION_DOCUMENTATION_URL} target="_blank" rel="noreferrer">Connect through OCI Bastion</a> guide to create a session and set up your client.
+            </p>
           </div>}
           <details className="deployment-step deployment-alternative">
             <summary>Updating an existing landing zone</summary>

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { describeHop, flowChoices, selectedRoles, toggleFlow } from './FlowSidebar';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import FlowSidebar, { describeHop, flowChoices, selectedRoles, toggleFlow } from './FlowSidebar';
 
 describe('toggleFlow', () => {
   const roles = ['web', 'app', 'db', 'infra'];
@@ -42,6 +44,21 @@ describe('describeHop', () => {
 describe('flowChoices', () => {
   const environments = [{ name: 'prod' }, { name: 'preprod' }, { name: 'dev' }];
 
+  it('offers the existing endpoint roles through Bastion only when its generated binding is available', () => {
+    expect(flowChoices(environments, 0).some((choice) => choice.id === 'prod:bastion')).toBe(false);
+    expect(flowChoices(environments, 0, true, [], true)).toContainEqual({ id: 'prod:bastion', label: 'Operator → prod', sub: 'Bastion SOCKS5 route preview' });
+    expect(toggleFlow([], 'prod:bastion', ['web', 'db'])).toEqual(['prod:bastion:web']);
+  });
+
+  it('offers only Bastion for platform-only scopes and keeps them out of ordinary east-west choices', () => {
+    const scopes = [{ name: 'prod', bastionOnly: true, bastionRoles: [{ id: 'SN-OKE', label: 'Private OKE subnet' }] },
+      { name: '@shared', label: 'Shared platforms', bastionOnly: true, bastionRoles: [{ id: 'SN-DB', label: 'Private database subnet' }] },
+      { name: 'dev' }];
+    expect(flowChoices(scopes, 0, true, [], true)).toEqual([{ id: 'prod:bastion', label: 'Operator → prod', sub: 'Bastion SOCKS5 route preview', roles: scopes[0].bastionRoles }]);
+    expect(flowChoices(scopes, 1, true, [], true)[0].label).toBe('Operator → Shared platforms');
+    expect(flowChoices(scopes, 2, true, [], true).some((choice) => choice.id.includes('east-west'))).toBe(false);
+  });
+
   it('makes every east-west destination explicit', () => {
     expect(flowChoices(environments, 0)).toEqual([
       { id: 'prod:egress', label: 'prod → Internet', sub: 'egress' },
@@ -69,6 +86,21 @@ describe('flowChoices', () => {
 });
 
 describe('OKE flow choices', () => {
+  it('retains original subnet indices in hop details when an API flow selects all allowed endpoints', () => {
+    const id = '@hub>prod/oke:api';
+    const markup = renderToStaticMarkup(createElement(FlowSidebar, {
+      environments: [
+        { name: 'Hub', scope: '@hub', apiOnly: true, roles: ['lb', 'fw', 'mgmt', 'mon'], rolesFor: (kind) => kind === 'api' ? ['mgmt', 'mon'] : [] },
+        { name: 'prod/oke', apiServer: true, roles: ['workers'], rolesFor: () => [] },
+      ],
+      active: [id],
+      traces: [{ id: `${id}#2`, kind: 'api', color: '#2a78d6', label: 'Hub API access', ok: true,
+        hops: [{ seq: 1, node: 'hub-vcn-sn-2', visitIndex: 0, label: 'Management source hop' }], segments: [], highlights: [] }],
+      steps: {}, onStep: () => {}, onChange: () => {}, collapsed: false, onToggleCollapse: () => {},
+    }));
+    expect(markup).toContain('Management source hop');
+  });
+
   it('shows a pod internet case without advertising worker internet when only pods are allowed', () => {
     const env = { name: 'prod/oke', oke: true, rolesFor: (kind: string) => kind === 'egress' ? ['pods'] : kind === 'services' ? ['workers', 'pods'] : [] };
     expect(flowChoices([env], 0).map(({ id, label }) => ({ id, label }))).toEqual([
