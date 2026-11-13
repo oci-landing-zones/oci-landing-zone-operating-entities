@@ -217,7 +217,7 @@ The module's `verify/` scripts provide its structural and source-result checks. 
 
 ### OAC connection
 
-When schema/source checks pass, continue with [OAC service preparation](../../installation-guide/oac/oac-service-setup.md) and [workbook import and connection](../../installation-guide/oac/oac-workbook-import.md). Those guides own the OAC service/catalog steps.
+When schema/source checks pass, continue with [OAC service preparation](../oac-configuration/oac-service-setup.md) and [workbook import and connection](../oac-configuration/oac-workbook-import.md). Those guides own the OAC service/catalog steps.
 
 ## Other operations
 

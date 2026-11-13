@@ -131,13 +131,13 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 3. **Configure the database modules.** Follow the [database configuration and installation guide](deployment/install/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 
-4. **Deploy and configure Oracle Analytics Cloud.**
+4. **[Deploy and configure Oracle Analytics Cloud](deployment/oac-configuration/README.md).**
 
    <ol type="A">
-     <li><a href="installation-guide/oac/oac-service-setup.md">Create the OAC instance manually and prepare ADB connectivity</a>, or reuse an existing service.</li>
-     <li><a href="installation-guide/oac/oac-workbook-import.md">Import the workbook and configure its database connection</a>.</li>
-     <li><a href="installation-guide/oac/oac-user-onboarding.md">Configure consumer access</a>.</li>
-     <li><strong>Optional:</strong> <a href="installation-guide/oac/oac-ai-assistant-consumers.md">Index datasets and enable AI Assistant</a>.</li>
+     <li><a href="deployment/oac-configuration/oac-service-setup.md">Create the OAC instance manually and prepare ADB connectivity</a>, or reuse an existing service.</li>
+     <li><a href="deployment/oac-configuration/oac-workbook-import.md">Import the workbook and configure its database connection</a>.</li>
+     <li><a href="deployment/oac-configuration/oac-user-onboarding.md">Configure consumer access</a>.</li>
+     <li><strong>Optional:</strong> <a href="deployment/oac-configuration/oac-ai-assistant-consumers.md">Index datasets and enable AI Assistant</a>.</li>
    </ol>
 
 ## License

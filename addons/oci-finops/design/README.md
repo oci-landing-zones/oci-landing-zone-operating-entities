@@ -8,7 +8,7 @@ FinOps FOCUS Platform is designed to run in an OCI **parent tenancy**. Its datab
 
 Provider modules own their source formats, landing data, remediation and analytical context. OCI is the only implemented provider. Its [design overview](02-oci-provider.md) defines the mandatory baseline, optional components and actual data dependencies. The architecture allows other cloud providers to be added through separate modules.
 
-Visualization modules publish database reporting interfaces independently of the presentation tool. The OAC database module prepares the OCI cost-detail interface; the separate OAC service uses it for datasets and dashboards. OAC is the default presentation tool, and its importable workbook is described in the [workbook guide](../installation-guide/oac/oac-workbook-import.md). Additional visualization modules can be added without changing ingestion.
+Visualization modules publish database reporting interfaces independently of the presentation tool. The OAC database module prepares the OCI cost-detail interface; the separate OAC service uses it for datasets and dashboards. OAC is the default presentation tool, and its importable workbook is described in the [workbook guide](../deployment/oac-configuration/oac-workbook-import.md). Additional visualization modules can be added without changing ingestion.
 
 ![Platform architecture with shared foundation, OCI modules and separate OAC service](diagrams/02-oci-provider.svg?rev=66e7d1e)
 

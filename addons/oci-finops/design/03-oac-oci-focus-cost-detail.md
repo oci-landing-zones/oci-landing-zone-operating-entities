@@ -146,7 +146,7 @@ A populated `STALE` MV remains queryable but excludes later landing commits unti
 
 `OAC_OCI_FOCUS_TAG_SLOT_V` exposes `MV_NAME`, `PROFILE_NAME`, `PROFILE_VERSION`, `SLOT_NUMBER`, `MV_COLUMN_NAME`, `DISPLAY_LABEL`, `NAMESPACE_NAME`, `TAG_NAME` and `ASSIGNED`. It resolves through the published synonym and its build audit, so a pending profile revision cannot relabel data still served by the old MV. Publication switches values and their label contract together; retired slots remain unassigned.
 
-OAC binds to `MV_COLUMN_NAME` and uses `DISPLAY_LABEL` for meaning. A different profile can change slot meanings or column count; consumer update steps are defined in the [workbook guide](../installation-guide/oac/oac-workbook-import.md#after-reporting-profile-changes).
+OAC binds to `MV_COLUMN_NAME` and uses `DISPLAY_LABEL` for meaning. A different profile can change slot meanings or column count; consumer update steps are defined in the [workbook guide](../deployment/oac-configuration/oac-workbook-import.md#after-reporting-profile-changes).
 
 ### MV log on `OCI_FOCUS_REPORTS`
 
