@@ -1,4 +1,4 @@
--- Install the OCI FOCUS cost-detail source for OAC. Run as FOCUSPLATFORM from deployment/sql/install.
+-- Install the OCI FOCUS cost-detail source for OAC. Run as FOCUSPLATFORM from deployment/database-installation/sql/install.
 -- Prepare an empty MV and its stable synonym now; populate it in the background.
 SET ECHO OFF VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100

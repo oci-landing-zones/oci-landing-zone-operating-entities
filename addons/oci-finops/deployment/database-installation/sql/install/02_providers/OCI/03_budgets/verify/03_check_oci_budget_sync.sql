@@ -1,4 +1,4 @@
--- Read-only source-sync report. Run as FOCUSPLATFORM from deployment/sql/install.
+-- Read-only source-sync report. Run as FOCUSPLATFORM from deployment/database-installation/sql/install.
 SET VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 210 PAGESIZE 100
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

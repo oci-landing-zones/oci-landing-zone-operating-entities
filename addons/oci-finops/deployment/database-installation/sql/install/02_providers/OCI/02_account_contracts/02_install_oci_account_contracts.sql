@@ -1,4 +1,4 @@
--- One OCI extension; two independent syncs. Run as FOCUSPLATFORM from deployment/sql/install.
+-- One OCI extension; two independent syncs. Run as FOCUSPLATFORM from deployment/database-installation/sql/install.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER OSERROR EXIT FAILURE

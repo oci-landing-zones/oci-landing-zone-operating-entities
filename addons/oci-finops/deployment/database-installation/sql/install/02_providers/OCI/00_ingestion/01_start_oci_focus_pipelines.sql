@@ -1,5 +1,5 @@
 -- Start OCI FOCUS year pipelines only after an empty, fully populated OAC MV.
--- Run once as FOCUSPLATFORM from deployment/sql/install after the OAC installer.
+-- Run once as FOCUSPLATFORM from deployment/database-installation/sql/install after the OAC installer.
 SET DEFINE OFF VERIFY OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER OSERROR EXIT FAILURE
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

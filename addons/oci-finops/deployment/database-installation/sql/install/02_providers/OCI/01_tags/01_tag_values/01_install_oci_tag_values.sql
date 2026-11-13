@@ -1,5 +1,5 @@
 -- Optional, self-contained OCI defined-tag value extraction module.
--- Run as FOCUSPLATFORM from the deployment/sql/install operating-system directory.
+-- Run as FOCUSPLATFORM from the deployment/database-installation/sql/install operating-system directory.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER OSERROR EXIT FAILURE

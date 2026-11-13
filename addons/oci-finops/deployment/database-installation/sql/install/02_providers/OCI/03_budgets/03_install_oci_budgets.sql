@@ -1,4 +1,4 @@
--- Run as FOCUSPLATFORM from deployment/sql/install. Read-only OCI Budgets collection.
+-- Run as FOCUSPLATFORM from deployment/database-installation/sql/install. Read-only OCI Budgets collection.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER OSERROR EXIT FAILURE

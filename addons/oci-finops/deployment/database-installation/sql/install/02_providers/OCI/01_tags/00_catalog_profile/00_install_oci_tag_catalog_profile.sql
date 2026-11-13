@@ -1,4 +1,4 @@
--- Run once as FOCUSPLATFORM from deployment/sql/install. Does not process FOCUS rows.
+-- Run once as FOCUSPLATFORM from deployment/database-installation/sql/install. Does not process FOCUS rows.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER OSERROR EXIT FAILURE

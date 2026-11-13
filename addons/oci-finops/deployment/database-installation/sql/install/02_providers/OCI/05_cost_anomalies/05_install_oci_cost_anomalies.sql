@@ -1,4 +1,4 @@
--- Run as FOCUSPLATFORM from deployment/sql/install. Reads native OCI anomaly results.
+-- Run as FOCUSPLATFORM from deployment/database-installation/sql/install. Reads native OCI anomaly results.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER OSERROR EXIT FAILURE

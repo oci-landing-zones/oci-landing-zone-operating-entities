@@ -1,4 +1,4 @@
--- Read-only post-install check. Run as FOCUSPLATFORM from deployment/sql/install.
+-- Read-only post-install check. Run as FOCUSPLATFORM from deployment/database-installation/sql/install.
 SET VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 SET LINESIZE 190 PAGESIZE 100
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

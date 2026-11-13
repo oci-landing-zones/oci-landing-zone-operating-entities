@@ -1,5 +1,5 @@
 -- One-time upgrade for an already installed OAC cost-detail module.
--- Run as FOCUSPLATFORM with the OS working directory at deployment/sql/install.
+-- Run as FOCUSPLATFORM with the OS working directory at deployment/database-installation/sql/install.
 -- The current MV and synonym remain in service while the replacement builds.
 SET ECHO OFF VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER OSERROR EXIT FAILURE

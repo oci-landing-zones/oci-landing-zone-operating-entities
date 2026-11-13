@@ -1,6 +1,6 @@
 -- Optional, read-only structural inventory. No DDL, DML, API calls or job starts.
 -- Run as FOCUSPLATFORM, or as ADMIN after setting CURRENT_SCHEMA=FOCUSPLATFORM.
--- From deployment/sql/install: @../monitoring/06_module_installation_health.sql
+-- From deployment/database-installation/sql/install: @../monitoring/06_module_installation_health.sql
 -- Missing optional components are informational. Findings never raise an error.
 SET ECHO OFF VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
 SET TAB OFF

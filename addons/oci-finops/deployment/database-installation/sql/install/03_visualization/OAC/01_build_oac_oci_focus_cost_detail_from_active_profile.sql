@@ -1,5 +1,5 @@
 -- After an explicit profile change, request another candidate MV in the background.
--- Run as FOCUSPLATFORM from deployment/sql/install. The published synonym remains available.
+-- Run as FOCUSPLATFORM from deployment/database-installation/sql/install. The published synonym remains available.
 SET ECHO OFF VERIFY OFF DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER OSERROR EXIT FAILURE
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK

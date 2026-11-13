@@ -1,5 +1,5 @@
 -- Install the complete OCI FOCUS ingestion provider as FOCUSPLATFORM.
--- Start SQL*Plus in deployment/sql/install. This is the only operator command for this
+-- Start SQL*Plus in deployment/database-installation/sql/install. This is the only operator command for this
 -- module. It creates one landing, one shared remediation stage, year pipelines,
 -- and the provider adapter for the already-enabled common daily coordinator.
 SET ECHO OFF VERIFY OFF DEFINE OFF FEEDBACK ON SERVEROUTPUT ON SIZE UNLIMITED
