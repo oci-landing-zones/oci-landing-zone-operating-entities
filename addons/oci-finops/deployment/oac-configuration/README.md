@@ -1,6 +1,6 @@
 # Deploy and configure Oracle Analytics Cloud
 
-Complete the [database installation](../install/README.md) before configuring reporting. Follow these guides in order:
+Complete the [database installation](../database-installation/README.md) before configuring reporting. Follow these guides in order:
 
 1. [Create or reuse OAC and prepare its private ADB connectivity](oac-service-setup.md).
 2. [Import the workbook and configure its database connection](oac-workbook-import.md).

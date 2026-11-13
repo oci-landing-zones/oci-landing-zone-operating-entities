@@ -272,7 +272,7 @@ def load_oci_sdk(auth_method: str, profile_name: str, region: str | None = None)
     try:
         import oci
     except ImportError as exc:
-        raise DeploymentError("The OCI Python SDK is missing. Install it with: python -m pip install -r deployment/install/python/requirements.txt") from exc
+        raise DeploymentError("The OCI Python SDK is missing. Install it with: python -m pip install -r deployment/database-installation/python/requirements.txt") from exc
     try:
         method = auth_method.upper()
         if method == "API_KEY":

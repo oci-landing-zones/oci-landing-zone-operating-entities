@@ -51,11 +51,11 @@ Module 00 creates `OAC_FOCUS_READER` and its grants. Check the connection target
 SELECT COUNT(*) FROM FOCUSPLATFORM.OAC_OCI_FOCUS_COST_DETAIL;
 ```
 
-For database authorization failures, have the DBA compare the [access contract](../../design/00-schema-bootstrap.md#created-objects-and-access) and use the [reader grant verification/repair script](../install/sql/install/00_schema/01_grant_oac_reader_access.sql) when appropriate. OAC metadata HTTP 403 errors instead require checking [dataset and connection sharing](oac-user-onboarding.md#troubleshooting).
+For database authorization failures, have the DBA compare the [access contract](../../design/00-schema-bootstrap.md#created-objects-and-access) and use the [reader grant verification/repair script](../database-installation/sql/install/00_schema/01_grant_oac_reader_access.sql) when appropriate. OAC metadata HTTP 403 errors instead require checking [dataset and connection sharing](oac-user-onboarding.md#troubleshooting).
 
 ## After reporting profile changes
 
-[Apply the profile, build and explicitly publish its candidate with Python](../install/python-installation.md#change-a-tag-profile), then refresh OAC dataset metadata and review presentation:
+[Apply the profile, build and explicitly publish its candidate with Python](../database-installation/python-installation.md#change-a-tag-profile), then refresh OAC dataset metadata and review presentation:
 
 | Change | Required review |
 | --- | --- |
