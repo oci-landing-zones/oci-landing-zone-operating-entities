@@ -38,20 +38,15 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 ## Step 2: Install the FinOps database modules
 
-### Common database prerequisites
+### Database prerequisites
 
-Both installation methods require a compatible ADB with working connectivity, credentials and OCI authorization for the selected source and modules. Complete the [ADB Resource Principal and IAM prerequisites](database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both sources; policies depend on Oracle-managed reports or a customer bucket. The route guides specify their host and credential requirements.
+The Python installer requires a compatible ADB with working connectivity, credentials and OCI authorization for the selected source and modules. Complete the [ADB Resource Principal and IAM prerequisites](database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both report sources; policies depend on Oracle-managed reports or a customer bucket.
 
-### Installation method
+The ADB, compartments, Vault, Secrets and tags must match the [installer prerequisite table](database-modules/python-installation.md#resources-that-must-already-exist).
 
-Choose an installation method. Both options install the same FinOps schemas and SQL modules:
+### Install with Python
 
-| **Your starting point** | **Choose** |
-| --- | --- |
-| The ADB, compartments, Vault, Secrets and tags follow the Landing Zone names and prerequisites expected by the installer. | **[Option A — Python installer (default)](database-modules/python-installation.md)**. Python discovers the resources and guides the installation. |
-| Your Landing Zone resources use different names or credential conventions, or you need to run SQL directly. | **[Option B — Direct SQL installation](database-modules/manual-sql-installation.md)**. Supply the connection, credentials and module inputs explicitly. |
-
-For Python, complete the [configuration and validation procedure](database-modules/python-installation.md#configure-validate-and-install) before installation; it checks ADMIN Secret access and a read-only connection to ADB. For direct SQL, follow the prerequisites and validation steps in its guide. Required IAM permissions, source access and database compatibility apply to both methods.
+Follow the [Python installation guide](database-modules/python-installation.md). Run configuration, validation and installation in that order. Validation checks ADMIN Secret access and a read-only connection to ADB; installation checks the required source/module access before proceeding.
 
 After installation, use [ADB maintenance and diagnostics](database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
 

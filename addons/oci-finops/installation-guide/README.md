@@ -10,7 +10,7 @@ Set up the FinOps add-on in the following order:
 | Folder | Contents |
 | --- | --- |
 | [infrastructure/](infrastructure/) | Landing Zone deployment guidance using Terraform modules and the Orchestrator. |
-| [database-modules/](database-modules/) | Python and direct SQL installation, ADB Resource Principal prerequisites, verification and maintenance. |
+| [database-modules/](database-modules/) | Python installation, ADB Resource Principal prerequisites, verification and maintenance. |
 | [oac/](oac/) | OAC service setup, database connectivity, workbook import and user access. |
 
 ## License

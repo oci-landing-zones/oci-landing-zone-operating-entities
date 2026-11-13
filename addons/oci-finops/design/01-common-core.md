@@ -204,4 +204,4 @@ An enabled `DBMS_SCHEDULER` stored-procedure job invokes `FINOPS_CORE_RUN_DAILY`
 
 The coordinator requires the Module 00 direct grants on `DBMS_LOCK` and `DBMS_CLOUD_NOTIFICATION`. Notifications additionally require the ADB Resource Principal and delivery prerequisites defined above. Provider packages own source-specific processing; they do not modify the common coordinator or notification configuration.
 
-Setup commands are in the [installation guide](../installation-guide/database-modules/manual-sql-installation.md#run-modules-in-order); report queries are in [coordinator diagnostics](../installation-guide/database-modules/maintenance-and-diagnostics.md#coordinator-and-notification-diagnostics).
+Setup commands are in the [installation guide](../installation-guide/database-modules/python-installation.md#configure-validate-and-install); report queries are in [coordinator diagnostics](../installation-guide/database-modules/maintenance-and-diagnostics.md#coordinator-and-notification-diagnostics).

@@ -100,7 +100,7 @@ Follow [Deploy and verify](#deploy-and-verify) for the deployment sequence and f
 The IaC deployment automates the core infrastructure required by FinOps, including ADB, IAM, networking, Vault/key and notifications. Complete the remaining setup through the [FinOps configuration guide](../../installation-guide/configuration.md#step-1-prepare-database-credentials-and-secrets):
 
 1. **Prepare database credentials and Secrets.** Change the initial ADMIN password and manually create the three password Secrets in the provisioned Vault.
-2. **Install the database modules.** Run the Python installer, the default method, or the direct SQL installation. This separate step creates the FinOps schemas and installs the ingestion, processing and reporting modules.
+2. **Install the database modules.** Run the Python installer. This separate step creates the FinOps schemas and installs the ingestion, processing and reporting modules.
 3. **Prepare OAC and reporting.** Manually create OAC if needed, or reuse an existing service. Configure its private ADB connectivity, database connection, datasets, workbook and user access.
 
 **Optional report source:** If using a customer-managed Object Storage bucket for FOCUS reports, provision and populate it separately and complete the [source access prerequisites](../../installation-guide/database-modules/oci-resource-principal-iam.md) before installing the database modules. The bucket is not created by the add-on IaC.

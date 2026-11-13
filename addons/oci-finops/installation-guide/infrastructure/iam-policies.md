@@ -1,6 +1,6 @@
 # FinOps IAM policies
 
-Reference for the policies currently defined in [finops_iam.json](../../deployment/FinOps_LandingZone_addon/finops_iam.json). Provision them through [the deployment guide](../../deployment/FinOps_LandingZone_addon/README.md); the Python/SQL installers do not create IAM policies.
+Reference for the policies currently defined in [finops_iam.json](../../deployment/FinOps_LandingZone_addon/finops_iam.json). Provision them through [the deployment guide](../../deployment/FinOps_LandingZone_addon/README.md); the Python installer does not create IAM policies.
 
 ## Contents
 

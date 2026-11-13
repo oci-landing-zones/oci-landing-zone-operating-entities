@@ -1,6 +1,6 @@
 # ADB maintenance and diagnostics
 
-Use this guide after schema installation for health checks, ADB restart, optional capacity adjustments and database maintenance. Installation steps and shared session inputs are defined once in the [manual SQL guide](manual-sql-installation.md); [Python status commands](python-installation.md#verify-installation-and-read-only-status) remain in the Python guide.
+Use this guide after schema installation for health checks, ADB restart, optional capacity adjustments and database maintenance. Follow the [Python guide](python-installation.md) for installation and status commands. The SQL procedures below are post-installation maintenance operations.
 
 Diagnostic reports are read-only. Rescheduling, capacity changes, MV rebuilds and retention change database state; run only the procedure required for the task. The retention sections distinguish preview, scheduling and destructive execution.
 
@@ -9,6 +9,7 @@ Diagnostic reports are read-only. Rescheduling, capacity changes, MV rebuilds an
 - [Installation inventory and dependencies](#installation-inventory-and-dependencies)
 - [Operating state](#operating-state)
 - [Filtered module status](#filtered-module-status)
+- [SQL maintenance session inputs](#sql-maintenance-session-inputs)
 - [Enable, change or disable core notifications](#enable-change-or-disable-core-notifications)
 - [Coordinator and notification diagnostics](#coordinator-and-notification-diagnostics)
 - [ADB stop and restart windows](#adb-stop-and-restart-windows)
@@ -33,7 +34,7 @@ From the repository's `deployment/sql/install` directory:
 
 `06_module_installation_health.sql` uses an explicit manifest of permanent tables, views, routines, packages and recurring jobs for each component. It distinguishes `NOT_INSTALLED`, `PARTIAL`, `INVALID`, `NEEDS_CONFIGURATION`, `CHECK_ERROR`, and `INSTALLED`. Partial and invalid rows list the missing or invalid objects. Configuration checks inspect small metadata/configuration tables, not FOCUS landing rows.
 
-`INSTALLED` means that the listed structural contract and minimum configuration are present. It is not a replacement for each module's detailed installer verifier: it does not validate every column, constraint, privilege, schedule setting, collector definition or source permission. Use the [module installation and verification sequence](manual-sql-installation.md#run-modules-in-order) for those checks.
+`INSTALLED` means that the listed structural contract and minimum configuration are present. It is not a replacement for each module's detailed installer verifier: it does not validate every column, constraint, privilege, schedule setting, collector definition or source permission. Use the [module verification and background checks](python-installation.md#module-verification-and-background-results) for those checks.
 
 Ingestion also requires a registered OCI provider and at least one yearly FOCUS pipeline. Owners use `USER_CLOUD_PIPELINES`; cross-schema administrators need `DBA_CLOUD_PIPELINES`. Missing dictionary access is reported as a check error, not a successful installation. Runtime state and target/source configuration still need the ingestion verifier. OAC structure is inventoried separately from the validity/freshness of its dynamically named published MV, which is reported by check 08.
 
@@ -60,11 +61,43 @@ For Python status options and interpretation, use [installation status guide](py
 
 SQL wrappers `06_module_installation_health.sql` and `09_selected_module_status.sql` share `internal/module_status_report.sql`. The filtered wrapper requires initialized session parameters with `status_module_ids` and optional `status_detail` (`SHORT` or `LONG`, default LONG). The all-module wrapper initializes its own diagnostic bind. Neither performs repairs or starts jobs; source coverage remains a separate check.
 
+## SQL maintenance session inputs
+
+For a maintenance script that requires inputs, connect as `FOCUSPLATFORM` with SQL*Plus working directory `addons/oci-finops/deployment/sql/install`, relative to the checkout root. Initialize once per connection, before assigning values:
+
+```sql
+@00_schema/00_set_install_parameters.sql
+```
+
+Assign the non-secret fields required by the operation in `fp_install_config`. For a custom-landing MV rebuild, for example:
+
+```sql
+BEGIN
+  :fp_install_config := TO_CLOB(
+    '{"schema_version":1,"source_table":"OCI_FOCUS_REPORTS"}'
+  );
+END;
+/
+```
+
+The rebuild helper defaults to `OCI_FOCUS_REPORTS` when `source_table` is omitted. The filtered status wrapper uses `status_module_ids` and optional `status_detail`; use [Python status](python-installation.md#verify-installation-and-read-only-status) for the command-line interface. Do not initialize again after assigning values: the initializer resets the inputs. When combining fields, preserve the ones needed by the current operation. No password belongs in this JSON.
+
 ## Enable, change or disable core notifications
 
 Connect as `FOCUSPLATFORM` with SQL*Plus working directory `deployment/sql/install`. Enabling requires an existing Notifications topic, a confirmed subscription and ADB publish permission; see the [notification access requirements](../../design/01-common-core.md#finops_core_notify_config--combined-report-destination).
 
-To enable delivery or replace the topic, initialize the session inputs and set `notifications_topic_ocid` in the existing `fp_install_config` CLOB as described in the [module input reference](manual-sql-installation.md#module-input-reference). Then run:
+To enable delivery or replace the topic, initialize the [session inputs](#sql-maintenance-session-inputs), then supply the topic and run:
+
+```sql
+BEGIN
+  :fp_install_config := TO_CLOB(
+    '{"schema_version":1,"notifications_topic_ocid":"<TOPIC_OCID>"}'
+  );
+END;
+/
+```
+
+Replace `<TOPIC_OCID>` with the intended topic OCID. Then run:
 
 ```sql
 @01_core/02_enable_finops_core_notifications.sql
@@ -111,9 +144,9 @@ The [tag-value design](../../design/02-oci-tag-values.md#how-it-works) defines b
 
 ## Rebuild and publish the OAC cost-detail MV
 
-For ordinary profile changes, follow [change a profile and publish an MV candidate](manual-sql-installation.md#change-a-profile-and-publish-an-mv-candidate). To choose another local landing table or changed scalar structure, run [`rebuild_oci_focus_cost_detail_from_landing.sql`](../../deployment/sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql) from `deployment/sql/install`, with initialized session binds and optional `source_table` in `fp_install_config` (default `OCI_FOCUS_REPORTS`). It does not prompt for a table name.
+For ordinary profile changes, follow [change a profile and publish an MV candidate with Python](python-installation.md#change-a-tag-profile). To choose another local landing table or changed scalar structure, run [`rebuild_oci_focus_cost_detail_from_landing.sql`](../../deployment/sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql) from `deployment/sql/install`, with initialized [session inputs](#sql-maintenance-session-inputs) and optional `source_table` in `fp_install_config` (default `OCI_FOCUS_REPORTS`). It does not prompt for a table name.
 
-The helper builds and validates a separate candidate and records it as `READY` without moving the published synonym. Inspect the build audit and candidate, then use the [explicit publication operation](manual-sql-installation.md#change-a-profile-and-publish-an-mv-candidate) with that run ID. Check the source columns, FAST-refresh eligibility and OAC dataset compatibility against the [source-table requirements](../../design/03-oac-oci-focus-cost-detail.md#scope-and-dependencies). A successful Scheduler invocation alone does not prove a valid candidate, publication or fresh reporting data.
+The helper builds and validates a separate candidate and records it as `READY` without moving the published synonym. Inspect the build audit and candidate, then use the [explicit Python publication operation](python-installation.md#change-a-tag-profile) with that run ID. Check the source columns, FAST-refresh eligibility and OAC dataset compatibility against the [source-table requirements](../../design/03-oac-oci-focus-cost-detail.md#scope-and-dependencies). A successful Scheduler invocation alone does not prove a valid candidate, publication or fresh reporting data.
 
 ## OAC build capacity and failures
 

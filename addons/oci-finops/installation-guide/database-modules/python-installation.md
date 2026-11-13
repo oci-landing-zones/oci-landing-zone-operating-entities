@@ -1,8 +1,8 @@
 # Install the FinOps add-on schemas with Python
 
-Use this route when the existing Landing Zone resources match the exact names below. For a different resource/credential convention, use [direct SQL](manual-sql-installation.md).
+Use the Python installer to create the FinOps schemas and install the database modules in the existing Landing Zone ADB. Resources must match the discovery requirements below.
 
-The [common deployment prerequisites](../configuration.md#common-database-prerequisites) apply to this route.
+Complete the [database prerequisites](../configuration.md#database-prerequisites) before running the installer.
 
 ## Contents
 
@@ -13,8 +13,11 @@ The [common deployment prerequisites](../configuration.md#common-database-prereq
 - [Customer bucket metadata access](#customer-bucket-metadata-access)
 - [Configure, validate and install](#configure-validate-and-install)
 - [Verify installation and read-only status](#verify-installation-and-read-only-status)
+  - [Module verification and background results](#module-verification-and-background-results)
 - [Install optional modules later](#install-optional-modules-later)
 - [Change a tag profile](#change-a-tag-profile)
+  - [Tag specification](#tag-specification)
+- [Compatibility limits](#compatibility-limits)
 - [OAC connection](#oac-connection)
 - [Failed or interrupted installation](#failed-or-interrupted-installation)
 
@@ -42,7 +45,7 @@ These are discovery requirements in `deployment/python/finops_addon.py`, not sug
 
 Secrets contain raw passwords, not JSON. New-user passwords must satisfy ADB rules and contain no double quotes or line breaks. Existing populated add-on schemas are not a fresh-install target. The [IAM reference](oci-resource-principal-iam.md) gives source-specific policies; module preflight verifies actual access.
 
-**If these names or credential-storage conventions do not match, use the [direct SQL route](manual-sql-installation.md).** Do not rename customer infrastructure merely to satisfy Python discovery. Missing functional permissions must still be resolved; switching routes does not bypass them.
+**Resource names and credential-storage conventions must match this table.** The installer does not discover arbitrary naming conventions. Resolve mismatches with the infrastructure owner before proceeding; do not rename existing customer resources blindly.
 
 ## Wallet and files prepared by Python
 
@@ -72,7 +75,7 @@ Prepare a host with the following tools and access before running the installer.
 | OCI access | Access to the selected region's OCI APIs and the resource-discovery/Vault permissions in the prerequisite table above. |
 | Database connectivity | A working route/DNS resolution to the ADB endpoint and the environment's required private access. Resolve any descriptor changes before validation. |
 
-Run Python commands from the add-on directory, `addons/oci-finops/`, using the prepared Python environment. Paths starting with `deployment/` in this guide are relative to that directory. The direct SQL route needs the checkout, SQL*Plus/client and database connectivity; Python dependencies and Python OCI authentication are not required for that route.
+Run Python commands from the add-on directory, `addons/oci-finops/`, using the prepared Python environment. Paths starting with `deployment/` in this guide are relative to that directory.
 
 ## Supported Python authentication
 
@@ -94,7 +97,7 @@ Only when selecting a customer-owned FOCUS bucket, Python `configure` calls `Get
 Allow group <INSTALLER_USER_GROUP> to read buckets in compartment id <BUCKET_COMPARTMENT_OCID> where target.bucket.name = '<BUCKET_NAME>'
 ```
 
-For Instance Principal, use the installation Compute instance's authorized dynamic group instead. Reuse existing equivalent permissions. This check does not apply to direct SQL installation and does not establish ADB report access. See Oracle's [Object Storage API permission mapping](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm).
+For Instance Principal, use the installation Compute instance's authorized dynamic group instead. Reuse existing equivalent permissions. This operator-side check does not establish ADB report access. See Oracle's [Object Storage API permission mapping](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/objectstoragepolicyreference.htm).
 
 ## Configure, validate and install
 
@@ -137,7 +140,40 @@ Valid names: `all`, `core`, `ingestion`, `tags`, `accounts`, `tag-values`, `budg
 
 The report separates missing/partial/invalid/installed objects, job enablement versus execution and source results. Oracle pipeline/history/file-tracking metadata is authoritative; load-log evidence does not override it. An empty tracking table means NO RECORDS; a missing one means NO TRACKING TABLE. Job results are scoped to the current job incarnation. FOUND counts objects, not data rows; INVALID is a subset of FOUND. Disabled retention/refresh jobs can be intentional.
 
-`status` reads the FOCUSPLATFORM password Secret and queries the database; it does not probe source APIs, repair, refresh or start jobs. Exit zero means the report ran, not that source coverage is complete. Current connection/SQL/check errors return nonzero; historical job failures remain report findings. Direct SQL uses the same [monitoring manifest/report](maintenance-and-diagnostics.md).
+`status` reads the FOCUSPLATFORM password Secret and queries the database; it does not probe source APIs, repair, refresh or start jobs. Exit zero means the report ran, not that source coverage is complete. Current connection/SQL/check errors return nonzero; historical job failures remain report findings. For SQL diagnostic reports, see [maintenance and diagnostics](maintenance-and-diagnostics.md).
+
+### Module verification and background results
+
+Python runs the module installers and their verifiers in dependency order. The following markers describe structural checks, not complete source coverage:
+
+| Component | Structural result |
+| --- | --- |
+| 00 — Schema, as `ADMIN` | `FOCUSPLATFORM SCHEMA VERIFICATION PASS` |
+| 01 — Shared core, as `FOCUSPLATFORM` | `FINOPS CORE VERIFICATION PASS` |
+| OCI 00 — Ingestion and remediation | `OCI INGESTION VERIFICATION PASS` |
+| OCI 01a — Tag definitions and profile | `OCI TAG CATALOG AND PROFILE VERIFICATION PASS` |
+| OCI 02 — Account context and contracts | `OCI ACCOUNT CONTEXT AND CONTRACT VERIFICATION PASS` |
+| OCI 01b — All defined-tag values | `OCI TAG VALUE EXTRACTION VERIFICATION PASS` |
+| OCI 03 — Budgets | `OCI BUDGETS VERIFICATION PASS` |
+| OCI 04 — Cloud Advisor | `OCI CLOUD ADVISOR VERIFICATION PASS` |
+| OCI 05 — Cost Anomalies | `OCI COST ANOMALY VERIFICATION PASS` |
+| OCI 06 — Native Forecast | `OCI NATIVE FORECAST VERIFICATION PASS` |
+| 03 / OAC — Database source | `OAC COST DETAIL STRUCTURE PASS` |
+| Start — OCI pipelines | Pipelines start only after MV `COMPLETE` and `VALID` checks |
+
+Source preflight runs before module DDL. It establishes API access for that attempt; structural PASS markers do not prove that later background work completed.
+
+| Component | Installation and acceptance checks |
+| --- | --- |
+| Shared core | The initial self-check calls `FINOPS_CORE_RUN_DAILY('N')` and records an audit without sending email. The verifier checks objects, configuration, selected time zone and enabled daily job. Confirm email delivery separately using [coordinator diagnostics](maintenance-and-diagnostics.md#coordinator-and-notification-diagnostics). |
+| Ingestion | Pipelines are configured stopped. Pipeline startup waits one minute for an initial configuration/status snapshot and requests an asynchronous run of the existing common daily job. Later file/row outcomes require pipeline metadata and remediation ledgers. Retention stays disabled until enabled through the maintenance procedure. |
+| Tag catalog/profile | Validate the core, clean module state, Resource Principal and requested specification before DDL. Initial catalog sync and profile selection precede the structural gate. The initial governed installation requires the reserved default profile. Module SQL has no ordinal-choice prompts. |
+| Account context/contracts | Preflight checks Identity and commercial discovery. Successful Identity queries alone do not establish commercial source access. Required source checks must succeed before installation proceeds. Initial context and contract runs are asynchronous: inspect both audits and the source-result report, not only job submission. |
+| Tag values | The structural gate checks metadata and code, then requests an immediate background run. It does not establish historical completion. Inspect `OCI_TAG_VALUE_RUN`, configuration/cursor progress and Scheduler history before accepting backfill. |
+| Budgets, Advisor, Anomalies, Forecast | Each checks its API access, creates its objects and requests background synchronization. The structural verifier and source-result report answer different questions. |
+| OAC cost detail | The initial verifier can report `OAC COST DETAIL SYNONYM READY; INITIAL POPULATION PENDING`. After population, rerun it and require `OAC COST DETAIL BUILD PASS`. Check a valid FAST-refreshable published MV, its staleness/compile state and totals by charge period/currency before creating OAC datasets. Scheduler success alone does not prove a complete first population. |
+
+The module's `verify/` scripts provide its structural and source-result checks. [Shared diagnostics](maintenance-and-diagnostics.md#installation-inventory-and-dependencies) report whole-solution inventory without replacing module-specific checks.
 
 ## Install optional modules later
 
@@ -152,7 +188,7 @@ Valid IDs: `oci_tag_values`, `oci_budgets`, `oci_cloud_advisor`, `oci_cost_anoma
 
 ## Change a tag profile
 
-Save a [tag specification](manual-sql-installation.md#tag-specification) as a local JSON file. With the existing database configuration and credentials:
+Save a [tag specification](#tag-specification) as a local JSON file. With the existing database configuration and credentials:
 
 ```bash
 python deployment/python/finops_addon.py apply-tag-profile --spec tag-profile.json
@@ -161,9 +197,43 @@ python deployment/python/finops_addon.py build-tag-mv
 python deployment/python/finops_addon.py publish-tag-mv --run-id 123
 ```
 
-Replace `123` with the specific validated READY candidate. Publication is explicit; these are independent operations. Every command supports `-h`. Python reads the tag JSON file, places it in the common CLOB parameter and invokes the same [SQL operations](manual-sql-installation.md#change-a-profile-and-publish-an-mv-candidate).
+Replace `123` with the specific validated READY candidate. Publication is explicit; these are independent operations. Every command supports `-h`. Python reads the tag JSON file and invokes the corresponding database operations. Applying a profile does not build an MV; refreshing a profile reuses its stored specification. A build leaves the candidate at READY without moving the published synonym. Before publication, inspect the build audit, mapping and row counts, candidate validity and workbook compatibility. Publication requires the exact READY run ID and a match with the active profile; a profile change after building rejects a stale candidate.
 
-See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) for slot/version rules and the [migration limits](manual-sql-installation.md#compatibility-limits) for existing schemas.
+See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) for slot/version rules and the [compatibility limits](#compatibility-limits) for existing schemas.
+
+### Tag specification
+
+`schema_version`, `profile_name` and `mode` are required. Profile names are 1–128 uppercase letters/digits/underscores, beginning with a letter. Namespaces and tag names are case-sensitive existing names, not ordinals. Use exactly one of the following:
+
+[NAMESPACE JSON example](../../deployment/config/tag-profile.namespace.example.json):
+
+```json
+{"schema_version":1,"profile_name":"CUSTOM_COST_REPORTING","mode":"NAMESPACE","namespace":"Finance"}
+```
+
+[TAG_LIST JSON example](../../deployment/config/tag-profile.list.example.json):
+
+```json
+{
+  "schema_version":1,
+  "profile_name":"CUSTOM_COST_REPORTING",
+  "mode":"TAG_LIST",
+  "tags":[
+    {"namespace":"Finance","tag":"CostCenter"},
+    {"namespace":"Operations","tag":"Environment"}
+  ]
+}
+```
+
+`NAMESPACE` selects all active definitions in exactly one existing namespace. `TAG_LIST` selects only the listed pairs, even if they belong to one namespace; duplicate pairs, inactive/missing definitions, an empty list, conflicting modes and unknown specification fields fail validation. Explicit lists never expand automatically on refresh. Governed installations still require the six standard governance tags when using the reserved default profile. That requirement is conditional on the requested governance profile, not a prerequisite for custom profiles.
+
+See the [profile design](../../design/02-oci-tags.md#reporting-column-contract) for stable slots, retired tags and immutable revisions.
+
+## Compatibility limits
+
+Fresh installations create the profile `SPEC_JSON` and item `IS_ACTIVE` columns and allow mixed-profile header namespaces. Existing databases need a reviewed migration preserving profile revisions, published mappings and slot identities. Do not run create-only installers over populated modules or expect the old mixed-profile delegate to upgrade them. Review automation that depended on prompts or dense renumbering.
+
+Before production use, validate Oracle compilation, grants, FAST refresh with retired typed-NULL columns, concurrent profile behavior and any existing-schema migration in a disposable Oracle environment.
 
 ## OAC connection
 
