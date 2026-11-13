@@ -5,6 +5,7 @@ SET DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 
 DECLARE
+  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.oci_realm_domain' ERROR ON ERROR);
   L_TENANCY VARCHAR2(512);
   L_ADB_REGION VARCHAR2(64);
   L_HOME_REGION VARCHAR2(64);
@@ -26,6 +27,10 @@ DECLARE
     P_BODY:=DBMS_CLOUD.GET_RESPONSE_TEXT(L_RESPONSE);
   END;
 BEGIN
+  IF L_REALM_DOMAIN IS NULL OR
+     NOT REGEXP_LIKE(L_REALM_DOMAIN,'^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
+    RAISE_APPLICATION_ERROR(-20990,'Missing or invalid tenancy realm domain; run Python configuration');
+  END IF;
   SELECT LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.TENANT_OCID')),
          LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.REGION'))
     INTO L_TENANCY,L_ADB_REGION FROM V$PDBS
@@ -35,7 +40,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20731,'ADB source identity is unavailable');
   END IF;
   GET_BODY('https://identity.'||L_ADB_REGION||
-    '.oci.oraclecloud.com/20160918/tenancies/'||L_TENANCY||
+    '.oci.'||L_REALM_DOMAIN||'/20160918/tenancies/'||L_TENANCY||
     '/regionSubscriptions',L_BODY);
   L_ITEMS:=JSON_ARRAY_T.PARSE(L_BODY);
   FOR I IN 0..L_ITEMS.GET_SIZE-1 LOOP
@@ -51,7 +56,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20731,'Home region is unavailable');
   END IF;
   GET_BODY('https://costad.'||L_HOME_REGION||
-    '.oci.oraclecloud.com/20190111/costAnomalyMonitors?compartmentId='||
+    '.oci.'||L_REALM_DOMAIN||'/20190111/costAnomalyMonitors?compartmentId='||
     L_TENANCY||'&limit=1',L_BODY);
   L_DOC:=JSON_OBJECT_T.PARSE(L_BODY);
   IF NOT L_DOC.HAS('items') OR NOT L_DOC.GET('items').IS_ARRAY THEN
@@ -59,7 +64,7 @@ BEGIN
   END IF;
   L_DAY:=TRUNC(SYS_EXTRACT_UTC(SYSTIMESTAMP));
   GET_BODY('https://costad.'||L_HOME_REGION||
-    '.oci.oraclecloud.com/20190111/costAnomalyEvents?compartmentId='||
+    '.oci.'||L_REALM_DOMAIN||'/20190111/costAnomalyEvents?compartmentId='||
     L_TENANCY||'&limit=1&timeAnomalyEventStartDate='||
     UTL_URL.ESCAPE(TO_CHAR(L_DAY-1,'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
       TRUE,'AL32UTF8')||'&timeAnomalyEventEndDate='||

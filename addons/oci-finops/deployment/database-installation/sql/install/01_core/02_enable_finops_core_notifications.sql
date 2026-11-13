@@ -11,7 +11,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20920,'Connect as FOCUSPLATFORM');
   END IF;
   IF L_TOPIC IS NULL OR LENGTH(L_TOPIC) > 255 OR
-     NOT REGEXP_LIKE(L_TOPIC,'^ocid1\.onstopic\.oc1\.[A-Za-z0-9._-]+$') THEN
+     NOT REGEXP_LIKE(L_TOPIC,'^ocid1\.onstopic\.oc[0-9]+\.[A-Za-z0-9._-]+$') THEN
     RAISE_APPLICATION_ERROR(-20921,'Enter a valid Notifications topic OCID');
   END IF;
   UPDATE FINOPS_CORE_NOTIFY_CONFIG

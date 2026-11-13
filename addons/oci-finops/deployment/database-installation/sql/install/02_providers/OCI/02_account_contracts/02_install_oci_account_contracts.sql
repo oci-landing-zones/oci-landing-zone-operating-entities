@@ -69,8 +69,8 @@ END;
 
 @02_providers/OCI/02_account_contracts/internal/01_create_oci_account_storage.sql
 
-INSERT INTO OCI_ACCOUNT_SOURCE(CONFIG_ID,TENANCY_OCID,HOME_REGION)
-VALUES(1,:source_tenancy_ocid,:source_home_region);
+INSERT INTO OCI_ACCOUNT_SOURCE(CONFIG_ID,TENANCY_OCID,HOME_REGION,IDENTITY_DOMAIN)
+VALUES(1,:source_tenancy_ocid,:source_home_region,FINOPS_CORE_ENDPOINT_DOMAIN());
 COMMIT;
 
 @02_providers/OCI/02_account_contracts/internal/02_create_oci_contract_storage.sql

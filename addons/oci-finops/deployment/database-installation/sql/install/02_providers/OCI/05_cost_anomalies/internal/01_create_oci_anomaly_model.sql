@@ -6,7 +6,7 @@ create table oci_anomaly_config (
   config_id number default 1 primary key check (config_id = 1),
   tenancy_ocid varchar2(512) not null,
   endpoint_region varchar2(64) not null,
-  endpoint_domain varchar2(128) default 'oraclecloud.com' not null,
+  endpoint_domain varchar2(128) not null,
   credential_name varchar2(128) default 'OCI$RESOURCE_PRINCIPAL' not null,
   lookback_days number default 365 not null
     check (lookback_days between 1 and 3660 and lookback_days = trunc(lookback_days)),

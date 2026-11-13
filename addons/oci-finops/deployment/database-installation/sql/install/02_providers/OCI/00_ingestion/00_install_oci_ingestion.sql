@@ -124,7 +124,7 @@ VARIABLE source_location_base VARCHAR2(4000)
 DECLARE
   L_SOURCE_MODE VARCHAR2(30) := UPPER(JSON_VALUE(:fp_install_config,'$.focus_source.mode' ERROR ON ERROR));
   L_SOURCE_REGION VARCHAR2(64);
-  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.focus_source.realm_domain' ERROR ON ERROR);
+  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.oci_realm_domain' ERROR ON ERROR);
   L_SOURCE_NAMESPACE VARCHAR2(255);
   L_SOURCE_BUCKET VARCHAR2(256);
   L_SOURCE_PREFIX_REGEX VARCHAR2(3000);
@@ -172,15 +172,10 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20983,
       'Invalid REGION or TENANT_OCID in V$PDBS.CLOUD_IDENTITY');
   END IF;
-  IF L_REALM_DOMAIN IS NULL THEN
-    IF REGEXP_SUBSTR(L_TENANCY_OCID, '[^.]+', 1, 3) <> 'oc1' THEN
-      RAISE_APPLICATION_ERROR(-20990,
-        'Resolve the source realm domain with the Python installer before ingestion');
-    END IF;
-    L_REALM_DOMAIN := 'oraclecloud.com';
-  END IF;
-  IF NOT REGEXP_LIKE(L_REALM_DOMAIN, '^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
-    RAISE_APPLICATION_ERROR(-20990, 'Invalid source realm domain');
+  IF L_REALM_DOMAIN IS NULL OR
+     NOT REGEXP_LIKE(L_REALM_DOMAIN, '^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
+    RAISE_APPLICATION_ERROR(-20990,
+      'Missing or invalid tenancy realm domain; run Python configuration');
   END IF;
   IF L_SOURCE_MODE = 'ORACLE_MANAGED' AND
      JSON_VALUE(:fp_install_config,'$.focus_source.region' ERROR ON ERROR) IS NULL THEN

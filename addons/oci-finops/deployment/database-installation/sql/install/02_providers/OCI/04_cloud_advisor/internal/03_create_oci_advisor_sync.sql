@@ -304,7 +304,7 @@ begin
     return;
   end if;
 
-  l_endpoint := 'https://optimizer.' || l_region || '.oci.oraclecloud.com';
+  l_endpoint := 'https://optimizer.' || l_region || '.oci.'||FINOPS_CORE_ENDPOINT_DOMAIN();
   begin_run;
   sync_recommendations;
   sync_resource_actions;

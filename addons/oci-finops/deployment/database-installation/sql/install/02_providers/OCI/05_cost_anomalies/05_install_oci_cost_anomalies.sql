@@ -25,8 +25,8 @@ END;
 @02_providers/OCI/05_cost_anomalies/internal/00_preflight_oci_anomaly_source.sql
 @02_providers/OCI/05_cost_anomalies/internal/01_create_oci_anomaly_model.sql
 
-INSERT INTO OCI_ANOMALY_CONFIG(CONFIG_ID,TENANCY_OCID,ENDPOINT_REGION,IS_SYNC_ENABLED)
-VALUES(1,:source_tenancy_ocid,:source_home_region,'Y');
+INSERT INTO OCI_ANOMALY_CONFIG(CONFIG_ID,TENANCY_OCID,ENDPOINT_REGION,ENDPOINT_DOMAIN,IS_SYNC_ENABLED)
+VALUES(1,:source_tenancy_ocid,:source_home_region,FINOPS_CORE_ENDPOINT_DOMAIN(),'Y');
 COMMIT;
 
 @02_providers/OCI/05_cost_anomalies/internal/02_create_oci_anomaly_sync.sql

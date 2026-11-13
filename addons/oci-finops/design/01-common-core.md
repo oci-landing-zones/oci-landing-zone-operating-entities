@@ -61,6 +61,7 @@ The diagram shows the declared foreign keys. Its [full-size SVG](diagrams/01-com
 | [FINOPS_CORE_NOTIFY_CONFIG](#finops_core_notify_config--combined-report-destination) | Table | Singleton Notifications topic and delivery switch; optional at install and adjustable later. |
 | [FINOPS_CORE_SCHEDULE_CONFIG](#finops_core_schedule_config--shared-scheduler-time-zone) | Table | Singleton IANA time-zone setting shared by recurring module jobs. |
 | [FINOPS_CORE_PROVIDER_RUN_PK](#finops_core_provider_run--provider-result-within-a-run), [FINOPS_CORE_PIPELINE_RUN_PK](#finops_core_pipeline_run--pipeline-result-within-a-provider-run) | Named indexes | Primary-key indexes; their columns and table ownership are defined below. |
+| [FINOPS_CORE_ENDPOINT_DOMAIN](#finops_core_endpoint_domain) | Function | Persisted OCI endpoint domain resolved from the authenticated tenancy by the OCI SDK. |
 | [FINOPS_CORE_REPORT](#finops_core_report) | Function | Builds the current or selected run report on demand without sending email. |
 | [FINOPS_CORE_RUN_DAILY](#finops_core_run_daily) | Procedure | Invokes enabled provider APIs, records results, and sends the combined report when requested. |
 | [FINOPS_CORE_SCHEDULE_API](#finops_core_schedule_api) | Package and body | Reads the central time-zone setting and supplies Scheduler start timestamps to modules. |
@@ -187,6 +188,12 @@ One configuration row stores the selected IANA time-zone region. Recurring jobs 
 `FINOPS_CORE_RUN_DAILY(P_SEND_EMAIL CHAR DEFAULT 'Y')` is the provider-neutral coordinator. It validates registered API package names, invokes enabled providers and records the coordinator/provider/pipeline audit hierarchy. `P_SEND_EMAIL` accepts only `Y` or `N`; `N` suppresses email without suppressing provider processing. Locking, notification decisions and error handling follow the execution flow above.
 
 The provider API requires `RUN(P_CORE_RUN_ID NUMBER, P_MAX_FILES_PER_PIPELINE NUMBER)` and `REPORT RETURN CLOB`. Each handled pipeline contributes a `FINOPS_CORE_PIPELINE_RUN` row. Registry entries identify a provider code, landing table and valid API package. An empty registry is valid: the coordinator can run with zero providers and report that none are registered.
+
+### `FINOPS_CORE_ENDPOINT_DOMAIN`
+
+`FINOPS_CORE_ENDPOINT_DOMAIN() RETURN VARCHAR2` returns the OCI endpoint domain resolved by the SDK for the authenticated tenancy at installation time. It contains no realm-specific mapping or public-realm fallback. Recurring tag, budget and Advisor calls use it directly; account, anomaly and forecast settings are initialized from the same value. Regional selection remains owned by each module. Before Core exists, source preflights receive that value through the non-secret module input JSON.
+
+The function stores only the endpoint domain, not credentials. A missing or invalid domain stops installation rather than choosing another realm. Existing installations require a reviewed update of their installed routines and endpoint settings; updating repository files alone does not modify a running database.
 
 ### `FINOPS_CORE_REPORT`
 

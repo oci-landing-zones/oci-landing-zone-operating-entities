@@ -298,10 +298,13 @@ def resolved_focus_source(config: dict) -> dict:
 
 
 def verify_notifications_topic(oci_module, sdk_config: dict, signer, topic_id: str) -> str:
-    match = re.fullmatch(r"ocid1\.onstopic\.oc1\.([a-z0-9-]+)\.[A-Za-z0-9_-]+", topic_id)
+    match = re.fullmatch(r"ocid1\.onstopic\.(oc[0-9]+)\.([a-z0-9-]+)\.[A-Za-z0-9_-]+", topic_id)
     if not match:
         raise ValueError("enter a valid OCI Notifications topic OCID, or leave blank to disable notifications.")
-    topic_region = resolve_oci_region(oci_module, match.group(1))
+    _, realm = tenancy_identity(sdk_config, signer)
+    if match.group(1) != realm:
+        raise ValueError("The Notifications topic must belong to the authenticated tenancy's realm.")
+    topic_region = resolve_bucket_region(oci_module, match.group(2), realm)
     topic_config = dict(sdk_config)
     topic_config["region"] = topic_region
     try:
@@ -960,6 +963,7 @@ def validate_admin_database_access(config: dict) -> None:
 def build_runtime_config(config: dict) -> dict:
     db = config["database"]
     settings = config["settings"]
+    source = resolved_focus_source(config)
     return {
         "deployment": {
             "region": db["oci_region"],
@@ -970,7 +974,8 @@ def build_runtime_config(config: dict) -> dict:
             "tns_admin": db["tns_admin"],
             "focusplatform_secret_id": db["focusplatform_password_secret_id"],
             "oac_reader_secret_id": db["oac_reader_password_secret_id"],
-            "oci_focus_source": resolved_focus_source(config),
+            "oci_focus_source": source,
+            "oci_realm_domain": source["realm_domain"],
             "first_focus_year": settings["first_focus_year"],
             "notifications_topic_ocid": settings.get("notifications_topic_ocid", ""),
             "scheduler_time_zone": settings["scheduler_time_zone"],

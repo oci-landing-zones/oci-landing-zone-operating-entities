@@ -5,6 +5,7 @@ SET DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 
 DECLARE
+  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.oci_realm_domain' ERROR ON ERROR);
   L_TENANCY VARCHAR2(512);
   L_ADB_REGION VARCHAR2(64);
   L_HOME_REGION VARCHAR2(64);
@@ -35,6 +36,10 @@ DECLARE
     P_BODY:=DBMS_CLOUD.GET_RESPONSE_TEXT(L_RESPONSE);
   END;
 BEGIN
+  IF L_REALM_DOMAIN IS NULL OR
+     NOT REGEXP_LIKE(L_REALM_DOMAIN,'^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
+    RAISE_APPLICATION_ERROR(-20990,'Missing or invalid tenancy realm domain; run Python configuration');
+  END IF;
   SELECT LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.TENANT_OCID')),
          LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.REGION'))
     INTO L_TENANCY,L_ADB_REGION FROM V$PDBS
@@ -44,7 +49,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20711,'ADB did not expose a valid tenancy and region');
   END IF;
   GET_BODY('https://identity.'||L_ADB_REGION||
-    '.oci.oraclecloud.com/20160918/tenancies/'||L_TENANCY||
+    '.oci.'||L_REALM_DOMAIN||'/20160918/tenancies/'||L_TENANCY||
     '/regionSubscriptions',L_BODY);
   L_ITEMS:=JSON_ARRAY_T.PARSE(L_BODY);
   IF L_ITEMS.GET_SIZE=0 THEN
@@ -63,7 +68,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20711,'Home region not found');
   END IF;
   L_BASE:='https://identity.'||L_HOME_REGION||
-    '.oci.oraclecloud.com/20160918';
+    '.oci.'||L_REALM_DOMAIN||'/20160918';
   GET_BODY(L_BASE||'/tenancies/'||L_TENANCY,L_BODY);
   IF JSON_VALUE(L_BODY,'$.id')<>L_TENANCY THEN
     RAISE_APPLICATION_ERROR(-20711,'Tenancy detail identity mismatch');
@@ -74,7 +79,7 @@ BEGIN
   -- Role discovery is diagnostic. Its failure must never turn an API error
   -- into a child-tenancy limitation or imply that a tenancy is standalone.
   L_ORG_BASE:='https://organizations.'||L_HOME_REGION||
-    '.oci.oraclecloud.com/20230401';
+    '.oci.'||L_REALM_DOMAIN||'/20230401';
   BEGIN
     LOOP
       GET_BODY(L_ORG_BASE||'/organizations?compartmentId='||L_TENANCY||

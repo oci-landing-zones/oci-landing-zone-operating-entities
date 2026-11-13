@@ -27,7 +27,7 @@ DECLARE
 BEGIN
   IF L_TOPIC IS NOT NULL AND UPPER(L_TOPIC) <> 'NONE' AND
      (LENGTH(L_TOPIC) > 255 OR
-      NOT REGEXP_LIKE(L_TOPIC, '^ocid1\.onstopic\.oc1\.[A-Za-z0-9._-]+$')) THEN
+      NOT REGEXP_LIKE(L_TOPIC, '^ocid1\.onstopic\.oc[0-9]+\.[A-Za-z0-9._-]+$')) THEN
     RAISE_APPLICATION_ERROR(-20900,
       'Enter a valid OCI Notifications topic OCID or NONE');
   END IF;
@@ -49,6 +49,7 @@ END;
 /
 
 @01_core/01a_create_finops_core_tables.sql
+@01_core/01c_create_finops_endpoint_domain.sql
 @01_core/01b_create_finops_core_routines.sql
 
 -- Exercise the coordinator without sending an email before enabling its job.

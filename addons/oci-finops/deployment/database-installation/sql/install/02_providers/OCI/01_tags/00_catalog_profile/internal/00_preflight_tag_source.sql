@@ -2,6 +2,7 @@
 SET DEFINE OFF SERVEROUTPUT ON SIZE UNLIMITED
 WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK
 DECLARE
+  L_REALM_DOMAIN VARCHAR2(255) := JSON_VALUE(:fp_install_config,'$.oci_realm_domain' ERROR ON ERROR);
   S JSON_OBJECT_T := JSON_OBJECT_T.PARSE(JSON_QUERY(:fp_install_config,'$.tag_profile' RETURNING CLOB ERROR ON ERROR));
   A JSON_ARRAY_T; O JSON_OBJECT_T;
   L_MODE VARCHAR2(20); L_NS VARCHAR2(100); L_TAG VARCHAR2(100);
@@ -26,6 +27,10 @@ DECLARE
     IF H.HAS('opc-next-page') THEN P_NEXT:=H.GET_STRING('opc-next-page'); END IF;
   END;
 BEGIN
+  IF L_REALM_DOMAIN IS NULL OR
+     NOT REGEXP_LIKE(L_REALM_DOMAIN,'^[a-z0-9]+([.-][a-z0-9]+)*$') THEN
+    RAISE_APPLICATION_ERROR(-20990,'Missing or invalid tenancy realm domain; run Python configuration');
+  END IF;
   S.ON_ERROR(1); L_MODE:=S.GET_STRING('mode');
   IF S.GET_NUMBER('schema_version')<>1 OR S.GET_STRING('profile_name') IS NULL OR
      NOT REGEXP_LIKE(S.GET_STRING('profile_name'),'^[A-Z][A-Z0-9_]{0,127}$','c') OR
@@ -57,7 +62,7 @@ BEGIN
   END IF;
   SELECT LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.TENANT_OCID')),LOWER(JSON_VALUE(CLOUD_IDENTITY,'$.REGION'))
     INTO L_TENANCY,L_REGION FROM V$PDBS WHERE CON_ID=TO_NUMBER(SYS_CONTEXT('USERENV','CON_ID'));
-  L_BASE:='https://identity.'||L_REGION||'.oci.oraclecloud.com/20160918';
+  L_BASE:='https://identity.'||L_REGION||'.oci.'||L_REALM_DOMAIN||'/20160918';
   LOOP
     L_URI:=L_BASE||'/tagNamespaces?compartmentId='||UTL_URL.ESCAPE(L_TENANCY,TRUE,'AL32UTF8')||
       '&includeSubcompartments=true&limit=1000';

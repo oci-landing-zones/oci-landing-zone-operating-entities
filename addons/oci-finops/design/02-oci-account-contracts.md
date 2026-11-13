@@ -63,7 +63,7 @@ Singleton source identity with primary key `CONFIG_ID=1`. Independent context an
 | `CONFIG_ID` | `NUMBER(1)` |
 | `TENANCY_OCID` | `VARCHAR2(512)` |
 | `HOME_REGION` | `VARCHAR2(64)` |
-| `IDENTITY_DOMAIN` | `VARCHAR2(128)` |
+| `IDENTITY_DOMAIN` | `VARCHAR2(128)`, required; initialized from the shared tenancy realm domain |
 | `CREDENTIAL_NAME` | `VARCHAR2(128)` |
 | `CONTEXT_ENABLED` | `CHAR(1)` |
 | `CONTRACT_ENABLED` | `CHAR(1)` |

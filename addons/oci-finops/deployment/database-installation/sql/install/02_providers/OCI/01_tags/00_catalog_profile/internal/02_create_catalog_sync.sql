@@ -131,7 +131,7 @@ BEGIN
       'V$PDBS.CLOUD_IDENTITY lacks a valid tenancy OCID or region');
   END IF;
   L_BASE := 'https://identity.' || L_REGION ||
-            '.oci.oraclecloud.com/20160918';
+            '.oci.'||FINOPS_CORE_ENDPOINT_DOMAIN()||'/20160918';
   L_NS_PAGE := NULL;
   LOOP
     L_URI := L_BASE || '/tagNamespaces?compartmentId=' ||

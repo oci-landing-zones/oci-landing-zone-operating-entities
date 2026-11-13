@@ -176,6 +176,7 @@ def database_sql_parameters(config: dict) -> dict:
     source["prefix"] = quote(str(source.get("prefix", "")).strip("/"), safe="/-._~")
     return {
         "schema_version": 1, "installation_mode": mode,
+        "oci_realm_domain": d.get("oci_realm_domain") or source.get("realm_domain"),
         "notifications_topic_ocid": (d.get("notifications_topic_ocid") or "").strip() or None,
         "scheduler_time_zone": d.get("scheduler_time_zone", "UTC"),
         "first_focus_year": d.get("first_focus_year"), "focus_source": source,

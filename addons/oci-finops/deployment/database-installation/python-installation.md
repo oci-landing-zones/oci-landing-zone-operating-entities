@@ -107,7 +107,7 @@ The configurator uses one editable form for both Oracle-managed reports and your
 | Bucket name | Authenticated tenancy OCID | Yes. |
 | Reports prefix | `FOCUS Reports/` | Yes; enter `/` for the bucket root. |
 
-Enter prefixes as plain text, not URL-encoded text. The installer encodes them when building URLs. The OCI SDK resolves the realm domain from the region; no realm question is required. The operator needs access to list the tenancy's region subscriptions to discover its home region. Existing configurations using empty Oracle-managed defaults are resolved before execution.
+Enter prefixes as plain text, not URL-encoded text. The installer encodes them when building URLs. The OCI SDK resolves the domain for the authenticated tenancy's realm and checks that the chosen region belongs to it; no realm question is required. The same non-secret domain is passed to all source preflights and persisted by Common Core for recurring module calls. No module substitutes a public-realm domain when resolution is missing. The operator needs access to list the tenancy's region subscriptions to discover its home region. Existing configurations using empty Oracle-managed defaults are resolved before execution.
 
 The `bling` namespace selects the Oracle-managed year/month/day layout. Oracle documents the default namespace, bucket and [FOCUS report structure](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/list-cost-usage-report.htm). Confirm the selected prefix actually contains FOCUS reports; a successful empty listing does not establish report availability.
 

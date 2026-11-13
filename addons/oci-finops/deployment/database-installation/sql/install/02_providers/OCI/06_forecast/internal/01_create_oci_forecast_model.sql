@@ -5,7 +5,7 @@ create table oci_forecast_config (
   config_id number default 1 primary key check(config_id=1),
   tenancy_ocid varchar2(512) not null,
   endpoint_region varchar2(64) not null,
-  endpoint_domain varchar2(128) default 'oraclecloud.com' not null,
+  endpoint_domain varchar2(128) not null,
   credential_name varchar2(128) default 'OCI$RESOURCE_PRINCIPAL' not null,
   history_days number default 60 not null check(history_days between 31 and 90 and history_days=trunc(history_days)),
   horizon_days number default 30 not null check(horizon_days between 1 and 60 and horizon_days=trunc(horizon_days)),

@@ -39,7 +39,7 @@ Singleton configuration with primary key `CONFIG_ID=1`. `HISTORY_DAYS` accepts 3
 | `CONFIG_ID` | `NUMBER` |
 | `TENANCY_OCID` | `VARCHAR2(512)` |
 | `ENDPOINT_REGION` | `VARCHAR2(64)` |
-| `ENDPOINT_DOMAIN` | `VARCHAR2(128)` |
+| `ENDPOINT_DOMAIN` | `VARCHAR2(128)`, required; initialized from the shared tenancy realm domain |
 | `CREDENTIAL_NAME` | `VARCHAR2(128)` |
 | `HISTORY_DAYS` | `NUMBER` |
 | `HORIZON_DAYS` | `NUMBER` |
