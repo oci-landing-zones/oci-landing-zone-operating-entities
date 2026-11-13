@@ -101,7 +101,6 @@ function(params)
       action: 'ACCEPT',
       match_criteria: {
         match_type: 'DRG_ATTACHMENT_ID',
-        attachment_type: 'REMOTE_PEERING_CONNECTION',
         drg_attachment_key: entry.drg_att_key,
       },
     },
@@ -136,7 +135,6 @@ function(params)
         action: 'ACCEPT',
         match_criteria: {
           match_type: 'DRG_ATTACHMENT_ID',
-          attachment_type: 'VCN',
           drg_attachment_key: hub_vcn_attachment_key,
         },
       },
@@ -146,7 +144,6 @@ function(params)
         action: 'ACCEPT',
         match_criteria: {
           match_type: 'DRG_ATTACHMENT_ID',
-          attachment_type: 'VCN',
           drg_attachment_key: vcn_entry.drg_att_key,
         },
       }

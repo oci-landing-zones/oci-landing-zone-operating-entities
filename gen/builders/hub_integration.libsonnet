@@ -31,13 +31,13 @@ function(params)
   };
 
   // --- 2. DRG Route Distribution Statements ---
+  // OCI omits attachment_type for ID matches; emitting it causes perpetual Terraform drift.
   local drg_distribution_statements(priority_offset, key_suffix) = {
     ['ROUTE-TO-VCN-%s%s-KEY' % [std.asciiUpper(e.name), key_suffix]]: {
       priority: e.priority + priority_offset,
       action: 'ACCEPT',
       match_criteria: {
         match_type: 'DRG_ATTACHMENT_ID',
-        attachment_type: 'VCN',
         drg_attachment_key: e.drg_att_key,
       },
     }
