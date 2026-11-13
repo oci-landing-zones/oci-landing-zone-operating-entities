@@ -18,9 +18,13 @@
 
 ## Overview
 
-The **OCI FinOps Add-on** extends the OCI Operating Entities Landing Zone with cloud cost visibility, allocation and optimization insights. It helps engineering, finance and business teams understand cloud spending, assign costs to business units, projects and environments, and identify opportunities to improve resource usage.
+The **OCI FinOps Add-on** extends the One-OE blueprint of the OCI Operating Entities Landing Zone with cost governance, financial allocation and cloud cost optimisation. Designed to support multicloud FinOps through FOCUS reports and additional data sources, the current implementation integrates OCI data in **Oracle Autonomous Database (ADB)** and presents it through **Oracle Analytics Cloud (OAC)**. Other providers can be integrated by extending the ingestion and data mappings.
 
-The solution centralizes OCI cost and usage data from FOCUS reports in **Oracle Autonomous Database (ADB)** and provides dashboards and reporting through **Oracle Analytics Cloud (OAC)**. It integrates with the Landing Zone’s existing identity domain, governance tags and shared network services.
+The default dashboards support executives, finance and business owners, FinOps practitioners, engineering teams and auditors, providing a shared view of cloud spending, cost allocation and optimisation opportunities.
+
+The add-on uses existing Landing Zone governance tags to associate costs with business units, cost centres, owners, platforms, environments and projects, supporting showback and chargeback analysis.
+
+The modular data model and dashboards can be extended or customised to meet organisational needs. Optional **OAC AI Assistant** capabilities help users explore reporting data through natural-language questions.
 
 **What is FinOps?** FinOps is a collaborative practice that brings engineering, finance and business teams together to understand cloud spending, take ownership of costs and maximize the business value of cloud investments.
 
