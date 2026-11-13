@@ -2,6 +2,7 @@
 // contains: "projection_contracts": true
 
 local tags = import 'gen/lib/cost_tags.libsonnet';
+local scope = import 'gen/lib/cost_scope.libsonnet';
 local cfg = {
   shared_platforms: { analytics: {} },
   environments: {
@@ -10,17 +11,39 @@ local cfg = {
     'sandbox-eu': { projects: { 'billing-api': {} } },
   },
 };
+local collision_config = (import 'gen/defaults.libsonnet').hub_e {
+  environments: {
+    prod: { projects: {} },
+    dev: {
+      projects: { network: { subnets: { data: '10.1.5.0/24' } }, prod: {} },
+      project_network: { network: { vcn: '10.1.0.0/21' } },
+    },
+  },
+  cost_governance: {
+    enable_tags: true,
+    cost_center_assignments: {
+      NETWORK_PROJECT: { project: ['network'] },
+      PROD_PROJECT: { project: ['prod'] },
+    },
+  },
+};
+local collision_result = (import 'gen/landing_zone.libsonnet')(collision_config);
+local published_collision = (import 'gen/blueprints/one-oe/runtime/one-stack/output_builder.libsonnet')({ config: collision_config });
+local collision_children = collision_result.iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].children;
+local dev_projects = collision_children['CMP-LZ-DEV-KEY'].children['CMP-LZ-DEV-PROJECTS-KEY'].children;
+local shared_network = collision_children['CMP-LZ-NETWORK-KEY'];
+local hub_vcn = collision_result.network.network_configuration.network_configuration_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
 local projected = tags.apply({
   network_configuration: { vcns: {
-    'VCN-SANDBOX-EU-BILLING-API-KEY': {},
-    'VCN-SANDBOX-BILLING-KEY': { defined_tags: { 'role.keep': 'yes' }, subnets: { 'SN-APP-KEY': {} } },
-  }, l7_load_balancers: { 'LB-PROD-KEY': { compartment_id: 'CMP-SHARED-NETWORK-KEY', listeners: { main: {} } } } },
-  compartments_configuration: { compartments: { 'CMP-SHARED-ANALYTICS-KEY': {}, 'CMP-SANDBOX-KUBERNETES-KEY': {}, 'CMP-PROD-SECURITY-KEY': {} } },
-  oke_clusters_configuration: { clusters: { 'OKE-SANDBOX-KUBERNETES-KEY': {
+    'VCN-SANDBOX-EU-BILLING-API-KEY': scope.mark({}, 'sandbox-eu', 'billing-api'),
+    'VCN-SANDBOX-BILLING-KEY': { _cost_scope:: scope.value('sandbox', 'billing'), defined_tags: { 'role.keep': 'yes' }, subnets: { 'SN-APP-KEY': {} } },
+  }, l7_load_balancers: { 'LB-PROD-KEY': { _cost_scope:: scope.value('prod'), compartment_id: 'CMP-SHARED-NETWORK-KEY', listeners: { main: {} } } } },
+  compartments_configuration: { compartments: { 'CMP-SHARED-ANALYTICS-KEY': {}, 'CMP-SANDBOX-KUBERNETES-KEY': scope.mark({}, 'sandbox', platform='oke'), 'CMP-PROD-SECURITY-KEY': scope.mark({}, 'prod', platform='security') } },
+  oke_clusters_configuration: { clusters: { 'OKE-SANDBOX-KUBERNETES-KEY': { _cost_scope:: scope.value('sandbox'),
     options: { service_lb_config: { defined_tags: { 'tagns-lz-oke.platform': 'sandbox.kubernetes' } } },
   } } },
-  oke_workers_configuration: { node_pools: { 'POOL-SANDBOX-KUBERNETES-KEY': { node_config_details: { image: 'unchanged' } } } },
-  oke_configuration: { 'OKE-SANDBOX-KUBERNETES-KEY': {
+  oke_workers_configuration: { node_pools: { 'POOL-SANDBOX-KUBERNETES-KEY': { _cost_scope:: scope.value('sandbox'), node_config_details: { image: 'unchanged' } } } },
+  oke_configuration: { 'OKE-SANDBOX-KUBERNETES-KEY': { _cost_scope:: scope.value('sandbox'),
     cluster_configuration: {
       defined_tags: { 'role.keep': 'cluster' },
       options: { service_lb_config: { defined_tags: { 'tagns-lz-oke.platform': 'sandbox.kubernetes' } } },
@@ -44,9 +67,24 @@ local pool = projected.oke_configuration['OKE-SANDBOX-KUBERNETES-KEY'].workers_c
 local iam = tags.apply({
   compartments_configuration: { compartments: { 'CMP-LANDINGZONE-KEY': {}, 'CMP-LZ-NETWORK-KEY': {}, 'CMP-LZ-SECURITY-KEY': {} } },
   identity_domains_configuration: { identity_domains: { DOMAIN: {} } },
-  identity_domain_groups_configuration: { groups: { 'GRP-PROD-PAYMENTS-KEY': {} } },
+  identity_domain_groups_configuration: { groups: { 'GRP-PROD-PAYMENTS-KEY': scope.mark({}, 'shared', 'payments') } },
   policies_configuration: { supplied_policies: { POLICY: {} } },
 }, { environments: { prod: { projects: { payments: {} } } } });
+assert published_collision.network == collision_result.network : 'Published adapters must retain topology scopes';
+assert value(shared_network, 'project') == 'notapplicable' : 'Shared network is not owned by the network project';
+assert value(hub_vcn, 'project') == 'notapplicable' : 'network_configuration must not select the network project';
+assert value(dev_projects['CMP-LZ-DEV-PROD-KEY'], 'environment') == 'dev' : 'A project named prod must retain its dev environment';
+assert value(dev_projects['CMP-LZ-DEV-PROD-KEY'], 'project') == 'prod';
+assert value(dev_projects['CMP-LZ-DEV-PROD-KEY'], 'cost-center') == 'PROD_PROJECT';
+assert value(dev_projects['CMP-LZ-DEV-NETWORK-KEY'], 'project') == 'network';
+assert value(shared_network, 'cost-center') == 'tobedefined';
+assert value(dev_projects['CMP-LZ-DEV-NETWORK-KEY'], 'platform') == 'iam';
+local dev_vcn = collision_result.network.network_configuration.network_configuration_categories['1-dev'].vcns['VCN-FRA-LZ-DEV-PROJECTS-KEY'];
+assert value(dev_vcn.subnets['SN-FRA-LZ-DEV-NETWORK-DATA-KEY'], 'project') == 'network';
+assert value(dev_vcn.subnets['SN-FRA-LZ-DEV-APP-KEY'], 'project') == 'notapplicable';
+assert value(dev_vcn.network_security_groups['NSG-FRA-LZ-DEV-PROD-APP-KEY'], 'environment') == 'dev';
+assert value(dev_vcn.network_security_groups['NSG-FRA-LZ-DEV-PROD-APP-KEY'], 'project') == 'prod';
+assert !std.objectHas(dev_projects['CMP-LZ-DEV-PROD-KEY'], '_cost_scope');
 assert value(vcns['VCN-SANDBOX-BILLING-KEY'], 'environment') == 'sandbox';
 assert value(vcns['VCN-SANDBOX-BILLING-KEY'], 'project') == 'billing';
 assert value(vcns['VCN-SANDBOX-BILLING-KEY'], 'platform') == 'network';

@@ -120,6 +120,7 @@ flowchart TD
 - `generate.sh` handles mode selection, file discovery, Jsonnet invocation, and formatting orchestration (it invokes `format_json.py`).
 - `config.libsonnet` handles normalization and auto-subnet calculation.
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
+- `lib/cost_scope.libsonnet` owns cost-tag ownership context: resolve exact topology compartment references and attach hidden `_cost_scope` metadata where a resource's business scope differs from its containing compartment. Builders must carry environment/project context before composition; never infer ownership by matching resource names. `lib/cost_tags.libsonnet` consumes this context and reuses it for OKE-created volumes, load balancers, and workers. Hidden scope metadata must never appear in generated JSON.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
 - `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
 - Builders that need environment identity, resource key segments, display segments, DNS segments, or compartment paths should use topology entries from `topology.libsonnet` instead of passing raw environment-name strings across builder boundaries.

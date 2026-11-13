@@ -1,3 +1,4 @@
+local cost_scope = import '../../../lib/cost_scope.libsonnet';
 // OKE identity output builder.
 
 local desc = import '../../../descriptions.libsonnet';
@@ -49,9 +50,11 @@ function(ctx) {
       if std.objectHas(ctx.params, 'bastion') then ctx.params.bastion else null,
       n,
       [group_names.admins],
-      ctx.key_segments
+      ctx.key_segments,
+      ownership=cost_scope.value(ctx.scope.scope_name)
     ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+        _cost_scope:: cost_scope.value(ctx.scope.scope_name),
         name: n.display_global('pcy', ctx.display_segments + ['admins']),
         description: desc.policy.grants(
           group_names.admins,
@@ -76,6 +79,7 @@ function(ctx) {
       },
 
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-ROLE'])]: {
+        _cost_scope:: cost_scope.value(ctx.scope.scope_name),
         name: n.display_global('pcy', ctx.display_segments + ['rbac-roles']),
         description: desc.policy.grants(
           'OKE RBAC administrator and viewer groups',

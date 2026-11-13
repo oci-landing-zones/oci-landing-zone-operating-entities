@@ -1,4 +1,5 @@
 // Resolve declared VCN/subnet targets using plan-time-stable configuration keys.
+local cost_scope = import 'cost_scope.libsonnet';
 function(network, document)
   if !std.objectHas(document, 'logging_configuration') then document else
   local get(obj, key, fallback) = if std.objectHas(obj, key) then obj[key] else fallback;
@@ -41,6 +42,7 @@ function(network, document)
     [flowKey + '-' + target.key]:
       local flow = flows[flowKey];
       {
+        _cost_scope:: if std.objectHasAll(flow, '_cost_scope') then flow._cost_scope else cost_scope.shared,
         name: target.name + '-flow-log',
         log_group_id: flow.log_group_id,
         service: 'flowlogs',

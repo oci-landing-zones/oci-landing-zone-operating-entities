@@ -1,6 +1,8 @@
 // gen/builders/iam/project_policies.libsonnet
 // Per-environment and per-project IAM policy construction.
 
+local cost_scope = import '../../lib/cost_scope.libsonnet';
+
 function(ctx)
   local n = ctx.n;
   local topo = ctx.topo;
@@ -43,6 +45,7 @@ function(ctx)
     local name_segments = [std.asciiLower(s) for s in entry.key_segments] + [std.asciiLower(proj_name)];
     {
       [proj_key]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
         name: 'pcy-lz-%s-admin' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,
@@ -85,6 +88,7 @@ function(ctx)
       },
 
       [proj_net_key]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
         name: 'pcy-lz-%s-admin-net' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,
@@ -101,6 +105,7 @@ function(ctx)
       },
 
       [proj_sec_key]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
         name: 'pcy-lz-%s-admin-sec' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,

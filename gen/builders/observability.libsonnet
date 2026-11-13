@@ -5,6 +5,7 @@
 // entrypoints project the complete variants into two shared CIS configurations.
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(config, n, realm_constants, topo)
   local env_entries = topo.ordered_env_entries();
@@ -137,6 +138,7 @@ function(config, n, realm_constants, topo)
     {
       key_segments: entry.key_segments,
       name_segments: entry.name_segments,
+      environment: entry.env_name,
       metric_compartment_id: topo.env_child_compartment_key(entry, 'NETWORK'),
     }
     for entry in env_entries
@@ -204,6 +206,7 @@ function(config, n, realm_constants, topo)
 
   local catalog_alarms = {
     [n.key_global('AL', scope.key_segments + spec.key)]: {
+      _cost_scope:: cost_scope.value(if std.objectHas(scope, 'environment') then scope.environment else 'shared'),
       compartment_id: security_cmp_key,
       display_name: n.display_global('al', scope.name_segments + spec.name),
       destination_topic_ids: [n.key_global('NOTT', [spec.topic])],
@@ -349,11 +352,13 @@ function(config, n, realm_constants, topo)
     function(acc, entry)
       acc + {
         [n.key_global('LOG', entry.key_segments + ['SUBNET', 'FLOW'])]: {
+          _cost_scope:: cost_scope.value(entry.env_name),
           log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
           target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'subnet',
         },
         [n.key_global('LOG', entry.key_segments + ['VCN', 'FLOW'])]: {
+          _cost_scope:: cost_scope.value(entry.env_name),
           log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
           target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'vcn',

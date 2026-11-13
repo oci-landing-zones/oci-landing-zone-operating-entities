@@ -1,3 +1,4 @@
+local cost_scope = import '../../../lib/cost_scope.libsonnet';
 local cost_tags = import '../../../lib/cost_tags.libsonnet';
 local explicit_flow_logs = import '../../../lib/explicit_flow_logs.libsonnet';
 local extensions = import '../../../extensions.libsonnet';
@@ -179,11 +180,13 @@ local products = import '../../exadb/products.libsonnet';
           n.key_global('LGRP', segments + ['VCN', 'FLOW']);
         acc + {
           [n.key_global('LOG', segments + ['SUBNET', 'FLOW'])]: {
+            _cost_scope:: cost_scope.value(scope.scope_name),
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'subnet',
           },
           [n.key_global('LOG', segments + ['VCN', 'FLOW'])]: {
+            _cost_scope:: cost_scope.value(scope.scope_name),
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'vcn',

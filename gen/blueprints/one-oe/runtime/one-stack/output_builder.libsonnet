@@ -2,90 +2,36 @@
 local lz = import '../../../../landing_zone.libsonnet';
 local cost_governance = import '../../../../lib/cost_governance.libsonnet';
 local explicitFlowLogs = import './explicit_flow_logs.libsonnet';
-local namespace = 'tagns-lz-cost-governance';
-local collections = [
-  'compartments', 'children', 'groups', 'identity_domains', 'supplied_policies',
-  'vcns', 'subnets', 'route_tables', 'security_lists', 'network_security_groups',
-  'internet_gateways', 'nat_gateways', 'service_gateways',
-  'dynamic_routing_gateways', 'drg_attachments', 'drg_route_tables',
-  'drg_route_distributions', 'l7_load_balancers', 'alarms', 'event_rules',
-  'topics', 'buckets', 'service_connectors',
-  'targets', 'host_recipes', 'host_targets', 'recipes', 'security_zones', 'vaults', 'keys',
-  'network_firewalls', 'network_firewall_policies', 'nlbs', 'log_groups', 'flow_logs',
-];
-
-local values(path, platform='tobedefined') =
-  local words = std.asciiUpper(std.join('/', path));
-  local contains(word) = std.length(std.findSubstr(word, words)) > 0;
-  local resourceKey = if std.length(path) > 0 then std.asciiUpper(path[std.length(path) - 1]) else '';
-  local compartmentPlatform =
-    if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-NETWORK-KEY') then 'network'
-    else if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-SECURITY-KEY') then 'security'
-    else 'iam';
-  {
-    [namespace + '.tag-lz-cost-center']: 'tobedefined',
-    [namespace + '.tag-lz-business-unit']: 'tobedefined',
-    [namespace + '.tag-lz-owner']: 'tobedefined',
-    [namespace + '.tag-lz-platform']: if platform == 'tobedefined' then compartmentPlatform else platform,
-    [namespace + '.tag-lz-environment']: if std.member(path, 'groups') then 'shared' else if contains('PREPROD') then 'preprod' else if contains('PROD') then 'prod' else 'shared',
-    [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'notapplicable',
-  };
-
+// Published families retain their section defaults without reclassifying resources.
 local existingTags(resource, field='defined_tags') =
   if std.objectHas(resource, field) && resource[field] != null then resource[field] else {};
-local tagResources(obj, path=[], platform='tobedefined') =
-  if std.type(obj) == 'array' then [tagResources(v, path, platform) for v in obj]
-  else if std.type(obj) != 'object' then obj
-  else {
-    [key]:
-      local childPath = path + [key];
-      local value = obj[key];
-      if std.member(collections, key) && std.type(value) == 'object' then {
-        [name]: tagResources(value[name], childPath + [name], platform) + {
-          defined_tags: existingTags(value[name]) + values(childPath + [name], platform),
-        }
-        for name in std.objectFields(value)
-      }
-      else if key == 'default_security_list' && std.type(value) == 'object' then
-        tagResources(value, childPath, platform) + { defined_tags: existingTags(value) + values(childPath, platform) }
-      else tagResources(value, childPath, platform)
-    for key in std.objectFields(obj)
-  };
-
-// Module-created security resources, such as cloned recipes, use section defaults.
-local tagSecurity(doc) =
-  local tagged = tagResources(doc, platform='security');
-  {
-    [family]: tagged[family] + {
-      default_defined_tags: existingTags(tagged[family], 'default_defined_tags') + values([], platform='security'),
+local sectionDefaults(doc, defaults, enabled) =
+  if !enabled then doc else {
+    [family]: doc[family] + {
+      default_defined_tags: defaults + existingTags(doc[family], 'default_defined_tags'),
     }
-    for family in std.objectFields(tagged)
-  };
-
-local tagObservability(doc) =
-  local tagged = tagResources(doc, platform='observability');
-  {
-    [family]: tagged[family] + {
-      default_defined_tags: existingTags(tagged[family], 'default_defined_tags') + values([], platform='observability'),
-    }
-    for family in std.objectFields(tagged)
+    for family in std.objectFields(doc)
   };
 
 function(profile) {
   local rendered = lz(profile.config),
-  iam: tagResources(rendered.iam),
-  network: tagResources(rendered.network, platform='network'),
-  network_backends: tagResources(rendered.network_backends, platform='network'),
-  observability_cis1: tagObservability(rendered.observability_cis1),
-  observability_cis1_pre: tagObservability(rendered.observability_cis1_pre),
-  observability_cis2: tagObservability(rendered.observability_cis2),
-  observability_cis2_pre: tagObservability(rendered.observability_cis2_pre),
-  observability_cis1_explicit: explicitFlowLogs(rendered.network, tagObservability(rendered.observability_cis1)),
-  observability_cis2_explicit: explicitFlowLogs(rendered.network, tagObservability(rendered.observability_cis2)),
-  security_cis1: tagSecurity(rendered.security_cis1),
-  security_cis1_pre: tagSecurity(rendered.security_cis1_pre),
-  security_cis2: tagSecurity(rendered.security_cis2),
-  security_cis2_pre: tagSecurity(rendered.security_cis2_pre),
+  local enabled = !std.objectHas(profile.config, 'cost_governance') ||
+    !std.objectHas(profile.config.cost_governance, 'enable_tags') || profile.config.cost_governance.enable_tags,
+  local securityTags = rendered.security_cis1.scanning_configuration.default_defined_tags,
+  local observabilityTags = rendered.observability_cis1.notifications_configuration.default_defined_tags,
+  iam: rendered.iam,
+  network: rendered.network,
+  network_backends: rendered.network_backends,
+  observability_cis1: sectionDefaults(rendered.observability_cis1, observabilityTags, enabled),
+  observability_cis1_pre: sectionDefaults(rendered.observability_cis1_pre, observabilityTags, enabled),
+  observability_cis2: sectionDefaults(rendered.observability_cis2, observabilityTags, enabled),
+  observability_cis2_pre: sectionDefaults(rendered.observability_cis2_pre, observabilityTags, enabled),
+  observability_cis1_explicit: explicitFlowLogs(rendered.network, sectionDefaults(rendered.observability_cis1, observabilityTags, enabled)),
+  observability_cis2_explicit: explicitFlowLogs(rendered.network, sectionDefaults(rendered.observability_cis2, observabilityTags, enabled)),
+  security_cis1: sectionDefaults(rendered.security_cis1, securityTags, enabled),
+  security_cis1_pre: sectionDefaults(rendered.security_cis1_pre, securityTags, enabled),
+  security_cis2: sectionDefaults(rendered.security_cis2, securityTags, enabled),
+  security_cis2_pre: sectionDefaults(rendered.security_cis2_pre, securityTags, enabled),
   governance: cost_governance.apply(rendered.governance, cost_governance.normalize(
     if std.objectHas(profile.config, 'cost_governance') then profile.config.cost_governance else {},
     projects=cost_governance.project_names(profile.config)

@@ -28,6 +28,11 @@ local check(value, owner=null) =
       (if owner == null then !std.objectHas(child, prefix + 'owner') else child[prefix + 'owner'] == owner)
     else check(child, owner)), std.objectFields(value), true);
 local governance = lz({ hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } }, cost_governance: { enable_tags: false } }).governance;
+local published_disabled = (import 'gen/blueprints/one-oe/runtime/one-stack/output_builder.libsonnet')({
+  config: { hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } }, cost_governance: { enable_tags: false } },
+});
+assert !std.objectHas(published_disabled.security_cis1.scanning_configuration, 'default_defined_tags');
+assert !std.objectHas(published_disabled.observability_cis1.notifications_configuration, 'default_defined_tags');
 assert check(disabled);
 assert check(enabled, 'owner@example.com');
 assert unchanged.oke_configuration.clusters.CLUSTER.defined_tags[prefix + 'owner'] == 'old@example.com';

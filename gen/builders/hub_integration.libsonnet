@@ -5,6 +5,7 @@
 // function(params) -> { pre, post }
 
 local common = import '../hub/hub_common.libsonnet';
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(params)
   local n = params.naming;
@@ -20,6 +21,7 @@ function(params)
   // --- 1. DRG Spoke/Platform Attachments ---
   local drg_spoke_attachments = {
     [e.drg_att_key]: {
+      _cost_scope:: if std.objectHasAll(e, '_cost_scope') then e._cost_scope else cost_scope.shared,
       display_name: e.drg_att_display,
       drg_route_table_key: n.key('DRGRT', ['SPOKES']),
       network_details: {

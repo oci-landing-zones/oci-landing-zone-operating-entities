@@ -1,3 +1,4 @@
+local cost_scope = import '../../lib/cost_scope.libsonnet';
 local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
 
 {
@@ -129,6 +130,7 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
     } else {});
     local project_groups = {
       [n.key_global('GRP', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
+        _cost_scope:: cost_scope.value('shared', spec.project_name),
         name: project_group_name(spec),
         description: descriptions.project_group(spec.scope, spec.project_name),
       }
@@ -348,6 +350,7 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
     local shared_infrastructure_use_policy =
       if has_environment_infra_group && components.database && shared_components.infrastructure then {
         [n.key_global('PCY', scope.key_segments + [product_upper, 'SHARED', 'INFRA', 'USE'])]: {
+          _cost_scope:: cost_scope.value(scope.scope_name),
           name: 'pcy-lz-%s-%s-shared-infra-use' % [environment_name, product.code],
           description:
             'Grants the %s environment %s infrastructure and database administration groups the shared infrastructure dependency permissions required by VMC, AVMC, and ACD operations.' % [
@@ -374,6 +377,7 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
 
     local project_policies = {
       [n.key_global('PCY', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
+        _cost_scope:: cost_scope.value(spec.scope.scope_name, spec.project_name),
         name: project_policy_name(spec),
         description: descriptions.project_policy(spec.scope, spec.project_name),
         compartment_id: inputs.project_db_key(spec.scope, spec.project_name),
@@ -426,7 +430,8 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
           inputs.bastion,
           n,
           [groups[key].name for key in std.objectFields(groups)],
-          scope.key_segments + ['PLATFORM', scope.platform_name]
+          scope.key_segments + ['PLATFORM', scope.platform_name],
+          ownership=cost_scope.value(scope.scope_name)
         ),
     },
 }

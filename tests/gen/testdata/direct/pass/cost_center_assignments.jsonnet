@@ -1,10 +1,11 @@
 // Cost-center filters intersect across dimensions and map each center to its Business Unit.
 // contains: "assignment_contracts": true
 local tags = import 'gen/lib/cost_tags.libsonnet';
+local scope = import 'gen/lib/cost_scope.libsonnet';
 local contract = import 'gen/lib/cost_governance.libsonnet';
 local prefix = 'tagns-lz-cost-governance.tag-lz-';
 local document = {
-  network_configuration: { vcns: { 'VCN-PROD-PAYMENTS-KEY': {}, 'VCN-PREPROD-PAYMENTS-KEY': {} } },
+  network_configuration: { vcns: { 'VCN-PROD-PAYMENTS-KEY': scope.mark({}, 'prod', 'payments'), 'VCN-PREPROD-PAYMENTS-KEY': scope.mark({}, 'preprod', 'payments') } },
   compartments_configuration: { compartments: { 'CMP-LANDINGZONE-KEY': {} } },
   tags_configuration: { namespaces: { KEEP: {} } },
 };
@@ -22,7 +23,7 @@ local explicit = apply({ CC1: {} }, { budgets_configuration: { budgets: { BUDGET
   defined_tags: { [prefix + 'cost-center']: 'CC2', 'role.keep': 'yes' },
 } } } });
 local implicit = apply({ CC1: { platform: ['network'], environment: ['prod'] } }, {
-  oke_configuration: { 'OKE-PROD-KEY': { cluster_configuration: {} } },
+  oke_configuration: { 'OKE-PROD-KEY': { _cost_scope:: scope.value('prod'), cluster_configuration: {} } },
 }).oke_configuration['OKE-PROD-KEY'].cluster_configuration;
 assert scoped.network_configuration.vcns['VCN-PROD-PAYMENTS-KEY'].defined_tags[prefix + 'cost-center'] == 'CC1';
 assert scoped.network_configuration.vcns['VCN-PROD-PAYMENTS-KEY'].defined_tags[prefix + 'business-unit'] == 'IT';

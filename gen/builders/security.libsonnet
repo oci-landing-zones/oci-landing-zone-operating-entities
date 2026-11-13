@@ -8,6 +8,7 @@
 //   blueprints/one-oe/runtime/one-stack/oneoe_security_cis2.json
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(config, n, realm_constants, topo)
   local security_target_env_names = topo.security_target_env_names();
@@ -33,6 +34,7 @@ function(config, n, realm_constants, topo)
     },
   } + {
     [environment_recipe_key(env_name)]: {
+      _cost_scope:: cost_scope.value(env_name),
       name: n.display_global('sz-rcp', ['03', env_name, 'environment']),
       description: 'Recipe 03 %s Environment' % topo.env_display(env_name),
       compartment_id: n.key_global('CMP', ['SECURITY']),

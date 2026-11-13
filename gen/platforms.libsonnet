@@ -1,3 +1,4 @@
+local cost_scope = import 'lib/cost_scope.libsonnet';
 local common = import 'hub/hub_common.libsonnet';
 
 {
@@ -112,6 +113,7 @@ local common = import 'hub/hub_common.libsonnet';
       function(i, s)
         local route_desc = 'Route to VCN %s Projects' % std.join(' ', s.entry.display_segments);
         {
+          _cost_scope:: cost_scope.value(s.entry.env_name),
           name: s.entry.qualified_name,
           display: std.join(' ', s.entry.display_segments),
           vcn: s.env.project_network.network.vcn,
@@ -136,6 +138,7 @@ local common = import 'hub/hub_common.libsonnet';
         local route_desc = 'Route to VCN %s' % label.display;
         local route_segments = pe.scope.key_segments + ['PLATFORM', pe.scope.platform_name];
         {
+          _cost_scope:: cost_scope.value(pe.scope.scope_name),
           name: label.raw_name,
           display: label.display,
           vcn: pe.platform_config.network.vcn,

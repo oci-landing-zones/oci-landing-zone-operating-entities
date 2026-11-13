@@ -1,3 +1,4 @@
+local cost_scope = import '../../../lib/cost_scope.libsonnet';
 local peering = import './oke_peering.libsonnet';
 // OKE network resource assembly helpers.
 
@@ -10,6 +11,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 {
   public_lb_frontend_nsg(ctx):: {
     [ctx.hub_frontend_nsg_key]: {
+      _cost_scope:: cost_scope.value(ctx.scope.scope_name),
       display_name: ctx.n.display('nsg', ['hub'] + ctx.display_segments + ['public-lb']),
       // The public frontend NSG is a Hub network resource created and governed
       // by network-team-controlled IaC. OKE can attach it only after endpoint

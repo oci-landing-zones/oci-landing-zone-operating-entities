@@ -27,6 +27,52 @@ function ready(model: ReturnType<typeof emptyLzModel>) {
   return model;
 }
 
+it('keeps topology ownership when project names overlap network roles and environments', async () => {
+  const files = await generateFromConfigCode(JSON.stringify({
+    hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+    bastion: { client_cidr_block_allow_list: ['192.0.2.0/24'] },
+    environments: {
+      prod: { projects: {} },
+      dev: {
+        projects: { network: {}, prod: {} },
+        project_network: { network: { vcn: '10.1.0.0/21' } },
+        platforms: { prod: {
+          network: { vcn: '10.1.64.0/20' },
+          extension: { type: 'oke_simple', params: {
+            kubernetes_version: 'v1.35.2', services_cidr: '172.22.0.0/16',
+            api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+          } },
+        } },
+      },
+    },
+    cost_governance: { enable_tags: true },
+  }));
+  const prefix = 'tagns-lz-cost-governance.tag-lz-';
+  const iam = JSON.parse(files['iam.json']);
+  const children = iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].children;
+  expect(children['CMP-LZ-NETWORK-KEY'].defined_tags[prefix + 'project']).toBe('notapplicable');
+  const project = children['CMP-LZ-DEV-KEY'].children['CMP-LZ-DEV-PROJECTS-KEY'].children['CMP-LZ-DEV-PROD-KEY'];
+  expect(project.defined_tags).toMatchObject({ [prefix + 'environment']: 'dev', [prefix + 'project']: 'prod', [prefix + 'platform']: 'iam' });
+  for (const role of ['ADMINS', 'RBAC-ROLE', 'BASTION-ACCESS']) {
+    const policy = iam.policies_configuration.supplied_policies[`PCY-LZ-DEV-PLATFORM-PROD-${role}-KEY`];
+    expect(policy.defined_tags[prefix + 'environment']).toBe('dev');
+  }
+  const network = JSON.parse(files['network.json']);
+  const hub = network.network_configuration.network_configuration_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
+  expect(hub.defined_tags[prefix + 'project']).toBe('notapplicable');
+  const oke = JSON.parse(files['oke.json']).oke_configuration;
+  const deployment = oke[Object.keys(oke)[0]];
+  expect(deployment.cluster_configuration.defined_tags[prefix + 'environment']).toBe('dev');
+  expect(deployment.cluster_configuration.options.service_lb_config.defined_tags[prefix + 'environment']).toBe('dev');
+  expect(deployment.cluster_configuration.options.persistent_volume_config.defined_tags[prefix + 'environment']).toBe('dev');
+  const pools = deployment.workers_configuration.worker_pools;
+  expect(pools[Object.keys(pools)[0]].node_defined_tags[prefix + 'environment']).toBe('dev');
+  for (const text of Object.values(files)) {
+    expect(text).not.toContain('_cost_scope');
+    expect(text).not.toContain('_cost_platform');
+  }
+}, 60_000);
+
 it('generates user-required tags and edited inherited budgets from Studio with one shared email', async () => {
   const model = emptyLzModel(); model.environments = []; model.projects = [];
   model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
