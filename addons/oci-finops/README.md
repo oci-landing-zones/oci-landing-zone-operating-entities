@@ -127,7 +127,12 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 
-4. **Create OAC and import the workbook.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md), then [configure consumer access](installation-guide/oac/oac-user-onboarding.md). Optionally, [index datasets and enable AI Assistant](installation-guide/oac/oac-ai-assistant-consumers.md).
+4. **Create OAC and configure reporting.**
+
+   - **A.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service.
+   - **B.** [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md).
+   - **C.** [Configure consumer access](installation-guide/oac/oac-user-onboarding.md).
+   - **D. Optional:** [Index datasets and enable AI Assistant](installation-guide/oac/oac-ai-assistant-consumers.md).
 
 ## License
 
