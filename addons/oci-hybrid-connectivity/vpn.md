@@ -67,7 +67,7 @@ The example consists of three configuration blocks: Customer-Premises Equipment 
 
 #### Block 1: Customer-Premises Equipment (CPE)
 
-This block defines the Customer-Premises Equipment (CPE), including its display name, public IP address, and device vendor. In this example, the CPE vendor is set to `Other`.
+This block defines the CPE, including its display name, public IP address, and device vendor. In this example, the CPE vendor is set to `Other`.
 
 ```json
 "customer_premises_equipments": {
