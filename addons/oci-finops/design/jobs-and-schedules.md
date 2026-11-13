@@ -12,7 +12,7 @@
 
 This is the cross-module reference for Scheduler jobs defined by the solution, including disabled jobs and jobs created only for a particular operation. Optional-module jobs exist only when their module is present. States below describe the definitions and their lifecycle, rather than the current state of a deployed database.
 
-Recurring application jobs use `FINOPS_CORE_SCHEDULE_API.LOCAL_START_DATE()` and the region stored in `FINOPS_CORE_SCHEDULE_CONFIG.TIME_ZONE`. Fixed times below are local to that configured time zone, including its daylight-saving rules; they are not fixed UTC times. A time-zone configuration change alone does not rewrite existing Scheduler start dates; see [ADB stop and restart windows](../installation-guide/database-modules/maintenance-and-diagnostics.md#adb-stop-and-restart-windows) for schedule maintenance.
+Recurring application jobs use `FINOPS_CORE_SCHEDULE_API.LOCAL_START_DATE()` and the region stored in `FINOPS_CORE_SCHEDULE_CONFIG.TIME_ZONE`. Fixed times below are local to that configured time zone, including its daylight-saving rules; they are not fixed UTC times. A time-zone configuration change alone does not rewrite existing Scheduler start dates; see [ADB stop and restart windows](../deployment/install/maintenance-and-diagnostics.md#adb-stop-and-restart-windows) for schedule maintenance.
 
 ## Recurring jobs
 
@@ -43,8 +43,8 @@ These jobs have no repeat interval or fixed daily launch time. The delays below 
 | --- | --- | --- | --- |
 | OAC initial population | [`OAC_OCI_FOCUS_COST_DETAIL_INITIAL_BUILD`](03-oac-oci-focus-cost-detail.md#oac_oci_focus_cost_detail_initial_build) | Initial MV population, 10 seconds after creation. | Created enabled; `AUTO_DROP=FALSE` retains the job after the one-time execution. |
 | OAC initial-load completion | [`OAC_OCI_FOCUS_COST_DETAIL_GATE_STOP`](03-oac-oci-focus-cost-detail.md#oac_oci_focus_cost_detail_gate_stop) | Successful gate completion, 1 minute after creation; disables the recurring initial-load monitor. | Created enabled; `AUTO_DROP=TRUE` removes the job after completion. |
-| OAC selected-profile candidate | `OAC_OCI_FOCUS_COST_DETAIL_BUILD_<id>` | An explicit [profile-build request](../deployment/sql/install/03_visualization/OAC/01_build_oac_oci_focus_cost_detail_from_active_profile.sql), 10 seconds after creation. No job is needed when the selected mapping is already published. | Created enabled; `AUTO_DROP=TRUE`. Builds a candidate without changing the published synonym. |
-| OAC source-table candidate | `OAC_OCI_COST_REBUILD_<id>` | An explicit [source-table rebuild request](../deployment/sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql), 10 seconds after creation. | Created disabled while its argument is set, then enabled by the same request; `AUTO_DROP=FALSE`. Publication remains explicit. |
+| OAC selected-profile candidate | `OAC_OCI_FOCUS_COST_DETAIL_BUILD_<id>` | An explicit [profile-build request](../deployment/install/sql/install/03_visualization/OAC/01_build_oac_oci_focus_cost_detail_from_active_profile.sql), 10 seconds after creation. No job is needed when the selected mapping is already published. | Created enabled; `AUTO_DROP=TRUE`. Builds a candidate without changing the published synonym. |
+| OAC source-table candidate | `OAC_OCI_COST_REBUILD_<id>` | An explicit [source-table rebuild request](../deployment/install/sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql), 10 seconds after creation. | Created disabled while its argument is set, then enabled by the same request; `AUTO_DROP=FALSE`. Publication remains explicit. |
 
 Both generated-name families use a unique 16-character identifier. A retained one-time job is not a recurring schedule, and an automatically removed job no longer appears in the current job inventory.
 
@@ -58,4 +58,4 @@ The [year-pipeline design](02-oci-ingestion.md#year-pipelines) defines source se
 
 ## Current database state
 
-Schedules can subsequently be changed, jobs disabled, and one-time jobs completed or removed. The read-only [job inventory](../deployment/sql/monitoring/04_focusplatform_job_inventory.sql) reports the actual `ENABLED` flag, Scheduler state, repeat expression, start-date time zone, next run and currently running jobs in the owner schema. Its use belongs to [maintenance and diagnostics](../installation-guide/database-modules/maintenance-and-diagnostics.md#operating-state).
+Schedules can subsequently be changed, jobs disabled, and one-time jobs completed or removed. The read-only [job inventory](../deployment/install/sql/monitoring/04_focusplatform_job_inventory.sql) reports the actual `ENABLED` flag, Scheduler state, repeat expression, start-date time zone, next run and currently running jobs in the owner schema. Its use belongs to [maintenance and diagnostics](../deployment/install/maintenance-and-diagnostics.md#operating-state).

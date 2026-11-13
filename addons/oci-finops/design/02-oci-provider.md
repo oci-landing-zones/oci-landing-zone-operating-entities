@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The OCI provider has three mandatory components for the complete solution: FOCUS ingestion (00), the FinOps tag catalog and reporting profile (01a), and tenancy/account context and contracts (02). These form the functional baseline. Optional extensions add datasets independently. All components run in `FOCUSPLATFORM` after the shared schema and common core; each also needs its own OCI API permissions. Start with the [platform installation guide](../installation-guide/README.md) for these prerequisites and the installation sequence.
+The OCI provider has three mandatory components for the complete solution: FOCUS ingestion (00), the FinOps tag catalog and reporting profile (01a), and tenancy/account context and contracts (02). These form the functional baseline. Optional extensions add datasets independently. All components run in `FOCUSPLATFORM` after the shared schema and common core; each also needs its own OCI API permissions. Start with the [platform installation guide](../deployment/install/README.md) for these prerequisites and the installation sequence.
 
 ## Functional architecture and data dependencies
 
@@ -44,7 +44,7 @@ This page defines component boundaries and data dependencies. Each linked compon
 | Cost Anomalies (05) | Optional | OCI anomaly monitors and events. Skipping it leaves out native anomaly datasets. | [Cost Anomalies](02-oci-cost-anomalies.md) |
 | Native Forecast (06) | Optional | OCI Usage API actuals and BASIC forecast. Skipping it leaves out native forecast datasets. | [Native Forecast](02-oci-forecast.md) |
 
-Deployment commands and verification markers are defined once in the [installation guide](../installation-guide/database-modules/python-installation.md#module-verification-and-background-results).
+Deployment commands and verification markers are defined once in the [installation guide](../deployment/install/python-installation.md#module-verification-and-background-results).
 
 ## Visualization boundary
 

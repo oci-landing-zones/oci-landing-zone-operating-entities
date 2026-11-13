@@ -30,7 +30,7 @@ The FinOps deployment uses the JSON files below. Before deployment, edit private
 | --- | --- | --- |
 | [finops_iam.json](finops_iam.json) | FinOps compartment, administrator groups, ADB Dynamic Group and policies; see the [IAM policy reference](iam-policies.md). | Confirm `COMMON-DOMAIN`, domain/compartment names in policy strings and the FinOps CIDR condition. Follow the two-phase IAM sequence in [Deploy and verify](#deploy-and-verify). |
 | [finops_network.json](finops_network.json) | FinOps VCN, private subnets, NSGs, service gateway and attachment to the existing hub DRG. | Review regional names/keys, non-overlapping VCN/subnet CIDRs, `hub_mgmt_*` source CIDRs and hub DRG/route-table references. Complete hub routing and attachment imports following the [One-OE integration reference](one-oe-integration.md). |
-| [finops_database.json](finops_database.json) | Private Autonomous Database. | Replace `<ADB_ADMIN_PASSWORD>` in `admin_password` with a password meeting the [ADB requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password). Review sizing and networking. Follow the [credential preparation steps](../../installation-guide/README.md#step-1-prepare-database-credentials-and-secrets) after creation. |
+| [finops_database.json](finops_database.json) | Private Autonomous Database. | Replace `<ADB_ADMIN_PASSWORD>` in `admin_password` with a password meeting the [ADB requirements](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db/autonomous-database/create.html#cmdoption-admin-password). Review sizing and networking. Follow the [credential preparation steps](../install/README.md#step-1-prepare-database-credentials-and-secrets) after creation. |
 | [finops_security.json](finops_security.json) | Vault and encryption key in `cmp-lz-security`. | Keep the Vault/key in `CMP-LZ-SECURITY-KEY` and the `vlt-lz-finops` name expected by Python discovery. Reuse existing managed resources through their owner. |
 | [finops_observability.json](finops_observability.json) | Notifications topic and email subscriptions. | Replace `email.address@example.com` in `subscriptions[].values` with the operational recipients. |
 | [finops_bastion.json](finops_bastion.json) | Central Bastion in `cmp-lz-security`. | Replace `<YOUR_IP>/32` in `cidr_block_allow_list` with approved source IPs/CIDRs. Confirm the existing hub management subnet. Keep `default_compartment_id=CMP-LZ-SECURITY-KEY`; the compartment is not a deployment choice. |
@@ -97,7 +97,7 @@ Follow [Deploy and verify](#deploy-and-verify) for the deployment sequence and f
 
 ## Next steps
 
-Continue with the [FinOps configuration guide](../../installation-guide/README.md).
+Continue with the [FinOps configuration guide](../install/README.md).
 
 ## License
 

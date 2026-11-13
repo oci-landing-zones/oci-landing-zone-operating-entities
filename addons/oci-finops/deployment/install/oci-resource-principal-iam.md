@@ -2,7 +2,7 @@
 
 This page covers the **ADB Resource Principal**, used by ingestion after database-module installation. Start by checking the IAM resources already supplied by the Landing Zone, then complete only the permissions missing for the chosen FOCUS source. The add-on installer does not create IAM groups or policies.
 
-For module API permissions and their scope, see the [ADB runtime policy reference](../../deployment/landing-zone-extension/iam-policies.md#adb-runtime-policies).
+For module API permissions and their scope, see the [ADB runtime policy reference](../landing-zone-extension/iam-policies.md#adb-runtime-policies).
 
 ## Contents
 

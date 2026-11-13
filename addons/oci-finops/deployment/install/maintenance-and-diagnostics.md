@@ -22,7 +22,7 @@ Diagnostic reports are read-only. Rescheduling, capacity changes, MV rebuilds an
 
 The diagnostic commands in the next three sections do not change the installation. They create no database objects, call no OCI APIs, start no jobs, and never compile or refresh materialized views. Run them as `FOCUSPLATFORM`. An administrator can instead set `CURRENT_SCHEMA=FOCUSPLATFORM` in their own session; the diagnostics use accessible dictionary views scoped to that schema. Dictionary access must cover the whole target schema for a complete inventory.
 
-From the repository's `deployment/sql/install` directory:
+From the repository's `deployment/install/sql/install` directory:
 
 ```sql
 @../monitoring/06_module_installation_health.sql
@@ -63,7 +63,7 @@ SQL wrappers `06_module_installation_health.sql` and `09_selected_module_status.
 
 ## SQL maintenance session inputs
 
-For a maintenance script that requires inputs, connect as `FOCUSPLATFORM` with SQL*Plus working directory `addons/oci-finops/deployment/sql/install`, relative to the checkout root. Initialize once per connection, before assigning values:
+For a maintenance script that requires inputs, connect as `FOCUSPLATFORM` with SQL*Plus working directory `addons/oci-finops/deployment/install/sql/install`, relative to the checkout root. Initialize once per connection, before assigning values:
 
 ```sql
 @00_schema/00_set_install_parameters.sql
@@ -84,7 +84,7 @@ The rebuild helper defaults to `OCI_FOCUS_REPORTS` when `source_table` is omitte
 
 ## Enable, change or disable core notifications
 
-Connect as `FOCUSPLATFORM` with SQL*Plus working directory `deployment/sql/install`. Enabling requires an existing Notifications topic, a confirmed subscription and ADB publish permission; see the [notification access requirements](../../design/01-common-core.md#finops_core_notify_config--combined-report-destination).
+Connect as `FOCUSPLATFORM` with SQL*Plus working directory `deployment/install/sql/install`. Enabling requires an existing Notifications topic, a confirmed subscription and ADB publish permission; see the [notification access requirements](../../design/01-common-core.md#finops_core_notify_config--combined-report-destination).
 
 To enable delivery or replace the topic, initialize the [session inputs](#sql-maintenance-session-inputs), then supply the topic and run:
 
@@ -136,15 +136,15 @@ WHERE JOB_NAME = 'FINOPS_CORE_DAILY';
 
 Scheduler runs inside ADB and cannot start a stopped database. Arrange the external start mechanism before the required module jobs and allow for database readiness. Module designs record job defaults; the core-selected IANA time zone controls local scheduling. Account for daylight-saving changes if the external start mechanism uses UTC.
 
-After restart, inspect module audits and Scheduler history rather than assuming missed occurrences ran. The [job inventory](../../deployment/sql/monitoring/04_focusplatform_job_inventory.sql) shows time zones, next runs, enabled state and active jobs. The optional [rescheduler](../../deployment/sql/monitoring/03_reschedule_focusplatform_after_adb_start.sql) uses the configured time zone and preserves the OAC cadence. Durable module ledgers protect committed work, but source coverage and MV freshness still need separate verification.
+After restart, inspect module audits and Scheduler history rather than assuming missed occurrences ran. The [job inventory](sql/monitoring/04_focusplatform_job_inventory.sql) shows time zones, next runs, enabled state and active jobs. The optional [rescheduler](sql/monitoring/03_reschedule_focusplatform_after_adb_start.sql) uses the configured time zone and preserves the OAC cadence. Durable module ledgers protect committed work, but source coverage and MV freshness still need separate verification.
 
 ## Optional defined-tag catch-up capacity
 
-The [tag-value design](../../design/02-oci-tag-values.md#how-it-works) defines bounded batches, row limits and historical-cursor behavior. The optional [catch-up adjustment](../../deployment/sql/monitoring/05_accelerate_oci_tag_value_catchup.sql) sets 40,000 rows and a five-minute cadence for an installed, enabled, idle worker. Measure duration, capacity, errors and ingestion impact first; overlapping triggers may be skipped. Record the original settings and reassess them after catch-up using the configuration, run audit and Scheduler history.
+The [tag-value design](../../design/02-oci-tag-values.md#how-it-works) defines bounded batches, row limits and historical-cursor behavior. The optional [catch-up adjustment](sql/monitoring/05_accelerate_oci_tag_value_catchup.sql) sets 40,000 rows and a five-minute cadence for an installed, enabled, idle worker. Measure duration, capacity, errors and ingestion impact first; overlapping triggers may be skipped. Record the original settings and reassess them after catch-up using the configuration, run audit and Scheduler history.
 
 ## Rebuild and publish the OAC cost-detail MV
 
-For ordinary profile changes, follow [change a profile and publish an MV candidate with Python](python-installation.md#change-a-tag-profile). To choose another local landing table or changed scalar structure, run [`rebuild_oci_focus_cost_detail_from_landing.sql`](../../deployment/sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql) from `deployment/sql/install`, with initialized [session inputs](#sql-maintenance-session-inputs) and optional `source_table` in `fp_install_config` (default `OCI_FOCUS_REPORTS`). It does not prompt for a table name.
+For ordinary profile changes, follow [change a profile and publish an MV candidate with Python](python-installation.md#change-a-tag-profile). To choose another local landing table or changed scalar structure, run [`rebuild_oci_focus_cost_detail_from_landing.sql`](sql/install/03_visualization/OAC/maintenance/rebuild_oci_focus_cost_detail_from_landing.sql) from `deployment/install/sql/install`, with initialized [session inputs](#sql-maintenance-session-inputs) and optional `source_table` in `fp_install_config` (default `OCI_FOCUS_REPORTS`). It does not prompt for a table name.
 
 The helper builds and validates a separate candidate and records it as `READY` without moving the published synonym. Inspect the build audit and candidate, then use the [explicit Python publication operation](python-installation.md#change-a-tag-profile) with that run ID. Check the source columns, FAST-refresh eligibility and OAC dataset compatibility against the [source-table requirements](../../design/03-oac-oci-focus-cost-detail.md#scope-and-dependencies). A successful Scheduler invocation alone does not prove a valid candidate, publication or fresh reporting data.
 
@@ -158,7 +158,7 @@ For `ORA-01555`, retain the build audit and correlate its interval with `V$UNDOS
 
 ## Upgrade an existing tag-name MV to stable slots
 
-From `deployment/sql/install`, run `@03_visualization/OAC/maintenance/upgrade_oci_focus_cost_detail_to_tag_slots.sql` as `FOCUSPLATFORM` once. It updates the run-state constraint for safe `READY` cutover, installs the published-slot label view and new builder, and requests a full replacement MV in the background. It does not drop or refresh the current published MV. Wait for a `COMPLETE` build whose MV matches the synonym, then run the OAC verifier and inspect `OAC_OCI_FOCUS_TAG_SLOT_V`. This first upgrade changes old tag-name columns to `TAG_n`; OAC workbooks using those old names need a one-time rebind. Later profile additions retain existing `TAG_n` bindings. Build duration depends on landing volume, storage, and available database resources; measure it in the target deployment.
+From `deployment/install/sql/install`, run `@03_visualization/OAC/maintenance/upgrade_oci_focus_cost_detail_to_tag_slots.sql` as `FOCUSPLATFORM` once. It updates the run-state constraint for safe `READY` cutover, installs the published-slot label view and new builder, and requests a full replacement MV in the background. It does not drop or refresh the current published MV. Wait for a `COMPLETE` build whose MV matches the synonym, then run the OAC verifier and inspect `OAC_OCI_FOCUS_TAG_SLOT_V`. This first upgrade changes old tag-name columns to `TAG_n`; OAC workbooks using those old names need a one-time rebind. Later profile additions retain existing `TAG_n` bindings. Build duration depends on landing volume, storage, and available database resources; measure it in the target deployment.
 
 Check the build and Scheduler result with the existing OAC verifier and this query:
 
@@ -182,7 +182,7 @@ The `COMPLETE` build must match the synonym target. A finished Scheduler job alo
 
 Fresh ingestion installs the rolling-retention component but leaves its monthly job disabled and runs no cleanup. Review the [retention design](../../design/02-oci-ingestion.md#optional-rolling-retention-execution) for cutoff protection, pipeline blockers, transaction boundaries and MV behavior before opting in.
 
-For an existing ingestion deployment without any retention objects, a qualified operator can install the create-only component as `FOCUSPLATFORM`, from `deployment/sql/install`:
+For an existing ingestion deployment without any retention objects, a qualified operator can install the create-only component as `FOCUSPLATFORM`, from `deployment/install/sql/install`:
 
 ```sql
 @02_providers/OCI/00_ingestion/internal/09_install_retention.sql
@@ -292,7 +292,7 @@ ORDER BY LOG_DATE DESC FETCH FIRST 10 ROWS ONLY;
 
 For an opt-in rolling policy, use the [rolling retention procedure](#configure-and-run-rolling-retention). The independent range helper below is an operator action with stricter pipeline prerequisites; it is not an initial installation step.
 
-To delete a retention interval of complete months, first stop all OCI FOCUS year pipelines and wait until no pipeline Scheduler run remains active. Keep manual loads, recovery workers and other landing writers stopped throughout the preview and deletion; the checks are not a database-wide writer lock. Connect as `FOCUSPLATFORM` in a dedicated SQL*Plus session with no unrelated pending transaction, start from `deployment/sql/install`, and run:
+To delete a retention interval of complete months, first stop all OCI FOCUS year pipelines and wait until no pipeline Scheduler run remains active. Keep manual loads, recovery workers and other landing writers stopped throughout the preview and deletion; the checks are not a database-wide writer lock. Connect as `FOCUSPLATFORM` in a dedicated SQL*Plus session with no unrelated pending transaction, start from `deployment/install/sql/install`, and run:
 
 ```sql
 @02_providers/OCI/00_ingestion/maintenance/purge_oci_focus_reports_before.sql

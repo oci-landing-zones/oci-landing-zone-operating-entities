@@ -58,4 +58,4 @@ The reader receives no platform-owner roles, DDL privileges or Resource Principa
 | `EXECUTE` on `DBMS_CLOUD_PIPELINE` | An execution path through a direct grant, `DWROLE` or `PUBLIC`. |
 | `EXECUTE` on `DBMS_MVIEW` | The public synonym resolves to `SYS.DBMS_SNAPSHOT`, with execution available to `PUBLIC` or `FOCUSPLATFORM`. |
 
-Database Resource Principal access and OCI authorization are separate. The ADB's dynamic-group membership and source-specific policies are defined in the [OCI IAM prerequisites](../installation-guide/database-modules/oci-resource-principal-iam.md).
+Database Resource Principal access and OCI authorization are separate. The ADB's dynamic-group membership and source-specific policies are defined in the [OCI IAM prerequisites](../deployment/install/oci-resource-principal-iam.md).

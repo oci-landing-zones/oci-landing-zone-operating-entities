@@ -21,7 +21,7 @@ The worker uses the last stored catalog rather than calling OCI Identity per bat
 | `ERROR` | A processing step failed or a later invocation detected an abandoned run. Committed batches remain available for recovery. |
 | `SKIPPED` | No source rows were available or another invocation held the lock. |
 
-The database releases the lock after a lost session; the next invocation closes stale audits and resumes from the committed ledger. Transaction size is bounded by the 500-row batch, while total invocation work is bounded by the configured row limit. Adjustment procedures are in the [maintenance guide](../installation-guide/database-modules/maintenance-and-diagnostics.md#optional-defined-tag-catch-up-capacity).
+The database releases the lock after a lost session; the next invocation closes stale audits and resumes from the committed ledger. Transaction size is bounded by the 500-row batch, while total invocation work is bounded by the configured row limit. Adjustment procedures are in the [maintenance guide](../deployment/install/maintenance-and-diagnostics.md#optional-defined-tag-catch-up-capacity).
 
 ## Why this module is optional
 

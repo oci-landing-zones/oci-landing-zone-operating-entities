@@ -4,7 +4,7 @@ This guide configures FinOps after the Landing Zone add-on infrastructure has be
 
 ## Prerequisites
 
-Complete the [FinOps Landing Zone Add-on deployment](../deployment/landing-zone-extension/README.md), including its prerequisites and readiness checks, before starting this guide.
+Complete the [FinOps Landing Zone Add-on deployment](../landing-zone-extension/README.md), including its prerequisites and readiness checks, before starting this guide.
 
 ## Configuration steps
 
@@ -25,7 +25,7 @@ The creation password in the private IaC input is a bootstrap credential. Coordi
 
 ### Create the password Secrets
 
-The [security configuration](../deployment/landing-zone-extension/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, created during infrastructure deployment, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
+The [security configuration](../landing-zone-extension/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, created during infrastructure deployment, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
 
 | Secret name | Content | Purpose |
 | --- | --- | --- |
@@ -39,15 +39,15 @@ Store only the raw password in each Secret, not a JSON document, username or con
 
 ### Database prerequisites
 
-The Python installer requires a compatible ADB with working connectivity, credentials and OCI authorization for the selected source and modules. Complete the [ADB Resource Principal and IAM prerequisites](database-modules/oci-resource-principal-iam.md): dynamic-group membership applies to both report sources; policies depend on Oracle-managed reports or a customer bucket.
+The Python installer requires a compatible ADB with working connectivity, credentials and OCI authorization for the selected source and modules. Complete the [ADB Resource Principal and IAM prerequisites](oci-resource-principal-iam.md): dynamic-group membership applies to both report sources; policies depend on Oracle-managed reports or a customer bucket.
 
-The ADB, compartments, Vault, Secrets and tags must match the [installer prerequisite table](database-modules/python-installation.md#resources-that-must-already-exist).
+The ADB, compartments, Vault, Secrets and tags must match the [installer prerequisite table](python-installation.md#resources-that-must-already-exist).
 
 ### Install with Python
 
-Follow the [Python installation guide](database-modules/python-installation.md). Run configuration, validation and installation in that order. Validation checks ADMIN Secret access and a read-only connection to ADB; installation checks the required source/module access before proceeding.
+Follow the [Python installation guide](python-installation.md). Run configuration, validation and installation in that order. Validation checks ADMIN Secret access and a read-only connection to ADB; installation checks the required source/module access before proceeding.
 
-After installation, use [ADB maintenance and diagnostics](database-modules/maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
+After installation, use [ADB maintenance and diagnostics](maintenance-and-diagnostics.md) for SQL health checks, restart procedures and optional maintenance.
 
 ## License
 

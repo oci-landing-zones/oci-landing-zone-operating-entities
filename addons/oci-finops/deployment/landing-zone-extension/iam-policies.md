@@ -43,7 +43,7 @@ Allow dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to read <resource-type> in
 
 Populate the OCIDs using the [same-stack provisioning sequence](README.md#deploy-and-verify). The endorsement and Notifications statements do not contain that per-ADB condition.
 
-The JSON includes grants for optional collectors even if those SQL modules are not selected. For a customer-owned report bucket, use the [source-specific ingestion policy](../../installation-guide/database-modules/oci-resource-principal-iam.md#2-choose-the-source-policy); that bucket grant is not defined by this Oracle-managed report endorsement.
+The JSON includes grants for optional collectors even if those SQL modules are not selected. For a customer-owned report bucket, use the [source-specific ingestion policy](../install/oci-resource-principal-iam.md#2-choose-the-source-policy); that bucket grant is not defined by this Oracle-managed report endorsement.
 
 ## usage-report or usage-reports
 
@@ -56,4 +56,4 @@ In a statement such as `define tenancy usage-report as ...`, `usage-report` is a
 ## Additional access to verify
 
 - **Account context:** the SQL preflight and collector call `GetTenancy`, `ListRegionSubscriptions` and `ListCompartments`. Oracle maps these to `TENANCY_INSPECT` and `COMPARTMENT_INSPECT`; see its [IAM API permission reference](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/iampolicyreference.htm). These grants are not explicit in the current FinOps JSON. Verify that the deployed LZ supplies them to the ADB principal; the static policy catalog does not prove effective authorization.
-- **Installation operator:** the Python identity needs separate resource-discovery, wallet and Secret access. Follow the [Python prerequisite table](../../installation-guide/database-modules/python-installation.md#resources-that-must-already-exist); ADB runtime grants do not authorize the Python operator.
+- **Installation operator:** the Python identity needs separate resource-discovery, wallet and Secret access. Follow the [Python prerequisite table](../install/python-installation.md#resources-that-must-already-exist); ADB runtime grants do not authorize the Python operator.

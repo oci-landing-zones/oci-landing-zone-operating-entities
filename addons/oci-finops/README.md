@@ -80,7 +80,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
 | **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-See the [Landing Zone extension deployment guide](deployment/landing-zone-extension/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets and database module installation.
+See the [Landing Zone extension deployment guide](deployment/landing-zone-extension/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](deployment/install/README.md) for database credentials, Secrets and database module installation.
 
 ### Database processing and reporting
 
@@ -129,7 +129,7 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/landing-zone-extension/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
 
-3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
+3. **Configure the database modules.** Follow the [database configuration and installation guide](deployment/install/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 
 4. **Deploy and configure Oracle Analytics Cloud.**
 

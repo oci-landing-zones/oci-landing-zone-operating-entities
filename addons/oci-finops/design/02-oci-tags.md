@@ -25,7 +25,7 @@ The catalog job refreshes metadata only. A profile change selects an immutable r
 
 Catalog synchronization paginates visible tenancy namespaces and defined tags, retaining historical definitions after they cease to be current. Profile specifications identify an existing namespace or an explicit tag list. The governed default uses the required cost-governance definitions; custom profiles retain their exact tag identities.
 
-The module depends on the shared core, authorized Resource Principal access and valid OCI defined-tag metadata. It has no FOCUS landing dependency. The [tag profile specification](../installation-guide/database-modules/python-installation.md#tag-specification) defines the configuration fields and the NAMESPACE and TAG_LIST formats.
+The module depends on the shared core, authorized Resource Principal access and valid OCI defined-tag metadata. It has no FOCUS landing dependency. The [tag profile specification](../deployment/install/python-installation.md#tag-specification) defines the configuration fields and the NAMESPACE and TAG_LIST formats.
 
 ## Entity relationships
 
@@ -186,7 +186,7 @@ Validates the specification, synchronizes the catalog, preserves existing identi
 
 `OCI_TAG_PROFILE_API.INSTALL_DEFAULT`
 
-Compatibility delegate to `APPLY_SPEC` for the reserved governance namespace/profile. Its required existing definitions are listed in the [Python resource prerequisites](../installation-guide/database-modules/python-installation.md#resources-that-must-already-exist).
+Compatibility delegate to `APPLY_SPEC` for the reserved governance namespace/profile. Its required existing definitions are listed in the [Python resource prerequisites](../deployment/install/python-installation.md#resources-that-must-already-exist).
 
 #### `OCI_TAG_PROFILE_API.SWITCH_NAMESPACE`
 
