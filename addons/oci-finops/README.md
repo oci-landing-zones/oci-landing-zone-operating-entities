@@ -14,7 +14,6 @@
     - [Database processing and reporting](#database-processing-and-reporting)
   - [FinOps Tagging](#finops-tagging)
   - [Installation](#installation)
-  - [Maintenance backlog](#maintenance-backlog)
   - [License](#license)
 
 ## Overview
@@ -127,10 +126,6 @@ Set up the solution in three stages. The FinOps add-on extends an existing Landi
 2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/FinOps_LandingZone_addon/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
 
 3. **Configure FinOps — prepare the platform and reporting.** Follow the [FinOps configuration guide](installation-guide/configuration.md) to prepare credentials and Secrets, install the database modules using Python or SQL, and configure OAC reporting and user access.
-
-## Maintenance backlog
-
-See the [maintenance backlog](BACKLOG.md) for pending code cleanup and its validation criteria.
 
 ## License
 
