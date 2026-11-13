@@ -57,7 +57,7 @@ Endorse dynamic-group <ADB_DYNAMIC_GROUP> to read objects in tenancy usage-repor
 
 Replace the group placeholder. Reuse an existing validated equivalent definition/endorsement instead of adding duplicates. See Oracle's [ADB cost-report policy example](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/oci-resources-cost-usage-views.html).
 
-**Reporting tenancy:** Before applying this policy, confirm the Oracle reporting tenancy OCID using the FOCUS report access instructions available in your OCI Console for your environment. The OC1 identifier shown here is an example for that realm; do not assume it applies to other realms. Reuse an existing validated reporting-tenancy definition where available. This identifier belongs to Oracle's reporting tenancy, not your own tenancy; usage-report is only the alias used in these policy statements.
+**Usage Report Tenancy:** Before applying this policy, confirm the Oracle usage report tenancy OCID using the FOCUS report access instructions available in your OCI Console for your environment. The OC1 identifier shown here is an example for that realm; do not assume it applies to other realms. Reuse an existing validated reporting-tenancy definition where available. This identifier belongs to Oracle's usage report tenancy, not your own tenancy; usage-report is only the alias used in these policy statements.
 
 The ADB source discovery also calls Identity `ListRegionSubscriptions` to find the customer tenancy's home region. Check the existing policies cover that operation; if missing, the corresponding statement is:
 
