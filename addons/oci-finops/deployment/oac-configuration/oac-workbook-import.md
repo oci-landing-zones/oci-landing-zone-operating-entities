@@ -37,7 +37,7 @@ Use the Data connection referenced by the imported datasets, rather than the sep
 
 ## Acceptance checks
 
-- All eight canvases open: **Overview**, **Month-To-Date Comparison**, **Details by TAG_4**, **Tag Analysis**, **Forecast**, **Advisor**, **Anomalies** and **Cost Detail**.
+- All eight canvases open: **Overview**, **Month-To-Date Comparison**, **Details Owner Consumption**, **Tag Analysis**, **Forecast**, **Advisor**, **Anomalies** and **Canvas 13**.
 - Cost totals agree with the destination database for the same period, currency and filters.
 - Tag slots have the expected meanings and coverage; Advisor queries the destination's views.
 - There are no missing-dataset/connection errors. Test the imported datasets against the destination rather than treating import success as proof of fresh data.
