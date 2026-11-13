@@ -10,9 +10,9 @@ Provider modules own their source formats, landing data, remediation and analyti
 
 Visualization modules publish database reporting interfaces independently of the presentation tool. The OAC database module prepares the OCI cost-detail interface; the separate OAC service uses it for datasets and dashboards. OAC is the default presentation tool, and its importable workbook is described in the [workbook guide](../installation-guide/oac/oac-workbook-import.md). Additional visualization modules can be added without changing ingestion.
 
-![Platform architecture with shared foundation, OCI modules and separate OAC service](diagrams/02-oci-provider.svg)
+![Platform architecture with shared foundation, OCI modules and separate OAC service](diagrams/02-oci-provider.svg?rev=66e7d1e)
 
-[Open the full-size architecture diagram](diagrams/02-oci-provider.svg).
+[Open the full-size architecture diagram](diagrams/02-oci-provider.svg?rev=66e7d1e).
 
 Arrows represent data consumption in the architecture. OAC reads costs and selected tags through the database reporting interface and combines them with datasets from the installed OCI modules: Account Context, Budgets, Cloud Advisor, Anomalies, Forecast and historical tag values. Shared foundation prerequisites apply to all database modules; the [installation guide](../installation-guide/README.md) defines installation order. Each concrete module design lists its database objects, table columns and Oracle types; Module 00 creates schemas and grants without application tables.
 
