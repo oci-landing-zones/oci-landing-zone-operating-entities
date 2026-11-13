@@ -100,8 +100,7 @@ local firewall_hub_checks(result, region, remote_cidr) =
     [
       statement
       for statement in std.objectValues(distribution.statements)
-      if statement.match_criteria.attachment_type ==
-         'REMOTE_PEERING_CONNECTION'
+      if statement.match_criteria.drg_attachment_key == rpc_attachment.key
     ]
     for distribution in std.objectValues(hub_drg.drg_route_distributions)
   ]);
