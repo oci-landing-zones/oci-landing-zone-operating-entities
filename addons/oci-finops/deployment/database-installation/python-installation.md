@@ -50,7 +50,7 @@ These are discovery requirements in `deployment/database-installation/python/fin
 | FOCUS source | Oracle-managed reports or a customer bucket you specify | ADB Resource Principal can read it. Customer bucket name/prefix are configurable, not fixed discovery names. |
 | Notifications, if enabled | Existing topic OCID you supply | `ACTIVE`, with ADB publish permission and a confirmed email subscription. Leave blank to skip email. |
 
-Secrets contain raw passwords, not JSON. New-user passwords must satisfy ADB rules and contain no double quotes or line breaks. Existing populated add-on schemas are not a fresh-install target. The [IAM reference](oci-resource-principal-iam.md) gives source-specific policies; module preflight verifies actual access.
+Secrets contain raw passwords, not JSON. Follow the [password requirements](README.md#password-requirements), including the current installer character restrictions. Existing populated add-on schemas are not a fresh-install target. The [IAM reference](oci-resource-principal-iam.md) gives source-specific policies; module preflight verifies actual access.
 
 **Resource names and credential-storage conventions must match this table.** The installer does not discover arbitrary naming conventions. Resolve mismatches with the infrastructure owner before proceeding; do not rename existing customer resources blindly.
 

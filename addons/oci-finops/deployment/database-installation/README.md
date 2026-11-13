@@ -23,6 +23,14 @@ After the ADB is available, change its initial ADMIN password before running the
 
 The creation password in the private IaC input is a bootstrap credential. Coordinate its subsequent management with the infrastructure owner so a later Terraform apply does not unintentionally restore that bootstrap value.
 
+### Password requirements
+
+Use passwords compatible with the database's active password policy. Under the [default ADB password rules](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/manage-users-create.html), passwords are 12–30 characters long, include uppercase and lowercase letters and a number, and must not contain the account's username; password-history and reuse restrictions also apply.
+
+- **First character:** for this deployment, prefer a letter, uppercase or lowercase. This is a naming convention for the supplied passwords, not a first-character check enforced by the installer.
+- **Installer restrictions:** the current Vault password reader rejects double quotes (`"`), ampersands (`&`), carriage returns and line feeds. These restrictions apply to all three password Secrets below.
+- Store only the raw password, and keep each Secret synchronized with its database account.
+
 ### Create the password Secrets
 
 The [security configuration](../landing-zone-extension/infrastructure-config/finops_security.json) provisions the Vault and encryption key, **not the Secrets**. After provisioning, create the following Secrets in **`vlt-lz-finops`**, in **`cmp-lz-security`**, in the same region as the ADB. Use the single encryption key `key-lz-finops-adb-admin`, created during infrastructure deployment, for all three Secrets. Follow the [OCI procedure for creating a Secret](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm).
@@ -33,7 +41,7 @@ The [security configuration](../landing-zone-extension/infrastructure-config/fin
 | `sec-lz-finops-adb-focus-platform` | A chosen password for `FOCUSPLATFORM`. | The module installer creates the schema owner using this password. |
 | `sec-lz-finops-adb-oac-focus-reader` | A chosen password for `OAC_FOCUS_READER`. | The module installer creates the OAC reporting account using this password. |
 
-Store only the raw password in each Secret, not a JSON document, username or connection string. With the Console, use manual secret content entry. Each Secret must be `ACTIVE` with the intended password in its `CURRENT` version. Choose database-compatible passwords; installer inputs must not contain double quotes or line breaks. Do not create the two schema accounts manually as part of this step.
+Store only the raw password in each Secret, not a JSON document, username or connection string. With the Console, use manual secret content entry. Each Secret must be `ACTIVE` with the intended password in its `CURRENT` version. Apply the [password requirements](#password-requirements) above. Do not create the two schema accounts manually as part of this step.
 
 ## Step 2: Install the FinOps database modules
 
