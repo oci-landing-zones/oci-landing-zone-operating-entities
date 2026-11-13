@@ -100,7 +100,7 @@ See [Design](design/README.md) for the solution's internal operation: component 
 
 ## FinOps Tagging
 
-The FinOps tagging strategy complements the One-OE compartment hierarchy with consistent financial ownership and cost-allocation metadata. The add-on reuses the `tagns-lz-cost-governance` namespace provided and managed by One-OE.
+The FinOps tagging strategy complements the One-OE compartment hierarchy with consistent financial ownership and cost-allocation metadata. The add-on uses the `tagns-lz-cost-governance` namespace provided and managed by One-OE.
 
 All six tags are **mandatory** and use **controlled lists of values defined in advance by the organization**. One-OE tag defaults can populate these required tags when resources are provisioned.
 
