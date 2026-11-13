@@ -131,7 +131,7 @@ Set up the FinOps add-on in four stages. The FinOps add-on extends an existing L
 
 3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
 
-4. **Create OAC and configure reporting.**
+4. **Deploy and configure Oracle Analytics Cloud.**
 
    <ol type="A">
      <li><a href="installation-guide/oac/oac-service-setup.md">Create the OAC instance manually and prepare ADB connectivity</a>, or reuse an existing service.</li>
