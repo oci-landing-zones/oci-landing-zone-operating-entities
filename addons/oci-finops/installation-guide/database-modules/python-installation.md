@@ -2,7 +2,7 @@
 
 Use the Python installer to create the FinOps schemas and install the database modules in the existing Landing Zone ADB. Resources must match the discovery requirements below.
 
-Complete the [database prerequisites](../configuration.md#database-prerequisites) before running the installer.
+Complete the [database prerequisites](../README.md#database-prerequisites) before running the installer.
 
 ## Contents
 

@@ -76,7 +76,7 @@ OAC is a separate presentation service. Its private access channel connects to t
 | **Notifications** | Topic and email subscriptions for platform operational notifications. | Created by the add-on IaC; recipients confirm their subscriptions. |
 | **Bastion (optional)** | Administrative access to private endpoints through a central Bastion in shared security. | Created by the add-on IaC when needed, or an existing managed central Bastion is reused. |
 
-See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/configuration.md) for database credentials, Secrets, database modules and OAC setup.
+See the [Landing Zone extension deployment guide](deployment/FinOps_LandingZone_addon/README.md) for infrastructure provisioning, resource ownership and dependencies. Follow the [FinOps configuration guide](installation-guide/README.md) for database credentials, Secrets, database modules and OAC setup.
 
 ### Database processing and reporting
 
@@ -119,13 +119,15 @@ The namespace, tag definitions, controlled values and defaults belong to One-OE 
 
 ## Installation
 
-Set up the solution in three stages. The FinOps add-on extends an existing Landing Zone; it does not deploy the One-OE foundation.
+Set up the FinOps add-on in four stages. The FinOps add-on extends an existing Landing Zone; it does not deploy the One-OE foundation.
 
 1. **Prerequisite — deploy the One-OE Landing Zone.** Deploy the base Landing Zone in the OCI parent tenancy using the [One-OE blueprint templates](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its shared compartments, identity domain, hub network and governance tags must be ready before deploying FinOps.
 
 2. **Deploy the FinOps add-on — extend the Landing Zone.** Follow the [FinOps infrastructure deployment steps](deployment/FinOps_LandingZone_addon/README.md) to provision the FinOps compartment, IAM, private networking, ADB, Vault/key and notifications, integrating with the existing One-OE services. Provision central Bastion access when needed, or reuse an existing managed central Bastion.
 
-3. **Configure FinOps — prepare the platform and reporting.** Follow the [FinOps configuration guide](installation-guide/configuration.md) to prepare credentials and Secrets, install the database modules using Python, and configure OAC reporting and user access.
+3. **Configure the database modules.** Follow the [database configuration and installation guide](installation-guide/README.md) to prepare credentials and Secrets, then install the FinOps schemas and modules using Python.
+
+4. **Create OAC and import the workbook.** [Create the OAC instance manually and prepare ADB connectivity](installation-guide/oac/oac-service-setup.md), or reuse an existing service. [Import the workbook and configure its database connection](installation-guide/oac/oac-workbook-import.md), then complete [consumer access and optional AI Assistant setup](installation-guide/README.md#step-3-oracle-analytics-cloud-dashboard).
 
 ## License
 

@@ -147,6 +147,6 @@ The FinOps stack owns the attachment; the existing hub stack owns its route tabl
 | Bastion | Verify source allowlist, session creation/list/get/delete, DNS, endpoint access, denied destinations and expiry. |
 | Network | Verify forward/return routing, security rules and firewall inspection for the selected hub. |
 | Database | Verify ADB private connectivity and Database Tools connection access where configured. |
-| OAC | Verify PAC and dashboard access separately during [OAC configuration](../configuration.md#step-3-oracle-analytics-cloud-dashboard). |
+| OAC | Verify PAC and dashboard access separately during [OAC configuration](../README.md#step-3-oracle-analytics-cloud-dashboard). |
 
 Static configuration and Terraform plans do not establish live OCI authorization or network connectivity.
