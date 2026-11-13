@@ -30,6 +30,8 @@ The modular data model and dashboards can be extended or customised to meet orga
 
 **Why this solution?** Understanding cloud spending requires connecting cost and usage data with business ownership and operational context. This add-on combines OCI FOCUS reports with Landing Zone tags and account information to help teams assign costs consistently, investigate spending and identify optimization opportunities.
 
+The add-on runs in an OCI **parent tenancy**.
+
 ### Example dashboards
 
 <p align="center">
@@ -52,7 +54,7 @@ Select an image to view it at full size.
 
 ## Architecture
 
-The OCI FinOps Add-on extends the Landing Zone foundation deployed in an OCI **parent tenancy** using the [**One-OE blueprint templates**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its architecture combines dedicated FinOps infrastructure, shared Landing Zone services and database modules that prepare cost and usage data for reporting.
+The OCI FinOps Add-on extends the Landing Zone foundation deployed using the [**One-OE blueprint templates**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). Its architecture combines dedicated FinOps infrastructure, shared Landing Zone services and database modules that prepare cost and usage data for reporting.
 
 The following sections describe how the add-on integrates with the Landing Zone and how data flows through the platform.
 
