@@ -89,6 +89,27 @@ Do not use this skill as the first response to an open-ended customer request su
 - For ExaDB-C@C, complete the placement decisions in `AGENTS.md`, then use the generator guide under `gen/workload-extensions/exacc/` for config and publication semantics.
 - If a requested resource is unsupported by Blueprint Factory config mode, keep unsupported resources out of generated files and mark the separate work as "Manual post-deployment configuration required."
 
+## FinOps Tag Configuration
+
+Follow step 11 of root `AGENTS.md` before authoring new customer sources. The customer-facing flow is documented in [OCI LZ AI Agent](../../../addons/oci-lz-ai-agent/README.md#optional-finops-tags).
+
+- For a new design with tags disabled, include `cost_governance: { enable_tags: false, require_tag_values: false, tag_resource_labels: false }`. Do not omit this object: factory defaults otherwise retain FinOps tags. Keep IAM role tags and compartment-based budgets.
+- When enabled, explicitly set `enable_tags: true`, `require_tag_values: true` and `tag_resource_labels: true`. Set `owner_email` to the customer-provided email and `tag_value_lists` for `tag-lz-business-unit` and `tag-lz-cost-center` to the reviewed business values. Derive Platform, Environment and Project through the existing factory topology rules rather than overriding their lists.
+- Map every center to its Business Unit in `cost_center_business_units`. Express its reviewed scope through `cost_center_assignments`: each center maps to optional `platform`, `environment` and `project` arrays. Values within a filter are alternatives; active filters must all match. Null, empty or omitted filters are unrestricted. Reject overlapping matches; never invent a priority rule.
+- Reuse the Home `cost_governance` settings in the regional DR source (a shared imported object is suitable). The factory's regional scope omits governance definitions and budgets while applying the selected tags and mappings to regional resources. Do not assume Studio's export/postprocessing behavior is implicit in standalone factory sources.
+- Preserve existing customer selections unless a change is requested. Keep sample emails, business values and unmatched `tobedefined` assignments visible as unresolved inputs before deployment.
+- Verify disabled outputs contain no FinOps namespace, defaults, assignments or tag-based budgets, while retaining role tags and compartment budgets. For enabled Home, verify all six tag defaults use `is_user_required: true`, the reviewed values and mappings are applied, and topology-derived values are retained. For DR, verify the same selection and assignments without home-owned governance.
+- With `tag_resource_labels: true`, complete scope also emits `governance_pre.json`. Include it in the output inventory and review its staging contract; do not supply it together with `governance.json`. This setting does not alter published JSON snapshots or the generator's global defaults.
+
+## Notification Recipient Configuration
+
+Apply the recipient discovery gate in step 12 of root `AGENTS.md` before generating customer outputs. Recipient settings are separate from `cost_governance.owner_email`, including when tags are disabled.
+
+- Encode a confirmed common event/alarm list as `notification_emails: { default: ['address@example.com'] }`, substituting the actual approved addresses. Optional `cloudguard`, `iam`, `network` and `security` arrays override the default for their topics. Home and DR can share the object or use separately confirmed regional lists. Do not copy home-only topics into DR; regional filtering remains factory-owned.
+- For a confirmed common budget list, set `cost_governance.budget_recipients` to the comma-separated addresses. For separately confirmed per-budget lists, omit that global override and use `cost_governance.budgets.<key>.alert_rule.recipients` (or `additional_budgets` for custom budgets); the global setting takes precedence. Preserve `enable_tags: false` when adding budget recipients to a design without FinOps tags.
+- Never populate these fields from Owner without explicit confirmation. Preserve valid settings in existing designs; explicitly deferred or sample recipients must remain clearly identified as deployment blockers.
+- Inspect every generated EMAIL subscription and budget alert, including both governance phase files, against the approved lists. Do not report a deployment-ready configuration while unapproved sample addresses remain. Keep the review of subscriptions separate from actual post-deployment subscription activation.
+
 ## Verification
 
 - Run `bash gen/generate.sh --config <config_file> [output_dir]` for normal Blueprint Factory generation.

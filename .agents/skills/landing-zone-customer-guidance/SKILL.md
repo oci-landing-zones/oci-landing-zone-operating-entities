@@ -31,7 +31,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 5. After each answer, summarize what is now known in one sentence, then ask the next missing question.
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
 7. Before recommending deployment artifacts or config-mode generation, ask the customer to choose CIS Level 1 or CIS Level 2. Explain that CIS1 is the less complex baseline; recommend CIS2 for its stricter security posture, while making clear that generated CIS2 configurations require customer-managed encryption keys for applicable resources and therefore add Vault, key, IAM, deployment-ordering, rotation, recovery, and workload-lifecycle complexity. For OKE, mention Kubernetes-secret and worker boot-volume CMEKs specifically. Do not silently accept the generator's CIS2 default.
-8. Only after all required decisions are known, including target region, any non-`oc1` realm requirement, and the explicit CIS-level choice, may you recommend a published runtime path, a workload extension path, or config-mode generation.
+8. Only after all required decisions are known, including target region, any non-`oc1` realm requirement, the explicit CIS-level choice, the FinOps-tag decision, and notification/budget recipients, may you recommend a published runtime path, a workload extension path, or config-mode generation.
 9. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer ORM with customer-controlled private Object Storage and the Orchestrator `rms-facade`; keep Terraform CLI, customer-controlled CI/CD, or approved private GitHub as alternatives. Read `references/orm-bucket-deployment.md` before giving exact deployment or staged-update steps.
 10. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
 
@@ -49,13 +49,28 @@ If the selected published path, Blueprint Factory, or workload extension does no
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
 - After establishing the One-OE baseline, ask: **Do you want to deploy a Disaster Recovery (DR) region?** If yes, ask for the home region first and the DR region next, one question at a time. Set `dr_region` on the complete home config for the DR Object Storage grant; the regional config has its own region metadata. The published Frankfurt/Amsterdam pair is an example. Explain that CIS2 deploys Vaults and keys in both regions, while matching compartment, governance, and extension IAM prerequisites stay home-owned.
-- Ask in root `AGENTS.md` order: One-OE baseline, DR decision, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, then the explicit CIS-level choice.
+- Ask in root `AGENTS.md` order: One-OE baseline, DR decision, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, the explicit CIS-level choice, optional FinOps tags, then notification and budget recipients.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `project_network`.
 - During network-scope sizing, ask whether project workloads can use shared subnets or require project-dedicated subnet allocations. Recommend shared subnets unless separate CIDR allocation or lifecycle management is required: shared subnets use address space more efficiently, while dedicated subnets commonly leave capacity stranded in lightly used per-project ranges.
 - Before asking for that choice, explain that dedicated allocation is not an IAM boundary: principals with subnet permissions in the environment network compartment may use any of its subnets. Also explain that same-subnet traffic never traverses the hub firewall and must be controlled with NSGs and security lists.
 - Use a professional, outcome-based question such as: “Shared subnets are the recommended default because they use the allocated address space efficiently. Do any projects need separately allocated subnet CIDRs for operational reasons, or can their workloads use shared subnets with NSGs and security lists for segmentation? Dedicated allocation does not provide IAM isolation.” Ask it as the next single discovery question, not as part of a bulk questionnaire.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
+
+## FinOps Tag Discovery
+
+After the CIS decision, follow step 11 of root `AGENTS.md`: ask whether to enable FinOps tags, with disabled as the new-design default. Do not treat a missing answer as approval to enable them. Preserve the selection in existing designs unless the customer requests a change.
+
+- Disabled: explicitly configure `enable_tags: false`, `require_tag_values: false` and `tag_resource_labels: false` under `cost_governance`; retain IAM role tags and compartment-based budgets. Omitting the object retains legacy factory defaults.
+- Enabled: explain all six tags and their tag-based budgets, and require values for all six. Derive Platform, Environment and Project from the topology. Collect Business Units, Cost Centers, each center's Business Unit and scope, then one valid Owner email, one question at a time.
+- Require at least one Cost Center per Business Unit and resolve overlapping scopes. Show a summary before generation; identify sample or unmatched values as deployment blockers rather than inventing customer data.
+- Linked DR follows the Home selection and business mappings. Home remains the governance owner. Use `landing-zone-config` to express the same choice in both sources without changing published One-OE files.
+
+## Notification Recipient Discovery
+
+Follow step 12 of root `AGENTS.md` before generation, including when FinOps tags are disabled. First ask for event/alarm recipients, offering a shared list or topic/region-specific lists. Then ask separately whether budget alerts should use the same list or different recipients. Skip the budget question only if no budgets are selected.
+
+Do not infer either list from the Owner email. Reuse an answer explicitly given for the same purpose and preserve existing valid settings. Collect missing values one question at a time, validate the addresses, and include both choices in the pre-generation summary. Sample or deferred recipients require an explicit customer decision and a deployment blocker in the draft; never silently substitute `email.address@example.com`.
 
 ## OKE-Specific Guardrails
 

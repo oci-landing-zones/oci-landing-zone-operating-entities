@@ -208,7 +208,25 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Ask the customer to choose explicitly; do not silently select CIS2 merely because it is the Blueprint Factory default. If the customer chooses CIS1, explain that they are accepting a less restrictive posture in exchange for lower deployment and workload-lifecycle complexity.
    - Map the decision to top-level `cis_level: 1` or `cis_level: 2` in Blueprint Factory config mode.
 
-Only after these ten decisions are known may the agent continue with:
+11. **Optional FinOps tags**
+   - After the CIS-level choice and before generation, ask: **Do you want to enable FinOps tags?** Explain that new designs default to disabled, as in Studio. Ask one question at a time; an unanswered question is not consent to enable tags.
+   - If disabled, explicitly set `cost_governance.enable_tags: false`, `require_tag_values: false`, and `tag_resource_labels: false`. Omit the six FinOps definitions, defaults, assignments and tag-based budgets from generated JSON. Retain IAM role tags used by policies and compartment-based budgets. Omitting `cost_governance` does not disable the factory's legacy tag defaults.
+   - If enabled, explain the six tags: Cost Center, Business Unit, Owner, Platform, Environment and Project. Generate all six with required values (`require_tag_values: true`, producing `is_user_required: true`) and resource labels (`tag_resource_labels: true`), together with their tag-based budgets.
+   - Derive Platform, Environment and Project values from the selected topology using the existing factory rules, including shared-service and not-applicable values. Do not ask customers to invent independent lists for those three tags.
+   - Collect Business Units, then Cost Centers and the Business Unit associated with each center. Each Business Unit must have at least one Cost Center. Ask where each center applies using the existing Platform, Environment and Project scopes; explain that an unrestricted scope applies everywhere and reject overlapping assignments rather than selecting a center arbitrarily.
+   - Collect one valid Owner email. Do not invent business values or silently accept sample recipients. If the customer explicitly requests a sample draft, identify all sample and unmatched values as unresolved before deployment.
+   - Show the derived values, Cost Center-to-Business Unit associations, scope assignments and Owner for customer review before generation. Preserve existing FinOps choices when modifying a design unless the customer requests a change; disabling deployed tags or budgets requires explicit confirmation.
+   - Home owns tag definitions, defaults and budgets. Linked DR follows the Home selection and business mappings, using its own regional topology for derived assignments. Do not create a second governance namespace in DR. Keep the choice explicit in both Blueprint Factory sources so disabled tags cannot reappear in regional outputs.
+   - Use the existing Blueprint Factory contract for these choices; do not edit published One-OE JSON snapshots or change the factory's global defaults. A request to tailor tags follows the customized path below.
+
+12. **Notification and budget recipients**
+   - Before generation, ask which email addresses should receive events and alarms. This is required even when FinOps tags are disabled; the Owner tag is a separate decision and must not be reused without confirmation.
+   - Offer one recipient list for all notification topics and both regions, or separate lists by topic/region. Collect the next missing list one question at a time, and validate email addresses before recording them.
+   - Ask separately whether budget alerts should use the same recipients or different ones. Collect recipients for retained compartment-based budgets even when FinOps tags are disabled; omit the question only if no budgets are selected.
+   - Reuse answers already provided explicitly for the same purpose. When updating an existing design, preserve valid recipients unless a change is requested. Do not silently generate `email.address@example.com`; if the customer explicitly requests a sample or defers recipients, mark the output as an incomplete draft with a deployment blocker.
+   - Include the event/alarm and budget recipient choices in the pre-generation review, distinguishing Home, DR and any topic-specific overrides. Verify the generated subscriptions and budget alert recipients match those choices.
+
+Only after these twelve decisions are known may the agent continue with:
 
 - recommending the standard published path versus the Blueprint Factory
 - explaining OKE deployment options such as single-stack, multi-stack, or Blueprint Factory `oke_simple`
