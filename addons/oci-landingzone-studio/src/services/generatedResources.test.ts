@@ -80,6 +80,15 @@ describe('generated resource inventory', () => {
     } } }, compartments);
     expect(result.groups.find((group) => group.kind === 'flowlogs')?.items).toEqual([{ key: 'FLOW', name: 'generated-flow-log-group' }]);
   });
+  it('places the Bastion from generated names and owner references in the security compartment', () => {
+    const result = extractGeneratedResources({ 'security_cis2.json': {
+      bastions_configuration: { default_compartment_id: 'SECURITY', default_subnet_id: 'HUB-MGMT', bastions: { 'actual-bastion-key': { name: 'actualBastionName', defined_tags: {
+        'tagns-lz-cost-governance.tag-lz-platform': 'security', 'tagns-lz-cost-governance.tag-lz-environment': 'shared', 'tagns-lz-cost-governance.tag-lz-project': 'notapplicable',
+      } } } },
+    } }, compartments);
+    expect(result.groups).toEqual([{ id: 'bastion:SECURITY', kind: 'bastion', compartmentKey: 'SECURITY', items: [{ key: 'actual-bastion-key', name: 'actualBastionName', subnetKey: 'HUB-MGMT', scope: { platform: 'security', environment: 'shared', project: 'notapplicable' } }] }]);
+  });
+
   it('uses canonical names, keys and owner inheritance for the six requested families', () => {
     const result = extractGeneratedResources(artifacts(), compartments);
     expect(result.compartments).toEqual([

@@ -31,6 +31,7 @@ import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
 import { exadataEntries } from './exadata';
+import { bastionClientCidrs } from './bastion';
 import { hybridConfig, stripInlineSecrets } from './hybridConnectivity';
 import type { HybridConnectivity } from '../model/hybridConnectivity';
 
@@ -50,6 +51,7 @@ export interface EnvConfigEntry {
 
 export interface LzConfig {
   cost_governance?: import('./costGovernance').CostGovernanceConfig;
+  bastion?: { client_cidr_block_allow_list: string[]; max_session_ttl_in_seconds: number };
   stack_scope?: 'complete' | 'regional';
   dr_region?: string;
   remote_peering_connections?: Record<string, {
@@ -205,6 +207,10 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
 
   return {
     ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(model.bastion?.enabled ? { bastion: {
+      client_cidr_block_allow_list: bastionClientCidrs(model.bastion),
+      max_session_ttl_in_seconds: model.bastion.maxSessionTtlInSeconds,
+    } } : {}),
     ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
     ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
       remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
@@ -400,6 +406,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
     ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
     ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),
+    ...(c.bastion ? [`  bastion: ${jsonnetValue(c.bastion)},`] : []),
     ...hubBlock,
     ...(c.remote_peering_connections ? [`  remote_peering_connections: ${jsonnetValue(c.remote_peering_connections)},`] : []),
     ...environmentsBlock,

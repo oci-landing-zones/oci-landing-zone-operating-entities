@@ -265,7 +265,7 @@ function filteredResourceScope(diagram: DiagramModel, model: TagScopeModel, filt
     });
   };
   const selected = { platform: selectedNames('platform'), environment: selectedNames('environment'), project: selectedNames('project') };
-  const platformFor = { identitydomain: 'iam', budgets: 'governance', requiredtags: 'governance', events: 'observability', notifications: 'observability', flowlogs: 'observability', vault: 'security', scanning: 'security', securityrecipes: 'security' };
+  const platformFor = { bastion: 'security', identitydomain: 'iam', budgets: 'governance', requiredtags: 'governance', events: 'observability', notifications: 'observability', flowlogs: 'observability', vault: 'security', scanning: 'security', securityrecipes: 'security' };
   for (const node of diagram.nodes.filter((entry) => entry.kind === 'resourcegroup' && entry.resourceKind && !inside(entry.id, new Set(ids)))) {
     const items = node.resourceItems ?? [];
     const matchingItems = items.filter((item) => {

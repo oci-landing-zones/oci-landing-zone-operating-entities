@@ -41,6 +41,26 @@ describe('Resource Manager deployment link', () => {
     expect(markup.indexOf('Open Home Region Review')).toBeLessThan(markup.indexOf('2. Create and apply phase 1'));
   });
 
+  it('summarizes enabled Bastion access and blocks downloads for an invalid client allowlist', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance!.recipients = 'finops@example.com';
+    model.foundation.notifications!.default = 'ops@example.com';
+    model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32', maxSessionTtlInSeconds: 3600 };
+    const render = () => renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Bastion" /></WizardProvider></MemoryRouter>);
+    expect(render()).toContain('Hub management subnet');
+    const summary = render().split('Deploy with OCI Resource Manager')[0];
+    expect(summary).not.toContain('Bastion access guide');
+    expect(summary).not.toContain('Connect through OCI Bastion');
+    expect(render().indexOf('After deployment')).toBeGreaterThan(render().indexOf('3. Update and apply phase 2'));
+    expect(render()).toContain('Connect through OCI Bastion');
+    expect(render()).not.toMatch(/<button[^>]*disabled[^>]*>Download files/);
+    model.bastion.clientCidrs = '0.0.0.0/0';
+    expect(render()).toContain('Access from 0.0.0.0/0 is not allowed.');
+    expect(render()).toMatch(/<button[^>]*disabled[^>]*>Download files/);
+    model.bastion.enabled = false;
+    expect(render()).not.toContain('Connect through OCI Bastion');
+  });
+
   it('blocks generation when a custom region short name is invalid', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = 'long';

@@ -15,6 +15,7 @@ The Blueprint Factory accepts JSON and Jsonnet input. Jsonnet is available for a
 [7. Shared Platforms](#7-shared-platforms)<br>
 [8. Workload Extensions](#8-workload-extensions)<br>
 [9. VPN and FastConnect](#9-vpn-and-fastconnect)<br>
+[10. Bastion](#10-bastion)<br>
 
 ## Blueprint Factory Hierarchy
 
@@ -59,6 +60,11 @@ The corresponding configuration nesting is:
     network: {
       vcn: '<hub-vcn-cidr>',
     },
+  },
+
+  bastion: {
+    client_cidr_block_allow_list: ['<approved-public-client-cidr>'],
+    max_session_ttl_in_seconds: 3600,
   },
 
   environments: {
@@ -518,6 +524,28 @@ Create the physical group/ports first, complete cabling and activation, then add
 **Manual post-deployment configuration required:** configure peer equipment and advertisements, complete carrier work, and permit approved traffic in firewall policy, NSGs and security lists. The customer owns those resources' lifecycle, drift management and compliance review.
 
 Configure connections in [Landing Zone Studio](../oci-landingzone-studio/README.md) or add the fields above to your private Blueprint Factory source configuration. Review the generated file set and complete the peer and provider work before testing connectivity.
+
+## 10. Bastion
+
+The optional top-level `bastion` block provisions one standard OCI Bastion in shared security, attached to the selected Hub A/B/C/E management subnet. FQDN/SOCKS5 support is enabled for **dynamic port forwarding sessions**. Omit `bastion` or set it to `null` to disable it. Unknown fields are rejected.
+
+```jsonnet
+bastion: {
+  client_cidr_block_allow_list: ['203.0.113.10/32'],
+  max_session_ttl_in_seconds: 3600,
+},
+```
+
+| Field | Type | Required | Default | Description |
+|---|---|---:|---|---|
+| `client_cidr_block_allow_list` | array of strings | Yes | None | 1 to 20 canonical IPv4 CIDRs for approved public workstation or corporate/VPN egress addresses. `/0` is rejected. |
+| `max_session_ttl_in_seconds` | integer | No | `3600` | Maximum session lifetime, inclusive range `1800` to `10800`. Omitted or `null` uses the default. |
+
+Replace the TEST-NET example with reviewed client CIDRs. Network prefixes must have zero host bits, for example `203.0.113.0/24`. The allowlist controls access to the Bastion; target ports still need separate network rules.
+
+The resource appears under `bastions_configuration` in the existing CIS security pre/final outputs. The Factory uses existing administrator groups for conditional Bastion/session grants and creates no new group. The normal Landing Zone deployment principal creates/deletes the Bastion using its existing IAM and network permissions; the service grants do not supply all network provisioning permissions. Operators create short-lived sessions after deployment; keys, sessions and target credentials are not source-configuration fields. Regional scope emits the regional resource but relies on complete Home IAM with Bastion enabled and matching compartments/groups.
+
+Review the [Bastion setup](../oci-bastion/README.md#setup), [Bastion example](./examples/07-bastion.json), and [macOS](../oci-bastion/macos.md) or [Windows](../oci-bastion/windows.md) operator guide. **Manual post-deployment configuration required:** use the actual Bastion private endpoint address for target rules, then validate routing, inspection and private DNS. Oracle documents a single-VCN boundary; the observed hub-to-spoke dynamic pattern requires topology validation beyond that documented boundary. Follow the [access validation steps](../oci-bastion/README.md#validate-access) before use.
 
 ## References
 

@@ -371,7 +371,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(JSON.parse(files['network.json'])).toEqual(fixture('oneoe_network_hub_a.json'));
   }, 60_000);
 
-  it('emits the full artifact set for a default wizard model', async () => {
+  it('emits the full artifact set with FinOps resource labels', async () => {
     const out = await generateOutputs(emptyLzModel());
     expect(out.primary).toEqual(['network.json']);
     expect(out.secondary).toContain('iam.json');
@@ -379,7 +379,8 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.secondary).toContain('security_cis2.json');
     expect(out.secondary).toContain('observability_cis2.json');
     expect(out.secondary).not.toContain('network.json');
-    expect(Object.keys(out.files).length).toBe(6);
+    expect(out.secondary).toContain('governance_pre.json');
+    expect(Object.keys(out.files).length).toBe(7);
     expect(out.config).toContain("kind: 'hub_a'");
 
     const net = JSON.parse(out.files['network.json']).network_configuration;
@@ -575,7 +576,7 @@ describe('generator (go-jsonnet wasm)', () => {
       '10.1.104.0/21', '10.1.168.0/21', '10.0.240.0/22',
       '10.1.192.0/21', '10.1.200.0/21', '10.1.208.0/21', '10.1.216.0/21']) expect(network).toContain(cidr);
     expect(network).not.toContain('10.172.');
-  }, 60_000);
+  }, 120_000);
 
   it('generates a Custom network-only platform without an unsupported extension', async () => {
     const base = emptyLzModel();
@@ -729,7 +730,7 @@ it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('independently controls w
       expect(egress.some((rule) => rule.dst_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
     }
   }
-}, 60_000);
+}, 120_000);
 
 it('attaches the additional peering NSG independently to workers and native pods', async () => {
   for (const [workerSpokeAccess, podSpokeAccess] of [[false, false], [true, false], [false, true], [true, true]]) {

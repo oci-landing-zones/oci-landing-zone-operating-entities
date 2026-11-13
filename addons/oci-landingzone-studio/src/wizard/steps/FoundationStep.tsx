@@ -23,6 +23,7 @@ import {
 } from '../../services/regions';
 import type { Environment, FoundationConfig } from '../../model/types';
 import { s as form } from './networkEditorStyles';
+import BastionSettings from './BastionSettings';
 
 const s: Record<string, React.CSSProperties> = {
   col:     form.col,
@@ -292,6 +293,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
       </section>
 
       <NotificationsSection />
+      <BastionSettings />
     </div>
   );
 }

@@ -286,7 +286,7 @@ function(hub_ctx) -> {
   fw_nsg_key:          string|null, // NSG key for firewall ingress rules (null if no FW)
   spoke_ingress_nsg_keys: [string], // NSGs that receive generated ingress rules for every routed VCN
   lb_return_nsg_key:   string|null, // stateless LB NSG that receives generated backend return-flow rules
-  has_spoke_natgw:     bool,        // whether spokes get NAT GW + direct peer routes
+  has_spoke_natgw:     bool,        // true only for Hub E: spoke NAT GW + direct peer routes
   post_route_entity_id:   string,   // (if firewall) naming-derived NFW/NLB resource key
   post_route_entity_desc: string,   // human description of the routing target
 }
@@ -331,6 +331,7 @@ Extensions live in `workload-extensions/` and are registered in `landing_zone.li
 }
 
 params.config_params  -- extension-specific parameters (e.g. kubernetes_version)
+params.bastion        -- normalized top-level Bastion object, or null when disabled
 params.network        -- { vcn: 'cidr', subnets: { name: cidr } }, or null when network is not used
 params.naming         -- naming object
 params.topology       -- shared scope semantics from `topology.libsonnet`
@@ -409,6 +410,8 @@ Regional base observability filtering belongs in `builders/observability.libsonn
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
 Config mode validates required fields during normalization. `config.environments` is optional and defaults to an empty object for a shared-services and hub-only Landing Zone. When provided, it must be an object.
+
+`config.bastion` is an optional top-level object; omitted or null disables it. Enabled configurations require `client_cidr_block_allow_list` with 1 to 20 canonical IPv4 CIDRs and no `/0`. `max_session_ttl_in_seconds` defaults to 3600 and must be an integer from 1800 to 10800 inclusive. Existing security outputs own the persistent hub Bastion; operator sessions are not generated. Existing administrator groups receive conditional shared-security session access, with no new group or role registry. Regional scope relies on complete Home IAM. Extension render params carry normalized `params.bastion`; standalone wrappers default it to null so standalone use does not enable Bastion. See the [public configuration contract](../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#10-bastion).
 
 ## 10. Network Artifacts And Internal Composition
 

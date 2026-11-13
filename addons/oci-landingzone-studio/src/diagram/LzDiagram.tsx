@@ -57,6 +57,7 @@ import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBacken
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from './layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from './routeTableLayout';
 import { hybridTopologySvg } from './hybridTopology';
+import { operatorWorkstationSvg } from './operatorWorkstation';
 
 const COOPERATIVE_QUERY = '(max-width: 1100px)';
 const ZOOM_KEYS = ['Meta', 'Control'];
@@ -94,11 +95,11 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
     case 'attachment':
       return { background: '#ffffff', border: '1.5px solid #6b7a99', borderRadius: 5, color: '#1f3a63', fontWeight: 800 };
     case 'project':
-      // Project nodes represent generated project compartments.
       return { background: oracle.compProjectFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'routetable':
     case 'rtdot':
     case 'resourcegroup':
+    case 'operator':
     case 'vpn':
     case 'premises':
     case 'vpntunnel':
@@ -131,11 +132,11 @@ function CompartmentNode({ data }: NodeProps) {
  * right border.
  */
 function SubnetNode({ data }: NodeProps) {
-  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean };
+  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
   const [name = '', cidr = ''] = (d.label ?? '').split('\n');
   const iconSvg = d.icon ? ICONS[d.icon] : undefined;
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: iconSvg || d.endpointName || d.container ? 'flex-start' : 'center', gap: 2, padding: '6px 18px 6px 12px', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.25 }}>
       {/* Public (IGW-routed) subnet badge — the LB / DMZ front-ends face the internet. */}
       {d.publicSubnet && (
         <span title="Public subnet (IGW-routed, internet-facing)" style={{ position: 'absolute', top: 4, right: 4, padding: '1px 6px', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, color: '#fff', background: CAPTION_COLORS.green, borderRadius: 8, lineHeight: 1.5 }}>
@@ -165,6 +166,7 @@ function SubnetNode({ data }: NodeProps) {
         style={{ position: 'absolute', top: '50%', right: -10, transform: 'translateY(-50%)', width: 20, height: 20, lineHeight: 0, background: '#ffffff' }}
         dangerouslySetInnerHTML={{ __html: ROUTE_TABLE_SVG }}
       />
+      <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
     </div>
   );
 }
@@ -242,6 +244,14 @@ function ProjectNode({ data }: NodeProps) {
   );
 }
 
+function OperatorNode({ data }: NodeProps) {
+  const node = data as unknown as DiagramNode;
+  return <div role="img" aria-label={`${node.label.replace('\n', ': ')}; connected over the Internet`} style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div dangerouslySetInnerHTML={{ __html: operatorWorkstationSvg(node) }} />
+    <Handle type="source" position={Position.Right} style={hiddenHandle} isConnectable={false} />
+  </div>;
+}
+
 const RT_COLORS = { hub: '#8C3A80', gateway: '#8C3A80', drg: '#B23A48', spoke: '#2E6E3F' } as const;
 type RtRow = NonNullable<DiagramNode['rtRows']>[number];
 const RT_CELLS = {
@@ -294,8 +304,14 @@ function RouteTableNode({ id, data }: NodeProps) {
 function ResourceGroupNode({ data }: NodeProps) {
   const d = data as unknown as DiagramNode;
   if (!d.resourceKind) return null;
-  return <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
-    dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />;
+  return <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
+      dangerouslySetInnerHTML={{ __html: resourceGroupSvg(d.resourceKind, d.resourceItems ?? [], d.width) }} />
+    {d.resourceKind === 'bastion' && <>
+      <Handle type="target" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+      <Handle type="source" position={Position.Left} style={hiddenHandle} isConnectable={false} />
+    </>}
+  </div>;
 }
 
 function ConnectivityNode({ data }: NodeProps) {
@@ -328,7 +344,7 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, vpn: ConnectivityNode, premises: ConnectivityNode, vpntunnel: ConnectivityNode, fastconnect: ConnectivityNode, customerrouter: ConnectivityNode, project: ProjectNode, operator: OperatorNode, routetable: RouteTableNode, rtdot: RtDotNode, resourcegroup: ResourceGroupNode };
 
 /** Nodes stay fixed; screen and export consume the same model-derived connector. */
 function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
@@ -341,7 +357,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
     const tagGroup = tagScope?.groups?.find((group) => group.nodeIds.includes(n.id));
-    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'operator' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
     return {
     id: n.id,
     ...(!tagScope?.overlay && tagScope?.nodeIds.includes(n.id) ? { className: `cost-tag-scope-node${tagGroup ? ` cost-tag-scope-${tagGroup.id}` : ''}`, ariaLabel: `${n.label}: ${tagGroup ? tagGroup.label + ' resources' : 'inherited scope'} of ${tagScope.tagName}` } : {}),

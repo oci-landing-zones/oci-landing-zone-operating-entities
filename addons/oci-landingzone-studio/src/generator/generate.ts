@@ -25,6 +25,7 @@ import { regionShortNameError } from '../services/regions';
 import { validateHybridConnectivity } from '../services/hybridConnectivity';
 import { validateCostGovernance } from '../services/costGovernance';
 import { costCenterCoverage, costCenterCoverageError } from '../services/costCenterCoverage';
+import { validateBastion } from '../services/bastion';
 
 export interface GeneratedOutputs {
   /** The wizard config that was fed to the generator. */
@@ -94,7 +95,7 @@ export function generateFromUpstreamDefaults(profile: string): Promise<Record<st
 
 /** Run the generator over a wizard model. */
 export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs> {
-  const issues = [...validateCostGovernance(model), ...validateHybridConnectivity(model), ...validatePlatformContracts(model), ...validateOkeModel(model), ...validateExadataModel(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model)];
+  const issues = [...validateBastion(model), ...validateCostGovernance(model), ...validateHybridConnectivity(model), ...validatePlatformContracts(model), ...validateOkeModel(model), ...validateExadataModel(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model)];
   const shortNameError = regionShortNameError(model.foundation.regionShortName);
   if (shortNameError) issues.push(shortNameError);
   if (issues.length) throw new GeneratorError(issues.join('\n'));

@@ -79,7 +79,7 @@ describe('generated diagram quality matrix', () => {
     ];
     for (const { step, options } of cases) {
       const graph = buildGraph(model, step, options, undefined, tables, inventory);
-      expectLayout(graph, { inventory, routeTables: tables, foundation: step === 1, showRouteTables: !!(options.showFlows || options.allFlows) }, `${hubKind} step ${step} ${JSON.stringify(options)}`);
+      expectLayout(graph, { inventory, routeTables: tables, upToStep: step, foundation: step === 1, showRouteTables: !!(options.showFlows || options.allFlows) }, `${hubKind} step ${step} ${JSON.stringify(options)}`);
       expect(structuralCrossings(physicalConnections(graph)), `${hubKind} step ${step} unrelated-resource intersections`).toEqual([]);
       if (options.showFlows || options.allFlows) {
         // Distinct physical links and clear text take priority over best-effort point crossings.

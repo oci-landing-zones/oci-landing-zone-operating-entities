@@ -3,6 +3,7 @@
 
 local project_policies = import './project_policies.libsonnet';
 local remote_peering_policies = import './remote_peering_policies.libsonnet';
+local bastion_policies = import './bastion_policies.libsonnet';
 
 function(ctx)
   local config = ctx.config;
@@ -24,6 +25,10 @@ function(ctx)
   local vol_deny = ctx.vol_deny;
   local obj_deny = ctx.obj_deny;
   local fs_deny = ctx.fs_deny;
+  local bastion_users = [grp_network] + std.flattenArrays([
+    [ctx.proj_grp_name(entry, project) for project in ctx.topo.project_names(entry)]
+    for entry in ctx.env_entries
+  ]);
 
   // Combined group list for generic admin policy statement
   local generic_admin_groups = [
@@ -153,7 +158,6 @@ function(ctx)
           tbac_allow(grp_network, 'manage', 'volume-family', cmp_lz, tag_network, vol_deny),
           tbac_allow(grp_network, 'manage', 'object-family', cmp_lz, tag_network, obj_deny),
           tbac_allow(grp_network, 'manage', 'file-family', cmp_lz, tag_network, fs_deny),
-          tbac_allow(grp_network, 'manage', 'bastion-session', cmp_lz, tag_network),
           tbac_allow(grp_network, 'manage', 'cloudevents-rules', cmp_lz, tag_network),
           tbac_allow(grp_network, 'read', 'instance-agent-plugins', cmp_lz, tag_network),
           tbac_allow(grp_network, 'manage', 'keys', cmp_lz, tag_network),
@@ -163,14 +167,13 @@ function(ctx)
           tbac_allow(grp_network, 'read', 'vss-family', cmp_lz, tag_network),
           // Cross-compartment access: security-tagged compartments
           tbac_allow(grp_network, 'read', 'ons-topics', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'use', 'bastion', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'use', 'bastion-session', cmp_lz, tag_security),
           tbac_allow(grp_network, 'use', 'vaults', cmp_lz, tag_security),
           tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
           'allow group %s to manage network-security-groups in compartment %s' % [domain_grp(grp_network), cmp_lz],
         ],
       },
-    } + project_policies(ctx) + remote_peering_policies(ctx) + {
+    } + project_policies(ctx) + remote_peering_policies(ctx)
+    + bastion_policies(ctx.bastion, n, bastion_users) + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(
@@ -208,7 +211,6 @@ function(ctx)
           tbac_allow(grp_security_lz, 'manage', 'orm-config-source-providers', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'manage', 'vss-family', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'read', 'work-requests', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'bastion-family', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'read', 'instance-agent-plugins', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'manage', 'cloudevents-rules', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'manage', 'alarms', cmp_lz, tag_security),
@@ -222,7 +224,11 @@ function(ctx)
           tbac_allow(grp_security_lz, 'manage', 'private-ips', cmp_lz, tag_network),
           tbac_allow(grp_security_lz, 'read', 'keys', cmp_lz, tag_network),
           tbac_allow(grp_security_lz, 'manage', 'operator-control-family', cmp_lz, tag_security),
-        ],
+        ] + (if ctx.bastion != null then [
+          'allow group %s to manage bastion-family in compartment %s' % [
+            domain_grp(grp_security_lz), n.compartment_path(['security']),
+          ],
+        ] else []),
       },
 
       [n.key_tenancy('PCY', ['SECURITY', 'ADMIN'])]: {

@@ -46,6 +46,8 @@ async function generatedRoutes(hubKind: HubKind) {
 describe('generated route preview parity', () => {
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('keeps OKE routing minimal only when %s emits the same DRG default', async (hubKind) => {
     const model = emptyLzModel();
+    model.foundation.costGovernance!.recipients = 'finops@example.com';
+    model.foundation.notifications!.default = 'ops@example.com';
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     model.environments.push({ id: 'environment-3', name: 'test', securityZone: false,
       network: envNetworkDefaults(2, 'test', model.environments.map((env) => env.network.vcnCidr)) });

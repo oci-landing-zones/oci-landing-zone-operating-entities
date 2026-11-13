@@ -16,6 +16,7 @@ interface LayoutContext {
   inventory?: GeneratedResourceInventory;
   routeTables?: RouteTable[];
   foundation?: boolean;
+  upToStep?: number;
   showRouteTables?: boolean;
 }
 const EPS = 0.01;
@@ -235,10 +236,11 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
       const width = Math.max(34, attachmentLabelLayout(node.label).textWidth * 10 / ATTACHMENT_LABEL.fontSize);
       return { ...node, x: node.x + (node.width - width) / 2, width, height: 35 + node.label.split('\n').length * 12.5 };
     });
-    const resourceColumns = new Map<number, DiagramNode[]>();
+    const resourceColumns = new Map<string, DiagramNode[]>();
     for (const node of siblings.filter((entry) => entry.kind === 'resourcegroup')) {
-      const x = Math.round(node.x / EPS);
-      resourceColumns.set(x, [...(resourceColumns.get(x) ?? []), node]);
+      const family = ['identitydomain', 'budgets', 'requiredtags'].includes(node.resourceKind ?? '') ? 'management' : 'resources';
+      const column = `${Math.round(node.x / EPS)}:${Math.round(node.width / EPS)}:${family}`;
+      resourceColumns.set(column, [...(resourceColumns.get(column) ?? []), node]);
     }
     for (const column of resourceColumns.values()) {
       column.sort((a, b) => a.y - b.y);
@@ -320,12 +322,18 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
     if (node.width + EPS < DIAGRAM_LAYOUT.resourceMinWidth) issue('resource-readability', [node.id], 'Resource blocks must preserve the minimum readable column width.');
     const measured = resourceGroupLayout(node.resourceKind, node.resourceItems, node.width);
     if (Math.abs(node.height - measured.height) > EPS) issue('resource-height', [node.id], 'Resource block height must equal its shared rendered extent.');
-    if (Math.abs((measured.headingYs[0] + measured.headingYs.at(-1)!) / 2 - measured.headerCenter) > EPS
+    const management = node.resourceKind === 'identitydomain' || node.resourceKind === 'budgets';
+    const specialized = management || node.resourceKind === 'requiredtags';
+    if (!specialized && (Math.abs((measured.headingYs[0] + measured.headingYs.at(-1)!) / 2 - measured.headerCenter) > EPS
       || Math.abs(measured.iconY + 12 - measured.headerCenter) > EPS
-      || measured.bodyTop <= measured.headingYs.at(-1)! + 12) {
+      || measured.bodyTop <= measured.headingYs.at(-1)! + 12)) {
       issue('resource-heading', [node.id], 'Resource icon, complete heading block and list must share the measured alignment.');
     }
-    if (measured.rows.some((row, index) => row.lines.join('') !== node.resourceItems![index].name)) {
+    const listedItems = node.resourceKind === 'identitydomain' ? node.resourceItems.slice(1) : node.resourceItems;
+    const domainName = node.resourceKind === 'identitydomain' && 'nameLines' in measured ? measured.nameLines.join('') : undefined;
+    if (measured.rows.some((row, index) => row.lines.join('') !== listedItems[index]?.name)
+      || (domainName !== undefined && domainName !== node.resourceItems[0]?.name)
+      || (specialized && measured.headingLines.join('') !== measured.label)) {
       issue('resource-content', [node.id], 'Wrapping must preserve every generated resource name.');
     }
   }
@@ -345,20 +353,25 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
       owners.set(key, matches[0]);
       return matches[0];
     };
-    const expected = context.inventory.groups.filter((group) => group.items.length);
+    const showGovernance = context.upToStep !== undefined ? context.upToStep >= 5 : !context.foundation;
+    const expected = context.inventory.groups.filter((group) => group.items.length &&
+      (showGovernance || !['budgets', 'requiredtags'].includes(group.kind)));
     const actual = diagram.nodes.filter((node) => node.kind === 'resourcegroup');
     if (actual.length !== expected.length) issue('inventory', actual.map((node) => node.id), 'Every generated resource group must appear exactly once.');
     for (const group of expected) {
       const node = byId.get(`resource-${group.id}`);
-      const owner = resolveOwner(group.compartmentKey);
+      const subnetIds = group.kind === 'bastion' ? [...new Set(context.routeTables?.flatMap((table) => table.associations)
+        .filter((binding) => binding.kind === 'subnet' && binding.resourceKey === group.items[0]?.subnetKey)
+        .map((binding) => binding.nodeId))] : [];
+      const owner = group.kind === 'bastion' ? (subnetIds.length === 1 ? byId.get(subnetIds[0]) : undefined) : resolveOwner(group.compartmentKey);
       const items = (value: { key: string; name: string }[]) => value.map((item) => JSON.stringify([item.key, item.name])).sort();
       if (!node || !owner || node.parentId !== owner.id || node.resourceKind !== group.kind
         || JSON.stringify(items(node.resourceItems ?? [])) !== JSON.stringify(items(group.items))) {
-        issue('inventory', [node?.id ?? `resource-${group.id}`], 'Generated resource keys, names and actual compartment ownership must be preserved.');
+        issue('inventory', [node?.id ?? `resource-${group.id}`], 'Generated resource keys and names must retain their compartment owner or generated Bastion subnet placement.');
       }
     }
     try {
-      for (const [key, minimum] of minimumOwnerWidths(context.inventory)) {
+      for (const [key, minimum] of minimumOwnerWidths({ ...context.inventory, groups: expected })) {
         const owner = resolveOwner(key);
         if (owner && owner.width + EPS < minimum) issue('owner-readability', [owner.id], 'Resource owners must reserve readable descendant columns before placement.');
       }

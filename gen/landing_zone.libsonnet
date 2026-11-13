@@ -129,6 +129,7 @@ function(raw_config)
   } else {};
 
   local extension_state = extensions.resolve({
+    bastion: config.bastion,
     extension_registry: extension_registry,
     extension_entries: extension_entries,
     cis_level: config.cis_level,

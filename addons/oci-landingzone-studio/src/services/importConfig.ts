@@ -4,6 +4,7 @@ import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, Platfor
 import { buildConfig } from './lzConfig';
 import { activeProjectNames, importCostGovernance } from './costGovernance';
 import { exadataNotificationSource } from './exadata';
+import { validateBastion } from './bastion';
 
 type ObjectValue = Record<string, unknown>;
 export interface ImportedConfig { model: LzModel; warnings: string[] }
@@ -195,6 +196,14 @@ export function importConfig(value: unknown): ImportedConfig {
   };
   if (config.stack_scope !== undefined) model.foundation.stackScope = choice(config.stack_scope, ['complete', 'regional'] as const, 'stack_scope');
   if (config.dr_region !== undefined) model.foundation.drRegion = text(config.dr_region, 'dr_region');
+  const bastion = config.bastion == null ? undefined : object(config.bastion, 'bastion');
+  if (bastion) {
+    model.bastion = { enabled: true,
+      clientCidrs: strings(bastion.client_cidr_block_allow_list, 'bastion.client_cidr_block_allow_list').join('\n'),
+      maxSessionTtlInSeconds: number(bastion.max_session_ttl_in_seconds ?? 3600, 'bastion.max_session_ttl_in_seconds'),
+    };
+    if (validateBastion(model).length) invalid('bastion');
+  }
   if (config.remote_peering_connections !== undefined) model.remotePeeringConnections = Object.entries(object(config.remote_peering_connections, 'remote_peering_connections')).map(([name, value], index) => {
     const path = `remote_peering_connections.${name}`;
     const connection = object(value, path);
@@ -270,7 +279,7 @@ export function importConfig(value: unknown): ImportedConfig {
   restoreExadata(model, 'exacs', shared, envs, warnings);
   if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model), model);
   else delete model.foundation.costGovernance;
-  const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
+  const expected: ObjectValue = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {
       const entry = object(value, `environments.${name}.platforms.${key}`);
@@ -286,6 +295,8 @@ export function importConfig(value: unknown): ImportedConfig {
     }));
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
+  if (config.bastion === null) delete expected.bastion;
+  if (bastion) expected.bastion = { ...bastion, max_session_ttl_in_seconds: bastion.max_session_ttl_in_seconds ?? 3600 };
   const canonical = buildConfig(model);
   const diff = difference({ ...expected, ...(canonical.cost_governance ? { cost_governance: canonical.cost_governance } : {}) }, canonical);
   if (diff) invalid(diff);
