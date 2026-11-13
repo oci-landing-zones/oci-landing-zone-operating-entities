@@ -5,16 +5,14 @@
 
 **Contents**
 
-- [OCI FinOps Add-on](#oci-finops-add-on)
-  - [An OCI Open LZ Add-on for Cloud Cost Visibility, Allocation and Optimization](#an-oci-open-lz-add-on-for-cloud-cost-visibility-allocation-and-optimization)
-  - [Overview](#overview)
-    - [Example dashboards](#example-dashboards)
-  - [Architecture](#architecture)
-    - [Infrastructure and Landing Zone integration](#infrastructure-and-landing-zone-integration)
-    - [Database processing and reporting](#database-processing-and-reporting)
-  - [FinOps Tagging](#finops-tagging)
-  - [Installation](#installation)
-  - [License](#license)
+- [Overview](#overview)
+  - [Example dashboards](#example-dashboards)
+- [Architecture](#architecture)
+  - [Infrastructure and Landing Zone integration](#infrastructure-and-landing-zone-integration)
+  - [Database processing and reporting](#database-processing-and-reporting)
+- [FinOps Tagging](#finops-tagging)
+- [Installation](#installation)
+- [License](#license)
 
 ## Overview
 
