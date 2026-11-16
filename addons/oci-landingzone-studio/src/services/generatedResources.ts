@@ -1,6 +1,7 @@
-export type ResourceKind = 'events' | 'vault' | 'scanning' | 'notifications' | 'flowlogs' | 'securityrecipes';
+export type ResourceKind = 'bastion' | 'events' | 'vault' | 'scanning' | 'notifications' | 'flowlogs' | 'securityrecipes';
 
 export const GENERATED_RESOURCE_COLLECTIONS = [
+  { kind: 'bastion', configuration: 'bastions_configuration', collection: 'bastions' },
   { kind: 'events', configuration: 'events_configuration', collection: 'event_rules' },
   { kind: 'events', configuration: 'home_region_events_configuration', collection: 'event_rules' },
   { kind: 'vault', configuration: 'vaults_configuration', collection: 'vaults' },
@@ -13,7 +14,7 @@ export const GENERATED_RESOURCE_COLLECTIONS = [
 
 export interface GeneratedResourceInventory {
   compartments: { key: string; name: string; parentKey?: string }[];
-  groups: { id: string; kind: ResourceKind; compartmentKey: string; items: { key: string; name: string }[] }[];
+  groups: { id: string; kind: ResourceKind; compartmentKey: string; items: { key: string; name: string; subnetKey?: string }[] }[];
 }
 
 type Obj = Record<string, unknown>;
@@ -54,7 +55,10 @@ export function extractGeneratedResources(artifacts: Record<string, unknown>, co
       if (!group) { group = { id, kind, compartmentKey, items: [] }; groups.set(id, group); }
       const existing = group.items.find((item) => item.key === key);
       if (existing && existing.name !== name) throw new Error(`Generated resource ${key} has conflicting names.`);
-      if (!existing) group.items.push({ key, name });
+      if (!existing) group.items.push({ key, name,
+        ...(kind === 'bastion' && text(resource.subnet_id ?? config.default_subnet_id)
+          ? { subnetKey: text(resource.subnet_id ?? config.default_subnet_id) } : {}),
+      });
     }
   };
   for (const [filename, artifact] of Object.entries(artifacts)) {

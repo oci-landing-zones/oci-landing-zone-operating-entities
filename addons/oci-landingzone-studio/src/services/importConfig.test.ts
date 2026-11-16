@@ -20,6 +20,21 @@ async function roundTrip(model: LzModel) {
 }
 
 describe('Studio config import', () => {
+  it('restores root Bastion settings without changing the exported configuration', async () => {
+    const model = emptyLzModel();
+    model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32\n198.51.100.0/24', maxSessionTtlInSeconds: 3600 };
+    expect((await roundTrip(model)).model.bastion).toEqual(model.bastion);
+  });
+
+  it('accepts the default Bastion duration and null disabled form, and rejects invalid settings', () => {
+    const base = buildConfig(emptyLzModel());
+    const restored = importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'] } }).model;
+    expect(restored.bastion?.maxSessionTtlInSeconds).toBe(3600);
+    expect(importConfig({ ...base, bastion: null }).model.bastion).toBeUndefined();
+    expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['0.0.0.0/0'] } })).toThrow('bastion');
+    expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'], unsupported: true } })).toThrow('bastion.unsupported');
+  });
+
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('restores %s foundation and project membership', async (hubKind) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = 1;

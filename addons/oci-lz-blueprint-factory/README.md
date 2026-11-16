@@ -48,6 +48,7 @@ A typical configuration describes the target Landing Zone in a few top-level blo
 - **Region metadata**: the OCI region and short region label used by the naming convention.
 - **Stack scope**: whether the source owns the complete Landing Zone domains or only supported regional resources.
 - **Hub**: the selected hub model and hub network range.
+- **Bastion**: optional private-access entry point with an approved public client allowlist and maximum session lifetime.
 - **Environments**: environment-specific networks, projects, platforms, and workload extensions.
 - **Extension parameters**: workload-specific settings, such as OKE or Exadata options, when an extension is part of the design.
 - **Remote peering connections**: peer role, region, remote routable CIDRs, and optional cross-tenancy identifiers for RPC designs.
@@ -110,6 +111,7 @@ The [examples](./examples) folder contains small and medium-size config files th
 | [Shared ExaCS with Autonomous DB tiers](./examples/04-shared-exacs-autonomous.json) | Shared ExaCS platform and project DB tiers across environments. |
 | [Cross-tenancy RPC acceptor](./examples/05-xrpc-cross-tenancy-acceptor.json) | Tenancy 1 acceptor with dynamic environment routing and cross-tenancy Admit policy. |
 | [Cross-tenancy RPC requester](./examples/06-xrpc-cross-tenancy-requester.json) | Tenancy 2 requester with peer RPC reference and cross-tenancy Allow/Endorse policy. |
+| [Hub Bastion](./examples/07-bastion.json) | Optional Bastion in a hub-only Hub E lab design. Replace its example public client CIDR before deployment. |
 | [One-OE regional DR pair](./examples/oneoe-dr/) | Independently generated home acceptor and regional DR requester configurations. |
 
 Generate any example from the repository root:
@@ -121,6 +123,8 @@ bash gen/generate.sh --config addons/oci-lz-blueprint-factory/examples/01-single
 Use the examples as readable patterns. Replace region, hub model, environment names, CIDRs, project names, extension parameters, and notification emails with values reviewed for the target deployment.
 
 The RPC examples form a Hub A acceptor and Hub B requester pair. Generate and review both sides separately. Deploy the acceptor side first, collect its RPC OCID, replace the requester's `peer_id` placeholder, and then generate or deploy the requester side. Environment names and counts are examples only; the factory derives routing from whatever network-producing environments and platforms each customer config defines. See the [X-RPC Blueprint Factory guide](../oci-x-rpc/runtime/x-rpc-blueprint-factory.md) for the complete role, IAM, routing, and generation contract.
+
+Enable [OCI Bastion](../oci-bastion/README.md) with the optional top-level [`bastion` block](./blueprint-factory-configuration-reference.md#10-bastion), alongside `hub`. It emits one hub Bastion with FQDN/SOCKS5 enabled in the existing security outputs and conditional permissions for existing administrators in complete IAM. The normal Landing Zone deployment principal provisions it with the existing IAM/network prerequisites; operators create dynamic sessions afterward. Review actual target rules and the documented cross-VCN boundary before relying on hub-to-spoke access.
 
 &nbsp;
 
@@ -202,6 +206,7 @@ Deployment follows the standard [Terraform deployment guide](/commons/content/te
 | [Jsonnet Composition Guide](/gen/JSONNET_COMPOSITION.md) | Advanced composition reference for repository contributors. |
 | [One-OE Runtime Documentation](/blueprints/one-oe/runtime/one-stack/readme.md) | Published blueprint runtime reference. |
 | [OCI Network Hubs](/addons/oci-hub-models/readme.md) | Published hub model add-ons. |
+| [OCI Bastion access](../oci-bastion/README.md) | Dynamic-session setup, private resource access, and macOS/Windows operator guides. |
 | [Workload Extensions](/workload-extensions/readme.md) | Published workload extension entry point. |
 
 #### License

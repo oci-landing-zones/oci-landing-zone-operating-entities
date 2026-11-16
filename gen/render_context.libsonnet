@@ -24,9 +24,9 @@
 //     extension_entries_by_type(type),
 //     require_extension_entries(type, label),
 //     env_platform_entry(env_name, platform_name),
-//     extension_routing_context(hub_has_spoke_natgw=true),
-//     extension_resolve_inputs(registry, entries, hub_has_spoke_natgw=true),
-//     extension_resolve_entry_inputs(registry, entry, hub_has_spoke_natgw=true),
+//     extension_routing_context(hub_has_spoke_natgw=config.hub.kind == 'hub_e'),
+//     extension_resolve_inputs(registry, entries, hub_has_spoke_natgw=config.hub.kind == 'hub_e'),
+//     extension_resolve_entry_inputs(registry, entry, hub_has_spoke_natgw=config.hub.kind == 'hub_e'),
 //   }
 //
 // Key semantics:
@@ -123,7 +123,11 @@ local common = import 'hub/hub_common.libsonnet';
           ];
         matches[0],
 
-      extension_routing_context(hub_has_spoke_natgw=true):: {
+      // Only Hub E may create NAT gateways in spoke VCNs.
+      extension_routing_context(hub_has_spoke_natgw=config.hub.kind == 'hub_e')::
+        assert !hub_has_spoke_natgw || config.hub.kind == 'hub_e' :
+          'Spoke NAT gateways are supported only with Hub E';
+      {
         naming: n,
         hub_vcn_cidr: config.hub.network.vcn,
         hub_lb_cidr: config.hub.network.subnets.lb,
@@ -131,14 +135,14 @@ local common = import 'hub/hub_common.libsonnet';
         hub_has_spoke_natgw: hub_has_spoke_natgw,
       },
 
-      extension_resolve_inputs(extension_registry, extension_entries, hub_has_spoke_natgw=true)::
+      extension_resolve_inputs(extension_registry, extension_entries, hub_has_spoke_natgw=config.hub.kind == 'hub_e')::
         {
           extension_registry: extension_registry,
           extension_entries: extension_entries,
           cis_level: config.cis_level,
         } + self.extension_routing_context(hub_has_spoke_natgw),
 
-      extension_resolve_entry_inputs(extension_registry, platform_entry, hub_has_spoke_natgw=true)::
+      extension_resolve_entry_inputs(extension_registry, platform_entry, hub_has_spoke_natgw=config.hub.kind == 'hub_e')::
         {
           extension_registry: extension_registry,
           platform_entry: platform_entry,

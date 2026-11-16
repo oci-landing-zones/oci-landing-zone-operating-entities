@@ -102,7 +102,21 @@ function(config, n, realm_constants, topo)
       tenancy_ocid: 'TENANCY-ROOT',
       recipes: recipe_set(cis_level),
     },
-  };
+  } + (if config.bastion != null then {
+    bastions_configuration: {
+      bastions: {
+        [n.key('BASTION', ['HUB'])]: {
+          bastion_type: 'STANDARD',
+          compartment_id: n.key_global('CMP', ['SECURITY']),
+          subnet_id: n.key('SN', ['HUB', 'MGMT']),
+          cidr_block_allow_list: config.bastion.client_cidr_block_allow_list,
+          enable_dns_proxy: true,
+          max_session_ttl_in_seconds: config.bastion.max_session_ttl_in_seconds,
+          name: n.bastion_name(['HUB']),
+        },
+      },
+    },
+  } else {});
 
   // --- CIS1 pre: base + CIS L1 zone only ---
   local cis1_pre = base(1) {

@@ -32,12 +32,15 @@ describe('hybrid routing views', () => {
     expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
     const tables = buildRouteTables(model, network);
     const hc = tables.find((table) => table.id === 'DRGRT-FRA-LZ-HUB-HC-KEY')!;
+    for (const attachment of hc.associations) expect(attachment).not.toHaveProperty('vcnNodeId');
     expect(hc.associations).toEqual(expect.arrayContaining([
       { nodeId: 'hybrid-vpn-backup:tunnel-1', kind: 'drg-attachment' },
       { nodeId: 'hybrid-vpn-backup:tunnel-2', kind: 'drg-attachment' },
       { nodeId: 'hybrid-fc-primary', kind: 'drg-attachment' },
     ]));
     expect(hc.associations).toHaveLength(3);
+    expect(tables.flatMap((table) => table.associations))
+      .toContainEqual({ nodeId: 'attach-hub', kind: 'drg-attachment', vcnNodeId: 'hub-vcn' });
     for (const environment of model.environments) for (const connection of ['hybrid-fc-primary', 'hybrid-vpn-backup']) {
       const flow = buildFlowTraces(model, [`${environment.name}:hybrid-in@${connection}:web`], 'kind', tables)[0];
       expect(flow.ok).toBe(true);
