@@ -1,0 +1,18 @@
+{
+    "realm"                           : "oc1",
+    "region"                          : "eu-frankfurt-1",
+    "region_short_name"               : "fra",
+
+    "hub": {
+        "kind"                        : "hub_e",
+
+        "network": {
+            "vcn"                     : "10.0.0.0/21"
+        }
+    },
+
+    "bastion": {
+        "client_cidr_block_allow_list": ["203.0.113.10/32"],
+        "max_session_ttl_in_seconds"  : 3600
+    }
+}

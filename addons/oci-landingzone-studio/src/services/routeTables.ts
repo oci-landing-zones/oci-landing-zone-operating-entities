@@ -28,6 +28,9 @@ export interface RouteRule {
 export type RouteTableKind = 'hub' | 'gateway' | 'drg' | 'spoke';
 export interface RouteAssociation {
   nodeId: string;
+  resourceKey?: string;
+  vcnNodeId?: string;
+  subnet?: { name: string; cidr: string; private: boolean };
   kind: 'subnet' | 'gateway' | 'vcn-ingress' | 'drg-attachment' | 'rpc-attachment';
 }
 export interface RouteTable {
@@ -185,7 +188,14 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
     if (!table || !nodeId) return;
     const nodeIds = object(resource.data.network_details).type === 'IPSEC_TUNNEL'
       ? [nodeId + ':tunnel-1', nodeId + ':tunnel-2'] : [nodeId];
-    for (const id of nodeIds) if (!table.associations.some((item) => item.nodeId === id && item.kind === kind)) table.associations.push({ nodeId: id, kind });
+    const vcn = kind === 'subnet' ? resources.get(resource.vcnKey ?? '')
+      : kind === 'drg-attachment' ? resources.get(text(object(resource.data.network_details).attached_resource_key)) : undefined;
+    for (const id of nodeIds) if (!table.associations.some((item) => item.nodeId === id && item.kind === kind)) table.associations.push({ nodeId: id, kind,
+      ...(vcn?.kind === 'vcn' && nodeFor(vcn) ? { vcnNodeId: nodeFor(vcn) } : {}),
+      ...(kind === 'subnet' ? { resourceKey: resource.key, subnet: {
+        name: text(resource.data.display_name), cidr: text(resource.data.cidr_block), private: resource.data.prohibit_public_ip_on_vnic === true,
+      } } : {}),
+    });
     if (kind === 'gateway') table.kind = 'gateway';
   };
   for (const resource of resources.values()) {

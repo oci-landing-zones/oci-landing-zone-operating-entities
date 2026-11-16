@@ -1,6 +1,7 @@
 // OKE identity output builder.
 
 local desc = import '../../../descriptions.libsonnet';
+local bastion_policies = import '../../../builders/iam/bastion_policies.libsonnet';
 
 function(ctx) {
   local n = ctx.n,
@@ -44,7 +45,12 @@ function(ctx) {
   },
 
   policies_configuration+: {
-    supplied_policies+: {
+    supplied_policies+: bastion_policies(
+      if std.objectHas(ctx.params, 'bastion') then ctx.params.bastion else null,
+      n,
+      [group_names.admins],
+      ctx.key_segments
+    ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['admins']),
         description: desc.policy.grants(

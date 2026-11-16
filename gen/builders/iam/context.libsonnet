@@ -11,6 +11,7 @@ function(config, n, realm_constants, topo)
 
   {
     config:: config_input,
+    bastion:: if std.objectHas(config_input, 'bastion') then config_input.bastion else null,
     n:: naming,
     realm_constants:: realm,
     topo:: topology,

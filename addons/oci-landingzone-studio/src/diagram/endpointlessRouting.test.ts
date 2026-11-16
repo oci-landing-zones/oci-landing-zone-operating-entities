@@ -48,8 +48,12 @@ describe('routing tables without Projects endpoints', () => {
         }
       }
       if (shared) {
-        expect(associations).toContainEqual({ nodeId: 'shared-plat-vcn-0-sn-0', kind: 'subnet' });
-        expect(associations).toContainEqual({ nodeId: 'attach-shared-0', kind: 'drg-attachment' });
+        expect(associations).toContainEqual({
+          nodeId: 'shared-plat-vcn-0-sn-0', kind: 'subnet', vcnNodeId: 'shared-plat-vcn-0',
+          resourceKey: 'SN-FRA-LZ-SHARED-PLATFORM-CORE-CORE-KEY',
+          subnet: { name: 'sn-fra-lz-shared-core-core', cidr: '10.0.32.0/24', private: true },
+        });
+        expect(associations).toContainEqual({ nodeId: 'attach-shared-0', kind: 'drg-attachment', vcnNodeId: 'shared-plat-vcn-0' });
       }
     }, 60_000);
   }

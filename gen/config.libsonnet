@@ -6,6 +6,7 @@ local collections = import 'lib/collections.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 local hybrid_contract = import 'addons/oci-hybrid-connectivity/config.libsonnet';
+local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
 
 {
   local hub_subnet_order = {
@@ -479,6 +480,7 @@ local hybrid_contract = import 'addons/oci-hybrid-connectivity/config.libsonnet'
     );
 
     config {
+      bastion: bastion_contract.normalize(if std.objectHas(config, 'bastion') then config.bastion else null),
       [if std.objectHas(config, 'hybrid_connectivity') then 'hybrid_connectivity']: hybrid,
       region: region,
       region_short_name: region_short_name,

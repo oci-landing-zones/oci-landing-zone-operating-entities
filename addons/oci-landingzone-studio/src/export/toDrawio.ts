@@ -13,6 +13,7 @@ import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from '../diagram/firew
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
 import { routeTableLayout, ROUTE_TABLE_METRICS } from '../diagram/routeTableLayout';
 import { hybridTopologySvg } from '../diagram/hybridTopology';
+import { operatorWorkstationSvg } from '../diagram/operatorWorkstation';
 
 const svgUri = (svg: string) => `data:image/svg+xml,${encodeURIComponent(svg)}`;
 const SHIELD_URI = svgUri(SHIELD_SVG);
@@ -175,7 +176,7 @@ function nodeStyle(node: DiagramNode): string {
       return `rounded=0;${containerTop}dashed=1;dashPattern=6 4;strokeWidth=2;fillColor=#ffffff;strokeColor=${oracle.vcnBorder};fontColor=${oracle.vcnBorder};`;
     case 'subnet': {
       // Decorated subnets (icon + caption) and endpoint subnets anchor their label to the top.
-      const align = node.icon || node.endpointName ? 'whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;' : compTop;
+      const align = node.icon || node.endpointName || node.container ? 'whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;' : compTop;
       return `rounded=0;${align}dashed=1;dashPattern=6 4;fillColor=#fffdfb;strokeColor=${oracle.vcnBorder};fontColor=#3f4750;`;
     }
     case 'gateway':
@@ -187,6 +188,8 @@ function nodeStyle(node: DiagramNode): string {
       return `rounded=1;${node.attachmentVertical ? 'horizontal=0;' : ''}whiteSpace=nowrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=${ATTACHMENT_LABEL.fontSize};fontFamily=${ATTACHMENT_LABEL.fontFamily};spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`;
     case 'project':
       return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=${node.container ? 'top' : 'middle'};fillColor=#ECEAE8;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=12;`;
+    case 'operator':
+      return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(operatorWorkstationSvg(node))};`;
     case 'routetable':
       return `rounded=0;shadow=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
     case 'rtdot':

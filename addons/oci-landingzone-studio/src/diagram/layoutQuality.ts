@@ -350,11 +350,14 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
     if (actual.length !== expected.length) issue('inventory', actual.map((node) => node.id), 'Every generated resource group must appear exactly once.');
     for (const group of expected) {
       const node = byId.get(`resource-${group.id}`);
-      const owner = resolveOwner(group.compartmentKey);
+      const subnetIds = group.kind === 'bastion' ? [...new Set(context.routeTables?.flatMap((table) => table.associations)
+        .filter((binding) => binding.kind === 'subnet' && binding.resourceKey === group.items[0]?.subnetKey)
+        .map((binding) => binding.nodeId))] : [];
+      const owner = group.kind === 'bastion' ? (subnetIds.length === 1 ? byId.get(subnetIds[0]) : undefined) : resolveOwner(group.compartmentKey);
       const items = (value: { key: string; name: string }[]) => value.map((item) => JSON.stringify([item.key, item.name])).sort();
       if (!node || !owner || node.parentId !== owner.id || node.resourceKind !== group.kind
         || JSON.stringify(items(node.resourceItems ?? [])) !== JSON.stringify(items(group.items))) {
-        issue('inventory', [node?.id ?? `resource-${group.id}`], 'Generated resource keys, names and actual compartment ownership must be preserved.');
+        issue('inventory', [node?.id ?? `resource-${group.id}`], 'Generated resource keys and names must retain their compartment owner or generated Bastion subnet placement.');
       }
     }
     try {

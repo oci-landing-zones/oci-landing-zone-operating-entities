@@ -162,6 +162,7 @@ Studio displays a UPL license notice at the bottom of the dashboard. Your organi
 | [OCI LZ AI Agent](../oci-lz-ai-agent/README.md) | AI-assisted discovery and config drafting guidance. |
 | [One-OE runtime documentation](../../blueprints/one-oe/runtime/one-stack/readme.md) | Published One-OE deployment reference. |
 | [OCI Network Hubs](../oci-hub-models/readme.md) | Hub A, B, C, and E guidance. |
+| [OCI Bastion access](../oci-bastion/README.md) | Enable optional Bastion access in Foundation, then follow the dynamic-session and macOS/Windows operator guides. |
 | [Workload Extensions](../../workload-extensions/readme.md) | Published workload-extension entry point. |
 
 #### License

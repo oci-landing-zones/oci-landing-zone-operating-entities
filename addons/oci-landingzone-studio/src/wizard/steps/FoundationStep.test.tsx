@@ -13,6 +13,35 @@ function render(model: LzModel) {
 }
 
 describe('observability fields', () => {
+  it('offers Bastion below Notifications in Foundations, disabled by default', () => {
+    const html = render(emptyLzModel());
+    expect(html).toContain('aria-label="Enable OCI Bastion"');
+    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('foundation-observability-title'));
+    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('lz-observability-default'));
+    expect(html).not.toContain('id="lz-bastion-client-cidrs"');
+  });
+
+  it('shows enabled Bastion settings with accessible errors and the access guide', () => {
+    const model = emptyLzModel();
+    Object.assign(model, { bastion: { enabled: true, clientCidrs: '0.0.0.0/0', maxSessionTtlInSeconds: 3600 } });
+    const html = render(model);
+    expect(html).toContain('id="lz-bastion-client-cidrs"');
+    expect(html).toContain('id="lz-bastion-session-duration"');
+    expect(html).toContain('lz-bastion-client-cidrs-error');
+    expect(html).toContain('hub management subnet');
+    expect(html).toContain('aria-label="About OCI Bastion"');
+    expect(html).toContain('popover="auto"');
+    expect(html).toContain('Oracle documents access within the Bastion&#x27;s VCN.');
+    expect(html).toContain('The service remains deployed until you remove it.');
+    expect(html).toContain('approved public IPv4 address OCI sees from your workstation or corporate internet gateway');
+    expect(html).toContain('Limit how long each access session can stay open.');
+    const intro = html.match(/<p id="foundation-bastion-intro"[^>]*>(.*?)<\/p>/)?.[1];
+    expect(intro).toContain('Access private databases and virtual machines');
+    expect(intro).toContain('Studio includes the service in your deployment files.');
+    expect(intro).not.toContain('SOCKS5');
+    expect(html).toContain('/addons/oci-bastion/README.md');
+  });
+
   it('keeps a custom region short name editable', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = 'fr2';
@@ -107,7 +136,7 @@ describe('observability fields', () => {
     expect(html).toContain('Changes here affect only this DR design.');
     expect(html).not.toContain('Home-owned');
     expect(html).not.toContain('Home controls');
-    expect(html).not.toContain('role="switch"');
+    expect(html).not.toContain('aria-label="Security zone for');
     expect(render(emptyLzModel())).toContain('role="switch"');
     expect(html).toContain('Home Region');
     expect(html).not.toContain('Home stack owns matching compartments');
