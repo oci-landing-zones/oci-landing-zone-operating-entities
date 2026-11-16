@@ -17,6 +17,17 @@ function render(model: LzModel) {
 }
 
 describe('observability and cost settings', () => {
+  it('shows an inline repair message for a deleted cost-center environment', () => {
+    const model = taggedModel();
+    model.foundation.costGovernance!.costCenterFilters = {
+      CC12345: { platform: null, environment: ['environment:deleted'], project: null },
+    };
+    const html = render(model);
+    expect(html).toContain('Selection needs review');
+    expect(html).toContain('selected environment is no longer available');
+    expect(html).toContain('cost-center-reference-CC12345-error');
+    expect(html).toContain('aria-describedby="cost-center-reference-CC12345-error"');
+  });
   it('preselects CC12345 for IT and shows an inline error for cost centers without a business unit', () => {
     const model = taggedModel();
     expect(render(model)).toMatch(/aria-label="CC12345 for business unit IT" checked=""/);

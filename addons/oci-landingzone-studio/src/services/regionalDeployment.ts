@@ -5,6 +5,7 @@ import { findRegion } from './regions';
 import type { DrDesignDraft } from './disasterRecoveryDesign';
 import { drPlatformProjection } from './disasterRecoveryPlatformProjection';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
+import { inheritRegionalCostGovernance } from './regionalCostGovernance';
 
 export function createRegionalModel(): LzModel {
   const model = { ...emptyLzModel(), environments: [], projects: [] };
@@ -135,5 +136,7 @@ export function legacyRegionalModel(home: LzModel, draft: DrDesignDraft): LzMode
   }
   model.remotePeeringConnections = draft.rpcEnabled ? [{ id: 'rpc-home', name: 'home', role: 'requester',
     remoteCidrs: configuredVcnCidrs(home), peerRegionName: home.foundation.region, peerId: '' }] : [];
+  const projectOrigins = Object.fromEntries(home.projects.flatMap((project) => model.environments.map((env) => [`${project.id}:${env.id}`, project.id])));
+  model.foundation.costGovernance = inheritRegionalCostGovernance(home, model, projectOrigins);
   return structuredClone(model);
 }

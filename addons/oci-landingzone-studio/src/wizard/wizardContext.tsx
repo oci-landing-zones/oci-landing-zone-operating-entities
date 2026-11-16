@@ -25,6 +25,7 @@ import { reconcileExadata } from '../services/exadata';
 import { createRegionalModel } from '../services/regionalDeployment';
 import { vcnConflicts } from '../services/vcnConflicts';
 import { syncDrEnvironments } from '../services/linkedDr';
+import { reconcileCostCenterFilters } from '../services/costGovernance';
 
 export interface HomeRegionSource {
   id: string;
@@ -77,7 +78,7 @@ function reduceState(state: WizardState, action: WizardAction): WizardState {
 
 function reducer(state: WizardState, action: WizardAction): WizardState {
   const next = reduceState(state, action);
-  const model = splitOkePlacements(next.model);
+  const model = reconcileCostCenterFilters(splitOkePlacements(next.model));
   return model === next.model ? next : { ...next, model };
 }
 
@@ -97,8 +98,8 @@ export function WizardProvider({
   onChange,
   children,
 }: React.PropsWithChildren<{ initialModel: LzModel; homeSource?: HomeRegionSource; onChange?: (model: LzModel) => void }>) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: splitOkePlacements(homeSource?.model
-    ? syncDrEnvironments(reconcileExadata(initialModel), homeSource.model) : reconcileExadata(initialModel)) }));
+  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: reconcileCostCenterFilters(splitOkePlacements(homeSource?.model
+    ? syncDrEnvironments(reconcileExadata(initialModel), homeSource.model) : reconcileExadata(initialModel))) }));
   useEffect(() => {
     if (homeSource?.model) dispatch({ type: 'SYNC_HOME', home: homeSource.model });
   }, [homeSource?.model]);

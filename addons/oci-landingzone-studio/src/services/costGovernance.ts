@@ -286,17 +286,59 @@ export function budgetFieldError(field: keyof CostBudget, value: string | number
 }
 
 type CostCenterContext = Pick<LzModel, 'environments' | 'projects'>;
+type ReferenceDimension = 'environment' | 'project';
+
+function costCenterReference(value: string, dimension: ReferenceDimension, model: CostCenterContext) {
+  const entries = dimension === 'environment' ? model.environments : model.projects;
+  const entry = entries.find((item) => `${dimension}:${item.id}` === value || item.name.trim() === value);
+  if (entry) return { value: `${dimension}:${entry.id}`, name: entry.name.trim() };
+  if (value === 'shared' && dimension === 'environment' || value === 'notapplicable' && dimension === 'project') return { value, name: value };
+  return undefined;
+}
+
+export function costCenterReferenceErrors(model: LzModel, center?: string): string[] {
+  const cfg = model.foundation.costGovernance;
+  if (!cfg || cfg.tagsEnabled === false) return [];
+  const centers = center ? [center] : parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345').filter((value) => value !== 'tobedefined');
+  return centers.flatMap((value) => {
+    const filter = costCenterFilter(cfg, value);
+    return (['environment', 'project'] as const).flatMap((dimension) =>
+      filter[dimension]?.some((reference) => !costCenterReference(reference, dimension, model))
+        ? [`Cost center ${value}: A selected ${dimension} is no longer available. Review its filters in Governance.`] : []);
+  });
+}
+
+/** Keep the last missing selection explicit: an empty filter would silently become unrestricted. */
+export function reconcileCostCenterFilters(model: LzModel): LzModel {
+  const cfg = model.foundation.costGovernance;
+  if (!cfg) return model;
+  const filters = { ...cfg.costCenterFilters };
+  let changed = false;
+  for (const center of parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345')) {
+    const filter = costCenterFilter(cfg, center);
+    const next = { ...filter };
+    let updated = false;
+    for (const dimension of ['environment', 'project'] as const) {
+      const values = filter[dimension];
+      if (!values?.length) continue;
+      const valid = values.map((value) => costCenterReference(value, dimension, model)?.value).filter((value): value is string => value !== undefined);
+      if (valid.length && (valid.length !== values.length || valid.some((value, index) => value !== values[index]))) {
+        next[dimension] = valid;
+        updated = true;
+      }
+    }
+    if (updated) { filters[center] = next; changed = true; }
+  }
+  return changed ? { ...model, foundation: { ...model.foundation, costGovernance: { ...cfg, costCenterFilters: filters } } } : model;
+}
 
 function exportCostCenterAssignments(cfg: CostGovernance, model: CostCenterContext): Record<string, BusinessUnitScope> {
   const resolve = (values: string[] | null, dimension: keyof BusinessUnitScope) => {
     if (!values?.length) return null;
     return values.map((value) => {
       if (dimension === 'platform') return value;
-      const entries = dimension === 'environment' ? model.environments : model.projects;
-      const entry = entries.find((item) => `${dimension}:${item.id}` === value || item.name.trim() === value);
-      if (entry) return entry.name.trim();
-      if (value === 'shared' && dimension === 'environment' || value === 'notapplicable' && dimension === 'project') return value;
-      throw new Error(`Unknown cost center ${dimension} filter: ${value}`);
+      // Serialization also renders drafts. Generation validates unresolved references separately.
+      return costCenterReference(value, dimension, model)?.name ?? value;
     });
   };
   return Object.fromEntries(parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345').filter((center) => center !== 'tobedefined').map((center) => {
@@ -326,6 +368,7 @@ export function costGovernanceConfig(value: CostGovernance | undefined, projectN
   const editableTagLists = Object.entries({ ...cfg.tagValueLists, ...(cfg.tagValueLists?.['tag-lz-business-unit'] === undefined ? { 'tag-lz-business-unit': 'IT' } : {}) }).filter(([name]) => !inheritedCostTagNames.includes(name) && name !== 'tag-lz-owner');
   return {
     ...(tagsEnabled ? {
+      enable_tags: true,
       require_tag_values: cfg.requireTagValues,
       tag_resource_labels: cfg.tagResourceLabels ?? true,
       cost_center_business_units: businessUnitAssignments(cfg),
@@ -352,11 +395,15 @@ export function costGovernanceConfig(value: CostGovernance | undefined, projectN
 }
 
 export function validateCostGovernance(model: LzModel): string[] {
-  if (model.foundation.stackScope === 'regional') return [];
   const projects = activeProjectNames(model);
   const defaults = defaultCostGovernance(projects);
   const cfg = model.foundation.costGovernance ?? defaults;
   const tagsEnabled = cfg.tagsEnabled !== false;
+  if (model.foundation.stackScope === 'regional') {
+    const ownerError = tagsEnabled ? ownerEmailError(ownerEmail(cfg)) : null;
+    return [...costCenterReferenceErrors(model), ...(tagsEnabled ? unassignedCostCenterErrors(cfg) : []),
+      ...(ownerError ? [`tag-lz-owner: ${ownerError}`] : [])];
+  }
   const keys = tagsEnabled ? [...Object.keys(defaults.budgets).filter((key) => ![...studioExcludedBudgetKeys, ...inactiveBusinessUnitBudgetKeys(cfg, projects)].includes(key)), ...Object.keys(cfg.additionalBudgets ?? {})]
     : Object.keys(budgetDefinitions(projects)).filter((key) => budgetDefinitions(projects)[key].target.type === 'COMPARTMENT');
   const sharedError = cfg.useSingleRecipient && keys.some((key) => !cfg.removedBudgets?.includes(key)) ? budgetRecipientError(cfg.recipients, true) : null;
@@ -370,7 +417,7 @@ export function validateCostGovernance(model: LzModel): string[] {
   const assignments = businessUnitAssignments(cfg);
   const unitErrors = !tagsEnabled ? [] : budgetTagValues(model, 'tag-lz-business-unit').filter((unit) => !Object.values(assignments).includes(unit)).map((unit) => `Business unit ${unit}: Assign at least one cost center.`);
   const centerErrors = tagsEnabled ? unassignedCostCenterErrors(cfg) : [];
-  return [...unitErrors, ...centerErrors, ...(ownerError ? [`tag-lz-owner: ${ownerError}`] : []), ...tagErrors, ...customErrors, ...(sharedError ? [`Budget alerts: ${sharedError}`] : []), ...keys.filter((key) => !cfg.removedBudgets?.includes(key)).flatMap((key) => {
+  return [...costCenterReferenceErrors(model), ...unitErrors, ...centerErrors, ...(ownerError ? [`tag-lz-owner: ${ownerError}`] : []), ...tagErrors, ...customErrors, ...(sharedError ? [`Budget alerts: ${sharedError}`] : []), ...keys.filter((key) => !cfg.removedBudgets?.includes(key)).flatMap((key) => {
     const budget = cfg.additionalBudgets?.[key] ?? cfg.budgets[key] ?? defaults.budgets[key];
     return fields.flatMap((field) => {
       const error = budgetFieldError(field, budget[field]);
@@ -384,7 +431,7 @@ export function importCostGovernance(value: unknown, projectNames: string[] = []
   const obj = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : fail();
   const cfg = obj(value);
   if (Object.keys(cfg).some((key) => !['enable_tags', 'require_tag_values', 'owner_email', 'budget_recipients', 'budgets', 'exclude_budgets', 'tag_value_lists', 'additional_budgets', 'cost_center_assignments', 'tag_resource_labels', 'cost_center_business_units'].includes(key))) fail();
-  const result = defaultCostGovernance(projectNames);
+  const result = { ...defaultCostGovernance(projectNames), tagsEnabled: false };
   if (cfg.enable_tags !== undefined) {
     if (typeof cfg.enable_tags !== 'boolean') fail();
     result.tagsEnabled = cfg.enable_tags as boolean;

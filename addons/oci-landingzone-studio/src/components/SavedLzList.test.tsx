@@ -6,6 +6,8 @@ import { createLZ, saveDisasterRecoveryLZ, saveOutputs } from '../services/lzSto
 import { createDrDraft } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint } from '../services/disasterRecoverySavedDesign';
 import SavedLzList from './SavedLzList';
+import { defaultCostGovernance } from '../services/costGovernance';
+import { serializeConfig } from '../services/lzConfig';
 
 beforeEach(() => {
   const data = new Map<string, string>();
@@ -17,6 +19,19 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
+  it('renders a saved design with cached outputs and a deleted cost-center reference', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
+      CC12345: { platform: null, environment: [`environment:${model.environments[0].id}`], project: null },
+    } };
+    const previous = serializeConfig(model);
+    model.environments = model.environments.slice(1);
+    const record = createLZ('Needs filter review', model).record!;
+    saveOutputs(record.id, { config: previous, files: { 'network.json': '{}' } });
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toContain('Needs filter review');
+    expect(html).toContain('>Open</button>');
+  });
   it('offers Create DR only for complete designs and removes Duplicate from all cards', () => {
     createLZ('Home', emptyLzModel());
     const regional = emptyLzModel();

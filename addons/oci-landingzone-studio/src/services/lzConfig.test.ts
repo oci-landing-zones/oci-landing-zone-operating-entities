@@ -15,7 +15,8 @@ describe('cost governance configuration', () => {
     const model = emptyLzModel(); model.foundation.stackScope = 'regional';
     expect(buildConfig(model)).toHaveProperty('cost_governance.enable_tags', false);
     model.foundation.costGovernance!.tagsEnabled = true;
-    expect(buildConfig(model)).not.toHaveProperty('cost_governance');
+    expect(buildConfig(model).cost_governance).toMatchObject({ enable_tags: true, budgets: {} });
+    expect(buildConfig(model).cost_governance).not.toHaveProperty('budget_recipients');
   });
 });
 import { newPlatform, newSharedPlatform } from './platforms';

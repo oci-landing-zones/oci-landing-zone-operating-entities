@@ -101,7 +101,7 @@ export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs>
   if (issues.length) throw new GeneratorError(issues.join('\n'));
   const config = serializeConfig(model);
   const files = await generateFromConfigCode(config);
-  const coverageError = model.foundation.stackScope === 'regional' ? null : costCenterCoverageError(costCenterCoverage(files), model);
+  const coverageError = costCenterCoverageError(costCenterCoverage(files), model);
   if (coverageError) throw new GeneratorError(coverageError);
   const primary = PRIMARY_OUTPUTS.filter((name) => name in files);
   const secondary = Object.keys(files).filter((name) => !primary.includes(name as never)).sort();

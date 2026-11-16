@@ -5,9 +5,11 @@ import { emptyLzModel } from '../model/defaults';
 import { defaultCostGovernance, setFinOpsTagsEnabled, syncCostCenterBudgets, parseTagValues, businessUnitAssignments } from '../services/costGovernance';
 import { hubKindDefaults } from '../services/hubKinds';
 import { generateOutputs, generateFromConfigCode } from './generate';
-import { serializeConfig } from '../services/lzConfig';
+import { buildConfig, serializeConfig } from '../services/lzConfig';
+import { importConfig, resolveImportedFinOps } from '../services/importConfig';
 import { generatePreview } from './preview';
 import { setAssetLoader } from './jsonnetVm';
+import { syncDrEnvironments } from '../services/linkedDr';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
 
@@ -295,4 +297,49 @@ it('omits FinOps tags from regional JSON when Home tagging is disabled', async (
   const output = await generateOutputs(model);
   expect(output.files['governance.json']).toBeUndefined();
   for (const text of Object.values(output.files)) expect(text).not.toContain('tagns-lz-cost-governance');
+}, 60_000);
+
+it('labels linked DR resources with Home business mappings without deploying regional governance', async () => {
+  const home = ready(emptyLzModel());
+  home.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  home.environments = []; home.projects = [];
+  Object.assign(home.foundation.costGovernance!, {
+    ownerEmail: 'home.owner@example.test',
+    tagValueLists: { 'tag-lz-cost-center': 'CC_HOME', 'tag-lz-business-unit': 'Operations' },
+    costCenterBusinessUnits: { CC_HOME: 'Operations' },
+    costCenterFilters: { CC_HOME: { platform: null, environment: null, project: null } },
+  });
+  const regional = structuredClone(home);
+  Object.assign(regional.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
+  regional.foundation.costGovernance!.ownerEmail = 'stale@example.test';
+  const output = await generateOutputs(syncDrEnvironments(regional, home));
+  const network = JSON.parse(output.files['network.json']);
+  const hub = network.network_configuration.network_configuration_categories['0-shared'].vcns['VCN-AMS-LZ-HUB-KEY'];
+  expect(hub.defined_tags).toMatchObject({
+    'tagns-lz-cost-governance.tag-lz-owner': 'home.owner@example.test',
+    'tagns-lz-cost-governance.tag-lz-cost-center': 'CC_HOME',
+    'tagns-lz-cost-governance.tag-lz-business-unit': 'Operations',
+  });
+  expect(output.files['iam.json']).toBeUndefined();
+  expect(output.files['governance.json']).toBeUndefined();
+  expect(output.files['governance_pre.json']).toBeUndefined();
+}, 60_000);
+
+
+it('keeps FinOps disabled in real generated outputs after importing a config without settings', async () => {
+  const original = emptyLzModel();
+  original.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  original.environments = []; original.projects = [];
+  const config = buildConfig(original);
+  delete config.cost_governance;
+  const imported = importConfig(config);
+  const model = resolveImportedFinOps(imported, null);
+  model.foundation.costGovernance!.useSingleRecipient = true;
+  model.foundation.costGovernance!.recipients = 'budgets@customer.test';
+  const output = await generateOutputs(model);
+  const governance = JSON.parse(output.files['governance.json']);
+  expect(governance.tags_configuration?.namespaces?.['TAGNS-LZ-COST-GOVERNANCE-KEY']).toBeUndefined();
+  expect(Object.keys(governance.budgets_configuration.budgets)).toEqual(['BUDGET-LANDINGZONE-KEY']);
+  expect(output.files['network.json']).not.toContain('tagns-lz-cost-governance');
+  expect(output.files['iam.json']).toContain('tagns-lz-role.tag-lz-role');
 }, 60_000);

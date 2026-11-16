@@ -349,7 +349,7 @@ describe('cost governance', () => {
   });
   it('migrates old exports and rejects unsupported governance fields', () => {
     const config = buildConfig(taggedModel()); delete config.cost_governance;
-    expect(importConfig(config).model.foundation.costGovernance).toBeUndefined();
+    expect(importConfig(config).model.foundation.costGovernance).toMatchObject({ tagsEnabled: false });
     expect(() => importConfig({ ...config, cost_governance: { unsupported: true } })).toThrow('cost_governance');
   });
   it('validates OCI ranges without incorrectly capping percentages at 100', () => {

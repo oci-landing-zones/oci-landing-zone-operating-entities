@@ -6,6 +6,7 @@ import { WizardProvider } from '../wizardContext';
 import { emptyHybridConnectivity, newVpn } from '../../services/hybridConnectivity';
 import ReviewStep from './ReviewStep';
 import { serializeConfig } from '../../services/lzConfig';
+import { defaultCostGovernance } from '../../services/costGovernance';
 
 const stored = vi.hoisted(() => ({ outputs: {} as Record<string, { config: string; files: Record<string, string> }> }));
 vi.mock('react-router-dom', async (original) => ({ ...await original<typeof import('react-router-dom')>(), useParams: () => ({ id: 'dr' }) }));
@@ -13,6 +14,15 @@ vi.mock('../../services/lzStore', async (original) => ({ ...await original<typeo
 beforeEach(() => { stored.outputs = {}; });
 
 describe('Resource Manager deployment link', () => {
+  it('shows a recoverable cost-center error and blocks download after an environment is deleted', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
+      CC12345: { platform: null, environment: ['environment:deleted'], project: null },
+    } };
+    const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Recoverable design" /></WizardProvider></MemoryRouter>);
+    expect(html).toContain('selected environment is no longer available');
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Download files<\/button>/);
+  });
   it('uses current factory files instead of cached files while retaining Hub C backend selection', () => {
     const model = emptyLzModel();
     model.foundation.stackScope = 'regional';

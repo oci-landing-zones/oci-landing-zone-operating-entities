@@ -27,6 +27,7 @@
  */
 
 import { activeProjectNames, costGovernanceConfig } from './costGovernance';
+import { regionalCostGovernanceConfig } from './regionalCostGovernance';
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
@@ -223,7 +224,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
-    ...(f.stackScope !== 'regional' || f.costGovernance?.tagsEnabled === false ? { cost_governance: costGovernanceConfig(f.costGovernance, activeProjectNames(model), model) } : {}),
+    cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,

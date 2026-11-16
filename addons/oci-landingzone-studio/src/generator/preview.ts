@@ -4,6 +4,7 @@ import { extractGeneratedResources, type GeneratedResourceInventory } from '../s
 import { costCenterCoverage, type UncoveredCostResource } from '../services/costCenterCoverage';
 import { evaluate } from './jsonnetVm';
 import { buildVirtualFs } from './virtualFs';
+import { costCenterReferenceErrors } from '../services/costGovernance';
 
 export interface GeneratedPreview {
   network: unknown;
@@ -14,6 +15,8 @@ export interface GeneratedPreview {
 
 /** One canonical evaluation keeps the diagram's routes and resource inventory in the same snapshot. */
 export async function generatePreview(model: LzModel): Promise<GeneratedPreview> {
+  const referenceErrors = costCenterReferenceErrors(model);
+  if (referenceErrors.length) throw new Error(referenceErrors.join('\n'));
   const { files } = buildVirtualFs();
   const entry = 'studio_preview.jsonnet';
   const result = await evaluate(entry, {
@@ -44,5 +47,5 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
   }
   const artifacts = preview.artifacts as Record<string, unknown>;
   return { network: preview.network, inventory: extractGeneratedResources(artifacts, preview.compartments), files: preview.files,
-    uncoveredCostResources: model.foundation.stackScope === 'regional' ? [] : costCenterCoverage({ ...artifacts, 'network.json': preview.network }) };
+    uncoveredCostResources: costCenterCoverage({ ...artifacts, 'network.json': preview.network }) };
 }

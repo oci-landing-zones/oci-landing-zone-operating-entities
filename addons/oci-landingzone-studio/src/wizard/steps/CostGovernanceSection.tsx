@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { BusinessUnitScope, CostBudget, CostGovernance, LzModel } from '../../model/types';
-import { setFinOpsTagsEnabled, activeProjectNames, budgetTagValues, budgetDefinitions, budgetFieldError, budgetRecipientError, costTagDefinitions, defaultCostGovernance, ownerEmail, ownerEmailError, businessUnitAssignments, unassignedCostCenterErrors, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, businessUnitScopeOptions, inheritedCostTagNames, studioExcludedBudgetKeys, inactiveBusinessUnitBudgetKeys, tagValueLists, parseTagValues, costCenterFilter, syncCostCenterBudgets, addCostCenters, removeCostCenter, customBudgetError } from '../../services/costGovernance';
+import { setFinOpsTagsEnabled, activeProjectNames, budgetTagValues, budgetDefinitions, budgetFieldError, budgetRecipientError, costTagDefinitions, defaultCostGovernance, ownerEmail, ownerEmailError, businessUnitAssignments, unassignedCostCenterErrors, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, businessUnitScopeOptions, inheritedCostTagNames, studioExcludedBudgetKeys, inactiveBusinessUnitBudgetKeys, tagValueLists, parseTagValues, costCenterFilter, costCenterReferenceErrors, syncCostCenterBudgets, addCostCenters, removeCostCenter, customBudgetError } from '../../services/costGovernance';
 import { fieldErrorProps } from '../../services/fieldErrors';
 import FieldError from '../../components/FieldError';
 import CostCenterCoverageNotice from '../../components/CostCenterCoverageNotice';
@@ -30,16 +30,17 @@ function GovernancePanel({ id, title, children }: { id: string; title: string; c
   </section>;
 }
 
-function BusinessUnitPicker({ unit, kind = 'business unit', field, options, selected, disabled, onChange }: {
+function BusinessUnitPicker({ unit, kind = 'business unit', field, options, selected, disabled, onChange, errorId }: {
   unit: string; kind?: 'business unit' | 'cost center'; field: keyof BusinessUnitScope; options: { value: string; label: string }[];
-  selected: string[] | null; disabled: boolean; onChange: (selected: string[] | null) => void;
+  selected: string[] | null; disabled: boolean; onChange: (selected: string[] | null) => void; errorId?: string;
 }) {
   const label = field.charAt(0).toUpperCase() + field.slice(1);
-  const shown = selected === null ? 'All' : options.filter((option) => selected.includes(option.value)).map((option) => option.label).join(', ') || 'Not apply';
+  const missing = selected?.some((value) => !options.some((option) => option.value === value));
+  const shown = missing ? 'Selection needs review' : selected === null ? 'All' : options.filter((option) => selected.includes(option.value)).map((option) => option.label).join(', ') || 'Not apply';
   return <fieldset disabled={disabled} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
     <span style={form.label}>{label}</span>
     <details>
-      <summary aria-label={`${label} for ${kind} ${unit}`} style={{ ...compactInput, cursor: 'pointer', overflowWrap: 'anywhere' }}>{shown}</summary>
+      <summary aria-label={`${label} for ${kind} ${unit}`} aria-describedby={missing ? errorId : undefined} style={{ ...compactInput, cursor: 'pointer', overflowWrap: 'anywhere' }}>{shown}</summary>
       <div style={{ padding: 8, border: `1px solid ${oracle.border}`, borderRadius: 4, marginTop: 4 }}>
         <button type="button" style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', minHeight: 44, padding: '6px 0', fontSize: 12 }} onClick={() => onChange(null)}>Select all</button>
         <button type="button" aria-label={`Not apply in ${label} for ${unit}`} title={`Do not restrict ${label.toLowerCase()}`} style={{ border: 0, background: 'transparent', color: oracle.redDark, cursor: 'pointer', minHeight: 44, padding: '6px 0', marginLeft: 12, fontSize: 12 }} onClick={() => onChange([])}>Not apply</button>
@@ -164,6 +165,8 @@ export default function CostGovernanceSection({ model, regional = model.foundati
             <td style={cell}>{tag.name === 'tag-lz-cost-center' ? <div style={{ display: 'grid', gap: 14 }}>
               {costCenterRows.map((value, index) => {
                 const scope = costCenterFilter(cfg, value.trim());
+                const referenceErrors = costCenterReferenceErrors(model, value.trim());
+                const referenceErrorId = `cost-center-reference-${encodeURIComponent(value.trim())}-error`;
                 return <div key={index} style={{ display: 'grid', gap: 10, paddingBottom: 14, borderBottom: `1px solid ${oracle.border}` }}>
                   <div className="cost-center-actions">
                   <input aria-label={`Cost center ${index + 1}`} disabled={regional} style={{ ...form.input, minWidth: 0 }} value={value}
@@ -181,10 +184,11 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                   <div id={`cost-center-advanced-${index}`} hidden={editingCostCenter !== index}>
                     <strong style={{ display: 'block', marginBottom: 10 }}>Advanced cost configuration</strong>
                     <div className="business-unit-scope-fields">
-                    {(['platform', 'environment', 'project'] as const).map((field) => <BusinessUnitPicker key={field} kind="cost center" unit={value.trim()} field={field} options={businessOptions[field]} selected={scope[field]} disabled={regional}
+                    {(['platform', 'environment', 'project'] as const).map((field) => <BusinessUnitPicker key={field} kind="cost center" unit={value.trim()} field={field} options={businessOptions[field]} selected={scope[field]} disabled={regional} errorId={referenceErrors.length ? referenceErrorId : undefined}
                       onChange={(selected) => patch({ costCenterFilters: { ...cfg.costCenterFilters, [value.trim()]: { ...scope, [field]: selected } } })} />)}
                     </div>
                   </div>
+                  <FieldError id={referenceErrorId} error={referenceErrors} />
                 </div>;
               })}
               {addingCostCenter ? <>

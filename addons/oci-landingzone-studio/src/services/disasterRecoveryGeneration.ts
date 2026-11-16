@@ -6,6 +6,8 @@ import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
 import { deploymentReadme } from './deployment';
+import { costCenterReferenceErrors } from './costGovernance';
+import { regionalCostGovernanceConfig } from './regionalCostGovernance';
 
 type EnvironmentConfig = Omit<EnvConfigEntry, 'project_network'> & { project_network?: EnvConfigEntry['project_network'] };
 interface RpcConfig { remote_cidrs: string[]; peer_region_name: string; peer_id?: string }
@@ -49,6 +51,8 @@ function validateNetworks(config: RegionalFileConfig, homeRanges: string[] = [])
 
 /** Build independent generator inputs; tenancy-level prerequisites remain Home-owned. */
 export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home: RegionalFileConfig; dr: RegionalFileConfig } {
+  const referenceErrors = costCenterReferenceErrors(model);
+  if (referenceErrors.length) throw new Error(referenceErrors.join('\n'));
   const region = drRegionOptions(model).find((item) => item.id === draft.region);
   if (!region || !draft.regionConfirmed) throw new Error('Select and confirm a different DR region before generating.');
   if (!draft.hubNetwork) throw new Error('Configure the DR hub VCN and subnets before generating.');
@@ -136,6 +140,12 @@ export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home
     const id = generic ? `shared:${generic.id}` : `extension:shared:${key}`;
     if (selected.has(id)) dr.shared_platforms[key] = platformEntry(entry, id);
   }
+  const tagEnvironments = model.environments.filter((env) => Object.hasOwn(dr.environments, envNames.get(env.name.trim())!))
+    .map((env) => ({ ...env, name: envNames.get(env.name.trim())! }));
+  const tagProjects = model.projects.flatMap((project) => tagEnvironments.filter((env) => project.environments === 'all' || project.environments.includes(env.id))
+    .map((env) => ({ ...project, id: `${project.id}:${env.id}`, name: draft.projectNames?.[env.id]?.[project.id]?.trim() || project.name, environments: [env.id] })));
+  const projectOrigins = Object.fromEntries(model.projects.flatMap((project) => tagEnvironments.map((env) => [`${project.id}:${env.id}`, project.id])));
+  dr.cost_governance = regionalCostGovernanceConfig(model, { environments: tagEnvironments, projects: tagProjects }, projectOrigins);
   validateNetworks(home);
   validateNetworks(dr, vcnRanges(home));
   if (draft.rpcEnabled) {

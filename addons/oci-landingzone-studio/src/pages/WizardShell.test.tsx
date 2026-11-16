@@ -6,6 +6,7 @@ import { getLZ } from '../services/lzStore';
 import { buildGraph } from '../diagram/buildGraph';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
 import WizardShell from './WizardShell';
+import { defaultCostGovernance } from '../services/costGovernance';
 
 vi.mock('../services/lzStore', async (original) => ({
   ...await original<typeof import('../services/lzStore')>(), getLZ: vi.fn(),
@@ -23,6 +24,17 @@ beforeEach(() => {
 });
 
 describe('diagram layout error recovery', () => {
+  it.each(['environment', 'project'] as const)('keeps the wizard editable with a deleted cost-center %s filter', (dimension) => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
+      CC12345: { platform: null, environment: null, project: null, [dimension]: [`${dimension}:deleted`] },
+    } };
+    vi.mocked(getLZ).mockReturnValue({ id: 'test', name: 'Preserved design', createdAt: '', updatedAt: '', model });
+    vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
+    const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test']}><Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes></MemoryRouter>);
+    expect(html).toContain('Preserved design');
+    expect(html).toContain('id="lz-region-short-name"');
+  });
   it('shows Notifications in Foundation while keeping Tags and Budgets in Governance', () => {
     vi.mocked(buildGraph).mockReturnValue({ nodes: [], edges: [] });
     const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/lz/test']}><Routes><Route path="/lz/:id" element={<WizardShell />} /></Routes></MemoryRouter>);

@@ -21,8 +21,7 @@ describe('regional designs in the standard model', () => {
     const config = buildConfig(model);
     model.foundation.stackScope = 'regional';
     expect(model).toEqual({ ...before, foundation: { ...before.foundation, stackScope: 'regional' } });
-    const regionalConfig = { ...config, stack_scope: 'regional' as const };
-    if (regionalConfig.cost_governance?.enable_tags !== false) delete regionalConfig.cost_governance;
+    const regionalConfig = { ...config, stack_scope: 'regional' as const, cost_governance: { enable_tags: false, require_tag_values: false, tag_resource_labels: false, budgets: {} } };
     expect(buildConfig(model)).toEqual(regionalConfig);
     expect(buildConfig(model)).toHaveProperty('cost_governance.enable_tags', false);
     expect(serializeConfig(model)).toContain("stack_scope: 'regional'");

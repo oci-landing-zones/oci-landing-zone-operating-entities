@@ -2,12 +2,19 @@
 import { emptyLzModel } from '../model/defaults';
 import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
 import { buildConfig } from './lzConfig';
-import { activeProjectNames, importCostGovernance } from './costGovernance';
+import { activeProjectNames, budgetDefinitions, importCostGovernance } from './costGovernance';
 import { exadataNotificationSource } from './exadata';
 import { validateBastion } from './bastion';
 
 type ObjectValue = Record<string, unknown>;
-export interface ImportedConfig { model: LzModel; warnings: string[] }
+export interface ImportedConfig { model: LzModel; warnings: string[]; requiresFinOpsChoice?: boolean }
+
+export function resolveImportedFinOps(imported: ImportedConfig, choice: boolean | null): LzModel {
+  if (imported.requiresFinOpsChoice && choice === null) throw new Error('Choose whether to keep FinOps tags before importing this design.');
+  const model = structuredClone(imported.model);
+  if (imported.requiresFinOpsChoice) model.foundation.costGovernance!.tagsEnabled = choice!;
+  return model;
+}
 
 function invalid(path: string): never {
   throw new Error(`Cannot import ${path}: invalid or unsupported configuration. Use a config.jsonnet exported by Studio.`);
@@ -277,8 +284,15 @@ export function importConfig(value: unknown): ImportedConfig {
   if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
-  if (config.cost_governance !== undefined) model.foundation.costGovernance = importCostGovernance(config.cost_governance, activeProjectNames(model), model);
-  else delete model.foundation.costGovernance;
+  const costSettings = config.cost_governance === undefined ? {} : object(config.cost_governance, 'cost_governance');
+  model.foundation.costGovernance = importCostGovernance(costSettings, activeProjectNames(model), model);
+  const definitions = budgetDefinitions(activeProjectNames(model));
+  // Legacy Studio exports omitted enable_tags even when they contained FinOps settings.
+  const requiresFinOpsChoice = costSettings.enable_tags === undefined && (
+    ['require_tag_values', 'tag_resource_labels', 'owner_email', 'tag_value_lists', 'cost_center_assignments', 'cost_center_business_units'].some((key) => Object.hasOwn(costSettings, key))
+    || Object.keys((costSettings.budgets ?? {}) as ObjectValue).some((key) => definitions[key]?.target.type === 'TAG')
+    || Object.keys((costSettings.additional_budgets ?? {}) as ObjectValue).length > 0
+  );
   const expected: ObjectValue = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {
@@ -300,5 +314,5 @@ export function importConfig(value: unknown): ImportedConfig {
   const canonical = buildConfig(model);
   const diff = difference({ ...expected, ...(canonical.cost_governance ? { cost_governance: canonical.cost_governance } : {}) }, canonical);
   if (diff) invalid(diff);
-  return { model, warnings };
+  return { model, warnings, ...(requiresFinOpsChoice ? { requiresFinOpsChoice: true } : {}) };
 }

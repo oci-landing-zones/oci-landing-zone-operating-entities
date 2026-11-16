@@ -5,6 +5,7 @@ import { buildDrFileConfigs } from './disasterRecoveryGeneration';
 import { buildConfig } from './lzConfig';
 import { newPlatform } from './platforms';
 import { legacyRegionalModel } from './regionalDeployment';
+import { defaultCostGovernance } from './costGovernance';
 import { validateExadataModel } from './exadata';
 
 function design() {
@@ -35,6 +36,26 @@ describe('legacy regional design conversion', () => {
     expect(home).toEqual(before);
   });
 
+
+  it('converts Home project filters to regional project identities without leaking Home-only rules', () => {
+    const { home, draft } = design();
+    const [prod, preprod] = home.environments;
+    const project = home.projects[0];
+    draft.projectNetworkIds = [`projects:${prod.id}`];
+    home.foundation.costGovernance = { ...defaultCostGovernance(), tagsEnabled: true,
+      ownerEmail: 'owner@customer.test',
+      tagValueLists: { 'tag-lz-cost-center': 'PROJECT, HOME_ONLY', 'tag-lz-business-unit': 'Operations' },
+      costCenterBusinessUnits: { PROJECT: 'Operations', HOME_ONLY: 'Operations' },
+      costCenterFilters: {
+        PROJECT: { platform: null, environment: [`environment:${prod.id}`], project: [`project:${project.id}`] },
+        HOME_ONLY: { platform: null, environment: [`environment:${preprod.id}`], project: null },
+      },
+    };
+    const regional = legacyRegionalModel(home, draft);
+    expect(regional.foundation.costGovernance!.costCenterFilters!.PROJECT.project).toEqual([`project:${project.id}:${prod.id}`]);
+    expect(buildConfig(regional).cost_governance).toEqual(buildDrFileConfigs(home, draft).dr.cost_governance);
+    expect(buildConfig(regional).cost_governance!.cost_center_assignments).not.toHaveProperty('HOME_ONLY');
+  });
 
   it('keeps independent OKE settings and manual subnet edits without reusing platform identities', () => {
     const { home, draft } = design();
