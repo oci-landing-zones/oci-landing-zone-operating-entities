@@ -8,8 +8,6 @@ The OCI Hybrid Connectivity addon provides guidance and configuration options fo
 
 FastConnect supports both **Private peering** for access to VCNs and **Public peering** for access to supported public OCI services. This guide describes **IPv4 Private peering** with the One-OE Landing Zone.
 
-The required OCI configurations can be generated using Landing Zone Studio or the Blueprint Factory and used for subsequent Terraform deployment.
-
 &nbsp;
 
 ### Architecture and routing
@@ -171,7 +169,7 @@ The configuration values shown above are examples. Update the partner service OC
 
 ### Preparing and Generating JSON Configuration Files
 
-The FastConnect configuration can be prepared using **Landing Zone Studio** or the **Blueprint Factory**. Both methods generate JSON configuration files for subsequent Terraform deployment.
+The FastConnect configuration can be prepared using [OCI Landing Zone Studio](../oci-landingzone-studio/README.md) or the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Both methods generate JSON configuration files for subsequent Terraform deployment.
 
 &nbsp;
 

@@ -5,7 +5,7 @@
 
 ## Overview
 
-The OCI Hybrid Connectivity addon provides configuration and deployment options for connecting an OCI One-OE Landing Zone to your on-premises network (or a network hosted by another cloud service provider) using Site-to-Site VPN, FastConnect, or both.
+The OCI Hybrid Connectivity addon provides configuration and deployment options for connecting an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md) to your on-premises network (or a network hosted by another cloud service provider) using [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm), [FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm), or both.
 
 This guide introduces the two connectivity options and links to their architecture, prerequisites, configuration, and deployment instructions.
 
@@ -20,7 +20,7 @@ This guide introduces the two connectivity options and links to their architectu
 
 Each option can be deployed independently. You can also deploy both and configure routing preferences to use Site-to-Site VPN as a backup path for FastConnect.
 
-You can design and prepare the configuration using [Landing Zone Studio](../oci-landingzone-studio/README.md) or define JSON configurations with [Blueprint Factory](../oci-lz-blueprint-factory/README.md). The resulting JSON configuration is deployed with Terraform to create the OCI connectivity resources and configure the associated landing zone routing.
+You can design and prepare the configuration using [OCI Landing Zone Studio](../oci-landingzone-studio/README.md) or define JSON configurations with [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). The resulting JSON configuration is deployed with Terraform to create the OCI connectivity resources and configure the associated landing zone routing.
 
 
 **Note**: This addon configures the OCI networking resources required for hybrid connectivity. To complete the connection, the customer or network provider must separately configure the corresponding infrastructure, routing, and security controls in the remote network (on-premises or in another cloud), and coordinate service activation.

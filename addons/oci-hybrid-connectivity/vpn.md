@@ -3,7 +3,7 @@
 &nbsp;
 
 ### Overview
-The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using Landing Zone Studio or the Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
+The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using OCI Landing Zone Studio or the OCI Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
 
 &nbsp;
 ### Architecture and routing
@@ -172,7 +172,7 @@ The configuration values shown above are examples based on the reference archite
 
 ### Preparing and Generating JSON Configuration Files
 
-The Site-to-Site VPN configuration can be prepared using either **OCI Landing Zone Studio** or the **OCI LZ Blueprint Factory**. Both methods generate the JSON configuration files required for subsequent Terraform deployment.
+The Site-to-Site VPN configuration can be prepared using either [OCI Landing Zone Studio](../oci-landingzone-studio/README.md) or the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Both methods generate the JSON configuration files required for subsequent Terraform deployment.
 
 The following instructions describe how to generate the deployment configuration illustrated in the example above, without manually defining the individual resource blocks in `network.json`.
 
