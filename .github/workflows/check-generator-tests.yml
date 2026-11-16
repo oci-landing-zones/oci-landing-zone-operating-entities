@@ -19,6 +19,11 @@ jobs:
         with:
           python-version: '3.8'
 
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.7'
+          terraform_wrapper: false
+
       - name: Run generator tests
         run: |
           set -euo pipefail

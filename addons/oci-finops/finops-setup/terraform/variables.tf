@@ -48,10 +48,27 @@ variable "finops_dynamic_group_name" {
   default     = "FinOps-DG"
 }
 
+variable "enable_cost_governance_tags" {
+  type        = bool
+  default     = true
+  description = "Add the six automatic FinOps tags. Requires the cost governance namespace and keys to exist. Set false for a Studio landing zone without FinOps tags; explicitly supplied defined_tags are still applied."
+
+  validation {
+    condition     = var.enable_cost_governance_tags != null
+    error_message = "enable_cost_governance_tags must be true or false; null is not supported."
+  }
+}
+
 variable "defined_tags" {
   type        = map(string)
   default     = {}
-  description = "Defined tags merged with the six cost governance tags. Set environment, project, owner, business unit and cost center for the deployment; the database platform is finops. The cost governance namespace must already exist."
+  description = "Customer-defined tags, preserved when automatic FinOps tags are disabled. When enabled, these override the six default cost governance values, except the database platform remains finops. Every supplied namespace and key must already exist."
+}
+
+variable "database_defined_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Database-only tag overrides, merged after defined_tags without changing IAM resource tags. Automatically generated from the same customer mapping by customize_tags.jsonnet. When automatic FinOps tags are enabled, the database Platform remains finops."
 }
 
 variable "finops_policy_name" {

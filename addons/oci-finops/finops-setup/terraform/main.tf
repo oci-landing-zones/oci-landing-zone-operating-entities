@@ -31,18 +31,6 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
 }
 
 locals {
-  cost_governance_tags = {
-    "tagns-lz-cost-governance.tag-lz-cost-center"   = "tobedefined"
-    "tagns-lz-cost-governance.tag-lz-business-unit" = "tobedefined"
-    "tagns-lz-cost-governance.tag-lz-owner"         = "tobedefined"
-    "tagns-lz-cost-governance.tag-lz-platform"      = "tobedefined"
-    "tagns-lz-cost-governance.tag-lz-environment"   = "tobedefined"
-    "tagns-lz-cost-governance.tag-lz-project"       = "notapplicable"
-  }
-  iam_defined_tags = merge(local.cost_governance_tags, var.defined_tags)
-  database_defined_tags = merge(local.iam_defined_tags, {
-    "tagns-lz-cost-governance.tag-lz-platform" = "finops"
-  })
   adw_ocid           = oci_database_autonomous_database.autonomous_database_private.id
   dynamic_group_rule = "ALL {resource.type = 'autonomousdatabase',resource.id='${local.adw_ocid}'}"
   policy_statements = ["define tenancy reporting as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
