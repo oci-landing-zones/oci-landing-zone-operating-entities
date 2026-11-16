@@ -4,7 +4,7 @@
 
 ### Overview
 
-The OCI Hybrid Connectivity add-on provides guidance and configuration options for integrating [OCI FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm) with an OCI One-OE Landing Zone. FastConnect provides a dedicated, private connection between your network and OCI. 
+The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). FastConnect provides a dedicated, private connection between your network and OCI. 
 
 FastConnect supports both **Private peering** for access to VCNs and **Public peering** for access to supported public OCI services. This guide describes **IPv4 Private peering** with the One-OE Landing Zone.
 
@@ -14,12 +14,12 @@ The required OCI configurations can be generated using Landing Zone Studio or th
 
 ### Architecture and routing
 
-This architecture diagram illustrates **FastConnect connectivity** to an **OCI One-OE Landing Zone with Hub A**. It shows a private virtual circuit connecting the remote network (`192.168.0.0/16`) to the landing zone’s DRG, with BGP peering addresses `172.20.2.1/30` on the customer side and `172.20.2.2/30` on the Oracle side.
+This architecture diagram illustrates **FastConnect connectivity** to an [OCI One-OE Landing Zone with Hub A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md). It shows a private virtual circuit connecting the remote network (`192.168.0.0/16`) to the landing zone’s DRG, with BGP peering addresses `172.20.2.1/30` on the customer side and `172.20.2.2/30` on the Oracle side.
 
 The virtual circuit attachment is associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the Hub and Spoke VCNs through the hub attachment. Traffic between the remote network and spoke VCNs passes through the internal network firewall for inspection in both directions:
 
 
-This routing and inspection model applies to **Hubs A, B**, and **C**. For **Hub E**, traffic between the remote network and spoke VCNs is routed directly through the DRG without traversing the hub VCN.
+This routing and inspection model applies to [Hubs A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md), [B](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md), and [C](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_c.md). For [Hub E](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_e.md), traffic between the remote network and spoke VCNs is routed directly through the DRG without traversing the hub VCN.
 
 &nbsp;
 
@@ -59,7 +59,7 @@ For the service-specific procedures, see [FastConnect with an Oracle partner](ht
 
 FastConnect uses **BGP dynamic routing**. For partner services, the BGP session from your network can terminate at Oracle (a Layer 2 service) or at the partner (a Layer 3 service). The partner service determines which ASN and peering settings you need to supply.
 
-The add-on requires `remote_cidrs` to prepare One-OE Landing Zone routes. This does not configure remote BGP advertisements or prefix filters; the expected networks must also be advertised through the connection.
+The add-on uses `remote_cidrs` to prepare One-OE Landing Zone routes to the specified remote networks. These networks must also be advertised to OCI through BGP by the remote router or FastConnect partner, depending on the service. The `remote_cidrs` setting does not configure those advertisements or filter the BGP routes received by OCI.
 
 **Important:** Plan redundancy across the complete connection, including the remote network and provider path. The required circuits and physical connections depend on the connectivity model. See [FastConnect Redundancy Best Practices](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectresiliency.htm).
 
@@ -158,7 +158,12 @@ Equal-Cost Multi-Path (ECMP) routing is disabled in this example.
 }
 ```
 
-**Note:** The configuration values shown above are examples. Update the partner service OCID, bandwidth, BGP parameters, network CIDRs, and resource references to match your environment. Include the blocks in their corresponding sections of the complete `network.json` file before Terraform deployment.
+The configuration values shown above are examples. Update the partner service OCID, bandwidth, BGP parameters, network CIDRs, and resource references to match your environment. Include the blocks in their corresponding sections of the complete `network.json` file before Terraform deployment.
+
+&nbsp;
+
+> [!NOTE]
+> A complete hybrid connectivity network configuration example for **One-OE with Hub A** is available [here](./examples/network.json). It includes configurations for both **Site-to-Site VPN** and **FastConnect**.
 
 &nbsp;
 

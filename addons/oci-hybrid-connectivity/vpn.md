@@ -3,17 +3,17 @@
 &nbsp;
 
 ### Overview
-The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an OCI One-OE Landing Zone. It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using Landing Zone Studio or the Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
+The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI Site-to-Site VPN](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). It supports both static and BGP dynamic routing and enables customers to generate the required OCI networking configurations using Landing Zone Studio or the Blueprint Factory. The resulting configuration files can then be used for subsequent Terraform deployment.
 
 &nbsp;
 ### Architecture and routing
 
-This architecture diagram illustrates **Site-to-Site VPN connectivity** to an **OCI One-OE Landing Zone with Hub A**. The VPN connection uses **BGP dynamic routing**, and the diagram shows the IPv4 addresses assigned to both ends of each IPSec tunnel.
+This architecture diagram illustrates **Site-to-Site VPN connectivity** to an [OCI One-OE Landing Zone with Hub A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md). The VPN connection uses **BGP dynamic routing**, and the diagram shows the IPv4 addresses assigned to both ends of each IPSec tunnel.
 
 
 Both VPN tunnel attachments are associated with the `drgrt-fra-lz-hc` DRG route table, which directs traffic destined for the hub and spoke VCNs through the hub attachment. With the routing configuration illustrated, traffic between the remote network and spoke VCNs traverses the internal network firewall for inspection in both directions.
 
-This routing and inspection model applies to **One-OE Landing Zone deployments with Hubs A, B, and C** models. For **Hub E**, which does not include a network firewall, traffic between the remote network and spoke VCNs can be routed directly through the DRG.
+This routing and inspection model applies to [Hubs A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md), [B](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md), and [C](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_c.md). For [Hub E](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_e.md), which does not include a network firewall, traffic between the remote network and spoke VCNs can be routed directly through the DRG.
 
 &nbsp;
 <img src="./images/oneoe-vpn.png" width="1100" alt="Site-to-Site VPN connected to a One-OE Landing Zone with Hub A and production and preproduction spoke VCNs">
@@ -159,7 +159,12 @@ Both tunnels reference the custom DRG route table (`DRGRT-FRA-LZ-HUB-HC-KEY`) de
 },
 ```
 
-**Note:** The configuration values shown above are examples based on the reference architecture. Update the CPE public IP address, BGP parameters, network CIDR blocks, and resource references to match your environment. The configuration blocks must be included in their corresponding sections of the `network.json` file before being used for Terraform deployment.
+The configuration values shown above are examples based on the reference architecture. Update the CPE public IP address, BGP parameters, network CIDR blocks, and resource references to match your environment. The configuration blocks must be included in their corresponding sections of the `network.json` file before being used for Terraform deployment.
+
+&nbsp;
+
+> [!NOTE]
+> A complete hybrid connectivity network configuration example for **One-OE with Hub A** is available [here](./examples/network.json). It includes configurations for both **Site-to-Site VPN** and **FastConnect**.
 
 &nbsp;
 
