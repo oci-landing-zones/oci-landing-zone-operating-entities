@@ -16,6 +16,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 function ready(model: ReturnType<typeof emptyLzModel>) {
   const cfg = model.foundation.costGovernance ?? defaultCostGovernance();
   cfg.tagsEnabled = true;
+  cfg.ownerEmail ??= 'owner@customer.test';
   if (!cfg.recipients) cfg.recipients = 'finops@example.com';
   if (!cfg.useSingleRecipient) for (const budget of [...Object.values(cfg.budgets), ...Object.values(cfg.additionalBudgets ?? {})]) {
     if (!budget.recipients) budget.recipients = 'finops@example.com';
@@ -244,6 +245,7 @@ it('reports uncovered IAM resources in the preview and blocks downloading until 
     },
   };
   model.foundation.costGovernance.recipients = 'finops@example.com';
+  model.foundation.costGovernance.ownerEmail = 'owner@customer.test';
   const preview = await generatePreview(model);
   expect(preview.uncoveredCostResources).toHaveLength(14);
   expect(preview.uncoveredCostResources.every((resource) => resource.platform === 'iam' && ['prod', 'preprod'].includes(resource.environment))).toBe(true);
@@ -342,4 +344,22 @@ it('keeps FinOps disabled in real generated outputs after importing a config wit
   expect(Object.keys(governance.budgets_configuration.budgets)).toEqual(['BUDGET-LANDINGZONE-KEY']);
   expect(output.files['network.json']).not.toContain('tagns-lz-cost-governance');
   expect(output.files['iam.json']).toContain('tagns-lz-role.tag-lz-role');
+}, 60_000);
+
+
+it.each(['', 'email.address@example.com'])('blocks a download with incomplete Owner %j before rendering files', async (ownerEmail) => {
+  const model = ready(emptyLzModel());
+  model.foundation.notifications!.default = 'alarms@customer.test';
+  model.foundation.costGovernance!.ownerEmail = ownerEmail;
+  await expect(generateOutputs(model)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
+});
+
+
+it('keeps the preview available while the required Owner is still empty', async () => {
+  const model = ready(emptyLzModel());
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.environments = []; model.projects = [];
+  model.foundation.costGovernance!.ownerEmail = '';
+  expect((await generatePreview(model)).network).toBeDefined();
+  await expect(generateOutputs(model)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
 }, 60_000);

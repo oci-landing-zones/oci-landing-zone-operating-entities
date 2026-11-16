@@ -124,7 +124,9 @@ describe('observability and cost settings', () => {
     expect(tags).toContain('staging-custom');
     expect(tags).toContain('payments');
     expect(tags).toContain('with required values and their associated tag-based budgets in generated JSON.');
-    expect(tags).toMatch(/type="email" aria-label="Owner email"[^>]*value="email.address@example.com"/);
+    expect(tags).toMatch(/type="email" aria-label="Owner email"[^>]*value=""/);
+    expect(tags).toContain('id="cost-owner-email-error"');
+    expect(tags).toMatch(/aria-label="Owner email"[^>]*aria-invalid="true"/);
     expect(tags).not.toContain('LOV for tag-lz-owner');
     expect(tags).toContain('Owner uses one email for all resources.');
     expect(tags).toContain('LOV (List of values)');

@@ -229,11 +229,11 @@ export function customBudgetError(budget: TagCostBudget, allowedValues?: string[
 }
 
 export function ownerEmail(cfg: CostGovernance): string {
-  return cfg.ownerEmail ?? cfg.tagValueLists?.['tag-lz-owner'] ?? 'email.address@example.com';
+  return cfg.ownerEmail ?? cfg.tagValueLists?.['tag-lz-owner'] ?? '';
 }
 
 export function ownerEmailError(value: string): string | null {
-  return /[,;\s]/.test(value) || notificationEmailError(value) ? 'Enter one valid owner email address.' : null;
+  return value.toLowerCase() === 'email.address@example.com' || /[,;\s]/.test(value) || notificationEmailError(value) ? 'Enter one valid owner email address.' : null;
 }
 
 type BudgetOverride = { name: string; amount: number; alert_rule: { threshold_value: number; recipients?: string } };
@@ -373,7 +373,7 @@ export function costGovernanceConfig(value: CostGovernance | undefined, projectN
       tag_resource_labels: cfg.tagResourceLabels ?? true,
       cost_center_business_units: businessUnitAssignments(cfg),
       ...(model ? { cost_center_assignments: exportCostCenterAssignments(cfg, model) } : {}),
-      owner_email: ownerEmail(cfg),
+      ...(ownerEmail(cfg) ? { owner_email: ownerEmail(cfg) } : {}),
       ...(editableTagLists.length ? { tag_value_lists: Object.fromEntries(editableTagLists.map(([tag, values]) => [tag, parseTagValues(values)])) } : {}),
       ...(cfg.additionalBudgets && Object.keys(cfg.additionalBudgets).length ? { additional_budgets: Object.fromEntries(Object.entries(cfg.additionalBudgets).map(([key, budget]) => [key, {
         tag_name: budget.tagName, tag_value: budget.tagValue.trim(), name: budget.name, amount: budget.amount,
@@ -441,7 +441,8 @@ export function importCostGovernance(value: unknown, projectNames: string[] = []
     result.tagResourceLabels = cfg.tag_resource_labels as boolean;
   }
   if (cfg.owner_email !== undefined) {
-    if (typeof cfg.owner_email !== 'string' || ownerEmailError(cfg.owner_email)) fail();
+    // Incomplete drafts and older exports remain editable; generation requires a real Owner.
+    if (typeof cfg.owner_email !== 'string' || cfg.owner_email !== '' && cfg.owner_email.toLowerCase() !== 'email.address@example.com' && ownerEmailError(cfg.owner_email)) fail();
     result.ownerEmail = cfg.owner_email as string;
   }
   if (cfg.tag_value_lists !== undefined) {

@@ -6,7 +6,7 @@ import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
 import { deploymentReadme } from './deployment';
-import { costCenterReferenceErrors } from './costGovernance';
+import { costCenterReferenceErrors, defaultCostGovernance, ownerEmail, ownerEmailError } from './costGovernance';
 import { regionalCostGovernanceConfig } from './regionalCostGovernance';
 
 type EnvironmentConfig = Omit<EnvConfigEntry, 'project_network'> & { project_network?: EnvConfigEntry['project_network'] };
@@ -162,6 +162,9 @@ function findRpcKeys(value: unknown): string[] {
 }
 
 export async function generateDrFileBundle(model: LzModel, draft: DrDesignDraft, onProgress?: (message: string) => void): Promise<Record<string, string>> {
+  const cost = model.foundation.costGovernance ?? defaultCostGovernance();
+  const ownerError = cost.tagsEnabled === false ? null : ownerEmailError(ownerEmail(cost));
+  if (ownerError) throw new Error(`tag-lz-owner: ${ownerError}`);
   const { home, dr } = buildDrFileConfigs(model, draft);
   const { generateFromConfigCode } = await import('../generator/generate');
   const serialize = (config: RegionalFileConfig) => `${JSON.stringify(config, null, 2)}\n`;

@@ -12,7 +12,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function design() {
   const model = emptyLzModel();
-  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com' };
+  model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
   model.foundation.notifications = { useSingleRecipient: true, default: 'home@example.com', cloudguard: '', iam: '', network: '', security: '' };
   const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', regionConfirmed: true, hubAdded: true, hubNetwork: createDrHubNetwork(model.network.hubKind) };
   draft.notifications = { ...model.foundation.notifications, default: 'dr@example.com' };
@@ -25,6 +25,12 @@ function vcnCidrs(value: unknown): string[] {
 }
 
 describe('DR file generation', () => {
+  it.each(['', 'email.address@example.com'])('blocks a combined download with incomplete Home Owner %j', async (ownerEmail) => {
+    const { model, draft } = design();
+    model.foundation.costGovernance!.ownerEmail = ownerEmail;
+    await expect(generateDrFileBundle(model, draft)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
+  });
+
   it('keeps Home complete and builds only selected regional networks with independent recipients', () => {
     const { model, draft } = design();
     const { home, dr } = buildDrFileConfigs(model, draft);

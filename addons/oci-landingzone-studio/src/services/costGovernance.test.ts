@@ -13,6 +13,7 @@ function taggedModel() {
 describe('cost governance', () => {
   it('requires notification emails instead of accepting the inherited example address', () => {
     const model = taggedModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+    cfg.ownerEmail = 'owner@customer.test';
     expect(cfg.recipients).toBe('');
     expect(validateCostGovernance(model)).toContain('Budget alerts: Enter at least one notification email address.');
     expect(budgetRecipientError('email.address@example.com')).toBe('Enter at least one notification email address.');
@@ -104,12 +105,12 @@ describe('cost governance', () => {
   });
   it('uses a single global owner email and retains it on export and import', () => {
     const model = taggedModel(); const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
-    expect(ownerEmail(cfg)).toBe('email.address@example.com');
+    expect(ownerEmail(cfg)).toBe('');
     cfg.ownerEmail = 'owner@example.com';
     const config = buildConfig(model);
     expect(config.cost_governance?.owner_email).toBe('owner@example.com');
     expect(buildConfig(importConfig(config).model)).toEqual(config);
-    for (const invalid of ['', 'owner', 'one@example.com,two@example.com', 'one@example.com;two@example.com', ' owner@example.com']) expect(ownerEmailError(invalid)).not.toBeNull();
+    for (const invalid of ['', 'email.address@example.com', 'EMAIL.ADDRESS@EXAMPLE.COM', 'owner', 'one@example.com,two@example.com', 'one@example.com;two@example.com', ' owner@example.com']) expect(ownerEmailError(invalid)).not.toBeNull();
     expect(ownerEmailError('owner@example.com')).toBeNull();
     const invalid = { ...config, cost_governance: { ...config.cost_governance, owner_email: 'one@example.com,two@example.com' } };
     expect(() => importConfig(invalid)).toThrow();
@@ -361,6 +362,7 @@ describe('cost governance', () => {
     expect(budgetRecipientError('a@example.com,b@example.com', true)).toBeTruthy();
     expect(budgetRecipientError('')).toBe('Enter at least one notification email address.');
     const model = taggedModel(); model.foundation.costGovernance = defaultCostGovernance();
+    model.foundation.costGovernance.ownerEmail = 'owner@customer.test';
     model.foundation.costGovernance.budgets['BUDGET-LANDINGZONE-KEY'].amount = 0;
     expect(validateCostGovernance(model)).not.toEqual([]);
     model.foundation.stackScope = 'regional';
@@ -391,4 +393,28 @@ it('starts new Studio designs without FinOps tags and enables required values in
   const disabled = setFinOpsTagsEnabled(enabled, false);
   expect(costGovernanceConfig(disabled).enable_tags).toBe(false);
   expect(setFinOpsTagsEnabled(disabled, true)).toMatchObject({ tagsEnabled: true, requireTagValues: true });
+});
+
+
+it('requires a supplied Owner when FinOps is enabled and preserves real stored and imported owners', () => {
+  const model = emptyLzModel();
+  const cfg = setFinOpsTagsEnabled(model.foundation.costGovernance!, true);
+  model.foundation.costGovernance = cfg;
+  cfg.recipients = 'budget@customer.test';
+  expect(ownerEmail(cfg)).toBe('');
+  expect(validateCostGovernance(model)).toContain('tag-lz-owner: Enter one valid owner email address.');
+  cfg.ownerEmail = 'email.address@example.com';
+  expect(validateCostGovernance(model)).toContain('tag-lz-owner: Enter one valid owner email address.');
+  cfg.ownerEmail = 'owner@customer.test';
+  expect(validateCostGovernance(model)).toEqual([]);
+  expect(importConfig(buildConfig(model)).model.foundation.costGovernance!.ownerEmail).toBe('owner@customer.test');
+});
+
+it.each(['', 'email.address@example.com'])('opens an incomplete Owner %j as a repairable import', (owner) => {
+  const model = taggedModel();
+  const config = buildConfig(model);
+  config.cost_governance!.owner_email = owner;
+  const restored = importConfig(config).model;
+  expect(ownerEmailError(ownerEmail(restored.foundation.costGovernance!))).not.toBeNull();
+  expect(validateCostGovernance(restored)).toContain('tag-lz-owner: Enter one valid owner email address.');
 });
