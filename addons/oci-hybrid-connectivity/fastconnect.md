@@ -163,7 +163,7 @@ The configuration values shown above are examples. Update the partner service OC
 &nbsp;
 
 > [!NOTE]
-> A complete hybrid connectivity network configuration example for **One-OE with Hub A** is available [here](./examples/network.json). It includes configurations for both **Site-to-Site VPN** and **FastConnect**.
+> A complete **FastConnect** network configuration example for **One-OE with Hub A** is available [here](./examples/oneoe_network_hub_a_fastconnect.json).
 
 &nbsp;
 
