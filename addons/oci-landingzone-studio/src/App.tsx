@@ -10,6 +10,7 @@ import { ErrorNotice } from './components/FieldError';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const WizardShell = React.lazy(() => import('./pages/WizardShell'));
+const Changelog = React.lazy(() => import('./pages/Changelog'));
 
 const routeFallback = (
   <div role="status" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', fontFamily: 'system-ui, sans-serif' }}>
@@ -60,6 +61,7 @@ export default function App() {
           <Routes>
             <Route path="/"       element={<Dashboard />} />
             <Route path="/lz/:id" element={<WizardShell />} />
+            <Route path="/changelog" element={<Changelog />} />
             <Route path="*"       element={<Navigate to="/" replace />} />
           </Routes>
         </React.Suspense>
