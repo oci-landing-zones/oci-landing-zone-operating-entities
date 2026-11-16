@@ -119,7 +119,10 @@ function migrate016(candidate: Partial<LzModel>): LzModel | null {
 
 export function normalizeModel(stored: unknown): LzModel {
   if (!stored || typeof stored !== 'object') return emptyLzModel();
-  const candidate = stored as Partial<LzModel>;
+  const source = stored as Partial<LzModel>;
+  const candidate = source.foundation && source.foundation.costGovernance == null
+    ? { ...source, foundation: { ...source.foundation, costGovernance: { ...defaultCostGovernance(), tagsEnabled: false } } }
+    : source;
   if (candidate.version === '0.16.0') return migrate016(candidate) ?? emptyLzModel();
   if (candidate.version === '0.18.0' && candidate.foundation && candidate.network
     && Array.isArray(candidate.environments) && Array.isArray(candidate.projects)
