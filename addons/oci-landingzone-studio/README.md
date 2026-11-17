@@ -27,11 +27,15 @@ Studio is designed for teams that want a guided alternative to editing configura
 
 Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Blueprint Factory provides the config-driven generation path; Studio provides a guided visual interface for creating and reviewing a supported config-driven design.
 
-### Studio video
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">
+    <img src="https://i.ytimg.com/vi/AG7Cjd04bKg/hqdefault.jpg" alt="Watch the OCI Landing Zone Studio video on YouTube">
+  </a>
+</p>
 
-[![Watch the OCI Landing Zone Studio video on YouTube](https://i.ytimg.com/vi/AG7Cjd04bKg/hqdefault.jpg)](https://www.youtube.com/watch?v=AG7Cjd04bKg)
-
-Select the image to watch the video on YouTube.
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">▶ Watch the Studio demo on YouTube</a>
+</p>
 
 &nbsp;
 
