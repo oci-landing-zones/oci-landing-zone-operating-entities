@@ -20,6 +20,16 @@
 
 **OCI Landing Zone Studio** is a browser-based visual design tool for OCI Landing Zone Operating Entities. It guides an operator through a Landing Zone design, shows the resulting network as a live diagram, and creates a reviewable deployment package from the repository's Jsonnet generator.
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">
+    <img src="https://i.ytimg.com/vi/AG7Cjd04bKg/hqdefault.jpg" alt="Watch the OCI Landing Zone Studio video on YouTube">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">▶ Watch the Studio demo on YouTube</a>
+</p>
+
 Studio is designed for teams that want a guided alternative to editing configuration files by hand while keeping the design, generated files, and deployment decision under their own control.
 
 > [!IMPORTANT]
