@@ -14,10 +14,10 @@
                         "dns_label"                            : "vcnfralzfinops",
 
                         "subnets": {
-                            "SN-FRA-LZ-FINOPS-OAC-KEY": {
-                                "display_name"                 : "sn-fra-lz-finops-oac",
+                            "SN-FRA-LZ-FINOPS-APP-KEY": {
+                                "display_name"                 : "sn-fra-lz-finops-app",
                                 "cidr_block"                   : "10.0.24.0/28",
-                                "dns_label"                    : "snfrafinopsoac",
+                                "dns_label"                    : "snfrafinopsapp",
                                 "prohibit_public_ip_on_vnic"   : true,
                                 "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
                                 "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
@@ -30,15 +30,6 @@
                                 "prohibit_public_ip_on_vnic"   : true,
                                 "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
                                 "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
-                            },
-
-                            "SN-FRA-LZ-FINOPS-INFRA-KEY": {
-                                "display_name"                 : "sn-fra-lz-finops-infra",
-                                "cidr_block"                   : "10.0.24.32/28",
-                                "dns_label"                    : "snfrafinopsinf",
-                                "prohibit_public_ip_on_vnic"   : true,
-                                "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
-                                "security_list_keys"           : ["SL-FRA-LZ-FINOPS-INFRA-KEY"]
                             }
                         },
 
@@ -70,61 +61,6 @@
                         },
 
                         "security_lists": {
-                            "SL-FRA-LZ-FINOPS-INFRA-KEY": {
-                                "display_name"                 : "sl-fra-lz-finops-infra",
-
-                                "ingress_rules": [
-                                    {
-                                        "description"          : "Path MTU discovery.",
-                                        "src"                  : "0.0.0.0/0",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "protocol"             : "ICMP",
-                                        "icmp_type"            : 3,
-                                        "icmp_code"            : 4,
-                                        "stateless"            : false
-                                    }
-                                ],
-
-                                "egress_rules": [
-                                    {
-                                        "description"          : "Access to Database Actions.",
-                                        "dst"                  : "10.0.24.16/28",
-                                        "dst_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 443,
-                                        "dst_port_max"         : 443,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "Database Tools and Bastion connections to Autonomous Database.",
-                                        "dst"                  : "10.0.24.16/28",
-                                        "dst_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 1522,
-                                        "dst_port_max"         : 1522,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "Access to the private OAC dashboard endpoint.",
-                                        "dst"                  : "10.0.24.0/28",
-                                        "dst_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 443,
-                                        "dst_port_max"         : 443,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "Access to regional Oracle services.",
-                                        "dst"                  : "all-services",
-                                        "dst_type"             : "SERVICE_CIDR_BLOCK",
-                                        "dst_port_min"         : 443,
-                                        "dst_port_max"         : 443,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    }
-                                ]
-                            },
-
                             "SL-FRA-LZ-FINOPS-SERVICES-KEY": {
                                 "display_name"                 : "sl-fra-lz-finops-services",
                                 "egress_rules"                 : [],
@@ -168,26 +104,6 @@
                                         "stateless"            : false
                                     },
 
-                                    "infra_https": {
-                                        "description"          : "Private access to Database Actions.",
-                                        "src"                  : "10.0.24.32/28",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 443,
-                                        "dst_port_max"         : 443,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-
-                                    "infra_mtls": {
-                                        "description"          : "Private administration connections to Autonomous Database.",
-                                        "src"                  : "10.0.24.32/28",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 1522,
-                                        "dst_port_max"         : 1522,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-
                                     "oac_mtls": {
                                         "description"          : "OAC private access channel connections to Autonomous Database.",
                                         "src"                  : "10.0.24.0/28",
@@ -219,16 +135,6 @@
                                     "hub_mgmt_https": {
                                         "description"          : "Private access to the OAC dashboard endpoint.",
                                         "src"                  : "10.0.1.0/24",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "dst_port_min"         : 443,
-                                        "dst_port_max"         : 443,
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    },
-
-                                    "infra_https": {
-                                        "description"          : "Private access to the OAC dashboard endpoint.",
-                                        "src"                  : "10.0.24.32/28",
                                         "src_type"             : "CIDR_BLOCK",
                                         "dst_port_min"         : 443,
                                         "dst_port_max"         : 443,
