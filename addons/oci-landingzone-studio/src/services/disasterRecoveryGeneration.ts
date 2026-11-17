@@ -3,6 +3,7 @@ import type { LzModel } from '../model/types';
 import { buildConfig, okeExtension, type EnvConfigEntry, type LzConfig, type PlatformConfigEntry } from './lzConfig';
 import { defaultDrPlatformCidrs, drRegionOptions, type DrDesignDraft } from './disasterRecoveryDesign';
 import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './cidr';
+import { validateCloudGuard } from './cloudGuard';
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
 import { deploymentReadme } from './deployment';
@@ -56,7 +57,7 @@ export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home
   const region = drRegionOptions(model).find((item) => item.id === draft.region);
   if (!region || !draft.regionConfirmed) throw new Error('Select and confirm a different DR region before generating.');
   if (!draft.hubNetwork) throw new Error('Configure the DR hub VCN and subnets before generating.');
-  const emails = [...validateNotificationEmails(model.foundation.notifications), ...validateNotificationEmails(draft.notifications ?? model.foundation.notifications)];
+  const emails = [...validateCloudGuard(model), ...validateNotificationEmails(model.foundation.notifications, false, model.foundation.cloudGuardEnabled !== false), ...validateNotificationEmails(draft.notifications ?? model.foundation.notifications, true, false)];
   if (emails.length) throw new Error(emails.join('\n'));
   const home: RegionalFileConfig = { ...structuredClone(buildConfig(model)), stack_scope: 'complete', dr_region: region.id };
   const dr: RegionalFileConfig = {

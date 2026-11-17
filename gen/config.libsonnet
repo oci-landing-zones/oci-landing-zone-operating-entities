@@ -200,6 +200,9 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     assert std.member(supported_realms, realm) :
            'config.realm must be one of: %s' % std.join(', ', supported_realms);
 
+    local enable_cloud_guard = if std.objectHas(config, 'enable_cloud_guard') then config.enable_cloud_guard else true;
+    assert std.type(enable_cloud_guard) == 'boolean' : 'config.enable_cloud_guard must be a boolean';
+
     local raw_cis_level =
       if std.objectHas(config, 'cis_level') && config.cis_level != null then config.cis_level
       else 2;
@@ -488,6 +491,7 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,
+      enable_cloud_guard: enable_cloud_guard,
       stack_scope: stack_scope,
       dr_region: dr_region,
       [if notification_emails != null then 'notification_emails']: notification_emails,

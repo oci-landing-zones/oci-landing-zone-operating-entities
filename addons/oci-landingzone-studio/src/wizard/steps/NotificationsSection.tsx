@@ -51,7 +51,7 @@ export default function NotificationsSection() {
               <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
               Use the same recipients for all topics
             </label>
-            <div style={{ ...s.help, marginTop: 6 }}>{regional ? 'Network and Security topics.' : 'Cloud Guard, IAM, Network and Security topics.'}</div>
+            <div style={{ ...s.help, marginTop: 6 }}>{regional ? 'Network and Security topics.' : f.cloudGuardEnabled === false ? 'IAM, Network and Security topics.' : 'Cloud Guard, IAM, Network and Security topics.'}</div>
           </div>
           {!singleRecipient && <div>
             {([
@@ -59,7 +59,7 @@ export default function NotificationsSection() {
               ['iam', 'IAM events'],
               ['network', 'Network events and alarms'],
               ['security', 'Security events and alarms'],
-            ] as const).filter(([topic]) => !regional || topic === 'network' || topic === 'security').map(([topic, label]) => (
+            ] as const).filter(([topic]) => (topic !== 'cloudguard' || f.cloudGuardEnabled !== false) && (!regional || topic === 'network' || topic === 'security')).map(([topic, label]) => (
               <div key={topic} style={s.topicRow} className="foundation-observability-row">
                 <div>
                   <label style={s.label} htmlFor={`lz-observability-${topic}`}>{label}</label>

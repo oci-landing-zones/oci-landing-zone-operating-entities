@@ -8,18 +8,18 @@ import { emptyHybridConnectivity, newVpn } from './hybridConnectivity';
 describe('default deployment settings', () => {
   it('expects complete observability without an obsolete pre file', () => {
     const files = expectedDeploymentFiles(buildConfig(emptyLzModel()));
-    expect(files).toContain('observability_cis2.json');
-    expect(files).not.toContain('observability_cis2_pre.json');
+    expect(files).toContain('observability_cis1.json');
+    expect(files).not.toContain('observability_cis1_pre.json');
   });
   it('presents preparation, phase 1 inputs and apply, then phase 2 inputs and apply in execution order', () => {
     const config = buildConfig(emptyLzModel());
     const guide = deploymentReadme(config, expectedDeploymentFiles(config));
     const prepare = guide.indexOf('1. Prepare the files');
     const create = guide.indexOf('2. Create and apply phase 1');
-    const firstInputs = guide.indexOf('  security_cis2_pre.json');
+    const firstInputs = guide.indexOf('  security_cis1_pre.json');
     const firstApply = guide.indexOf('Select Create');
     const update = guide.indexOf('3. Update and apply phase 2');
-    const finalInputs = guide.indexOf('  security_cis2.json');
+    const finalInputs = guide.indexOf('  security_cis1.json');
     const finalApply = guide.indexOf('Save the updated variables');
     expect(prepare).toBeGreaterThan(-1);
     expect(create).toBeGreaterThan(prepare);

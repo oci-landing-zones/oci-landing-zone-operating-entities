@@ -12,6 +12,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function design() {
   const model = emptyLzModel();
+  model.foundation.cisLevel = 2;
   model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
   model.foundation.notifications = { useSingleRecipient: true, default: 'home@example.com', cloudguard: '', iam: '', network: '', security: '' };
   const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', regionConfirmed: true, hubAdded: true, hubNetwork: createDrHubNetwork(model.network.hubKind) };
@@ -25,6 +26,14 @@ function vcnCidrs(value: unknown): string[] {
 }
 
 describe('DR file generation', () => {
+  it('requires external Cloud Guard confirmation before preparing combined files', () => {
+    const { model, draft } = design();
+    model.foundation.cloudGuardEnabled = false;
+    expect(() => buildDrFileConfigs(model, draft)).toThrow('Confirm that Cloud Guard is already enabled');
+    model.foundation.cloudGuardExistingConfirmed = true;
+    expect(buildDrFileConfigs(model, draft).home.enable_cloud_guard).toBe(false);
+  });
+
   it.each(['', 'email.address@example.com'])('blocks a combined download with incomplete Home Owner %j', async (ownerEmail) => {
     const { model, draft } = design();
     model.foundation.costGovernance!.ownerEmail = ownerEmail;

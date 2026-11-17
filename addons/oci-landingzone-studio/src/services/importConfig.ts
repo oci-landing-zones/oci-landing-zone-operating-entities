@@ -194,10 +194,12 @@ function restoreExadata(model: LzModel, type: 'exacc' | 'exacs', shared: ObjectV
 export function importConfig(value: unknown): ImportedConfig {
   const config = object(value, 'config');
   const model = emptyLzModel();
+  if (config.enable_cloud_guard !== undefined && typeof config.enable_cloud_guard !== 'boolean') invalid('enable_cloud_guard');
   const cisLevel = number(config.cis_level ?? 2, 'cis_level');
   if (cisLevel !== 1 && cisLevel !== 2) invalid('cis_level');
   model.foundation = {
     ...model.foundation,
+    cloudGuardEnabled: config.enable_cloud_guard !== false,
     realm: text(config.realm, 'realm'), region: text(config.region, 'region'),
     regionShortName: text(config.region_short_name, 'region_short_name'), cisLevel,
   };
@@ -309,6 +311,12 @@ export function importConfig(value: unknown): ImportedConfig {
     }));
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
+  if (config.enable_cloud_guard === true) delete expected.enable_cloud_guard;
+  if ((model.foundation.cloudGuardEnabled === false || model.foundation.stackScope === 'regional') && expected.notification_emails) {
+    expected.notification_emails = { ...object(expected.notification_emails, 'notification_emails') };
+    delete (expected.notification_emails as ObjectValue).cloudguard;
+    if (!Object.keys(expected.notification_emails as ObjectValue).length) delete expected.notification_emails;
+  }
   if (config.bastion === null) delete expected.bastion;
   if (bastion) expected.bastion = { ...bastion, max_session_ttl_in_seconds: bastion.max_session_ttl_in_seconds ?? 3600 };
   const canonical = buildConfig(model);

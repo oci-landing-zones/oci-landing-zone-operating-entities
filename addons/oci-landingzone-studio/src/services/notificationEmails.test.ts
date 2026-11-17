@@ -25,3 +25,7 @@ describe('observability recipients', () => {
       iam: 'iam@example.com', network: 'net@example.com', security: 'sec@example.com' })).toEqual([]);
   });
 });
+
+it('does not require a Cloud Guard recipient when Cloud Guard is excluded', () => {
+  expect(validateNotificationEmails({ useSingleRecipient: false, default: '', cloudguard: '', iam: 'iam@customer.test', network: 'net@customer.test', security: 'sec@customer.test' }, false, false)).toEqual([]);
+});

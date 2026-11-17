@@ -17,6 +17,28 @@ import { buildRouteTables } from '../services/routeTables';
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
 describe('canonical diagram preview', () => {
+  it('blocks generation without external Cloud Guard confirmation', async () => {
+    const model = emptyLzModel();
+    model.foundation.cloudGuardEnabled = false;
+    await expect(generateOutputs(model)).rejects.toThrow('Confirm that Cloud Guard is already enabled');
+  });
+
+  it.each([1, 2] as const)('excludes Cloud Guard resources consistently from CIS%d downloads and previews', async (cisLevel) => {
+    const model = emptyLzModel();
+    Object.assign(model.foundation, { cisLevel, cloudGuardEnabled: false, cloudGuardExistingConfirmed: true });
+    model.foundation.costGovernance!.recipients = 'budgets@customer.test';
+    const output = await generateOutputs(model);
+    const security = JSON.parse(output.files[`security_cis${cisLevel}.json`]);
+    expect(security).not.toHaveProperty('cloud_guard_configuration');
+    expect(security).toHaveProperty('security_zones_configuration');
+    const obs = JSON.parse(output.files[`observability_cis${cisLevel}.json`]);
+    expect(obs.notifications_configuration.topics).not.toHaveProperty('NOTT-LZ-CLOUDGUARD-KEY');
+    expect(obs.home_region_events_configuration.event_rules).not.toHaveProperty('RUL-LZ-CLOUDGUARD-KEY');
+    const preview = await generatePreview(model);
+    expect(preview.inventory.groups.flatMap((group) => group.items).some((item) => /cloudguard|cg-tgt/i.test(item.name))).toBe(false);
+    expect(preview.files).toEqual(Object.keys(output.files).sort());
+  }, 60_000);
+
   it.each([1, 2] as const)('matches deployable CIS%d artifacts and exports their Bastion identity', async (cisLevel) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = cisLevel;
@@ -64,6 +86,7 @@ describe('canonical diagram preview', () => {
   }, 60_000);
   it('matches the selected deployable final artifacts and produces the CIS2 resource families and identity domain', async () => {
     const model = emptyLzModel();
+    model.foundation.cisLevel = 2;
     model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const preview = await generatePreview(model);
     const generated = await generateOutputs(model);
@@ -100,7 +123,7 @@ describe('canonical diagram preview', () => {
 
   it('honors regional output filtering while retaining Home compartment references for placement', async () => {
     const model = emptyLzModel();
-    Object.assign(model.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
+    Object.assign(model.foundation, { cisLevel: 2, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
     const { inventory } = await generatePreview(model);
     expect(inventory.groups.some((group) => group.kind === 'securityrecipes' || group.compartmentKey === 'TENANCY-ROOT')).toBe(false);
     expect(inventory.groups.some((group) => group.kind === 'vault')).toBe(true);

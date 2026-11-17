@@ -286,7 +286,7 @@ function(config, n, realm_constants, topo)
       default_compartment_id: 'TENANCY-ROOT',
 
       event_rules: {
-        [n.key_global('RUL', ['CLOUDGUARD'])]: {
+        [if config.enable_cloud_guard then n.key_global('RUL', ['CLOUDGUARD'])]: {
           destination_topic_ids: [n.key_global('NOTT', ['CLOUDGUARD'])],
           event_display_name: n.display_global('rul', ['notify-on-cloudguard-changes']),
           supplied_events: cloudguard_events,
@@ -304,7 +304,7 @@ function(config, n, realm_constants, topo)
       default_compartment_id: security_cmp_key,
 
       topics: {
-        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.', 'cloudguard'),
+        [if config.enable_cloud_guard then n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.', 'cloudguard'),
         [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.', 'iam'),
         [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.', 'network'),
         [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.', 'security'),

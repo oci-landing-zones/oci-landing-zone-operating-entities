@@ -46,7 +46,7 @@ function(config, n, realm_constants, topo)
 
   // --- Base security (shared across all CIS levels) ---
   local base(cis_level) = {
-    cloud_guard_configuration: {
+    [if config.enable_cloud_guard then 'cloud_guard_configuration']: {
       compartment_id: 'TENANCY-ROOT',
       reporting_region: config.region,
       self_manage_resources: false,

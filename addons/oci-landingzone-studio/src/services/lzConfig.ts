@@ -67,6 +67,7 @@ export interface LzConfig {
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
+  enable_cloud_guard?: boolean;
   notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
     kind: HubKind;
@@ -145,6 +146,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   const notification_emails: NonNullable<LzConfig['notification_emails']> = {};
   const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
   for (const topic of (singleRecipient ? ['default'] : ['cloudguard', 'iam', 'network', 'security']) as Array<keyof NonNullable<LzConfig['notification_emails']>>) {
+    if (topic === 'cloudguard' && (f.cloudGuardEnabled === false || f.stackScope === 'regional')) continue;
     const recipients = (f.notifications?.[topic] ?? '').split(/[,;\n]/).map((value) => value.trim()).filter(Boolean);
     if (recipients.length) notification_emails[topic] = recipients;
   }
@@ -224,6 +226,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(f.cloudGuardEnabled === false ? { enable_cloud_guard: false } : {}),
     cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
@@ -403,6 +406,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.enable_cloud_guard === false ? ['  enable_cloud_guard: false,'] : []),
     ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
     ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),

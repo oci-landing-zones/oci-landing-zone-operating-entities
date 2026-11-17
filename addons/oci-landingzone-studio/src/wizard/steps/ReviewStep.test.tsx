@@ -164,10 +164,10 @@ it('shows each phase input list before its apply action and keeps unrelated alte
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={emptyLzModel()}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
   const prepare = html.indexOf('1. Prepare the files');
   const create = html.indexOf('2. Create and apply phase 1');
-  const firstInputs = html.indexOf('>security_cis2_pre.json</code>');
+  const firstInputs = html.indexOf('>security_cis1_pre.json</code>');
   const firstApply = html.indexOf('Select Create');
   const update = html.indexOf('3. Update and apply phase 2');
-  const finalInputs = html.indexOf('>security_cis2.json</code>');
+  const finalInputs = html.indexOf('>security_cis1.json</code>');
   const finalApply = html.indexOf('Save the updated variables');
   expect(prepare).toBeGreaterThan(-1);
   expect(create).toBeGreaterThan(prepare);

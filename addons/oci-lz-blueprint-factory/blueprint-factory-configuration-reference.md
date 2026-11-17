@@ -136,6 +136,7 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `dr_region` | string | No | Omitted | DR region whose Object Storage service must be authorized by complete home IAM. Must differ from `region`. |
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
+| `enable_cloud_guard` | boolean | No | `true` | Include Cloud Guard configuration and its dedicated event rule and topic. Set `false` only when Cloud Guard is already enabled and managed externally; the baseline Security Zones require it. Regional output always excludes Cloud Guard. |
 | `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
 | `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |

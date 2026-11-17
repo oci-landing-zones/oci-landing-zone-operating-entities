@@ -1,13 +1,12 @@
 /**
  * FoundationStep — step 1 inputs: realm / region / region short name, plus the
- * environments table (name + Security Zone toggle). Writes straight into the
+ * environments table. Writes straight into the
  * canonical model via the wizard context; the diagram and JSON re-derive.
  */
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
-import Switch from '../../components/Switch';
 import NotificationsSection from './NotificationsSection';
 import DeleteButton from '../../components/DeleteButton';
 import FieldError from '../../components/FieldError';
@@ -23,7 +22,6 @@ import {
 } from '../../services/regions';
 import type { Environment, FoundationConfig } from '../../model/types';
 import { s as form } from './networkEditorStyles';
-import BastionSettings from './BastionSettings';
 
 const s: Record<string, React.CSSProperties> = {
   col:     form.col,
@@ -32,18 +30,17 @@ const s: Record<string, React.CSSProperties> = {
   body:    { padding: 20 },
   title:   form.title,
   help:    form.help,
-  twoCol:  { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
   locationGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 14 },
   label:   form.label,
   input:   form.input,
   field:   { marginBottom: 14 },
 
-  tableHead: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 112px 64px', gap: 12, alignItems: 'center', padding: '10px 12px', background: oracle.surfaceAlt, border: `1px solid ${oracle.border}`, borderRadius: '6px 6px 0 0', fontSize: 12, fontWeight: 600, color: oracle.textMuted },
-  row:     { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 112px 64px', gap: 12, alignItems: 'center', padding: '10px 12px', borderLeft: `1px solid ${oracle.border}`, borderRight: `1px solid ${oracle.border}`, borderBottom: `1px solid ${oracle.border}` },
+  tableHead: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '10px 12px', background: oracle.surfaceAlt, border: `1px solid ${oracle.border}`, borderRadius: '6px 6px 0 0', fontSize: 12, fontWeight: 600, color: oracle.textMuted },
+  row:     { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '10px 12px', borderLeft: `1px solid ${oracle.border}`, borderRight: `1px solid ${oracle.border}`, borderBottom: `1px solid ${oracle.border}` },
   rowInput:form.rowInput,
   empty:   { padding: '16px 12px', border: `1px dashed ${oracle.border}`, borderTop: 'none', color: oracle.textMuted, fontSize: 13 },
 
-  addRow:  { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 112px 64px', gap: 12, alignItems: 'center', padding: '0 12px', borderLeft: '1px solid transparent', borderRight: '1px solid transparent' },
+  addRow:  { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '0 12px', borderLeft: '1px solid transparent', borderRight: '1px solid transparent' },
   addBtn:  { ...form.addBtn, padding: '9px 8px' },
   addLabel:{ ...form.label, margin: '20px 12px 8px' },
 };
@@ -58,10 +55,8 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
   const f = model.foundation;
   const regional = f.stackScope === 'regional';
   const envs = model.environments;
-  const environmentGrid = regional ? { gridTemplateColumns: 'minmax(0, 1fr) 64px' } : {};
 
   const [newName, setNewName] = useState('');
-  const [newSecure, setNewSecure] = useState(false);
 
   const regionOptions = getRegionsForRealm(f.realm);
   const regionError = !findRegion(f.realm, f.region) ? 'Select a region in this realm.' : null;
@@ -124,9 +119,8 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         vcnCidr, ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}),
       } } };
     }));
-    setEnvs([...envs, { id, name, securityZone: newSecure, network }]);
+    setEnvs([...envs, { id, name, securityZone: false, network }]);
     setNewName('');
-    setNewSecure(false);
   }
 
   return (
@@ -135,7 +129,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.accent} />
         <div style={s.body}>
           <h2 style={s.title}>Foundation</h2>
-          <p style={form.intro}>Choose the deployment type, OCI location and security baseline.</p>
+          <p style={form.intro}>Choose the deployment type, OCI location and environments.</p>
           <div style={s.field}>
             <label style={s.label} htmlFor="saved-lz-name">Design name</label>
             <input
@@ -150,28 +144,13 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             <div id="saved-lz-name-help" style={{ ...s.help, marginTop: 6 }}>Used for saved designs and download filenames. OCI resource names are generated separately.</div>
             <FieldError id="saved-lz-name-error" error={nameError} />
           </div>
-          <div style={s.twoCol} className="foundation-two-col">
+          <div>
             <div>
               <label style={s.label} htmlFor="lz-realm">Realm</label>
               <select id="lz-realm" value={f.realm} disabled={!!homeSource} onChange={(e) => onRealm(e.target.value)} aria-describedby="lz-realm-help">
                 {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
               </select>
               <div id="lz-realm-help" style={{ ...s.help, marginTop: 6 }}>Use the realm that contains your tenancy.</div>
-            </div>
-            <div>
-              <div className="studio-info-heading"><label style={s.label} htmlFor="lz-cis-level">CIS benchmark level</label>
-                <InfoButton title="CIS benchmark level"><p>Both levels use the landing zone's security baseline. Level 2 also prepares customer-managed encryption keys.</p><p>Choose the level required by your organization. Review the generated security settings before deployment.</p></InfoButton>
-              </div>
-              <select
-                id="lz-cis-level"
-                value={f.cisLevel}
-                onChange={(e) => setFoundation({ cisLevel: Number(e.target.value) as 1 | 2 })}
-                aria-describedby="lz-cis-level-help"
-              >
-                <option value={2}>Level 2</option>
-                <option value={1}>Level 1</option>
-              </select>
-              <div id="lz-cis-level-help" style={{ ...s.help, marginTop: 6 }}>Level 2 adds customer-managed encryption keys to the Level 1 security baseline.</div>
             </div>
           </div>
           <div style={{ ...s.field, marginTop: 14 }}>
@@ -215,7 +194,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               </select>}
             </div>
           </div>
-          {!regional && <p id="lz-dr-region-help" style={s.help}>Selecting a DR region allows its Object Storage service to use this landing zone's encryption keys. Create the DR deployment separately.</p>}
+          {!regional && <p id="lz-dr-region-help" style={s.help}>Selecting a DR region allows its Object Storage service to use this landing zone's encryption keys. To prepare the DR deployment, return to the dashboard and select Create DR on this design's card. This creates a linked DR design in Studio. Deploy its files in a separate stack from this Home Region deployment.</p>}
         </div>
       </section>
 
@@ -224,7 +203,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div className="studio-info-heading"><h2 style={s.title}>{regional ? 'Home Region environments' : 'Environments'}</h2>
             {regional ? <InfoButton title="Home Region environments"><p>These environments are expected to be deployed in the Home Region. DR reuses their existing compartments, IAM and governance.</p><p>{homeSource ? 'Environment names and membership sync from the Home Region design. Edit them there.' : 'Use the same environment names as your Home Region deployment.'}</p></InfoButton>
-              : <InfoButton title="Environments and Security Zones"><p>Environments separate stages such as production and development. Projects and workload platforms are placed within the environments you select.</p><p>A Security Zone applies additional restrictions to an environment. Check that those restrictions suit its workloads before enabling it.</p><p>You can remove every environment to design a hub with shared services only.</p></InfoButton>}
+              : <InfoButton title="Environments"><p>Environments separate stages such as production and development. Projects and workload platforms are placed within the environments you select.</p><p>You can remove every environment to design a hub with shared services only.</p></InfoButton>}
           </div>
           {homeSource ? <>
             <p id="foundation-environments-help" style={form.intro}>{homeSource.model
@@ -239,18 +218,17 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
           </> : <>
           <p id="foundation-environments-help" style={form.intro}>{regional
             ? 'Use the same environment names as your Home Region deployment.'
-            : 'Separate stages such as production and development. A Security Zone enforces stricter controls on an environment. You can rename or remove the defaults, including all environments.'}</p>
+            : 'Separate stages such as production and development. You can rename or remove the defaults, including all environments.'}</p>
 
-          <div style={{ ...s.tableHead, ...environmentGrid }} className={regional ? undefined : 'foundation-environment-grid'}>
+          <div style={s.tableHead} className="foundation-environment-grid">
             <span>{regional ? 'Environment' : 'Name'}</span>
-            {!regional && <span>Security zone</span>}
             <span>Actions</span>
           </div>
           {envs.length === 0 && <div style={s.empty}>{regional
             ? 'No Home Region environments. Hub and shared services only.'
             : 'Hub and shared services only. Environments are optional.'}</div>}
           {envs.map((env, i) => (
-            <div key={i} style={{ ...s.row, ...environmentGrid }} className={regional ? undefined : 'foundation-environment-grid'}>
+            <div key={i} style={s.row} className="foundation-environment-grid">
               <div><input
                 aria-label={`Environment ${i + 1} name`}
                 {...fieldErrorProps(`environment-${env.id}-error`, configKeyError(env.name, envs.filter((_, index) => index !== i).map((other) => other.name)), regional ? 'foundation-environments-help' : undefined)}
@@ -258,19 +236,13 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 value={env.name}
                 onChange={(e) => updateEnv(i, { name: e.target.value })}
               /><FieldError id={`environment-${env.id}-error`} error={configKeyError(env.name, envs.filter((_, index) => index !== i).map((other) => other.name))} /></div>
-              {!regional && <Switch
-                checked={env.securityZone}
-                onChange={(v) => updateEnv(i, { securityZone: v })}
-                label={env.securityZone ? 'On' : 'Off'}
-                ariaLabel={`Security zone for ${env.name || `environment ${i + 1}`}`}
-              />}
               <DeleteButton label={regional ? `Remove ${env.name || `environment ${i + 1}`} from DR` : `Delete environment ${env.name || i + 1}`} onClick={() => deleteEnv(i)} />
             </div>
           ))}
 
           {!regional && <p style={{ ...s.help, marginTop: 12 }}>Network ranges are assigned automatically. You can change them in Projects.</p>}
           <label style={s.addLabel} htmlFor="new-environment-name">Add environment</label>
-          <div style={{ ...s.addRow, ...environmentGrid }} className={regional ? undefined : 'foundation-add-grid'}>
+          <div style={s.addRow} className="foundation-add-grid">
             <div><input
               aria-label="New environment name"
               id="new-environment-name"
@@ -281,7 +253,6 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') addEnv(); }}
             /><FieldError id="new-environment-error" error={newNameError} /></div>
-            {!regional && <Switch checked={newSecure} onChange={setNewSecure} label={newSecure ? 'On' : 'Off'} ariaLabel="Security zone for new environment" />}
             <button type="button" style={newNameError ? { ...s.addBtn, ...form.addBtnDisabled } : s.addBtn} disabled={!!newNameError} onClick={addEnv}>Add</button>
           </div>
           </>}
@@ -293,7 +264,6 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
       </section>
 
       <NotificationsSection />
-      <BastionSettings />
     </div>
   );
 }

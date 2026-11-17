@@ -36,6 +36,8 @@ export function deploymentPrerequisites(config: LzConfig): string[] {
   const peers = Object.values(config.remote_peering_connections ?? {});
   const tunnels = Object.values(config.hybrid_connectivity?.ipsecs ?? {}).flatMap((vpn) => Object.values(vpn.tunnels_management));
   return [
+    ...(config.stack_scope !== 'regional' && config.enable_cloud_guard === false
+      ? ['Cloud Guard must already be enabled and managed externally before deploying Security Zones. This package excludes Cloud Guard configuration and its dedicated event rule and notification topic.'] : []),
     ...(regional ? [
       'Deploy the Home Region stack first with matching compartments, project and platform IAM, and governance.'
         + (config.cis_level === 2 ? ' Select this DR region in Home to grant Object Storage access to its encryption keys.' : ''),

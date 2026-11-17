@@ -1,3 +1,4 @@
+import { validateCloudGuard } from '../services/cloudGuard';
 /**
  * generate — run the real OCI landing-zone jsonnet generator over the wizard's
  * canonical config and hand back the deployable JSON artifacts.
@@ -96,6 +97,7 @@ export function generateFromUpstreamDefaults(profile: string): Promise<Record<st
 /** Run the generator over a wizard model. */
 export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs> {
   const issues = [...validateBastion(model), ...validateCostGovernance(model), ...validateHybridConnectivity(model), ...validatePlatformContracts(model), ...validateOkeModel(model), ...validateExadataModel(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model)];
+  issues.push(...validateCloudGuard(model));
   const shortNameError = regionShortNameError(model.foundation.regionShortName);
   if (shortNameError) issues.push(shortNameError);
   if (issues.length) throw new GeneratorError(issues.join('\n'));

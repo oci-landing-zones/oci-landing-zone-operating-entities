@@ -842,7 +842,7 @@ a:focus:not(:focus-visible) {
 
   .foundation-environment-grid,
   .foundation-add-grid {
-    grid-template-columns: minmax(92px, 1fr) 82px 56px !important;
+    grid-template-columns: minmax(92px, 1fr) 56px !important;
     gap: 8px !important;
   }
 

@@ -138,6 +138,7 @@ describe('generated diagram quality matrix', () => {
 
   it('keeps future generated owners and long added resource names readable without clipping', async () => {
     const model = environmentCount(3);
+    model.foundation.cisLevel = 2;
     const { inventory, tables } = await generated(model);
     const parent = inventory.groups.find((group) => group.kind === 'vault')!.compartmentKey;
     inventory.compartments.push({ key: 'FUTURE-COMPARTMENT', name: 'cmp-future-security-services', parentKey: parent });

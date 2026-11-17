@@ -48,3 +48,17 @@ describe('saved FinOps model normalization', () => {
     expect(second.foundation.costGovernance!.tagsEnabled).toBe(false);
   });
 });
+
+describe('Studio CIS defaults', () => {
+  it('starts a new design at CIS 1 and exports that choice', () => {
+    const model = emptyLzModel();
+    expect(model.foundation.cisLevel).toBe(1);
+    expect(buildConfig(model).cis_level).toBe(1);
+  });
+
+  it.each([1, 2] as const)('preserves CIS %s in saved designs', (cisLevel) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = cisLevel;
+    expect(normalizeModel(model).foundation.cisLevel).toBe(cisLevel);
+  });
+});

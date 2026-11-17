@@ -28,6 +28,7 @@ import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
 import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
+import { validateCloudGuard } from '../../services/cloudGuard';
 import { validateNotificationEmails } from '../../services/notificationEmails';
 import { validateCostGovernance } from '../../services/costGovernance';
 import { costCenterCoverageError, type UncoveredCostResource } from '../../services/costCenterCoverage';
@@ -129,8 +130,8 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     return [...new Set([
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
-      ...validateBastion(model),
-      ...validateNotificationEmails(model.foundation.notifications, regional),
+      ...validateBastion(model), ...validateCloudGuard(model),
+      ...validateNotificationEmails(model.foundation.notifications, regional, model.foundation.cloudGuardEnabled !== false),
       ...validateCostGovernance(model),
       ...(coverageError ? [coverageError] : []),
       ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
@@ -237,6 +238,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               ['Deployment', regional ? 'DR' : 'Home Region'],
               ['Region', model.foundation.region],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
+              ['Cloud Guard', regional ? 'Managed in Home Region' : model.foundation.cloudGuardEnabled === false ? (model.foundation.cloudGuardExistingConfirmed ? 'Managed externally' : 'Excluded; confirmation required') : 'Included'],
               ['Hub', hub?.label ?? model.network.hubKind],
               ['OCI Bastion', model.bastion?.enabled ? 'Hub management subnet' : 'Off'],
             ].map(([label, value]) => (

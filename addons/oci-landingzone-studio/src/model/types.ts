@@ -27,6 +27,9 @@ export interface FoundationConfig {
   regionShortName: string; // three-letter region key, e.g. fra
   /** Generator security and observability baseline. */
   cisLevel: 1 | 2;
+  cloudGuardEnabled?: boolean;
+  /** Browser confirmation that Cloud Guard is enabled outside this Home deployment. */
+  cloudGuardExistingConfirmed?: boolean;
   /** One-OE notification topic recipients; blank fields keep the published placeholder. */
   notifications?: OneOeNotifications;
 }

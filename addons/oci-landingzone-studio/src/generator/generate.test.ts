@@ -20,6 +20,7 @@ import { defaultCostGovernance } from '../services/costGovernance';
 
 function emptyLzModel() {
   const model = emptyModel();
+  model.foundation.cisLevel = 2;
   model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
   return model;
 }
@@ -248,6 +249,7 @@ describe('generator (go-jsonnet wasm)', () => {
   }, 60_000);
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s regional DR with X-RPC and no environments', async (hubKind) => {
     const model = createRegionalModel();
+    model.foundation.cisLevel = 2;
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     Object.assign(model.foundation, { homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams' });
     model.remotePeeringConnections = [{ id: 'home', name: 'home', role: 'requester', remoteCidrs: ['10.3.0.0/21'], peerRegionName: 'eu-frankfurt-1', peerId: 'RPC-HOME-KEY' }];

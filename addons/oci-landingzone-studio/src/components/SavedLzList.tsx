@@ -224,7 +224,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
-                        ? <span style={s.staleTag} title="The design or deployment format changed. Open step 5 to regenerate these files.">Stale</span>
+                        ? <span style={s.staleTag} title="The design or deployment format changed. Open Review to regenerate these files.">Stale</span>
                         : <span style={s.outMeta}>Last generated {formatTime(out.generatedAt)}</span>}
                     </div>
                   )}

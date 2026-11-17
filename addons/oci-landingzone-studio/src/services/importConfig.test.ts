@@ -35,6 +35,12 @@ describe('Studio config import', () => {
     expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'], unsupported: true } })).toThrow('bastion.unsupported');
   });
 
+  it.each([1, 2] as const)('preserves an imported CIS %s choice', (cisLevel) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = cisLevel;
+    expect(importConfig(buildConfig(model)).model.foundation.cisLevel).toBe(cisLevel);
+  });
+
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('restores %s foundation and project membership', async (hubKind) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = 1;

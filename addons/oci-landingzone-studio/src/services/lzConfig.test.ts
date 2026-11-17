@@ -173,7 +173,7 @@ describe('serializeConfig', () => {
       "  realm: 'oc1',",
       "  region: 'eu-frankfurt-1',",
       "  region_short_name: 'fra',",
-      '  cis_level: 2,',
+      '  cis_level: 1,',
       '  environments: { prod: {}, preprod: {} },',
       "  security_targets: ['prod'],",
       '}',

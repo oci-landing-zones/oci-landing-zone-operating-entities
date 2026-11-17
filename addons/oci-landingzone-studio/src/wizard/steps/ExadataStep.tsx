@@ -208,7 +208,7 @@ function ProjectChoices({ type, selected, onChange, environments }: {
       <legend style={styles.legend}>Autonomous database project tiers</legend>
       <div style={styles.hint}>Choose only projects that need a database compartment. This does not create an extra project network.</div>
       {!environments.length && <div style={styles.hint}>Select an environment above to choose its project tiers.</div>}
-      {!model.projects.length && <div style={styles.hint}>Add a project in step 3 to configure a database tier.</div>}
+      {!model.projects.length && <div style={styles.hint}>Add a project in Projects to configure a database tier.</div>}
       {model.environments.filter((env) => environments.includes(env.id)).map((env) => {
         const eligible = model.projects.filter((project) => project.environments === 'all' || project.environments.includes(env.id));
         if (!eligible.length) return null;
