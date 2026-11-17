@@ -89,7 +89,6 @@ function(hub_ctx)
 
                   match_criteria: {
                     match_type: 'DRG_ATTACHMENT_ID',
-                    attachment_type: 'VCN',
                     drg_attachment_key: n.key('DRGATT', ['HUB', 'VCN']),
                   },
                 },

@@ -567,7 +567,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PROJ-KEY"
                                             }
                                         },
@@ -578,7 +577,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PREPROD-PROJ-KEY"
                                             }
                                         },
@@ -589,7 +587,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PLATFORM-EXACS-KEY"
                                             }
                                         },
@@ -600,7 +597,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PREPROD-PLATFORM-EXACS-KEY"
                                             }
                                         }
@@ -627,7 +623,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                             }
                                         },
@@ -638,7 +633,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PROJ-KEY"
                                             }
                                         },
@@ -649,7 +643,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PREPROD-PROJ-KEY"
                                             }
                                         },
@@ -660,7 +653,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PLATFORM-EXACS-KEY"
                                             }
                                         },
@@ -671,7 +663,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PREPROD-PLATFORM-EXACS-KEY"
                                             }
                                         }

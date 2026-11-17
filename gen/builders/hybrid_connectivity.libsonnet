@@ -97,7 +97,7 @@ function(params)
                 statements: {
                   [n.key_global('HYBRID-LOCAL', [e.name])]: {
                     priority: i + 1, action: 'ACCEPT',
-                    match_criteria: { match_type: 'DRG_ATTACHMENT_ID', attachment_type: 'VCN', drg_attachment_key: e.drg_att_key },
+                    match_criteria: { match_type: 'DRG_ATTACHMENT_ID', drg_attachment_key: e.drg_att_key },
                   }
                   for i in std.range(0, std.length(local_entries) - 1)
                   for e in [local_entries[i]]

@@ -468,7 +468,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PLATFORM-OCVS-KEY"
                                             }
                                         }
@@ -495,7 +494,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                             }
                                         },
@@ -506,7 +504,6 @@
 
                                             "match_criteria": {
                                                 "match_type"                           : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                      : "VCN",
                                                 "drg_attachment_key"                   : "DRGATT-FRA-LZ-PROD-PLATFORM-OCVS-KEY"
                                             }
                                         }

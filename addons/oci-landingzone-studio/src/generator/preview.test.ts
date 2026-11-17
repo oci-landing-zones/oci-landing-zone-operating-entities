@@ -64,7 +64,7 @@ describe('canonical diagram preview', () => {
   }, 60_000);
   it('matches the selected deployable final artifacts and produces the CIS2 resource families and identity domain', async () => {
     const model = emptyLzModel();
-    model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+    model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const preview = await generatePreview(model);
     const generated = await generateOutputs(model);
     expect(preview.files).toEqual(Object.keys(generated.files).sort());

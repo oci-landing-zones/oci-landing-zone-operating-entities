@@ -27,7 +27,7 @@ describe('canonical deployment file sets', () => {
     if (regional) Object.assign(model.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
     model.network = { hubKind: hub, ...hubKindDefaults(hub) };
     if (oke) model.platforms = [newPlatform('oke_simple', [])];
-    model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+    model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const result = await generateOutputs(model);
     expect(Object.keys(result.files).filter((file) => /^(security|observability)_cis/.test(file)).sort()).toEqual([
       `security_cis${cis}_pre.json`, `security_cis${cis}.json`,

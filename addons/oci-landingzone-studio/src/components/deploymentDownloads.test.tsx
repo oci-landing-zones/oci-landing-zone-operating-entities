@@ -135,7 +135,7 @@ describe('deployment downloads use the current factory', () => {
   it('keeps session keys in explicit artifacts while omitting them from the guide and browser cache', async () => {
     const model = emptyLzModel();
     model.foundation.notifications!.default = 'ops@example.com';
-    model.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+    model.foundation.costGovernance = { ownerEmail: 'owner@customer.test', requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
     hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
     hybrid.ipsecs.office = { ...newVpn('office'), remote_cidrs: ['172.20.0.0/16'] };
@@ -168,7 +168,7 @@ describe('deployment downloads use the current factory', () => {
   it.each(['Review', 'saved card'])('regenerates matching cached outputs for every %s download', async (surface) => {
     const model = emptyLzModel();
     model.foundation.notifications!.default = 'ops@example.com';
-    model.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+    model.foundation.costGovernance = { ownerEmail: 'owner@customer.test', requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const record = createLZ('Home', model).record!;
     controls.id = record.id;
     const config = serializeConfig(model);
@@ -224,7 +224,7 @@ describe('deployment downloads use the current factory', () => {
   it.each(['Review', 'saved card', 'legacy card'])('retains the previous saved package without downloading it after %s generation fails', async (surface) => {
     const model = emptyLzModel();
     model.foundation.notifications!.default = 'ops@example.com';
-    model.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
+    model.foundation.costGovernance = { ownerEmail: 'owner@customer.test', requireTagValues: false, useSingleRecipient: true, recipients: 'ops@example.com', budgets: {}, tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const draft = createDrDraft(model);
     const record = surface === 'legacy card'
       ? saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Home' }).record!

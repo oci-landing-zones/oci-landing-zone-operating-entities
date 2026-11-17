@@ -20,7 +20,7 @@ import { defaultCostGovernance } from '../services/costGovernance';
 
 function emptyLzModel() {
   const model = emptyModel();
-  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'finops@example.com' };
+  model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
   return model;
 }
 
