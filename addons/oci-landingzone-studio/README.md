@@ -20,13 +20,6 @@
 
 **OCI Landing Zone Studio** is a browser-based visual design tool for OCI Landing Zone Operating Entities. It guides an operator through a Landing Zone design, shows the resulting network as a live diagram, and creates a reviewable deployment package from the repository's Jsonnet generator.
 
-Studio is designed for teams that want a guided alternative to editing configuration files by hand while keeping the design, generated files, and deployment decision under their own control.
-
-> [!IMPORTANT]
-> Studio is provided as-is and used at your own risk. Review every design, generated file, placeholder, route, security setting, and compliance requirement before deployment. Studio does not deploy resources to OCI and is not an Oracle-managed deployment service.
-
-Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Blueprint Factory provides the config-driven generation path; Studio provides a guided visual interface for creating and reviewing a supported config-driven design.
-
 <p align="center">
   <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">
     <img src="https://i.ytimg.com/vi/AG7Cjd04bKg/hqdefault.jpg" alt="Watch the OCI Landing Zone Studio video on YouTube">
@@ -36,6 +29,13 @@ Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/RE
 <p align="center">
   <a href="https://www.youtube.com/watch?v=AG7Cjd04bKg">▶ Watch the Studio demo on YouTube</a>
 </p>
+
+Studio is designed for teams that want a guided alternative to editing configuration files by hand while keeping the design, generated files, and deployment decision under their own control.
+
+> [!IMPORTANT]
+> Studio is provided as-is and used at your own risk. Review every design, generated file, placeholder, route, security setting, and compliance requirement before deployment. Studio does not deploy resources to OCI and is not an Oracle-managed deployment service.
+
+Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Blueprint Factory provides the config-driven generation path; Studio provides a guided visual interface for creating and reviewing a supported config-driven design.
 
 &nbsp;
 
