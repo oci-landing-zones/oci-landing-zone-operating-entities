@@ -1,3 +1,4 @@
+import { getHubKind } from './hubKinds';
 /**
  * lzConfig — derives the Landing Zone config object from the canonical model and
  * serialises it in the jsonnet style the generator expects.
@@ -67,6 +68,7 @@ export interface LzConfig {
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
+  security_zone_recipe1_cis_level?: 1 | 2;
   enable_cloud_guard?: boolean;
   notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
@@ -74,6 +76,7 @@ export interface LzConfig {
     network: {
       vcn: string;
       subnets: Record<string, string>;
+      custom_subnets?: Record<string, string>;
     };
   };
   environments: Record<string, EnvConfigEntry>;
@@ -202,10 +205,13 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   Object.assign(shared_platforms, exadata.shared);
 
   const subnets: Record<string, string> = {};
+  const customSubnets: Record<string, string> = {};
+  const requiredKeys = getHubKind(model.network.hubKind)!.defaultSubnets.map((subnet) => subnet.name);
   for (const sn of model.network.subnets) {
     const k = sn.name.trim();
-    if (!k) continue; // skip half-typed rows
-    subnets[k] = sn.cidr.trim();
+    if (!k) continue;
+    // Keep duplicate/reserved custom names visible to factory validation rather than replacing a required subnet.
+    (requiredKeys.includes(k) && !Object.hasOwn(subnets, k) ? subnets : customSubnets)[k] = sn.cidr.trim();
   }
 
   return {
@@ -226,6 +232,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(f.securityZoneRecipe1CisLevel !== undefined ? { security_zone_recipe1_cis_level: f.securityZoneRecipe1CisLevel } : {}),
     ...(f.cloudGuardEnabled === false ? { enable_cloud_guard: false } : {}),
     cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
@@ -234,6 +241,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
       network: {
         vcn: model.network.hubVcnCidr,
         subnets,
+        ...(Object.keys(customSubnets).length ? { custom_subnets: customSubnets } : {}),
       },
     },
     environments,
@@ -395,6 +403,11 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
         '    network: {',
         `      vcn: ${quote(c.hub.network.vcn)},`,
         ...subnets,
+        ...(c.hub.network.custom_subnets ? [
+          '      custom_subnets: {',
+          ...Object.entries(c.hub.network.custom_subnets).map(([k, v]) => `        ${key(k)}: ${quote(v)},`),
+          '      },',
+        ] : []),
         '    },',
         '  },',
       ]
@@ -406,6 +419,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.security_zone_recipe1_cis_level !== undefined ? [`  security_zone_recipe1_cis_level: ${c.security_zone_recipe1_cis_level},`] : []),
     ...(c.enable_cloud_guard === false ? ['  enable_cloud_guard: false,'] : []),
     ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),

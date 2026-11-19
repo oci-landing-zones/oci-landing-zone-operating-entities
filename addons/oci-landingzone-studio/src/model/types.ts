@@ -27,6 +27,8 @@ export interface FoundationConfig {
   regionShortName: string; // three-letter region key, e.g. fra
   /** Generator security and observability baseline. */
   cisLevel: 1 | 2;
+  /** Omitted follows the baseline; applies only to Security Zone Recipe 01. */
+  securityZoneRecipe1CisLevel?: 1 | 2;
   cloudGuardEnabled?: boolean;
   /** Browser confirmation that Cloud Guard is enabled outside this Home deployment. */
   cloudGuardExistingConfirmed?: boolean;
@@ -321,6 +323,7 @@ export interface DiagramNode {
   firewallBackendLowerArm?: number;
   /** Caption under a subnet icon (e.g. nfw-<region>-hub-dmz). */
   caption?: string;
+  routingNote?: string;
   /** Caption colour. */
   captionTone?: 'green' | 'orange';
   /** Extra line under the caption — e.g. a firewall instance IP address. */

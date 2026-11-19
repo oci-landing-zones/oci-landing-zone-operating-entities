@@ -53,7 +53,7 @@ export function emptyLzModel(): LzModel {
       notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
     environments: [
-      { id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) },
+      { id: 'environment-1', name: 'prod', securityZone: false, network: envNetworkDefaults(0) },
       { id: 'environment-2', name: 'preprod', securityZone: false, network: envNetworkDefaults(1) },
     ],
     network: { hubKind: 'hub_a', ...hubKindDefaults('hub_a') },
@@ -152,6 +152,7 @@ export function normalizeModel(stored: unknown): LzModel {
     candidate.version !== LZ_MODEL_VERSION
     || !candidate.foundation
     || (candidate.foundation.cisLevel !== 1 && candidate.foundation.cisLevel !== 2)
+    || (candidate.foundation.securityZoneRecipe1CisLevel !== undefined && candidate.foundation.securityZoneRecipe1CisLevel !== 1 && candidate.foundation.securityZoneRecipe1CisLevel !== 2)
     || !candidate.network
     || !Array.isArray(candidate.environments)
     || !Array.isArray(candidate.projects)

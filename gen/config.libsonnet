@@ -212,6 +212,9 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     local cis_level =
       if raw_cis_level == 1 || raw_cis_level == '1' then 1
       else 2;
+    local recipe1_level = if std.objectHas(config, 'security_zone_recipe1_cis_level') then config.security_zone_recipe1_cis_level else null;
+    assert recipe1_level == null || std.member([1, 2], recipe1_level) :
+           'config.security_zone_recipe1_cis_level must be 1 or 2';
     local stack_scope =
       if std.objectHas(config, 'stack_scope') && config.stack_scope != null then
         config.stack_scope
@@ -248,6 +251,21 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       if std.objectHas(hub_network, 'subnets') then
         subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
+    local custom_label = 'config.hub.network.custom_subnets';
+    local custom_subnets = validation.object(
+      if std.objectHas(hub_network, 'custom_subnets') then hub_network.custom_subnets else {},
+      custom_label
+    );
+    local custom_names = std.objectFields(custom_subnets);
+    local reserved_names = collections.unique(std.flattenArrays(std.objectValues(hub_subnet_order)));
+    assert collections.all([!std.member(reserved_names, name) for name in custom_names]) :
+           '%s uses a reserved subnet name' % custom_label;
+    assert collections.all([valid_connection_name(name) && std.length(std.findSubstr('_', name)) == 0 for name in custom_names]) :
+           '%s custom subnet names must use lowercase letters, numbers or hyphens and start and end with a letter or number' % custom_label;
+    assert std.length(custom_names) <= 99 : '%s supports at most 99 subnets' % custom_label;
+    local checked_hub_subnets = subnet_utils.validate_named_subnets(
+      hub_subnets + custom_subnets, 'config.hub.network combined subnets', hub_vcn
+    );
     local remote_peering_connections =
       if std.objectHas(config, 'remote_peering_connections') &&
          config.remote_peering_connections != null then
@@ -496,7 +514,10 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       dr_region: dr_region,
       [if notification_emails != null then 'notification_emails']: notification_emails,
       hub+: {
-        network+: { subnets: hub_subnets },
+        network+: {
+          subnets: assert std.length(std.objectFields(checked_hub_subnets)) > 0; hub_subnets,
+          [if std.objectHas(hub_network, 'custom_subnets') then 'custom_subnets']: custom_subnets,
+        },
       },
       [if std.length(std.objectFields(remote_peering_connections)) > 0 then 'remote_peering_connections']:
         remote_peering_connections,

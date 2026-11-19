@@ -67,7 +67,7 @@ function(hub_ctx)
   local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
   local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
-  local subnets = hub_config.network.subnets;
+  local subnets = hub_config.network.subnets + (if std.objectHas(hub_config.network, 'custom_subnets') then hub_config.network.custom_subnets else {});
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
 
   local untrust_nlb_key = n.key('NLB', ['HUB', 'UNTRUST']);

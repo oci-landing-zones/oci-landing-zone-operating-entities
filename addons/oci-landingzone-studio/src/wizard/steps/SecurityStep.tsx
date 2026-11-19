@@ -12,6 +12,7 @@ export default function SecurityStep() {
   const { model, setField, homeSource } = useWizard();
   const f = model.foundation;
   const regional = f.stackScope === 'regional';
+  const recipe1Foundation = regional && homeSource?.model ? homeSource.model.foundation : f;
   const cloudGuardError = validateCloudGuard(model)[0] ?? null;
 
   return (
@@ -39,6 +40,47 @@ export default function SecurityStep() {
         </div>
       </section>
 
+      <section style={s.panel} aria-labelledby="security-zones-title">
+        <div style={s.accent} />
+        <div style={s.body}>
+          <div className="studio-info-heading">
+            <h2 id="security-zones-title" style={s.title}>Security Zones</h2>
+            <InfoButton title="Security Zones"><p>A Security Zone applies additional restrictions to an environment. Check that those restrictions suit its workloads before enabling it.</p><p>Environment names are managed in Foundation. Security Zones are created and managed by the Home Region deployment.</p></InfoButton>
+          </div>
+          <p style={s.intro}>{regional
+            ? 'Security Zones are managed in the Home Region. Configure them in the Home Region design.'
+            : 'Apply stricter security controls to the environments that need them.'}</p>
+          <label style={s.label} htmlFor="lz-recipe1-cis-level">Recipe 01 — CIS level</label>
+          <select id="lz-recipe1-cis-level" disabled={regional}
+            value={recipe1Foundation.securityZoneRecipe1CisLevel ?? recipe1Foundation.cisLevel}
+            aria-describedby="lz-recipe1-cis-help"
+            onChange={(event) => setField('foundation', { ...f, securityZoneRecipe1CisLevel: Number(event.target.value) as 1 | 2 })}>
+            <option value={1}>CIS Level 1</option>
+            <option value={2}>CIS Level 2</option>
+          </select>
+          <p id="lz-recipe1-cis-help" style={{ ...s.help, marginTop: 6 }}>{regional
+            ? 'Recipe 01 is managed in the Home Region design.'
+            : 'Recipe 01 follows Security baseline until you choose another level. This changes Recipe 01 restrictions; encryption and other recipes keep the baseline level.'}</p>
+          {!regional && f.securityZoneRecipe1CisLevel !== undefined && <button type="button" style={s.addBtn}
+            id="lz-recipe1-use-baseline"
+            onClick={() => { const { securityZoneRecipe1CisLevel: _level, ...foundation } = f; setField('foundation', foundation); }}>Use baseline level (CIS {f.cisLevel})</button>}
+          {regional && homeSource && !homeSource.model && <p style={s.help}>The Home Region design is unavailable. These Security Zone settings are from the last saved version.</p>}
+          {regional && homeSource?.model && <Link to={`/lz/${encodeURIComponent(homeSource.id)}`} target="_blank" rel="noopener noreferrer"
+            aria-label="Open Home Region (opens in a new tab)" className="guide-link">Open Home Region</Link>}
+          {model.environments.length ? <ul aria-label="Environment Security Zones" style={{ listStyle: 'none', padding: 0, margin: '14px 0 0' }}>
+            {model.environments.map((env, index) => <li key={env.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 0', borderTop: `1px solid ${oracle.border}` }}>
+              <span style={{ fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere', minWidth: 0 }}>{env.name || `Environment ${index + 1}`}</span>
+              {regional ? <span style={{ ...s.help, flex: '0 0 auto' }}>{env.securityZone ? 'On' : 'Off'}</span> : <Switch
+                checked={env.securityZone}
+                onChange={(securityZone) => setField('environments', model.environments.map((current) => current.id === env.id ? { ...current, securityZone } : current))}
+                label={env.securityZone ? 'On' : 'Off'}
+                ariaLabel={`Security zone for ${env.name || `environment ${index + 1}`}`}
+              />}
+            </li>)}
+          </ul> : <p style={s.help}>{regional ? 'No environments in the Home Region design.' : 'Add environments in Foundation to configure Security Zones.'}</p>}
+        </div>
+      </section>
+
       <section style={s.panel} aria-labelledby="security-cloud-guard-title">
         <div style={s.accent} />
         <div style={s.body}>
@@ -61,33 +103,6 @@ export default function SecurityStep() {
             <p id="existing-cloud-guard-help" style={{ ...s.help, marginTop: 8 }}>Security Zones require Cloud Guard, including the landing zone baseline zones. This choice omits Cloud Guard configuration and its dedicated event rule and notification topic from the generated files. Review the Terraform plan when updating an existing deployment.</p>
             <FieldError id="existing-cloud-guard-error" error={cloudGuardError} />
           </>}
-        </div>
-      </section>
-
-      <section style={s.panel} aria-labelledby="security-zones-title">
-        <div style={s.accent} />
-        <div style={s.body}>
-          <div className="studio-info-heading">
-            <h2 id="security-zones-title" style={s.title}>Security Zones</h2>
-            <InfoButton title="Security Zones"><p>A Security Zone applies additional restrictions to an environment. Check that those restrictions suit its workloads before enabling it.</p><p>Environment names are managed in Foundation. Security Zones are created and managed by the Home Region deployment.</p></InfoButton>
-          </div>
-          <p style={s.intro}>{regional
-            ? 'Security Zones are managed in the Home Region. Configure them in the Home Region design.'
-            : 'Apply stricter security controls to the environments that need them.'}</p>
-          {regional && homeSource && !homeSource.model && <p style={s.help}>The Home Region design is unavailable. These Security Zone settings are from the last saved version.</p>}
-          {regional && homeSource?.model && <Link to={`/lz/${encodeURIComponent(homeSource.id)}`} target="_blank" rel="noopener noreferrer"
-            aria-label="Open Home Region (opens in a new tab)" className="guide-link">Open Home Region</Link>}
-          {model.environments.length ? <ul aria-label="Environment Security Zones" style={{ listStyle: 'none', padding: 0, margin: '14px 0 0' }}>
-            {model.environments.map((env, index) => <li key={env.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 0', borderTop: `1px solid ${oracle.border}` }}>
-              <span style={{ fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere', minWidth: 0 }}>{env.name || `Environment ${index + 1}`}</span>
-              {regional ? <span style={{ ...s.help, flex: '0 0 auto' }}>{env.securityZone ? 'On' : 'Off'}</span> : <Switch
-                checked={env.securityZone}
-                onChange={(securityZone) => setField('environments', model.environments.map((current) => current.id === env.id ? { ...current, securityZone } : current))}
-                label={env.securityZone ? 'On' : 'Off'}
-                ariaLabel={`Security zone for ${env.name || `environment ${index + 1}`}`}
-              />}
-            </li>)}
-          </ul> : <p style={s.help}>{regional ? 'No environments in the Home Region design.' : 'Add environments in Foundation to configure Security Zones.'}</p>}
         </div>
       </section>
 

@@ -217,7 +217,8 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
     network: {
       vcn: '10.0.0.0/21',
-      subnets: { ... },                  // optional: auto-calculated as /24s if omitted
+      subnets: { ... },                  // optional: canonical /24s if omitted
+      custom_subnets: { ... },           // optional: private subnets sharing MGMT RT/SL
     },
   },
   environments: {
@@ -444,3 +445,9 @@ Hybrid connectivity is a top-level add-on, not a platform or workload extension.
 - **Optional parameters**: Use `null` as default, not empty array/object. Test with `!= null`.
 - **Named parameters**: Always use named parameters when calling functions with optional args.
 - **Comments**: Use `//` style. Include function signature and parameter docs in header comment.
+
+### Custom Hub Subnet Contract
+
+`hub.network.custom_subnets` is a separate optional CIDR map. Canonical `subnets` remain exact and required when supplied. Normalize and validate the combined allocation, reject all hub-reserved names and invalid custom names, and keep custom ranges inside the hub VCN. Common hub rendering associates custom private subnets with MGMT RT/SL. A/B NAT return routes must include every custom CIDR. Studio must split and reunite canonical/custom maps on export/import and show the shared routing/security behavior. Omitted custom maps must preserve published output.
+
+`security_zone_recipe1_cis_level` optionally overrides Recipe 01 and its root target in both pre/final outputs. Absent/null preserves each CIS variant's baseline. Other recipes, encryption and extension outputs remain driven by `cis_level`.

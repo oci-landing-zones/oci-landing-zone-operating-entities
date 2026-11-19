@@ -132,7 +132,7 @@ function CompartmentNode({ data }: NodeProps) {
  * right border.
  */
 function SubnetNode({ data }: NodeProps) {
-  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
+  const d = data as { label?: string; icon?: string; caption?: string; routingNote?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
   const [name = '', cidr = ''] = (d.label ?? '').split('\n');
   const iconSvg = d.icon ? ICONS[d.icon] : undefined;
   return (
@@ -145,6 +145,7 @@ function SubnetNode({ data }: NodeProps) {
       )}
       <span style={{ color: d.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName, fontWeight: 700 }}>{name}</span>
       <span style={{ color: oracle.cidrBlue, fontWeight: 600 }}>{cidr}</span>
+      {d.routingNote && <span style={{ color: oracle.text, fontSize: 11 }}>{d.routingNote}</span>}
       {iconSvg && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, marginTop: 2 }}>
           <span style={{ width: 42, height: 42, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: iconSvg.replace('width="48" height="48"', 'width="42" height="42"') }} />
@@ -367,7 +368,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
+    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, routingNote: n.routingNote, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType

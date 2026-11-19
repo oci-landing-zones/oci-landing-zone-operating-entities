@@ -120,8 +120,9 @@ describe('toDrawioXml', () => {
   });
 
   it('adds a Security Zone shield image to secure compartments only', () => {
-    // default model: prod is a Security Zone, preprod is not
-    const xml = toDrawioXml(buildGraph(emptyLzModel()));
+    const model = emptyLzModel();
+    model.environments[0].securityZone = true;
+    const xml = toDrawioXml(buildGraph(model));
     expect(xml).toContain('id="cmp-env-0-shield"');   // prod
     expect(xml).toContain('shape=image;');
     expect(xml).not.toContain('id="cmp-env-1-shield"'); // preprod

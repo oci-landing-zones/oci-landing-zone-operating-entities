@@ -237,7 +237,7 @@ const PAGE_H = 1100;
 function subnetHtmlLabel(node: DiagramNode): string {
   const [name, cidr] = node.label.split('\n');
   const nameColor = node.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName;
-  return `<font color="${nameColor}"><b>${escapeHtml(name ?? '')}</b></font><br><font color="${oracle.cidrBlue}">${escapeHtml(cidr ?? '')}</font>`;
+  return `<font color="${nameColor}"><b>${escapeHtml(name ?? '')}</b></font><br><font color="${oracle.cidrBlue}">${escapeHtml(cidr ?? '')}</font>${node.routingNote ? `<br><font color="${oracle.text}">${escapeHtml(node.routingNote)}</font>` : ''}`;
 }
 
 function nodeCell(node: DiagramNode, dx = 0, dy = 0): string {

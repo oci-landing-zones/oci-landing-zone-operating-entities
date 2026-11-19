@@ -118,6 +118,7 @@ interface SubnetSpec {
   backendGapAfter?: number;
   icon?: DiagramNode['icon'];
   caption?: string;
+  routingNote?: string;
   captionTone?: 'green' | 'orange';
   ipNote?: string;
   /** A VM endpoint to draw inside the subnet (only icon-less subnets get one). */
@@ -128,9 +129,9 @@ interface SubnetSpec {
 
 const SUB_H_ICON_IP = SUB_H_ICON + 16; // icon + caption + an IP line
 const SUB_H_ENDPOINT = 110;            // plain subnet grown to hold a VM (name + icon + IP)
-const subnetHeight = (sn: SubnetSpec) =>
+const subnetHeight = (sn: SubnetSpec) => (sn.routingNote ? 18 : 0) + (
   sn.resourceGroup ? SUB_H + resourceGroupLayout(sn.resourceGroup.kind, sn.resourceGroup.items, SUB_W - 2 * PAD).height + PAD
-    : sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H;
+    : sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H);
 
 /**
  * Give an icon-less subnet a VM endpoint and a host `.10` inside its range.
@@ -288,7 +289,7 @@ function pushVcn(
     nodes.push({
       id: `${id}-sn-${i}`, kind: 'subnet', label: `${sn.name}\n${sn.cidr}`, parentId: id,
       container: sn.resourceGroup ? true : undefined,
-      icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
+      routingNote: sn.routingNote, icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
       endpointName: sn.endpoint?.name, endpointIp: sn.endpoint?.ip, publicSubnet: sn.isPublic,
       x: SUB_X, y: sy, width: SUB_W, height,
     });
@@ -439,7 +440,10 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
 
   // ---- hub network (left column), driven by the step 2 fields
   const hubSubnets = model.network.subnets.map((sn, j) => {
-    const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
+    const required = getHubKind(model.network.hubKind)!.defaultSubnets.some((subnet) => subnet.name === sn.name);
+    const spec: SubnetSpec = required
+      ? decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok)
+      : { name: generatorNames.hubSubnet(regionTok, sn.name), cidr: sn.cidr, routingNote: 'Private · RT: mgmt' };
     if (bastion?.subnetNode === `hub-vcn-sn-${j}`) {
       spec.resourceGroup = inventory?.groups.find((group) => `resource-${group.id}` === bastion.serviceNode);
     }

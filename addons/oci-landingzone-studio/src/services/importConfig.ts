@@ -233,10 +233,15 @@ export function importConfig(value: unknown): ImportedConfig {
       cloudguard: recipients('cloudguard'), iam: recipients('iam'), network: recipients('network'), security: recipients('security'),
     };
   }
+  if (config.security_zone_recipe1_cis_level !== undefined && config.security_zone_recipe1_cis_level !== null) {
+    const level = number(config.security_zone_recipe1_cis_level, 'security_zone_recipe1_cis_level');
+    if (level !== 1 && level !== 2) invalid('security_zone_recipe1_cis_level');
+    model.foundation.securityZoneRecipe1CisLevel = level;
+  }
   const hub = object(config.hub, 'hub');
   const hubKind = choice<HubKind>(hub.kind, ['hub_a', 'hub_b', 'hub_c', 'hub_e'], 'hub.kind');
   const hubNetwork = network(hub.network, 'hub.network');
-  model.network = { hubKind, hubVcnCidr: hubNetwork.vcnCidr, subnets: hubNetwork.subnets };
+  model.network = { hubKind, hubVcnCidr: hubNetwork.vcnCidr, subnets: [...hubNetwork.subnets, ...subnets(object(hub.network, 'hub.network').custom_subnets ?? {}, 'hub.network.custom_subnets')] };
   const envs = object(config.environments === undefined ? {} : config.environments, 'environments');
   const securityTargets = strings(config.security_targets ?? Object.keys(envs), 'security_targets');
   model.environments = Object.entries(envs).map(([name, value], index) => {
@@ -318,6 +323,12 @@ export function importConfig(value: unknown): ImportedConfig {
     if (!Object.keys(expected.notification_emails as ObjectValue).length) delete expected.notification_emails;
   }
   if (config.bastion === null) delete expected.bastion;
+  if (config.security_zone_recipe1_cis_level === null) delete expected.security_zone_recipe1_cis_level;
+  const expectedHubNetwork = { ...object(hub.network, 'hub.network') };
+  if (expectedHubNetwork.custom_subnets && Object.keys(object(expectedHubNetwork.custom_subnets, 'hub.network.custom_subnets')).length === 0) {
+    delete expectedHubNetwork.custom_subnets;
+    expected.hub = { ...hub, network: expectedHubNetwork };
+  }
   if (bastion) expected.bastion = { ...bastion, max_session_ttl_in_seconds: bastion.max_session_ttl_in_seconds ?? 3600 };
   const canonical = buildConfig(model);
   const diff = difference({ ...expected, ...(canonical.cost_governance ? { cost_governance: canonical.cost_governance } : {}) }, canonical);

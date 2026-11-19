@@ -136,6 +136,7 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `dr_region` | string | No | Omitted | DR region whose Object Storage service must be authorized by complete home IAM. Must differ from `region`. |
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
+| `security_zone_recipe1_cis_level` | number | No | `cis_level` | Optional CIS `1` or `2` override for Security Zone Recipe 01 and its root target only. |
 | `enable_cloud_guard` | boolean | No | `true` | Include Cloud Guard configuration and its dedicated event rule and topic. Set `false` only when Cloud Guard is already enabled and managed externally; the baseline Security Zones require it. Regional output always excludes Cloud Guard. |
 | `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
@@ -202,6 +203,12 @@ notification_emails: {
 },
 ```
 
+### Security Zone Recipe 01 CIS level
+
+Optional `security_zone_recipe1_cis_level: 1` or `2` overrides only Recipe 01 and its landing-zone target. When omitted or null, Recipe 01 follows `cis_level`. Shared-network and environment recipes, CMEKs, Vaults and workload security continue to use `cis_level`. A different Recipe 01 level therefore does not establish compliance with that CIS level for the complete landing zone. Review compatibility between the selected restrictions and the resources you deploy.
+
+Studio exposes this override under **Security → Security Zones → Recipe 01 — CIS level**. New designs follow Security baseline until a level is chosen explicitly; **Use baseline level** restores that behavior. New Studio environments have their optional Security Zone toggles off and export `security_targets: []`; baseline landing-zone and shared-network zones remain generated. Saved environment selections are preserved.
+
 ## 2. Hub
 
 The hub is the landing zone's central network. Its `kind` selects the supported routing and firewall pattern.
@@ -224,6 +231,22 @@ hub: {
 ```
 
 `network.vcn` is always required and must be a valid CIDR. When `hub.network.subnets` is omitted, the factory allocates the canonical `/24` subnet layout. If it is supplied, it must contain the complete key set for the selected hub, use valid non-overlapping CIDRs, and remain inside the hub VCN.
+
+### Custom private hub subnets
+
+Use the separate optional `hub.network.custom_subnets` map for additional private subnets. Keep `subnets` limited to the complete canonical set above; canonical subnets remain mandatory. Custom names cannot reuse any hub's reserved subnet name and must use lowercase letters, digits or hyphens, starting and ending with a letter or digit. At most 99 custom subnets are supported. DNS labels use a stable hash of each custom name to remain within OCI limits; adding another subnet does not change existing labels.
+
+```jsonnet
+hub: {
+  kind: 'hub_e',
+  network: {
+    vcn: '10.0.0.0/21',
+    custom_subnets: { tools: '10.0.6.0/24' },
+  },
+},
+```
+
+All custom CIDRs must fit inside the hub VCN and must not overlap canonical or other custom subnets. They prohibit public IPs and internet ingress and reference the **same MGMT route table and security list**, as MON and DNS do. This includes MGMT's current outbound, ICMP and Bastion SSH rules; it does not add application-specific ingress or NSGs. Review those shared rules for the intended workload. Hubs A and B also include every custom CIDR in NAT gateway return routes through their firewall. Hub C reuses its MGMT Trust-NLB path; Hub E reuses its MGMT NAT/service-gateway and generated peer routes. This option does not enable inspection of same-subnet traffic or add subnet-specific IAM boundaries.
 
 ## 3. Environments
 

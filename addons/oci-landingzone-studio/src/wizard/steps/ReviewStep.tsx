@@ -248,6 +248,9 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               </div>
             ))}
           </dl>
+          {model.network.subnets.some((subnet) => !hub?.defaultSubnets.some((required) => required.name === subnet.name)) && <p style={s.help}>
+            Custom hub subnets ({model.network.subnets.filter((subnet) => !hub?.defaultSubnets.some((required) => required.name === subnet.name)).map((subnet) => `${subnet.name}: ${subnet.cidr}`).join(', ')}) are private and share the mgmt route table and security list.
+          </p>}
           <ul style={local.counts} aria-label="Workloads and realm">
             <li>Realm {model.foundation.realm.toUpperCase()}</li>
             <li>{envCount} {envCount === 1 ? 'environment' : 'environments'}</li>

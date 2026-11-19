@@ -179,3 +179,9 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
 See [LICENSE](../../LICENSE.txt) for more details.
+
+### Custom hub subnets and Security Zones
+
+Hub Network protects canonical subnet names and allows additional private subnets. Custom rows share the MGMT route table and security list, and show that association in the form, diagram, Draw.io export and review. Export uses `hub.network.custom_subnets`; import preserves this map. Review the inherited outbound, ICMP and Bastion SSH rules before deploying workloads.
+
+Security shows Security Zones before Cloud Guard. Recipe 01 follows the Security baseline CIS level by default and can be overridden under Security Zones; use **Use baseline level** to restore the default. Other recipes and encryption retain the baseline level. Environment Security Zones start off for every new environment; saved choices remain unchanged.

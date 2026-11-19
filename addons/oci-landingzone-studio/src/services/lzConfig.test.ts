@@ -32,6 +32,11 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('leaves new environment zones off and emits an explicit empty target list', () => {
+    const fresh = emptyLzModel();
+    expect(fresh.environments.every((environment) => !environment.securityZone)).toBe(true);
+    expect(buildConfig(fresh).security_targets).toEqual([]);
+  });
   it('keeps the local design description out of deployable configuration', () => {
     const original = emptyLzModel();
     const described = structuredClone(original);
@@ -115,7 +120,7 @@ describe('buildConfig', () => {
     const c = buildConfig(model({
       network: { ...base.network, subnets: [...base.network.subnets, { name: 'my-subnet', cidr: '10.0.7.0/24' }] },
     }));
-    expect(c.hub.network.subnets['my-subnet']).toBe('10.0.7.0/24');
+    expect(c.hub.network.custom_subnets?.['my-subnet']).toBe('10.0.7.0/24');
   });
 });
 
@@ -175,7 +180,7 @@ describe('serializeConfig', () => {
       "  region_short_name: 'fra',",
       '  cis_level: 1,',
       '  environments: { prod: {}, preprod: {} },',
-      "  security_targets: ['prod'],",
+      "  security_targets: [],",
       '}',
       '',
     ].join('\n'));

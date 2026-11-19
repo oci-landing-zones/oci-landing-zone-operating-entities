@@ -27,6 +27,41 @@ function findControl(node: ReactNode, predicate: (props: Record<string, unknown>
 }
 
 describe('Security settings', () => {
+  it.each([1, 2] as const)('defaults Recipe 01 to baseline CIS %s and places Cloud Guard after zones', (level) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = level;
+    const html = render(model);
+    const select = html.match(/<select[^>]*id="lz-recipe1-cis-level"[\s\S]*?<\/select>/)?.[0];
+    expect(select).toContain(`<option value="${level}" selected="">`);
+    expect(html.indexOf('id="security-zones-title"')).toBeLessThan(html.indexOf('id="security-cloud-guard-title"'));
+  });
+
+  it('persists an explicit Recipe 01 override without changing the baseline', () => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = 2;
+    const setField = vi.fn();
+    vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+    const control = findControl(SecurityStep(), (props) => props.id === 'lz-recipe1-cis-level');
+    expect(control).toBeDefined();
+    (control!.onChange as (event: ChangeEvent<HTMLSelectElement>) => void)({ target: { value: '1' } } as ChangeEvent<HTMLSelectElement>);
+    expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, securityZoneRecipe1CisLevel: 1 });
+    model.foundation.securityZoneRecipe1CisLevel = 1;
+    expect(render(model)).toMatch(/<select[^>]*id="lz-recipe1-cis-level"[\s\S]*?<option value="1" selected="">/);
+  });
+
+  it('restores following the baseline after an explicit Recipe 01 override', () => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = 2;
+    model.foundation.securityZoneRecipe1CisLevel = 1;
+    const setField = vi.fn();
+    vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+    const control = findControl(SecurityStep(), (props) => props.id === 'lz-recipe1-use-baseline');
+    (control!.onClick as () => void)();
+    const foundation = setField.mock.calls[0][1];
+    expect(foundation.cisLevel).toBe(2);
+    expect(foundation).not.toHaveProperty('securityZoneRecipe1CisLevel');
+  });
+
   it('enables Cloud Guard by default and requests external confirmation when excluded', () => {
     const model = emptyLzModel();
     expect(render(model)).toMatch(/role="switch" aria-checked="true" aria-label="Enable Cloud Guard"/);
