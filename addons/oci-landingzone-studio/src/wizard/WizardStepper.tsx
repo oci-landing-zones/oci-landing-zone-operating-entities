@@ -1,5 +1,5 @@
 /**
- * WizardStepper — navigation across the five-step wizard.
+ * WizardStepper — navigation across the seven-step wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */
@@ -16,11 +16,18 @@ export interface WizardStep {
 
 export const WIZARD_STEPS: WizardStep[] = [
   { id: 1, label: 'Foundation' },
-  { id: 2, label: 'Hub Network' },
-  { id: 3, label: 'Projects' },
-  { id: 4, label: 'Platforms' },
-  { id: 5, label: 'Review' },
+  { id: 2, label: 'Security' },
+  { id: 3, label: 'Hub Network' },
+  { id: 4, label: 'Projects' },
+  { id: 5, label: 'Platforms' },
+  { id: 6, label: 'Governance' },
+  { id: 7, label: 'Review' },
 ];
+
+/** Security shares Foundation's preview phase; later steps retain their existing layers. */
+export function previewPhase(step: number): number {
+  return step > 1 ? step - 1 : 1;
+}
 
 const css = {
   row: { display: 'flex', gap: 10, margin: '4px 0 22px', alignItems: 'stretch' } as React.CSSProperties,
@@ -28,7 +35,7 @@ const css = {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     padding: '11px 14px', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
     border: `1px solid ${oracle.border}`, borderRadius: 8, background: oracle.surface,
-    color: oracle.textMuted, cursor: 'pointer', whiteSpace: 'nowrap',
+    color: oracle.textMuted, cursor: 'pointer', whiteSpace: 'nowrap', minWidth: 'max-content',
     transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease',
   } as React.CSSProperties,
   num: {

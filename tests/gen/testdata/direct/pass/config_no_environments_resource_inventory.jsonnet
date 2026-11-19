@@ -25,7 +25,6 @@ local iam = outputs['iam.json'];
 local landing_zone_compartment =
   iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'];
 
-local observability_pre = outputs['observability_cis2_pre.json'];
 local observability = outputs['observability_cis2.json'];
 local security_pre = outputs['security_cis2_pre.json'];
 local security = outputs['security_cis2.json'];
@@ -102,11 +101,11 @@ local security = outputs['security_cis2.json'];
     alarms: keys(observability.alarms_configuration.alarms),
     event_rules: keys(observability.events_configuration.event_rules),
     home_region_event_rules: keys(observability.home_region_events_configuration.event_rules),
-    flow_logs: keys(observability.logging_configuration.flow_logs),
+    service_logs: keys(observability.logging_configuration.service_logs),
     log_groups: keys(observability.logging_configuration.log_groups),
     topics: keys(observability.notifications_configuration.topics),
     buckets: keys(observability.service_connectors_configuration.buckets),
     service_connectors: keys(observability.service_connectors_configuration.service_connectors),
-    pre_has_logging: std.objectHas(observability_pre, 'logging_configuration'),
+    has_pre_output: std.objectHas(outputs, 'observability_cis2_pre.json'),
   },
 }

@@ -1,6 +1,8 @@
 // gen/builders/iam/identity_domains.libsonnet
 // Identity domain groups and domain definitions for the IAM output.
 
+local cost_scope = import '../../lib/cost_scope.libsonnet';
+
 {
   groups(ctx)::
     local n = ctx.n;
@@ -18,6 +20,7 @@
           function(gacc, proj_name)
             gacc + {
               [n.key_global('GRP', entry.key_segments + [proj_name, 'ADMIN'])]: {
+                _cost_scope:: cost_scope.value('shared', proj_name),
                 name: ctx.proj_grp_name(entry, proj_name),
                 description: desc.group.project(ctx.env_desc(entry.env_name), proj_name, 'administration'),
               },

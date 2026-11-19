@@ -59,16 +59,14 @@ The deployment uses four JSON configuration files.
 | `oke_network.json` | Network infrastructure: OKE VCN, subnets, NSGs, route tables, service gateway, DRG attachment, and a Hub-network-owned, platform-tagged frontend NSG injected into the existing Hub VCN through `network_dependency` |
 | `oke.json` | Consolidated OKE configuration: cluster settings and managed worker pools |
 
-### Staged Observability Files <!-- omit from toc -->
+### Observability Files <!-- omit from toc -->
 
-The folder includes companion JSONs with CIS-aligned observability settings. Multi-stack OKE is deployed on top of an existing Landing Zone, so it does not repeat the security baseline or security resources owned by that Landing Zone.
+Include the complete observability JSON for the selected CIS level in the initial extension deployment. Its explicit Flow Logs target only the OKE VCN and subnets managed by this stack. Multi-stack OKE is deployed on top of an existing Landing Zone, so it does not repeat the security baseline or security resources owned by that Landing Zone.
 
 | File | Purpose |
 | --- | --- |
 | `oke_observability_cis1.json` | Observability settings (CIS profile 1) |
-| `oke_observability_cis1_pre.json` | Pre-requisites for `oke_observability_cis1.json` |
 | `oke_observability_cis2.json` | Observability settings (CIS profile 2) |
-| `oke_observability_cis2_pre.json` | Pre-requisites for `oke_observability_cis2.json` |
 
 &nbsp;
 
@@ -88,12 +86,12 @@ Prefer ORM with configuration files staged in a customer-controlled private OCI 
    - Use Orchestrator `v2.4.1` with CIS OKE `v0.3.0` and set the working directory to `rms-facade`.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_network.json`, `oke_identity.json`, and `oke.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_network.json`, `oke_identity.json`, `oke.json`, and the selected `oke_observability_cis1.json` or `oke_observability_cis2.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
    - If you depend on outputs from a previously deployed landing zone, stage those dependency files in the same controlled source.
 
 3. **Configure ORM Variables**
    - Set the configuration source to match the private location you chose.
-   - Point the stack at the four staged JSON files and any required dependency files.
+   - Point the stack at the four core JSON files, the selected observability file, and any required dependency files.
 
 4. **Review Configuration Keys**
 

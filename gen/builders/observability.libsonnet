@@ -1,17 +1,26 @@
 // gen/builders/observability.libsonnet
 // Observability builder: alarms, events, notifications, service connectors, and logging.
 //
-// Generates the same structures as:
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2_pre.json
-//   blueprints/one-oe/runtime/one-stack/oneoe_observability_cis2.json
+// Builds pre and complete variants for composition consumers. Published One-OE
+// entrypoints project the complete variants into two shared CIS configurations.
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(config, n, realm_constants, topo)
   local env_entries = topo.ordered_env_entries();
   local networked_env_entries = topo.networked_env_entries();
+  local logging_env_entries = [
+    entry
+    for entry in env_entries
+    if std.objectHas(entry.env, 'project_network') || std.length([
+      platform
+      for platform in std.objectValues(
+        if std.objectHas(entry.env, 'platforms') then entry.env.platforms else {}
+      )
+      if std.objectHas(platform, 'network') && platform.network != null
+    ]) > 0
+  ];
   local security_cmp_key = n.key_global('CMP', ['SECURITY']);
   local shared_network_cmp_key = n.key_global('CMP', ['NETWORK']);
 
@@ -129,6 +138,7 @@ function(config, n, realm_constants, topo)
     {
       key_segments: entry.key_segments,
       name_segments: entry.name_segments,
+      environment: entry.env_name,
       metric_compartment_id: topo.env_child_compartment_key(entry, 'NETWORK'),
     }
     for entry in env_entries
@@ -196,6 +206,7 @@ function(config, n, realm_constants, topo)
 
   local catalog_alarms = {
     [n.key_global('AL', scope.key_segments + spec.key)]: {
+      _cost_scope:: cost_scope.value(if std.objectHas(scope, 'environment') then scope.environment else 'shared'),
       compartment_id: security_cmp_key,
       display_name: n.display_global('al', scope.name_segments + spec.name),
       destination_topic_ids: [n.key_global('NOTT', [spec.topic])],
@@ -275,7 +286,7 @@ function(config, n, realm_constants, topo)
       default_compartment_id: 'TENANCY-ROOT',
 
       event_rules: {
-        [n.key_global('RUL', ['CLOUDGUARD'])]: {
+        [if config.enable_cloud_guard then n.key_global('RUL', ['CLOUDGUARD'])]: {
           destination_topic_ids: [n.key_global('NOTT', ['CLOUDGUARD'])],
           event_display_name: n.display_global('rul', ['notify-on-cloudguard-changes']),
           supplied_events: cloudguard_events,
@@ -293,7 +304,7 @@ function(config, n, realm_constants, topo)
       default_compartment_id: security_cmp_key,
 
       topics: {
-        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.', 'cloudguard'),
+        [if config.enable_cloud_guard then n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.', 'cloudguard'),
         [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.', 'iam'),
         [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.', 'network'),
         [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.', 'security'),
@@ -336,22 +347,24 @@ function(config, n, realm_constants, topo)
     },
   };
 
-  // --- Per-env flow logs and log groups (CIS2 only) ---
+  // --- Per-environment flow logs and log groups, including platform-only networks ---
   local env_flow_logs = std.foldl(
     function(acc, entry)
       acc + {
         [n.key_global('LOG', entry.key_segments + ['SUBNET', 'FLOW'])]: {
+          _cost_scope:: cost_scope.value(entry.env_name),
           log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
           target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'subnet',
         },
         [n.key_global('LOG', entry.key_segments + ['VCN', 'FLOW'])]: {
+          _cost_scope:: cost_scope.value(entry.env_name),
           log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
           target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'vcn',
         },
       },
-    networked_env_entries,
+    logging_env_entries,
     {}
   );
 
@@ -363,7 +376,7 @@ function(config, n, realm_constants, topo)
           compartment_id: topo.env_child_compartment_key(entry, 'SECURITY'),
         },
       },
-    networked_env_entries,
+    logging_env_entries,
     {}
   );
 

@@ -8,6 +8,35 @@ To deploy the OCI FinOps addon, it is recommended to start with an Oracle recomm
 
 ## Step 1: Setup One-OE Landing Zone with FinOps Platform
 
+The published IAM and network inputs below include FinOps tags and require the `tagns-lz-cost-governance` namespace and all six key definitions to be deployed first. Published Tag Defaults use `is_user_required: false`. For a Studio landing zone without FinOps tags, follow [FinOps tags and Studio compatibility](../../readme.md#finops-tags-and-studio-compatibility) to prepare separate adapted copies of **both** inputs before deploying Step 1. The Terraform option in Step 2 does not change these JSON files.
+
+### Apply customer tag mappings consistently
+
+Use [`customize_tags.jsonnet`](customize_tags.jsonnet) to prepare IAM, network and ADB tag inputs from the same `cost_governance` object used by the customer's design. This is a **tag-only adapter for this standalone add-on**. It retains the published Hub E / Frankfurt sample's names, keys, compartment hierarchy, policies and CIDRs. Review and adapt that topology separately before deployment; this command does not generate the customer's landing zone or add FinOps support to Studio.
+
+From the repository root, with Jsonnet installed and a separate existing output directory:
+
+```sh
+jsonnet --multi /path/to/customer-finops-output/ \
+  --tla-code-file config=/path/to/customer-design.jsonnet \
+  --tla-str environment=qa \
+  addons/oci-finops/finops-setup/customize_tags.jsonnet
+```
+
+Choose a new output directory to avoid overwriting files. Set `environment` to a name present in the design, or explicitly to `shared` for a shared FinOps platform. This selects business attribution; it does not move resources between compartments. The adapter keeps the hub and common IAM scaffolding `shared`, while the FinOps VCN, its DRG attachment, FinOps compartment and FinOps-specific IAM objects follow the selected scope. It uses exact resource scopes, not matches against resource names.
+
+The three outputs are:
+
+| File | Use |
+| --- | --- |
+| `finops_iam.auto.tfvars.json` | Reviewed copy of the Step 1 IAM input. |
+| `finops_network.auto.tfvars.json` | Reviewed copy of the Step 1 network input. |
+| `finops_adb.auto.tfvars.json` | Tag variables for the Step 2 Terraform configuration. Stage this file only with that Terraform root, not as an orchestrator input. Supply its other required variables separately. |
+
+When FinOps tags are enabled, provide `owner_email`, `cost_center_assignments` and `cost_center_business_units` under `cost_governance`. Reuse the design's existing business values. Assignments must cover both shared resources and the selected environment, including the `iam`, `network`, `security` and `finops` Platform values that apply there. The adapter rejects missing ownership, unmatched scopes and overlapping assignments instead of emitting unresolved values. Platform-based rules can intentionally assign different cost centers to IAM, networking and ADB; the ADB file carries separate common/IAM and database overrides from that same mapping. It does not create tag definitions: ensure the deployed governance configuration accepts the resulting values.
+
+With `cost_governance.enable_tags: false`, the adapter strips FinOps tags from both JSON copies and emits `enable_cost_governance_tags: false` with empty common and database tag maps for Step 2. Other tags are retained. The published input files and their default tagging behavior remain unchanged. Studio downloads do not automatically run this adapter.
+
 Follow the deployment sheet below to setup the FinOps platform in your tenancy on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint with IaC declarations.  This will not provision the ADB, but this is a reusable operation you can use to setup the FinOps platform in **any** Operating Entities Landing Zone blueprint.
 
 

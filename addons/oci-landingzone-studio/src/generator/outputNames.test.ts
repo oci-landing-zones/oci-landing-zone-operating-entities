@@ -19,6 +19,13 @@ describe('deploymentStages', () => {
     expect(stages[1].files).toEqual([...persistent, 'network.json', ...final, ...workloads]);
   });
 
+  it('replaces governance bootstrap with the final labelled governance without duplicate families', () => {
+    const stages = deploymentStages(['iam.json', 'governance_pre.json', 'governance.json', 'network.json', 'security_cis2_pre.json', 'security_cis2.json']);
+    expect(stages[0].files).toContain('governance_pre.json');
+    expect(stages[0].files).not.toContain('governance.json');
+    expect(stages[1].files).toContain('governance.json');
+    expect(stages[1].files).not.toContain('governance_pre.json');
+  });
   it('keeps design, guide, diagram and runtime dependency files out of both phases', () => {
     const stages = deploymentStages(['network.json', 'config.jsonnet', 'README.txt', 'design.drawio',
       'compartments_output.json', 'network_output.json']);
@@ -39,9 +46,22 @@ describe('deploymentStages', () => {
     expect(() => deploymentStages(['network.json'], 'network_backends.json')).toThrow('network_backends.json');
   });
 
+  it.each([1, 2])('includes complete CIS%s observability in the initial apply when no pre file exists', (cis) => {
+    const observability = `observability_cis${cis}.json`;
+    const stages = deploymentStages(['network.json', `security_cis${cis}_pre.json`, `security_cis${cis}.json`, observability]);
+    expect(stages[0].files).toContain(observability);
+    expect(stages[1].files).toContain(observability);
+    expect(stages[0].files).not.toContain(`security_cis${cis}.json`);
+  });
+
 });
 
 describe('isCurrentOutputSet', () => {
+  it.each([1, 2])('regenerates cached CIS%s bundles with obsolete partial observability', (cis) => {
+    const saved = { config: '{}', files: { 'network.json': '{}', [`observability_cis${cis}.json`]: '{}' } };
+    expect(isCurrentOutputSet(saved, saved.config)).toBe(true);
+    expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, [`observability_cis${cis}_pre.json`]: '{}' } }, saved.config)).toBe(false);
+  });
   it('accepts current outputs and requires regeneration after design or network-format changes', () => {
     const saved = { config: '{ cis_level: 2 }', files: { 'network.json': '{}' } };
     expect(isCurrentOutputSet(saved, saved.config)).toBe(true);

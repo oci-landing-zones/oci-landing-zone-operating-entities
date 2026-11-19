@@ -3,9 +3,12 @@ import type { LzModel } from '../model/types';
 import { buildConfig, okeExtension, type EnvConfigEntry, type LzConfig, type PlatformConfigEntry } from './lzConfig';
 import { defaultDrPlatformCidrs, drRegionOptions, type DrDesignDraft } from './disasterRecoveryDesign';
 import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './cidr';
+import { validateCloudGuard } from './cloudGuard';
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
 import { deploymentReadme } from './deployment';
+import { costCenterReferenceErrors, defaultCostGovernance, ownerEmail, ownerEmailError } from './costGovernance';
+import { regionalCostGovernanceConfig } from './regionalCostGovernance';
 
 type EnvironmentConfig = Omit<EnvConfigEntry, 'project_network'> & { project_network?: EnvConfigEntry['project_network'] };
 interface RpcConfig { remote_cidrs: string[]; peer_region_name: string; peer_id?: string }
@@ -49,14 +52,16 @@ function validateNetworks(config: RegionalFileConfig, homeRanges: string[] = [])
 
 /** Build independent generator inputs; tenancy-level prerequisites remain Home-owned. */
 export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home: RegionalFileConfig; dr: RegionalFileConfig } {
+  const referenceErrors = costCenterReferenceErrors(model);
+  if (referenceErrors.length) throw new Error(referenceErrors.join('\n'));
   const region = drRegionOptions(model).find((item) => item.id === draft.region);
   if (!region || !draft.regionConfirmed) throw new Error('Select and confirm a different DR region before generating.');
   if (!draft.hubNetwork) throw new Error('Configure the DR hub VCN and subnets before generating.');
-  const emails = [...validateNotificationEmails(model.foundation.notifications), ...validateNotificationEmails(draft.notifications ?? model.foundation.notifications)];
+  const emails = [...validateCloudGuard(model), ...validateNotificationEmails(model.foundation.notifications, false, model.foundation.cloudGuardEnabled !== false), ...validateNotificationEmails(draft.notifications ?? model.foundation.notifications, true, false)];
   if (emails.length) throw new Error(emails.join('\n'));
   const home: RegionalFileConfig = { ...structuredClone(buildConfig(model)), stack_scope: 'complete', dr_region: region.id };
   const dr: RegionalFileConfig = {
-    ...structuredClone(buildConfig({ ...model, foundation: { ...model.foundation, notifications: draft.notifications ?? model.foundation.notifications } })),
+    ...structuredClone(buildConfig({ ...model, foundation: { ...model.foundation, stackScope: 'regional', notifications: draft.notifications ?? model.foundation.notifications } })),
     stack_scope: 'regional', region: region.id, region_short_name: region.shortName,
     hub: { kind: draft.hubKind, network: { vcn: draft.hubNetwork.hubVcnCidr.trim(), subnets: Object.fromEntries(draft.hubNetwork.subnets.map((subnet) => [subnet.name, subnet.cidr.trim()])) } },
     environments: {}, shared_platforms: {}, security_targets: [],
@@ -136,6 +141,12 @@ export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home
     const id = generic ? `shared:${generic.id}` : `extension:shared:${key}`;
     if (selected.has(id)) dr.shared_platforms[key] = platformEntry(entry, id);
   }
+  const tagEnvironments = model.environments.filter((env) => Object.hasOwn(dr.environments, envNames.get(env.name.trim())!))
+    .map((env) => ({ ...env, name: envNames.get(env.name.trim())! }));
+  const tagProjects = model.projects.flatMap((project) => tagEnvironments.filter((env) => project.environments === 'all' || project.environments.includes(env.id))
+    .map((env) => ({ ...project, id: `${project.id}:${env.id}`, name: draft.projectNames?.[env.id]?.[project.id]?.trim() || project.name, environments: [env.id] })));
+  const projectOrigins = Object.fromEntries(model.projects.flatMap((project) => tagEnvironments.map((env) => [`${project.id}:${env.id}`, project.id])));
+  dr.cost_governance = regionalCostGovernanceConfig(model, { environments: tagEnvironments, projects: tagProjects }, projectOrigins);
   validateNetworks(home);
   validateNetworks(dr, vcnRanges(home));
   if (draft.rpcEnabled) {
@@ -152,6 +163,9 @@ function findRpcKeys(value: unknown): string[] {
 }
 
 export async function generateDrFileBundle(model: LzModel, draft: DrDesignDraft, onProgress?: (message: string) => void): Promise<Record<string, string>> {
+  const cost = model.foundation.costGovernance ?? defaultCostGovernance();
+  const ownerError = cost.tagsEnabled === false ? null : ownerEmailError(ownerEmail(cost));
+  if (ownerError) throw new Error(`tag-lz-owner: ${ownerError}`);
   const { home, dr } = buildDrFileConfigs(model, draft);
   const { generateFromConfigCode } = await import('../generator/generate');
   const serialize = (config: RegionalFileConfig) => `${JSON.stringify(config, null, 2)}\n`;

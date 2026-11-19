@@ -7,6 +7,9 @@ const LINE_HEIGHT = 14;
 const ICON_SIZE = 24;
 const ROW_GAP = 2;
 const LABELS: Record<ResourceKind, string> = {
+  identitydomain: 'Identity Domain',
+  budgets: 'Budgets',
+  requiredtags: 'Required tags',
   bastion: 'OCI Bastion',
   events: 'Events',
   vault: 'Vault',
@@ -17,7 +20,14 @@ const LABELS: Record<ResourceKind, string> = {
 };
 
 // These are service glyphs; resource names are supplied only by Jsonnet output.
+const GROUP_ICON = '<circle cx="22" cy="12" r="6"/><circle cx="8" cy="15" r="5"/><circle cx="36" cy="15" r="5"/><path d="M12 40V29c0-6 4-10 10-10s10 4 10 10v11M2 38V29c0-5 3-8 7-8m33 17V29c0-5-3-8-7-8M18 40V29m8 11V29"/>';
+const DOMAIN_ICON = '<path d="M6 22H3c0-7 4-11 10-11C16 2 30 2 33 11c7 0 10 5 10 11h-5M22 13l12 5v9c0 7-6 12-12 15-6-3-12-8-12-15v-9Z"/><circle cx="22" cy="25" r="4"/><path d="M16 35c1-5 11-5 12 0"/>';
+const BUDGET_ICON = '<ellipse cx="16" cy="10" rx="12" ry="5"/><path d="M4 10v9c0 7 24 7 24 0v-9M4 19v9c0 6 15 7 22 3"/><circle cx="30" cy="29" r="12"/><path d="M30 21v16m4-13h-6a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-6"/>';
+const TAG_ICON = '<path d="M4 5h18l17 17-18 18L4 23Z"/><circle cx="12" cy="13" r="3"/><path d="m18 24 5 5 9-11"/>';
 const ICONS: Record<ResourceKind, string> = {
+  budgets: BUDGET_ICON,
+  requiredtags: TAG_ICON,
+  identitydomain: DOMAIN_ICON,
   // Reuse the OCI Bastion glyph embedded in the Multi-OE service-provider design.
   bastion: `<g transform="translate(8 1)" fill="${TEAL}" stroke="none"><path d="M2.52,38.14V35.48H14a7,7,0,0,1,.2-1.53H4.31L5,19.48h13.4l.44,9.75A6.26,6.26,0,0,1,20.32,29l-.43-9.53h.16a1.72,1.72,0,0,0,1.71-1.72v-8H16.43v3.05h-2.1V9.76h-1.9v-3h4.06a.13.13,0,0,1,.13.13h0a1.67,1.67,0,0,0,1.66,1.59h5.85L22.39,5.62l1.7-2.91H18.14v0A1.69,1.69,0,0,0,16.46,1H10.9V9.76H9v3.05H6.9V9.76H1.57v8a1.72,1.72,0,0,0,1.72,1.72h.15L2.79,34H1v5.72H15.39a6.58,6.58,0,0,1-.91-1.53ZM21.43,4.24l-.82,1.4.78,1.26H18.28a.13.13,0,0,1-.14-.13V4.24Zm-5-1.72a.17.17,0,0,1,.16.17V5.2H12.43V2.52ZM3.29,18a.18.18,0,0,1-.19-.19V11.29H5.38v3h5.14v-3h2.29v3H18v-3h2.29v6.47a.19.19,0,0,1-.19.19H3.29Z"/><path d="M20.52,30.14A5.43,5.43,0,1,0,26,35.57,5.43,5.43,0,0,0,20.52,30.14Zm0,9.34a3.91,3.91,0,1,1,3.91-3.91A3.91,3.91,0,0,1,20.52,39.48Z"/><polygon points="21.88 33.74 19.78 35.84 19.13 35.19 18.05 36.26 19.78 38 22.96 34.82 21.88 33.74"/><polygon points="13.23 22.48 14.22 23.48 10.14 23.48 10.14 25 14.2 25 13.23 25.97 14.3 27.05 17.13 24.23 14.3 21.41 13.23 22.48"/><polygon points="10.18 26.55 9.1 25.48 6.28 28.3 9.1 31.12 10.18 30.04 9.33 29.19 13.19 29.19 13.19 27.67 9.06 27.67 10.18 26.55"/></g>`,
   events: '<path d="M10 9h8m7 9 9-9M25 26l9 9M8 24h8"/><circle cx="21" cy="21" r="7"/><rect x="3" y="3" width="7" height="7"/><rect x="34" y="3" width="7" height="7"/><rect x="34" y="34" width="7" height="7"/><path d="m3 20 4-7 4 7Z"/>',
@@ -58,7 +68,42 @@ function wrap(value: string, width: number, fontSize: number): string[] {
   return lines;
 }
 
+export function managementGroupLayout(kind: 'identitydomain' | 'budgets', items: { key: string; name: string }[], width: number) {
+  const domain = kind === 'identitydomain';
+  const sideBySide = width >= 600;
+  const leftWidth = sideBySide ? 200 : 12;
+  const textWidth = sideBySide ? leftWidth - 24 : width - 88;
+  const headingLines = wrap(LABELS[kind], Math.max(30, textWidth), 12);
+  const nameLines = wrap(domain ? items[0]?.name ?? '' : 'Platform: governance', Math.max(30, textWidth), 12);
+  const groupTop = sideBySide ? 12 : Math.max(80, 54 + (headingLines.length + nameLines.length) * LINE_HEIGHT);
+  const gap = 10;
+  const available = width - leftWidth - 12;
+  const groups = domain ? items.slice(1) : items;
+  const columns = Math.max(1, Math.min(6, groups.length, Math.floor((available + gap) / 160)));
+  const cardWidth = Math.min(180, (available - (columns - 1) * gap) / columns);
+  const rows = groups.map((item) => ({ ...item, lines: wrap(item.name, Math.max(24, cardWidth - 16), 11), x: 0, y: 0, width: cardWidth, height: 0 }));
+  let y = groupTop;
+  for (let index = 0; index < rows.length; index += columns) {
+    const row = rows.slice(index, index + columns);
+    const height = 72 + Math.max(...row.map((item) => item.lines.length)) * LINE_HEIGHT;
+    row.forEach((item, column) => Object.assign(item, { x: leftWidth + column * (cardWidth + gap), y, height }));
+    y += height + gap;
+  }
+  const height = Math.max(92 + (headingLines.length + nameLines.length) * LINE_HEIGHT, y + 2);
+  return { label: LABELS[kind], headingLines, headingYs: headingLines.map((_, i) => (sideBySide ? 76 : 34) + i * LINE_HEIGHT),
+    textX: sideBySide ? 12 : 72, nameTop: sideBySide ? 96 : 54, nameLines, iconY: 16, headerCenter: 36, rows, bodyTop: groupTop, height };
+}
+
+function managementGroupSvg(kind: 'identitydomain' | 'budgets', items: { key: string; name: string }[], width: number): string {
+  const layout = managementGroupLayout(kind, items, width);
+  const icon = (glyph: string, x: number, y: number, size: number) => `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 44 44"><g fill="#ffffff" stroke="${TEAL}" stroke-width="1.8" stroke-linejoin="round">${glyph}</g></svg>`;
+  const cards = layout.rows.map((row) => `<g><title>${escapeXml(row.name)}</title><rect x="${row.x}" y="${row.y}" width="${row.width}" height="${row.height}" fill="#ffffff" stroke="#96938d" stroke-dasharray="2 2"/>${icon(kind === 'identitydomain' ? GROUP_ICON : BUDGET_ICON, row.x + (row.width - 44) / 2, row.y + 8, 44)}${row.lines.map((line, i) => `<text x="${row.x + row.width / 2}" y="${row.y + 68 + i * LINE_HEIGHT}" text-anchor="middle" font-size="11">${escapeXml(line)}</text>`).join('')}</g>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${layout.height}" viewBox="0 0 ${width} ${layout.height}"><g font-family="${FONT}" fill="${INK}"><title>${escapeXml(kind === 'identitydomain' ? items[0]?.name ?? 'Identity Domain' : 'Budgets')}</title><rect x="0.75" y="0.75" width="${width - 1.5}" height="${layout.height - 1.5}" rx="8" fill="#ffffff" stroke="#96938d"/>${icon(kind === 'identitydomain' ? DOMAIN_ICON : BUDGET_ICON, 16, 16, 44)}${layout.headingLines.map((line, i) => `<text x="${layout.textX}" y="${layout.headingYs[i]}" font-size="12" font-weight="700">${escapeXml(line)}</text>`).join('')}${layout.nameLines.map((line, i) => `<text x="${layout.textX}" y="${layout.nameTop + (layout.headingLines.length - 1 + i) * LINE_HEIGHT}" font-size="12" font-weight="700">${escapeXml(line)}</text>`).join('')}${cards}</g></svg>`;
+}
+
 export function resourceGroupLayout(kind: ResourceKind, items: { key: string; name: string }[], width: number) {
+  if (kind === 'identitydomain' || kind === 'budgets') return managementGroupLayout(kind, items, width);
+  if (kind === 'requiredtags') return { label: 'Required tags', headingLines: ['Required tags'], headingYs: [24], iconY: 10, headerCenter: 28, rows: [], bodyTop: 40, height: 60 };
   const label = LABELS[kind];
   const headingLines = wrap(label, width - 42, 12);
   const headerHeight = Math.max(ICON_SIZE, headingLines.length * LINE_HEIGHT);
@@ -79,6 +124,8 @@ export function resourceGroupLayout(kind: ResourceKind, items: { key: string; na
 
 /** Both renderers embed this same measured resource block. */
 export function resourceGroupSvg(kind: ResourceKind, items: { key: string; name: string }[], width: number): string {
+  if (kind === 'identitydomain' || kind === 'budgets') return managementGroupSvg(kind, items, width);
+  if (kind === 'requiredtags') return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="60" viewBox="0 0 ${width} 60"><g font-family="${FONT}" fill="${INK}"><title>${escapeXml(items.map((item) => item.name).join(', '))}</title><rect x="0.75" y="0.75" width="${width - 1.5}" height="58.5" rx="6" fill="#ffffff" stroke="#96938d"/><svg x="8" y="10" width="36" height="36" viewBox="0 0 44 44"><g fill="none" stroke="${TEAL}" stroke-width="1.8">${TAG_ICON}</g></svg><text x="54" y="24" font-size="12" font-weight="700">Required tags</text><text x="54" y="44" font-size="10">${items.length} tags · governance · shared</text></g></svg>`;
   const layout = resourceGroupLayout(kind, items, width);
   const rows = layout.rows.map((row) => {
     const text = row.lines.map((line, index) => `<text x="${index ? 17 : 8}" y="${row.y + index * LINE_HEIGHT}" font-size="11">${index ? '' : '• '}${escapeXml(line)}</text>`).join('');

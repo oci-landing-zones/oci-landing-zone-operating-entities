@@ -1,3 +1,4 @@
+local cost_tags = import '../../../lib/cost_tags.libsonnet';
 local extensions = import '../../../extensions.libsonnet';
 local render_context = import '../../../render_context.libsonnet';
 local exacc = import '../exacc.libsonnet';
@@ -62,7 +63,7 @@ local products = import '../../exadb/products.libsonnet';
       else platform_db_key(exacc_entries[0].scope);
     local security_compartment = n.key_global('CMP', ['SECURITY']);
 
-    {
+    cost_tags.apply({
       identity: extension_state.iam {
         compartments_configuration: {
           enable_delete: 'true',
@@ -84,5 +85,5 @@ local products = import '../../exadb/products.libsonnet';
           default_compartment_id: security_compartment,
         },
       },
-    }
+    }, ctx.config)
 }

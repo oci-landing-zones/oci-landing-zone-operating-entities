@@ -5,7 +5,7 @@ import {
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { createDrDraft } from './disasterRecoveryDesign';
 import { legacyRegionalModel } from './regionalDeployment';
-import { serializeConfig } from './lzConfig';
+import { buildConfig, serializeConfig } from './lzConfig';
 import { isCurrentOutputSet } from '../generator/outputNames';
 import { drDesignFingerprint, isCurrentDrOutputSet } from './disasterRecoverySavedDesign';
 
@@ -31,6 +31,20 @@ beforeEach(() => {
 });
 
 describe('lzStore', () => {
+  it('reopens pre-FinOps browser records disabled without rewriting the saved source', () => {
+    const saved = createSaved('Pre-FinOps design');
+    delete saved.model.foundation.costGovernance;
+    const raw = JSON.stringify(saved);
+    window.localStorage.setItem(`lzng.lz.${saved.id}`, raw);
+    const reopened = getLZ(saved.id)!;
+    expect(reopened.name).toBe(saved.name);
+    expect(reopened.model.foundation.costGovernance?.tagsEnabled).toBe(false);
+    expect(buildConfig(reopened.model).cost_governance?.enable_tags).toBe(false);
+    expect(window.localStorage.getItem(`lzng.lz.${saved.id}`)).toBe(raw);
+    expect(saveLZ(saved.id, reopened.model).ok).toBe(true);
+    expect(getLZ(saved.id)?.model.foundation.costGovernance?.tagsEnabled).toBe(false);
+  });
+
   it.each(['regional', 'complete'] as const)('retains and restores the original combined source when the first edit uses %s scope', (scope) => {
     const home = emptyLzModel();
     const draft = { ...createDrDraft(home), region: 'eu-amsterdam-1' };

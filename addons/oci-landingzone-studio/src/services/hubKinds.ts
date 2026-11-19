@@ -99,3 +99,10 @@ export function hubKindDefaults(id: HubKind): { hubVcnCidr: string; subnets: Sub
     subnets: def.defaultSubnets.map((sn) => ({ ...sn })),
   };
 }
+
+/** Names reserved for fixed hub infrastructure cannot be repurposed as custom subnets. */
+export function hubCustomSubnetNameError(name: string): string | null {
+  if (HUB_KINDS.some((kind) => kind.defaultSubnets.some((subnet) => subnet.name === name))) return 'This name is reserved for hub infrastructure.';
+  return /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(name) ? null
+    : 'Use lowercase letters, numbers or hyphens; start and end with a letter or number.';
+}

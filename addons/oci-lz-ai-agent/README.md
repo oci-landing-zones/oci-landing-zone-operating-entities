@@ -80,6 +80,35 @@ The AI Agent works within the [Blueprint Factory](../oci-lz-blueprint-factory/RE
 
 This approach keeps AI assistance anchored in the repository landing zone patterns and best practices while enabling customization.
 
+### Optional FinOps tags
+
+For new designs, FinOps tags are disabled by default, as in [Landing Zone Studio](../oci-landingzone-studio/README.md). After the security baseline is selected, the agent asks whether to enable them. IAM role tags used by policies and compartment-based budgets remain available in either case.
+
+If you enable FinOps tags, the agent configures six tags with required values and their associated tag-based budgets:
+
+| Tag | How values are defined |
+|---|---|
+| Platform | Derived from the selected landing zone components. |
+| Environment | Derived from the selected environments. |
+| Project | Derived from the selected projects. |
+| Business Unit | You provide the business units. |
+| Cost Center | You provide the centers, their business units and the scopes where they apply. |
+| Owner | You provide one valid responsible-owner email address. |
+
+The agent collects these inputs one question at a time and presents a summary before generation. Each Business Unit needs at least one Cost Center. The scope of each center can use Platform, Environment and Project values from the design; overlapping assignments must be resolved. Shared-service and not-applicable values follow the existing Blueprint Factory rules.
+
+If you decline, generated files exclude the six FinOps tag definitions, defaults, resource assignments and tag-based budgets. The agent explicitly disables them in the source configuration, because omitting the setting retains Blueprint Factory's legacy defaults. This customization uses Blueprint Factory without changing published One-OE JSON files.
+
+Home owns governance definitions and budgets; a linked DR design follows its selection and business mappings. When updating an existing design, the agent preserves its current selection unless you request a change. Enabling tags prepares cost allocation metadata; deploying and configuring the [FinOps add-on](../oci-finops/README.md) is a separate step.
+
+### Notification and budget recipients
+
+Before generating files, the agent asks which email addresses should receive events and alarms. You can use one list for all topics and both regions, or different recipients by topic or region. These recipients are independent of the FinOps Owner tag and are required even when FinOps tags are disabled.
+
+The agent then asks whether budget alerts should use the same recipients or a separate list. This also applies to compartment-based budgets when FinOps tags are disabled. Explicit answers already provided are reused; existing valid settings are preserved when updating a design.
+
+Both choices appear in the review summary before generation. The agent checks the generated notification subscriptions and budget alerts against your answers. If you explicitly defer recipients or request sample addresses, the files are marked as an incomplete draft requiring those values before deployment.
+
 ### Example of complete OKE one-shot prompt to Generate Landing Zone
 
 ```text

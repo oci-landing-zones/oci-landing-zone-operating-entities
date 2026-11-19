@@ -1,4 +1,5 @@
 import type { LzModel } from '../model/types';
+import { inheritRegionalCostGovernance } from './regionalCostGovernance';
 import { configuredVcnCidrs, reconcileExadata } from './exadata';
 import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv, customDefaultSubnets } from './platforms';
 import { environmentPlatformCidr } from './oneOeCidrs';
@@ -54,6 +55,7 @@ export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
         ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) } };
     }
   }
-  const synced = reconcileExadata(next);
+  const reconciled = reconcileExadata(next);
+  const synced = { ...reconciled, foundation: { ...reconciled.foundation, costGovernance: inheritRegionalCostGovernance(home, reconciled) } };
   return JSON.stringify(synced) === JSON.stringify(dr) ? dr : synced;
 }

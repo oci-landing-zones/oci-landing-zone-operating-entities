@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { importConfigFile } from '../services/configImportFile';
-import type { ImportedConfig } from '../services/importConfig';
+import { resolveImportedFinOps, type ImportedConfig } from '../services/importConfig';
 import { createLZ } from '../services/lzStore';
 import { oracle } from '../theme';
 import { ErrorNotice } from './FieldError';
@@ -12,6 +12,20 @@ const button: React.CSSProperties = {
 };
 const primary: React.CSSProperties = { ...button, background: oracle.red, color: '#fff', border: `1px solid ${oracle.redDark}` };
 
+export function FinOpsImportChoice({ value, onChange }: { value: boolean | null; onChange: (enabled: boolean) => void }) {
+  return <fieldset aria-describedby="import-finops-description" style={{ margin: '20px 0 0', padding: 16, border: `1px solid ${oracle.border}`, borderRadius: 6 }}>
+    <legend style={{ fontSize: 14, fontWeight: 700 }}>FinOps tags</legend>
+    <p id="import-finops-description" style={{ margin: '0 0 8px', fontSize: 14 }}>
+      This older export contains FinOps settings but does not record whether FinOps tags were enabled. Choose how to import them. Keeping tags preserves their saved values; disabling them omits FinOps tags and tag-based budgets from new downloads. Compartment-based budgets remain available.
+    </p>
+    {[{ enabled: true, label: 'Keep FinOps tags' }, { enabled: false, label: 'Disable FinOps tags' }].map(({ enabled, label }) =>
+      <label key={String(enabled)} style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 44, cursor: 'pointer', fontSize: 14 }}>
+        <input type="radio" name="import-finops" value={enabled ? 'enabled' : 'disabled'} required checked={value === enabled} onChange={() => onChange(enabled)} />
+        {label}
+      </label>)}
+  </fieldset>;
+}
+
 export default function ImportLandingZoneDialog({ onClose, onImported }: { onClose: () => void; onImported: (id: string) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -21,6 +35,7 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<ImportedConfig | null>(null);
+  const [finOpsChoice, setFinOpsChoice] = useState<boolean | null>(null);
   const [name, setName] = useState('');
   const [filename, setFilename] = useState('');
 
@@ -37,6 +52,7 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
     event.target.value = '';
     if (!file) return;
     setPending(null);
+    setFinOpsChoice(null);
     setError(null);
     setFilename(file.name);
     setImporting(true);
@@ -57,7 +73,10 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
   function confirmImport(event: React.FormEvent) {
     event.preventDefault();
     if (!pending || !name.trim()) return;
-    const created = createLZ(name, pending.model);
+    let model;
+    try { model = resolveImportedFinOps(pending, finOpsChoice); }
+    catch (err) { setError(err instanceof Error ? err.message : 'Choose how to import FinOps tags.'); return; }
+    const created = createLZ(name, model);
     if (!created.ok || !created.record) {
       setError(created.message ?? 'Could not save the imported Landing Zone.');
       return;
@@ -96,9 +115,11 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
               style={{ boxSizing: 'border-box', width: '100%', padding: '10px 12px', font: 'inherit', color: oracle.text,
                 background: oracle.appBg, border: `1px solid ${oracle.border}`, borderRadius: 4 }} />
             {pending.warnings.map((warning) => <p key={warning} style={{ fontSize: 14 }}>{warning}</p>)}
+            {pending.requiresFinOpsChoice && <FinOpsImportChoice value={finOpsChoice} onChange={setFinOpsChoice} />}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 24 }}>
-            <button type="submit" disabled={!name.trim()} style={{ ...primary, ...(!name.trim() ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }}>Import Landing Zone</button>
+            <button type="submit" disabled={!name.trim() || !!pending.requiresFinOpsChoice && finOpsChoice === null}
+              style={{ ...primary, ...(!name.trim() || pending.requiresFinOpsChoice && finOpsChoice === null ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }}>Import Landing Zone</button>
             <button type="button" onClick={onClose} style={button}>Cancel</button>
           </div>
         </form>

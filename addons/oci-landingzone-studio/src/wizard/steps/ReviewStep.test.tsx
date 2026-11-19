@@ -6,6 +6,7 @@ import { WizardProvider } from '../wizardContext';
 import { emptyHybridConnectivity, newVpn } from '../../services/hybridConnectivity';
 import ReviewStep from './ReviewStep';
 import { serializeConfig } from '../../services/lzConfig';
+import { defaultCostGovernance } from '../../services/costGovernance';
 
 const stored = vi.hoisted(() => ({ outputs: {} as Record<string, { config: string; files: Record<string, string> }> }));
 vi.mock('react-router-dom', async (original) => ({ ...await original<typeof import('react-router-dom')>(), useParams: () => ({ id: 'dr' }) }));
@@ -13,6 +14,15 @@ vi.mock('../../services/lzStore', async (original) => ({ ...await original<typeo
 beforeEach(() => { stored.outputs = {}; });
 
 describe('Resource Manager deployment link', () => {
+  it('shows a recoverable cost-center error and blocks download after an environment is deleted', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
+      CC12345: { platform: null, environment: ['environment:deleted'], project: null },
+    } };
+    const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Recoverable design" /></WizardProvider></MemoryRouter>);
+    expect(html).toContain('selected environment is no longer available');
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Download files<\/button>/);
+  });
   it('uses current factory files instead of cached files while retaining Hub C backend selection', () => {
     const model = emptyLzModel();
     model.foundation.stackScope = 'regional';
@@ -43,6 +53,7 @@ describe('Resource Manager deployment link', () => {
 
   it('summarizes enabled Bastion access and blocks downloads for an invalid client allowlist', () => {
     const model = emptyLzModel();
+    model.foundation.costGovernance!.recipients = 'finops@example.com';
     model.foundation.notifications!.default = 'ops@example.com';
     model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32', maxSessionTtlInSeconds: 3600 };
     const render = () => renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Bastion" /></WizardProvider></MemoryRouter>);
@@ -153,10 +164,10 @@ it('shows each phase input list before its apply action and keeps unrelated alte
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={emptyLzModel()}><ReviewStep designName="Home" /></WizardProvider></MemoryRouter>);
   const prepare = html.indexOf('1. Prepare the files');
   const create = html.indexOf('2. Create and apply phase 1');
-  const firstInputs = html.indexOf('>security_cis2_pre.json</code>');
+  const firstInputs = html.indexOf('>security_cis1_pre.json</code>');
   const firstApply = html.indexOf('Select Create');
   const update = html.indexOf('3. Update and apply phase 2');
-  const finalInputs = html.indexOf('>security_cis2.json</code>');
+  const finalInputs = html.indexOf('>security_cis1.json</code>');
   const finalApply = html.indexOf('Save the updated variables');
   expect(prepare).toBeGreaterThan(-1);
   expect(create).toBeGreaterThan(prepare);

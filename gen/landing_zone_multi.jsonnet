@@ -4,6 +4,8 @@ function(config)
   local lz = import 'landing_zone.libsonnet';
   local result = lz(config);
   local cis_level = result.cis_level;
+  local normalized = (import 'config.libsonnet').normalize(config);
+  local label_tags = std.objectHas(normalized, 'cost_governance') && normalized.cost_governance.tag_resource_labels;
   local security_output(phase) =
     local security = result['security_cis%d%s' % [cis_level, phase]];
     if result.stack_scope != 'regional' then security else {
@@ -28,8 +30,8 @@ function(config)
       for key in std.objectFields(security)
       if !std.member(['cloud_guard_configuration', 'security_zones_configuration'], key)
     };
-  local observability_output(phase) =
-    local observability = result['observability_cis%d%s' % [cis_level, phase]];
+  local observability_output =
+    local observability = result['observability_cis%d' % cis_level];
     if result.stack_scope != 'regional' then observability else {
       [key]: observability[key]
       for key in std.objectFields(observability)
@@ -40,12 +42,12 @@ function(config)
     'network.json': result.network,
     ['security_cis%d_pre.json' % cis_level]: security_output('_pre'),
     ['security_cis%d.json' % cis_level]: security_output(''),
-    ['observability_cis%d_pre.json' % cis_level]: observability_output('_pre'),
-    ['observability_cis%d.json' % cis_level]: observability_output(''),
+    ['observability_cis%d.json' % cis_level]: observability_output,
   }
   + (if std.objectHas(result, 'network_backends') && result.network_backends != null then { 'network_backends.json': result.network_backends } else {})
   + (if std.objectHas(result, 'extra') then { [key + '.json']: result.extra[key] for key in std.objectFields(result.extra) } else {})
   + (if result.stack_scope == 'complete' then {
        'iam.json': result.iam,
-       'governance.json': result.governance,
+       'governance.json': if label_tags then (import 'lib/governance_resource_tags.libsonnet')(result.governance, normalized) else result.governance,
+       [if label_tags then 'governance_pre.json']: result.governance,
      } else {})

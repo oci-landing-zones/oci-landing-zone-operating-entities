@@ -4,6 +4,7 @@
 // function(inputs) -> { categories }
 
 local common = import '../hub/hub_common.libsonnet';
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(inputs)
   local n = inputs.naming;
@@ -56,6 +57,7 @@ function(inputs)
 
     local dedicated_sn(proj_name, project_index, subnet_name, subnet_index, cidr) = {
       [n.key('SN', key_segments + [proj_name, subnet_name])]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
         display_name: n.display('sn', name_segments + [proj_name, subnet_name]),
         cidr_block: cidr,
         // OCI DNS labels are limited to 15 characters. Stable sorted indexes
@@ -157,6 +159,7 @@ function(inputs)
         local proj_cmp = topo.env_project_compartment_key(entry, proj_name);
         acc {
         [web_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'web']),
           egress_rules: common._nsg_egress_all,
@@ -179,6 +182,7 @@ function(inputs)
           },
         },
         [app_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'app']),
           egress_rules: common._nsg_egress_all,
@@ -201,6 +205,7 @@ function(inputs)
           },
         },
         [db_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'db']),
           egress_rules: common._nsg_egress_all,

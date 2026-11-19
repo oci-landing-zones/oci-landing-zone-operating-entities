@@ -1,3 +1,5 @@
+// Hub E declares the network targets common to all four published hubs.
+// Firewall-specific subnets are covered by the VCN-level Flow Log.
 local profiles = import './profiles.libsonnet';
-local lz = import '../../../../landing_zone.libsonnet';
-lz(profiles.hub_a.config).observability_cis1
+local output = import './output_builder.libsonnet';
+output(profiles.hub_e).observability_cis1_explicit

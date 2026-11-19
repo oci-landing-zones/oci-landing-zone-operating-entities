@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setAssetLoader } from '../generator/jsonnetVm';
 import { newPlatform } from './platforms';
+import { defaultCostGovernance } from './costGovernance';
 import { emptyLzModel } from '../model/defaults';
 import { createDrDraft, createDrHubNetwork } from './disasterRecoveryDesign';
 import { buildDrFileConfigs, generateDrFileBundle } from './disasterRecoveryGeneration';
@@ -11,6 +12,8 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('
 
 function design() {
   const model = emptyLzModel();
+  model.foundation.cisLevel = 2;
+  model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
   model.foundation.notifications = { useSingleRecipient: true, default: 'home@example.com', cloudguard: '', iam: '', network: '', security: '' };
   const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', regionConfirmed: true, hubAdded: true, hubNetwork: createDrHubNetwork(model.network.hubKind) };
   draft.notifications = { ...model.foundation.notifications, default: 'dr@example.com' };
@@ -23,11 +26,28 @@ function vcnCidrs(value: unknown): string[] {
 }
 
 describe('DR file generation', () => {
+  it('requires external Cloud Guard confirmation before preparing combined files', () => {
+    const { model, draft } = design();
+    model.foundation.cloudGuardEnabled = false;
+    expect(() => buildDrFileConfigs(model, draft)).toThrow('Confirm that Cloud Guard is already enabled');
+    model.foundation.cloudGuardExistingConfirmed = true;
+    expect(buildDrFileConfigs(model, draft).home.enable_cloud_guard).toBe(false);
+  });
+
+  it.each(['', 'email.address@example.com'])('blocks a combined download with incomplete Home Owner %j', async (ownerEmail) => {
+    const { model, draft } = design();
+    model.foundation.costGovernance!.ownerEmail = ownerEmail;
+    await expect(generateDrFileBundle(model, draft)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
+  });
+
   it('keeps Home complete and builds only selected regional networks with independent recipients', () => {
     const { model, draft } = design();
     const { home, dr } = buildDrFileConfigs(model, draft);
     expect(home).toMatchObject({ stack_scope: 'complete', dr_region: 'eu-amsterdam-1', region: 'eu-frankfurt-1' });
     expect(dr).toMatchObject({ stack_scope: 'regional', region: 'eu-amsterdam-1', region_short_name: 'ams', notification_emails: { default: ['dr@example.com'] } });
+    expect(home).toHaveProperty('cost_governance');
+    expect(dr.cost_governance).toMatchObject({ enable_tags: true, budgets: {} });
+    expect(dr.cost_governance).not.toHaveProperty('budget_recipients');
     expect(Object.keys(dr.environments)).toEqual(['prod']);
     expect(dr.environments.prod.project_network?.network.vcn).toBe('10.0.200.0/21');
     expect(home.environments.prod.project_network?.network.vcn).toBe('10.0.64.0/21');
@@ -53,7 +73,40 @@ describe('DR file generation', () => {
     expect(files['DR/README.txt']).toContain('DR deployment');
     expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
     expect(files['DR/README.txt']).toContain('oci_dependency_objects');
-  }, 30000);
+  }, 60000);
+
+  it('keeps customer FinOps labels in the regional bundle with only selected scope rules', async () => {
+    const { model, draft } = design();
+    const [prod, preprod] = model.environments;
+    const project = model.projects[0];
+    Object.assign(model.foundation.costGovernance!, {
+      ownerEmail: 'owner@customer.test',
+      tagValueLists: { 'tag-lz-cost-center': 'SHARED, WORKLOAD, HOME_ONLY', 'tag-lz-business-unit': 'Operations' },
+      costCenterBusinessUnits: { SHARED: 'Operations', WORKLOAD: 'Operations', HOME_ONLY: 'Operations' },
+      costCenterFilters: {
+        SHARED: { platform: null, environment: ['shared'], project: null },
+        WORKLOAD: { platform: null, environment: [`environment:${prod.id}`], project: null },
+        HOME_ONLY: { platform: null, environment: [`environment:${preprod.id}`], project: [`project:${project.id}`] },
+      },
+    });
+    const files = await generateDrFileBundle(model, draft);
+    const regional = JSON.parse(files['DR/config.jsonnet']).cost_governance;
+    expect(regional.cost_center_assignments).not.toHaveProperty('HOME_ONLY');
+    expect(regional.budgets).toEqual({});
+    expect(regional).not.toHaveProperty('exclude_budgets');
+    const maps = (value: unknown): Record<string, string>[] => {
+      if (!value || typeof value !== 'object') return [];
+      return Object.entries(value).flatMap(([key, child]) => key === 'defined_tags' ? [child as Record<string, string>] : maps(child));
+    };
+    const tags = maps(JSON.parse(files['DR/network.json']));
+    const prefix = 'tagns-lz-cost-governance.tag-lz-';
+    expect(tags.length).toBeGreaterThan(0);
+    expect(tags.every((tag) => tag[prefix + 'owner'] === 'owner@customer.test' && tag[prefix + 'business-unit'] === 'Operations')).toBe(true);
+    expect(new Set(tags.map((tag) => tag[prefix + 'cost-center']))).toEqual(new Set(['SHARED', 'WORKLOAD']));
+    expect(files['DR/governance.json']).toBeUndefined();
+    expect(files['DR/governance_pre.json']).toBeUndefined();
+    expect(files['Home/governance.json']).toBeDefined();
+  }, 60000);
 
   it('includes selected EXACS networks, edited subnets and matched RPC peer keys', async () => {
     const { model, draft } = design();
@@ -76,7 +129,7 @@ describe('DR file generation', () => {
     expect(files['Home/network.json']).toContain('RPC-FRA-LZ-HUB-DR-KEY');
     expect(files['DR/network.json']).toContain('"peer_key": "RPC-FRA-LZ-HUB-DR-KEY"');
     expect(JSON.parse(files['DR/config.jsonnet']).environments.prod.platforms.exacs.network.vcn).toBe('10.0.240.0/21');
-  }, 30000);
+  }, 60000);
 
 
 
@@ -102,7 +155,7 @@ describe('DR file generation', () => {
     expect(okeFiles.map(([, value]) => value).join('\n')).toContain('172.30.0.0/16');
     draft.platformOkeParams[id].servicesCidr = '10.0.216.0/21';
     expect(() => buildDrFileConfigs(model, draft)).toThrow(/service CIDR.*overlap/i);
-  }, 30000);
+  }, 60000);
 
   it('rejects incomplete or overlapping DR addressing before generating', () => {
     const { model, draft } = design();

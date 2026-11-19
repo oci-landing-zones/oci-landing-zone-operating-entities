@@ -230,7 +230,7 @@ export default function EnvNetworkStep() {
         <div style={s.body}>
           <h2 style={s.title}>Projects</h2>
           <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
-            Choose an implemented hub model in step 2 first — the environment (spoke) networks and projects build on it.
+            Choose an implemented hub model in Hub Network first — the environment (spoke) networks and projects build on it.
           </div>
         </div>
       </section>

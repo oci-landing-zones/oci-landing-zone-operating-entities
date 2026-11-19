@@ -4,6 +4,7 @@ import HubNetworkStep, { VcnEditor } from './HubNetworkStep';
 import { WizardProvider } from '../wizardContext';
 import { emptyLzModel } from '../../model/defaults';
 import { emptyHybridConnectivity } from '../../services/hybridConnectivity';
+import { HUB_KINDS, hubKindDefaults } from '../../services/hubKinds';
 
 it('uses shared inline feedback for connectivity errors', () => {
   const model = emptyLzModel();
@@ -30,6 +31,33 @@ it('gives RPC, VPN and FastConnect independent, initially collapsed panels', () 
 });
 
 describe('VCN subnet validation', () => {
+  it.each(HUB_KINDS)('keeps $label subnet keys fixed while allowing CIDR edits', ({ id }) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: id, ...hubKindDefaults(id) };
+    const html = renderToStaticMarkup(<WizardProvider initialModel={model}><HubNetworkStep /></WizardProvider>);
+    model.network.subnets.forEach((subnet, index) => {
+      const nameInput = html.match(new RegExp(`<input[^>]*aria-label="Subnet ${index + 1} name"[^>]*>`))?.[0];
+      expect(nameInput).toContain(`value="${subnet.name}"`);
+      expect(nameInput).toContain('readOnly=""');
+      const cidrInput = html.match(new RegExp(`<input[^>]*aria-label="Subnet ${index + 1} CIDR"[^>]*>`))?.[0];
+      expect(cidrInput).toContain(`value="${subnet.cidr}"`);
+      expect(cidrInput).not.toMatch(/readOnly|disabled/);
+      expect(html).not.toContain(`aria-label="Delete subnet ${subnet.name}"`);
+    });
+    expect(html).toContain('Add custom subnet');
+    expect(html).toContain('Hub subnet names are required by the selected network model. You can change their CIDR ranges.');
+  });
+
+  it('keeps custom subnet controls available for unrestricted networks', () => {
+    const html = renderToStaticMarkup(<VcnEditor idPrefix="custom" vcnCidr="10.0.0.0/21" emptyNote="" onApply={() => {}}
+      subnets={[{ name: 'app', cidr: '10.0.0.0/24' }]} />);
+    const nameInput = html.match(/<input[^>]*aria-label="Subnet 1 name"[^>]*>/)?.[0];
+    expect(nameInput).toContain('value="app"');
+    expect(nameInput).not.toMatch(/readOnly|disabled/);
+    expect(html).toContain('aria-label="Delete subnet app"');
+    expect(html).toContain('Add custom subnet');
+  });
+
   it('keeps managed subnets read-only while leaving the VCN editable', () => {
     const html = renderToStaticMarkup(<VcnEditor idPrefix="managed" vcnCidr="10.0.0.0/20" emptyNote="" onApply={() => {}} readOnlySubnets
       subnets={[{ name: 'workers', cidr: '10.0.8.0/23' }]} />);

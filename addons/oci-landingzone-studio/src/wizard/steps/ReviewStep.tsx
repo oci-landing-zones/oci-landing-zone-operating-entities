@@ -1,5 +1,5 @@
 /**
- * ReviewStep — step 5 ("Review"). Summarises the model, then runs the *real* OCI
+ * ReviewStep — step 6 ("Review"). Summarises the model, then runs the *real* OCI
  * landing-zone jsonnet generator over the config the wizard has been building and
  * packages the resulting artifacts as one complete ZIP download.
  *
@@ -28,7 +28,10 @@ import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
 import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
+import { validateCloudGuard } from '../../services/cloudGuard';
 import { validateNotificationEmails } from '../../services/notificationEmails';
+import { validateCostGovernance } from '../../services/costGovernance';
+import { costCenterCoverageError, type UncoveredCostResource } from '../../services/costCenterCoverage';
 import { validateRemotePeering } from '../../services/remotePeering';
 import { validateRegionalDeployment } from '../../services/regionalDeployment';
 import { BASTION_DOCUMENTATION_URL, validateBastion } from '../../services/bastion';
@@ -99,7 +102,7 @@ function DeploymentText({ text }: { text: string }) {
   })}</>;
 }
 
-export default function ReviewStep({ designName, getDiagram, diagramReady = true, generatedFiles }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean; generatedFiles?: readonly string[] }) {
+export default function ReviewStep({ designName, getDiagram, diagramReady = true, generatedFiles, uncoveredCostResources }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean; generatedFiles?: readonly string[]; uncoveredCostResources?: readonly UncoveredCostResource[] }) {
   const { model, homeSource } = useWizard();
   const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
@@ -123,15 +126,18 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
   const exacs = exadataReadiness(model, 'exacs');
   const contractErrors = useMemo(() => {
     const shortNameError = regionShortNameError(model.foundation.regionShortName);
+    const coverageError = costCenterCoverageError(uncoveredCostResources ?? [], model);
     return [...new Set([
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
-      ...validateBastion(model),
-      ...validateNotificationEmails(model.foundation.notifications, regional),
+      ...validateBastion(model), ...validateCloudGuard(model),
+      ...validateNotificationEmails(model.foundation.notifications, regional, model.foundation.cloudGuardEnabled !== false),
+      ...validateCostGovernance(model),
+      ...(coverageError ? [coverageError] : []),
       ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
       ...platformReadiness(model, 'oke_simple').errors,
     ])];
-  }, [model, regional]);
+  }, [model, regional, uncoveredCostResources]);
   const hasSecrets = containsInlineSecrets(model.hybridConnectivity);
   const prerequisites = deploymentPrerequisites(deploymentConfig);
   const handover = deploymentHandover(deploymentConfig);
@@ -232,6 +238,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               ['Deployment', regional ? 'DR' : 'Home Region'],
               ['Region', model.foundation.region],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
+              ['Cloud Guard', regional ? 'Managed in Home Region' : model.foundation.cloudGuardEnabled === false ? (model.foundation.cloudGuardExistingConfirmed ? 'Managed externally' : 'Excluded; confirmation required') : 'Included'],
               ['Hub', hub?.label ?? model.network.hubKind],
               ['OCI Bastion', model.bastion?.enabled ? 'Hub management subnet' : 'Off'],
             ].map(([label, value]) => (
@@ -241,6 +248,9 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               </div>
             ))}
           </dl>
+          {model.network.subnets.some((subnet) => !hub?.defaultSubnets.some((required) => required.name === subnet.name)) && <p style={s.help}>
+            Custom hub subnets ({model.network.subnets.filter((subnet) => !hub?.defaultSubnets.some((required) => required.name === subnet.name)).map((subnet) => `${subnet.name}: ${subnet.cidr}`).join(', ')}) are private and share the mgmt route table and security list.
+          </p>}
           <ul style={local.counts} aria-label="Workloads and realm">
             <li>Realm {model.foundation.realm.toUpperCase()}</li>
             <li>{envCount} {envCount === 1 ? 'environment' : 'environments'}</li>

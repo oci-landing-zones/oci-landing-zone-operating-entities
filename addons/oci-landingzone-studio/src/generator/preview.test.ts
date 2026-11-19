@@ -6,6 +6,7 @@ import { generatePreview } from './preview';
 import { setAssetLoader } from './jsonnetVm';
 import { extractGeneratedResources } from '../services/generatedResources';
 import { newPlatform } from '../services/platforms';
+import { defaultCostGovernance } from '../services/costGovernance';
 import * as virtualFs from './virtualFs';
 import { defaultBastion } from '../services/bastion';
 import { buildGraph } from '../diagram/buildGraph';
@@ -16,9 +17,33 @@ import { buildRouteTables } from '../services/routeTables';
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 
 describe('canonical diagram preview', () => {
+  it('blocks generation without external Cloud Guard confirmation', async () => {
+    const model = emptyLzModel();
+    model.foundation.cloudGuardEnabled = false;
+    await expect(generateOutputs(model)).rejects.toThrow('Confirm that Cloud Guard is already enabled');
+  });
+
+  it.each([1, 2] as const)('excludes Cloud Guard resources consistently from CIS%d downloads and previews', async (cisLevel) => {
+    const model = emptyLzModel();
+    Object.assign(model.foundation, { cisLevel, cloudGuardEnabled: false, cloudGuardExistingConfirmed: true });
+    model.foundation.costGovernance!.recipients = 'budgets@customer.test';
+    const output = await generateOutputs(model);
+    const security = JSON.parse(output.files[`security_cis${cisLevel}.json`]);
+    expect(security).not.toHaveProperty('cloud_guard_configuration');
+    expect(security).toHaveProperty('security_zones_configuration');
+    const obs = JSON.parse(output.files[`observability_cis${cisLevel}.json`]);
+    expect(obs.notifications_configuration.topics).not.toHaveProperty('NOTT-LZ-CLOUDGUARD-KEY');
+    expect(obs.home_region_events_configuration.event_rules).not.toHaveProperty('RUL-LZ-CLOUDGUARD-KEY');
+    const preview = await generatePreview(model);
+    expect(preview.inventory.groups.flatMap((group) => group.items).some((item) => /cloudguard|cg-tgt/i.test(item.name))).toBe(false);
+    expect(preview.files).toEqual(Object.keys(output.files).sort());
+  }, 60_000);
+
   it.each([1, 2] as const)('matches deployable CIS%d artifacts and exports their Bastion identity', async (cisLevel) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = cisLevel;
+    model.foundation.costGovernance!.recipients = 'finops@example.com';
+    model.foundation.notifications!.default = 'ops@example.com';
     model.bastion = { ...defaultBastion(), enabled: true, clientCidrs: '203.0.113.10/32' };
     const generated = await generateOutputs(model);
     const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
@@ -29,9 +54,9 @@ describe('canonical diagram preview', () => {
     expect(network).toEqual(outputs['network.json']);
     expect(inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
     if (cisLevel === 2) {
-      expect([...new Set(inventory.groups.map((group) => group.kind))].sort()).toEqual(['bastion', 'events', 'flowlogs', 'notifications', 'scanning', 'securityrecipes', 'vault']);
+      expect([...new Set(inventory.groups.map((group) => group.kind))].sort()).toEqual(['bastion', 'budgets', 'events', 'flowlogs', 'identitydomain', 'notifications', 'scanning', 'securityrecipes', 'vault']);
       expect(inventory.groups.find((group) => group.kind === 'vault')?.items).toEqual([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
-      expect(inventory.groups.find((group) => group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
+      expect(inventory.groups.find((group) => group.kind === 'events' && group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
     }
     const group = inventory.groups.find((entry) => entry.kind === 'bastion')!;
     expect(group.items).toEqual(Object.entries(final.bastions).map(([key, value]) => ({ key,
@@ -48,17 +73,30 @@ describe('canonical diagram preview', () => {
     expect(decodeURIComponent(encoded!)).toBe(resourceGroupSvg('bastion', group.items, node.width));
   }, 60_000);
 
-  it('matches the selected deployable final artifacts and produces all six CIS2 resource families', async () => {
+  it('includes the additional identity domain and every generated management and project group', async () => {
     const model = emptyLzModel();
+    const preview = await generatePreview(model);
+    const domain = preview.inventory.groups.find((group) => group.id === 'identitydomain:COMMON-DOMAIN');
+    expect(domain?.compartmentKey).toBe('TENANCY-ROOT');
+    expect(domain?.items[0]).toMatchObject({ key: 'COMMON-DOMAIN', name: 'id_lz_common' });
+    expect(domain?.items.slice(1).map((item) => item.name).sort()).toEqual([
+      'grp-auditors-admin', 'grp-cost-admin', 'grp-iam-admin', 'grp-lz-network-admin',
+      'grp-lz-preprod-proj1-admin', 'grp-lz-prod-proj1-admin', 'grp-lz-security-admin', 'grp-security-admin',
+    ]);
+  }, 60_000);
+  it('matches the selected deployable final artifacts and produces the CIS2 resource families and identity domain', async () => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = 2;
+    model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const preview = await generatePreview(model);
     const generated = await generateOutputs(model);
     expect(preview.files).toEqual(Object.keys(generated.files).sort());
     const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
     expect(preview.network).toEqual(outputs['network.json']);
     expect(preview.inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
-    expect([...new Set(preview.inventory.groups.map((group) => group.kind))].sort()).toEqual(['events', 'flowlogs', 'notifications', 'scanning', 'securityrecipes', 'vault']);
-    expect(preview.inventory.groups.find((group) => group.kind === 'vault')?.items).toEqual([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
-    expect(preview.inventory.groups.find((group) => group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
+    expect([...new Set(preview.inventory.groups.map((group) => group.kind))].sort()).toEqual(['budgets', 'events', 'flowlogs', 'identitydomain', 'notifications', 'scanning', 'securityrecipes', 'vault']);
+    expect(preview.inventory.groups.find((group) => group.kind === 'vault')?.items).toMatchObject([{ key: 'VLT-LZ-SHARED-SECURITY-KEY', name: 'vlt-lz-shared-security' }]);
+    expect(preview.inventory.groups.find((group) => group.kind === 'events' && group.compartmentKey === 'TENANCY-ROOT')?.items.map((item) => item.name)).toContain('rul-lz-notify-on-iam-changes');
   }, 60_000);
 
   it('uses canonical CIS1 conditions instead of showing CIS2 vaults', async () => {
@@ -85,7 +123,7 @@ describe('canonical diagram preview', () => {
 
   it('honors regional output filtering while retaining Home compartment references for placement', async () => {
     const model = emptyLzModel();
-    Object.assign(model.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
+    Object.assign(model.foundation, { cisLevel: 2, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
     const { inventory } = await generatePreview(model);
     expect(inventory.groups.some((group) => group.kind === 'securityrecipes' || group.compartmentKey === 'TENANCY-ROOT')).toBe(false);
     expect(inventory.groups.some((group) => group.kind === 'vault')).toBe(true);
@@ -96,7 +134,7 @@ describe('canonical diagram preview', () => {
     expect(inventory.groups.filter((group) => group.kind === 'flowlogs').flatMap((group) => group.items.map((item) => item.name))).toContain('lgrp-lz-prod-vcn-flow');
   }, 60_000);
 
-  it('does not evaluate unrelated workload payloads or alarm definitions for the preview', async () => {
+  it('keeps unrelated workload inputs lazy while checking emitted resource configurations', async () => {
     const vfs = virtualFs.buildVirtualFs();
     const replacement = vi.spyOn(virtualFs, 'buildVirtualFs').mockReturnValueOnce({ ...vfs, files: {
       ...vfs.files,
@@ -105,9 +143,6 @@ describe('canonical diagram preview', () => {
         local outputs = (import 'original_multi.jsonnet')(config);
         outputs + {
           'runtime-workload.json': { deployment_ids: error 'Unrelated workload inputs must stay lazy' },
-          ['observability_cis%d.json' % config.cis_level]+: {
-            alarms_configuration: error 'Alarm payload must stay lazy',
-          },
         }`,
     } });
     try {

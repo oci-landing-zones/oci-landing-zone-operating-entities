@@ -34,7 +34,7 @@ export default function BastionSettings() {
         {bastion.enabled && <div style={{ display: 'grid', gap: 16 }}>
           <div>
             <label style={s.label} htmlFor="lz-bastion-client-cidrs">Allowed public IPv4 ranges (CIDR)</label>
-            <textarea id="lz-bastion-client-cidrs" style={{ ...s.input, minHeight: 92, resize: 'vertical' }} rows={3}
+            <textarea id="lz-bastion-client-cidrs" style={{ ...s.input, minHeight: 44, resize: 'vertical' }} rows={1}
               value={bastion.clientCidrs} onChange={(event) => update({ clientCidrs: event.target.value })}
               placeholder="203.0.113.10/32"
               {...fieldErrorProps('lz-bastion-client-cidrs-error', allowlistError, 'lz-bastion-client-cidrs-help')} />

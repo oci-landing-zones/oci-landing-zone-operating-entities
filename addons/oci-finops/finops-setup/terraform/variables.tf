@@ -1,5 +1,5 @@
 variable "tenancy_ocid" {
-  type = string
+  type        = string
   description = "Tenancy ocid"
 }
 
@@ -25,44 +25,61 @@ variable "autonomous_database_license_model" {
 }
 
 variable "adw_display_name" {
-  type = string
+  type        = string
   description = "ADW display name"
-  default = "FINOPS"
+  default     = "FINOPS"
 }
 
 variable "adw_db_name" {
-  type = string
+  type        = string
   description = "ADW database name"
-  default = "FINOPS"
+  default     = "FINOPS"
 }
 
 variable "db_version" {
-  type = string
+  type        = string
   description = "Database version."
-  default = "23ai"
+  default     = "23ai"
 }
 
 variable "finops_dynamic_group_name" {
-  type = string
+  type        = string
   description = "Finops dynamic groups name"
-  default = "FinOps-DG"
+  default     = "FinOps-DG"
+}
+
+variable "enable_cost_governance_tags" {
+  type        = bool
+  default     = true
+  description = "Add the six automatic FinOps tags. Requires the cost governance namespace and keys to exist. Set false for a Studio landing zone without FinOps tags; explicitly supplied defined_tags are still applied."
+
+  validation {
+    condition     = var.enable_cost_governance_tags != null
+    error_message = "enable_cost_governance_tags must be true or false; null is not supported."
+  }
 }
 
 variable "defined_tags" {
-  type = map(string)
-  default = {}
-  description = "Defined Tags"
+  type        = map(string)
+  default     = {}
+  description = "Customer-defined tags, preserved when automatic FinOps tags are disabled. When enabled, these override the six default cost governance values, except the database platform remains finops. Every supplied namespace and key must already exist."
+}
+
+variable "database_defined_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Database-only tag overrides, merged after defined_tags without changing IAM resource tags. Automatically generated from the same customer mapping by customize_tags.jsonnet. When automatic FinOps tags are enabled, the database Platform remains finops."
 }
 
 variable "finops_policy_name" {
-  type = string
+  type        = string
   description = "Finops policy name"
-  default = "FinOps-policy"
+  default     = "FinOps-policy"
 }
 
 variable "create_policy" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Whether to create dynamic group and policy or not"
 }
 

@@ -12,34 +12,50 @@ function render(model: LzModel) {
   </WizardProvider>);
 }
 
-describe('observability fields', () => {
-  it('offers Bastion below Notifications in Foundations, disabled by default', () => {
-    const html = render(emptyLzModel());
-    expect(html).toContain('aria-label="Enable OCI Bastion"');
-    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('foundation-observability-title'));
-    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('lz-observability-default'));
-    expect(html).not.toContain('id="lz-bastion-client-cidrs"');
+describe('foundation fields', () => {
+  it('hides excluded Cloud Guard notifications while retaining their saved recipients', () => {
+    const model = emptyLzModel();
+    model.foundation.cloudGuardEnabled = false;
+    model.foundation.notifications!.useSingleRecipient = false;
+    model.foundation.notifications!.cloudguard = 'cg@customer.test';
+    expect(render(model)).not.toContain('id="lz-observability-cloudguard"');
+    expect(model.foundation.notifications!.cloudguard).toBe('cg@customer.test');
+    model.foundation.cloudGuardEnabled = true;
+    expect(render(model)).toContain('value="cg@customer.test"');
   });
 
-  it('shows enabled Bastion settings with accessible errors and the access guide', () => {
+
+
+
+  it('starts with the shared recipient checked and a required email field', () => {
+    const html = render(emptyLzModel());
+    expect(html).toMatch(/type="checkbox"[^>]*checked/);
+    expect(html).toMatch(/id="lz-observability-default"[^>]*required/);
+    expect(html).toContain('Enter at least one notification email address.');
+    expect(html).not.toContain('id="lz-observability-cloudguard"');
+  });
+
+  it('keeps the switch above topic inputs when separate recipients are selected', () => {
     const model = emptyLzModel();
-    Object.assign(model, { bastion: { enabled: true, clientCidrs: '0.0.0.0/0', maxSessionTtlInSeconds: 3600 } });
+    model.foundation.notifications!.useSingleRecipient = false;
     const html = render(model);
-    expect(html).toContain('id="lz-bastion-client-cidrs"');
-    expect(html).toContain('id="lz-bastion-session-duration"');
-    expect(html).toContain('lz-bastion-client-cidrs-error');
-    expect(html).toContain('hub management subnet');
-    expect(html).toContain('aria-label="About OCI Bastion"');
-    expect(html).toContain('popover="auto"');
-    expect(html).toContain('Oracle documents access within the Bastion&#x27;s VCN.');
-    expect(html).toContain('The service remains deployed until you remove it.');
-    expect(html).toContain('approved public IPv4 address OCI sees from your workstation or corporate internet gateway');
-    expect(html).toContain('Limit how long each access session can stay open.');
-    const intro = html.match(/<p id="foundation-bastion-intro"[^>]*>(.*?)<\/p>/)?.[1];
-    expect(intro).toContain('Access private databases and virtual machines');
-    expect(intro).toContain('Studio includes the service in your deployment files.');
-    expect(intro).not.toContain('SOCKS5');
-    expect(html).toContain('/addons/oci-bastion/README.md');
+    const recipientChoice = html.indexOf('Use the same recipients for all topics');
+    expect(recipientChoice).toBeGreaterThan(-1);
+    expect(recipientChoice).toBeLessThan(html.indexOf('id="lz-observability-cloudguard"'));
+    expect(html).not.toContain('id="lz-observability-default"');
+    expect(html.match(/<section[^>]*aria-labelledby="foundation-observability-title"[\s\S]*?<\/section>/)?.[0]).not.toMatch(/type="checkbox"[^>]*checked/);
+  });
+
+  it('clears the field error for a valid shared recipient', () => {
+    const model = emptyLzModel();
+    model.foundation.notifications!.default = 'ops@example.com';
+    expect(render(model)).not.toContain('role="alert"');
+  });
+  it('leaves CIS, Bastion and Security Zone controls to Security', () => {
+    const html = render(emptyLzModel());
+    expect(html).not.toContain('id="lz-cis-level"');
+    expect(html).not.toContain('aria-label="Enable OCI Bastion"');
+    expect(html).not.toContain('aria-label="Security zone for');
   });
 
   it('keeps a custom region short name editable', () => {
@@ -131,13 +147,13 @@ describe('observability fields', () => {
     expect(html).toContain('These environments are expected to be deployed in the Home Region.');
     expect(html).toContain('Use the same environment names as your Home Region deployment.');
     expect(html).toMatch(/<details[^>]*><summary[^>]*>How DR uses these environments<\/summary>/);
-    expect(html).not.toMatch(/<details[^>]*\bopen/);
+    expect(html.split('Tags y Budgets')[0]).not.toMatch(/<details[^>]*\bopen/);
     expect(html).toContain('compartments from your Home Region.');
     expect(html).toContain('Changes here affect only this DR design.');
     expect(html).not.toContain('Home-owned');
     expect(html).not.toContain('Home controls');
     expect(html).not.toContain('aria-label="Security zone for');
-    expect(render(emptyLzModel())).toContain('role="switch"');
+    expect(render(emptyLzModel())).not.toContain('aria-label="Security zone for');
     expect(html).toContain('Home Region');
     expect(html).not.toContain('Home stack owns matching compartments');
     model.environments = [];
@@ -146,26 +162,7 @@ describe('observability fields', () => {
     expect(html).not.toContain('id="lz-observability-iam"');
     expect(html).toContain('id="lz-observability-network"');
   });
-  it('starts with the shared recipient checked and a required email field', () => {
-    const html = render(emptyLzModel());
-    expect(html).toMatch(/type="checkbox"[^>]*checked/);
-    expect(html).toMatch(/id="lz-observability-default"[^>]*required/);
-    expect(html).toContain('Enter at least one notification email address.');
-    expect(html).not.toContain('id="lz-observability-cloudguard"');
-  });
-  it('keeps the switch above topic inputs when separate recipients are selected', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.useSingleRecipient = false;
-    const html = render(model);
-    const recipientChoice = html.indexOf('Use the same recipients for all topics');
-    expect(recipientChoice).toBeGreaterThan(-1);
-    expect(recipientChoice).toBeLessThan(html.indexOf('id="lz-observability-cloudguard"'));
-    expect(html).not.toContain('id="lz-observability-default"');
-    expect(html).not.toMatch(/type="checkbox"[^>]*checked/);
-  });
-  it('clears the field error for a valid shared recipient', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.default = 'ops@example.com';
-    expect(render(model)).not.toContain('role="alert"');
-  });
+
+
+
 });

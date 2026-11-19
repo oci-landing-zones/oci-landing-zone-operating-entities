@@ -115,3 +115,13 @@ describe('linked environment synchronization', () => {
     expect(syncDrEnvironments(dr, emptyLzModel())).toBe(dr);
   });
 });
+
+it('inherits disabled FinOps tagging from Home without sharing mutable settings', () => {
+  const home = emptyLzModel(); const dr = emptyLzModel(); dr.foundation.stackScope = 'regional';
+  home.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: '', budgets: {}, tagsEnabled: false };
+  const synced = syncDrEnvironments(dr, home);
+  expect(synced.foundation.costGovernance?.tagsEnabled).toBe(false);
+  expect(synced.foundation.costGovernance).not.toBe(home.foundation.costGovernance);
+  home.foundation.costGovernance.tagsEnabled = true;
+  expect(syncDrEnvironments(synced, home).foundation.costGovernance?.tagsEnabled).toBe(true);
+});

@@ -1,4 +1,6 @@
-function(bastion, n, group_names, key_segments=[])
+local cost_scope = import '../../lib/cost_scope.libsonnet';
+
+function(bastion, n, group_names, key_segments=[], ownership=cost_scope.shared)
   if bastion == null || std.length(group_names) == 0 then {} else
     local groups = std.join(', ', ["'id_lz_common'/'%s'" % name for name in std.set(group_names)]);
     local allow = 'allow group %s' % groups;
@@ -6,6 +8,7 @@ function(bastion, n, group_names, key_segments=[])
     local network = n.compartment_path(['network']);
     {
       [n.key_global('PCY', key_segments + ['BASTION', 'ACCESS'])]: {
+        _cost_scope:: ownership,
         name: n.display_global('pcy', key_segments + ['bastion', 'access']),
         description: 'Grants existing administrators access to shared Bastion sessions.',
         compartment_id: 'CMP-LANDINGZONE-KEY',

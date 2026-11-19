@@ -198,7 +198,21 @@
     is_ipv6enabled: false,
     is_oracle_gua_allocation_enabled: false,
 
-    subnets: extra_subnets + {
+    subnets: {
+      [n.key('SN', ['HUB', name])]: {
+        display_name: n.display('sn', ['hub', name]),
+        // Stable labels avoid renaming existing DNS entries when another subnet is added.
+        dns_label: n.dns_label(['hc', std.substr(std.md5(name), 0, 13)]),
+        cidr_block: subnets[name],
+        dhcp_options_key: 'default_dhcp_options',
+        prohibit_internet_ingress: true,
+        prohibit_public_ip_on_vnic: true,
+        route_table_key: n.key('RT', ['HUB', 'MGMT']),
+        security_list_keys: [n.key('SL', ['HUB', 'MGMT'])],
+      }
+      for name in $.management_subnet_names(subnets)
+      if !std.member(['mgmt', 'mon', 'dns'], name)
+    } + extra_subnets + {
       [n.key('SN', ['HUB', 'LB'])]: {
         display_name: n.display('sn', ['hub', 'lb']),
         dns_label: n.dns_label(['sn', n.region, 'hub', 'lb']),
@@ -465,28 +479,20 @@
   nfw_ip_from_subnet(subnet_cidr)::
     $.host_ip_from_subnet(subnet_cidr, 10),
 
-  // NATGW route rules pointing MGMT/MON/DNS traffic through a firewall entity (for hubs A, B).
-  // n: naming object, subnets: { mgmt, mon, dns, ... } from normalized config
+  // All private service subnets share MGMT routing, including custom subnets.
+  management_subnet_names(subnets):: [
+    name for name in std.objectFields(subnets)
+    if !std.member(['lb', 'fw', 'fw-dmz', 'fw-int', 'trust', 'untrust'], name)
+  ],
+
+  // Include each private subnet in the NAT gateway's firewall return path.
   _natgw_firewall_routes(n, subnets, entity_id, fw_desc='OCI Network Firewall'):: {
-    [n.route_rule(['vcn', n.region, 'hub', 'mgmt', 'sn'])]: {
-      description: 'Route to mgmt subnet in Hub VCN through %s' % fw_desc,
-      destination: subnets.mgmt,
+    [n.route_rule(['vcn', n.region, 'hub', name, 'sn'])]: {
+      description: 'Route to %s subnet in Hub VCN through %s' % [name, fw_desc],
+      destination: subnets[name],
       destination_type: 'CIDR_BLOCK',
       network_entity_id: entity_id,
-    },
-
-    [n.route_rule(['vcn', n.region, 'hub', 'mon', 'sn'])]: {
-      description: 'Route to mon subnet in Hub VCN through %s' % fw_desc,
-      destination: subnets.mon,
-      destination_type: 'CIDR_BLOCK',
-      network_entity_id: entity_id,
-    },
-
-    [n.route_rule(['vcn', n.region, 'hub', 'dns', 'sn'])]: {
-      description: 'Route to dns subnet in Hub VCN through %s' % fw_desc,
-      destination: subnets.dns,
-      destination_type: 'CIDR_BLOCK',
-      network_entity_id: entity_id,
-    },
+    }
+    for name in $.management_subnet_names(subnets)
   },
 }

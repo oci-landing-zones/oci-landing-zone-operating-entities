@@ -20,6 +20,19 @@ async function roundTrip(model: LzModel) {
 }
 
 describe('Studio config import', () => {
+  it('keeps omitted behavior when importing null Recipe 01 or empty custom subnets', () => {
+    const config = buildConfig(emptyLzModel());
+    const input = { ...config, security_zone_recipe1_cis_level: null,
+      hub: { ...config.hub, network: { ...config.hub.network, custom_subnets: {} } } };
+    expect(buildConfig(importConfig(input).model)).toEqual(config);
+  });
+  it.each([1, 2] as const)('round trips an explicit Recipe 01 CIS %s override', async (level) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = level === 1 ? 2 : 1;
+    model.foundation.securityZoneRecipe1CisLevel = level;
+    expect((await roundTrip(model)).model.foundation.securityZoneRecipe1CisLevel).toBe(level);
+  });
+
   it('restores root Bastion settings without changing the exported configuration', async () => {
     const model = emptyLzModel();
     model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32\n198.51.100.0/24', maxSessionTtlInSeconds: 3600 };
@@ -33,6 +46,12 @@ describe('Studio config import', () => {
     expect(importConfig({ ...base, bastion: null }).model.bastion).toBeUndefined();
     expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['0.0.0.0/0'] } })).toThrow('bastion');
     expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'], unsupported: true } })).toThrow('bastion.unsupported');
+  });
+
+  it.each([1, 2] as const)('preserves an imported CIS %s choice', (cisLevel) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = cisLevel;
+    expect(importConfig(buildConfig(model)).model.foundation.cisLevel).toBe(cisLevel);
   });
 
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('restores %s foundation and project membership', async (hubKind) => {

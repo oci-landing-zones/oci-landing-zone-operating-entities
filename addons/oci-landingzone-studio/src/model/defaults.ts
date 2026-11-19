@@ -5,6 +5,7 @@ import { additionalEnvironmentCidr, oneOeEnvironmentCidrs, SHARED_EXACS_CIDR } f
 import { formatIp, parseCidr } from '../services/cidr';
 import { splitOkePlacements } from '../services/okePlacements';
 import { reconcileExadata } from '../services/exadata';
+import { defaultCostGovernance } from '../services/costGovernance';
 
 export const LZ_MODEL_VERSION = '0.20.0';
 
@@ -46,11 +47,13 @@ export function emptyLzModel(): LzModel {
       realm: 'oc1',
       region: region?.id ?? 'eu-frankfurt-1',
       regionShortName: region?.shortName ?? 'fra',
-      cisLevel: 2,
+      cisLevel: 1,
+      cloudGuardEnabled: true,
+      costGovernance: { ...defaultCostGovernance(), tagsEnabled: false },
       notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
     environments: [
-      { id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) },
+      { id: 'environment-1', name: 'prod', securityZone: false, network: envNetworkDefaults(0) },
       { id: 'environment-2', name: 'preprod', securityZone: false, network: envNetworkDefaults(1) },
     ],
     network: { hubKind: 'hub_a', ...hubKindDefaults('hub_a') },
@@ -117,7 +120,10 @@ function migrate016(candidate: Partial<LzModel>): LzModel | null {
 
 export function normalizeModel(stored: unknown): LzModel {
   if (!stored || typeof stored !== 'object') return emptyLzModel();
-  const candidate = stored as Partial<LzModel>;
+  const source = stored as Partial<LzModel>;
+  const candidate = source.foundation && source.foundation.costGovernance == null
+    ? { ...source, foundation: { ...source.foundation, costGovernance: { ...defaultCostGovernance(), tagsEnabled: false } } }
+    : source;
   if (candidate.version === '0.16.0') return migrate016(candidate) ?? emptyLzModel();
   if (candidate.version === '0.18.0' && candidate.foundation && candidate.network
     && Array.isArray(candidate.environments) && Array.isArray(candidate.projects)
@@ -146,6 +152,7 @@ export function normalizeModel(stored: unknown): LzModel {
     candidate.version !== LZ_MODEL_VERSION
     || !candidate.foundation
     || (candidate.foundation.cisLevel !== 1 && candidate.foundation.cisLevel !== 2)
+    || (candidate.foundation.securityZoneRecipe1CisLevel !== undefined && candidate.foundation.securityZoneRecipe1CisLevel !== 1 && candidate.foundation.securityZoneRecipe1CisLevel !== 2)
     || !candidate.network
     || !Array.isArray(candidate.environments)
     || !Array.isArray(candidate.projects)

@@ -1,3 +1,4 @@
+local cost_scope = import '../../lib/cost_scope.libsonnet';
 local labels = import '../../labels.libsonnet';
 local collections = import '../../lib/collections.libsonnet';
 local validation = import '../../lib/validation.libsonnet';
@@ -146,6 +147,8 @@ local validation = import '../../lib/validation.libsonnet';
         [n.key_global('CMP', env_segments + [project_name])]+: {
           children+: {
             [$.project_db_key_for_scope(product, n, env_scope, project_name)]: {
+              _cost_scope:: cost_scope.value(env_scope.scope_name, project_name),
+              _cost_platform:: product.code,
               name: $.project_db_name_for_scope(product, env_scope, project_name),
               description: descriptions.project_db_compartment(
                 env_scope,
@@ -271,6 +274,8 @@ local validation = import '../../lib/validation.libsonnet';
     {
       [$.project_db_key_for_scope(product, n, scope_for(env_name), project_name)]: {
         local project_scope = scope_for(env_name),
+        _cost_scope:: cost_scope.value(project_scope.scope_name, project_name),
+        _cost_platform:: product.code,
         name: $.project_db_name_for_scope(product, project_scope, project_name),
         description: descriptions.project_db_compartment(project_scope, project_name),
         parent_id: n.key_global('CMP', $.scope_key_segments(project_scope) + [project_name]),

@@ -1,3 +1,4 @@
+local cost_scope = import '../../lib/cost_scope.libsonnet';
 local desc = import '../../descriptions.libsonnet';
 local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
 
@@ -20,9 +21,11 @@ function(ctx) {
       if std.objectHas(ctx.params, 'bastion') then ctx.params.bastion else null,
       n,
       [group_name],
-      ctx.scope.key_segments + ['PLATFORM', ctx.plat]
+      ctx.scope.key_segments + ['PLATFORM', ctx.plat],
+      ownership=cost_scope.value(ctx.scope.scope_name)
     ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+        _cost_scope:: cost_scope.value(ctx.scope.scope_name),
         name: policy_name,
         description: desc.policy.grants(
           group_name,
