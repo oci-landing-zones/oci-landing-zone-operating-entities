@@ -25,6 +25,9 @@ local strip_network_observability(doc) =
         function(key, alarm)
           key != 'AL-LZ-NETWORK-LB-KEY'
           && !(std.objectHas(alarm, 'compartment_id') && is_network_compartment(alarm.compartment_id))
+          && !(std.objectHas(alarm, 'supplied_alarm')
+               && std.objectHas(alarm.supplied_alarm, 'metric_compartment_id')
+               && is_network_compartment(alarm.supplied_alarm.metric_compartment_id))
       ),
     },
     events_configuration+: {
