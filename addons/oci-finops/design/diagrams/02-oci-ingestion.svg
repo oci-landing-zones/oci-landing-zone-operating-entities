@@ -76,4 +76,21 @@
 <text class="entity" x="57" y="988">OCI_FOCUS_REMED_TARGET_CONFIG</text>
 <text class="attribute" x="58" y="1033">PK  TARGET_TABLE</text>
 <text class="attribute" x="58" y="1062">ENABLED</text>
+<path class="fk" d="M 1070 490 L 1130 490 L 1130 900 L 940 900 L 940 955"/>
+<text class="cardinality" x="1080" y="480">1</text>
+<text class="cardinality" x="950" y="943">0..*</text>
+<path class="logical" d="M 1250 1080 L 1760 1080 L 1760 760 L 1680 760"/>
+<text class="cardinality" x="1260" y="1070">0..1</text>
+<text class="cardinality" x="1690" y="750">0..1</text>
+<rect class="card" x="650" y="955" width="600" height="282" rx="8"/>
+<path class="header" d="M 652 1003 L 1248 1003 L 1248 958 L 653 958 Z"/>
+<line x1="650" y1="1005" x2="1250" y2="1005" stroke="#476987" stroke-width="2"/>
+<text class="entity" x="667" y="988">OCI_FOCUS_REMED_ROW</text>
+<text class="attribute" x="668" y="1033">PK/FK  PIPELINE_NAME</text>
+<text class="attribute" x="668" y="1062">PK/FK  GENERATION_NO</text>
+<text class="attribute" x="668" y="1091">PK/FK  SOURCE_NAME_HASH</text>
+<text class="attribute" x="668" y="1120">PK  ORIGINAL_CHARGEPERIODSTART</text>
+<text class="attribute" x="668" y="1149">PK  ORIGINAL_REFERENCE</text>
+<text class="attribute" x="668" y="1178">FINAL_REFERENCE / OUTCOME</text>
+<text class="attribute" x="668" y="1207">RAW_ROW_JSON / CREATED_AT</text>
 </svg>

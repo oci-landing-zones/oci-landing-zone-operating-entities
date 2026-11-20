@@ -69,6 +69,7 @@ END;
 -- year. P_INIT ends before 2024; monthly partitions begin with 2024 data.
 @02_providers/OCI/00_ingestion/internal/01_create_oci_storage.sql
 @02_providers/OCI/00_ingestion/internal/02_install_failure_detection.sql
+@02_providers/OCI/00_ingestion/internal/02a_install_remediation_api.sql
 @02_providers/OCI/00_ingestion/internal/03_install_row_remediation.sql
 @02_providers/OCI/00_ingestion/internal/04_install_recovery.sql
 @02_providers/OCI/00_ingestion/internal/09_install_retention.sql
@@ -83,7 +84,7 @@ BEGIN
   SELECT COUNT(*) INTO L_VALID_CODE FROM USER_OBJECTS
    WHERE OBJECT_NAME IN ('OCI_FOCUS_SOURCE_PREFIX',
        'OCI_FOCUS_FILL_SOURCE_URIS', 'OCI_FOCUS_DISCOVER_FAILURES',
-       'OCI_FOCUS_REMED_MUTEX', 'OCI_FOCUS_REMED_NUMBER',
+       'OCI_FOCUS_REMED_MUTEX', 'OCI_FOCUS_REMED_ROW_API', 'OCI_FOCUS_REMED_NUMBER',
        'OCI_FOCUS_REMED_TIMESTAMP', 'OCI_FOCUS_REMEDIATE_FILES',
        'OCI_FOCUS_RESOLVE_MANUAL_ROW',
        'OCI_FOCUS_COPY_RECOVERY_DECIDE', 'OCI_FOCUS_RECOVER_COPYING',
@@ -93,7 +94,7 @@ BEGIN
      AND STATUS = 'VALID';
   SELECT COUNT(*) INTO L_INVALID FROM USER_OBJECTS
    WHERE OBJECT_NAME LIKE 'OCI_FOCUS_%' AND STATUS <> 'VALID';
-  IF L_VALID_CODE <> 17 OR L_INVALID <> 0 THEN
+  IF L_VALID_CODE <> 19 OR L_INVALID <> 0 THEN
     RAISE_APPLICATION_ERROR(-20965,
       'OCI provider code is incomplete or invalid; inspect USER_ERRORS');
   END IF;

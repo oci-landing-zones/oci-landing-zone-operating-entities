@@ -5,23 +5,36 @@ flowchart TD
     E["Daily or initial FINOPS_CORE_DAILY run"] --> F["OCI_FOCUS_CORE_API.RUN acquires the shared OCI mutex"]
     D -.->|read by discovery| G
     F --> G["Scan every eligible pipeline; queue all new FAILED files"]
-    G --> H{"Interrupted active file?"}
+    G --> GC["Recheck all outstanding files: current Oracle state and attributable cause"]
+    GC --> H{"Interrupted active file?"}
     H -- Yes --> I{"Recovery evidence safe?"}
     I -- Completed COPY --> J["Resume remaining stage rows"]
     I -- Dead empty COPY --> K["Requeue file as NEW"]
     I -- Ambiguous --> Z["Stop OCI run; report recovery error"]
-    H -- No --> M{"Next NEW file in this pipeline within its limit?"}
+    H -- No --> M{"Next admitted NEW file in this pipeline within its limit?"}
     K --> M
-    M -- Yes --> N["COPY_DATA loads one file into shared raw stage"]
+    M -- Yes --> NS{"Recheck Oracle state and cause"}
+    NS -- COMPLETED --> NC["Close PIPELINE_LOADED; do not insert"]
+    NS -- "RUNNING / PENDING / ambiguous" --> ND["Defer and report; recheck next coordinator run"]
+    NS -- "Access / unknown cause" --> ND
+    NC --> M
+    ND --> M
+    NS -- "FAILED with deterministic data cause" --> N["COPY_DATA loads one file into shared raw stage"]
     M -- No --> V["Finalize FINOPS_CORE_PIPELINE_RUN result"]
     N --> O{"COPY completed and row counts match?"}
-    O -- No --> P["Mark file ERROR; no automatic retry"]
+    O -- No --> P["Record COPY ERROR; requeue only with proven inactive empty attempt"]
     P --> M
     O -- Yes --> J
     J --> R["Convert and insert one remaining stage row"]
     R --> S{"Landing INSERT succeeds?"}
-    S -- Yes --> T["Commit landing row, counter, and stage deletion"]
-    S -- No --> U["Commit manual row, counter, and stage deletion"]
+    S -- Yes --> T["Commit landing row, provenance ledger, counter, and stage deletion"]
+    S -- "Exact landing PK only" --> SP["Retry original reference + ~ + full source-name hash; validate length"]
+    SP -- "Insert succeeds" --> T
+    SP -- "Data error / length / key conflict" --> U
+    SP -- "Operational / unknown error" --> SD["Keep pending stage; report and defer"]
+    S -- "Operational / unknown error" --> SD
+    SD --> Z
+    S -- "Other deterministic data error" --> U["Commit manual row, counter, and stage deletion"]
     T --> W{"Stage rows remain?"}
     U --> W
     W -- Yes --> R

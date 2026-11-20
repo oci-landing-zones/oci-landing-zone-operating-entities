@@ -16,23 +16,36 @@ flowchart TD
     E["Daily or initial FINOPS_CORE_DAILY run"] --> F["OCI_FOCUS_CORE_API.RUN acquires the shared OCI mutex"]
     D -.->|read by discovery| G
     F --> G["Scan every eligible pipeline; queue all new FAILED files"]
-    G --> H{"Interrupted active file?"}
+    G --> GC["Recheck all outstanding files: current Oracle state and attributable cause"]
+    GC --> H{"Interrupted active file?"}
     H -- Yes --> I{"Recovery evidence safe?"}
     I -- Completed COPY --> J["Resume remaining stage rows"]
     I -- Dead empty COPY --> K["Requeue file as NEW"]
     I -- Ambiguous --> Z["Stop OCI run; report recovery error"]
-    H -- No --> M{"Next NEW file in this pipeline within its limit?"}
+    H -- No --> M{"Next admitted NEW file in this pipeline within its limit?"}
     K --> M
-    M -- Yes --> N["COPY_DATA loads one file into shared raw stage"]
+    M -- Yes --> NS{"Recheck Oracle state and cause"}
+    NS -- COMPLETED --> NC["Close PIPELINE_LOADED; do not insert"]
+    NS -- "RUNNING / PENDING / ambiguous" --> ND["Defer and report; recheck next coordinator run"]
+    NS -- "Access / unknown cause" --> ND
+    NC --> M
+    ND --> M
+    NS -- "FAILED with deterministic data cause" --> N["COPY_DATA loads one file into shared raw stage"]
     M -- No --> V["Finalize FINOPS_CORE_PIPELINE_RUN result"]
     N --> O{"COPY completed and row counts match?"}
-    O -- No --> P["Mark file ERROR; no automatic retry"]
+    O -- No --> P["Record COPY ERROR; requeue only with proven inactive empty attempt"]
     P --> M
     O -- Yes --> J
     J --> R["Convert and insert one remaining stage row"]
     R --> S{"Landing INSERT succeeds?"}
-    S -- Yes --> T["Commit landing row, counter, and stage deletion"]
-    S -- No --> U["Commit manual row, counter, and stage deletion"]
+    S -- Yes --> T["Commit landing row, provenance ledger, counter, and stage deletion"]
+    S -- "Exact landing PK only" --> SP["Retry original reference + ~ + full source-name hash; validate length"]
+    SP -- "Insert succeeds" --> T
+    SP -- "Data error / length / key conflict" --> U
+    SP -- "Operational / unknown error" --> SD["Keep pending stage; report and defer"]
+    S -- "Operational / unknown error" --> SD
+    SD --> Z
+    S -- "Other deterministic data error" --> U["Commit manual row, counter, and stage deletion"]
     T --> W{"Stage rows remain?"}
     U --> W
     W -- Yes --> R
@@ -48,7 +61,11 @@ flowchart TD
 
 Oracle pipelines load successful files directly into `OCI_FOCUS_REPORTS`. Under the shared OCI mutex, the coordinator scans every eligible pipeline before remediation, using generation-aware watermarks with overlap. New pipelines without a status table are skipped until a later run; Oracle's file statuses remain unchanged.
 
-One `COPY_DATA` call stages a failed file. Decimal/UTC conversion and JSON parsing precede each landing insert; invalid rows, including duplicate keys, go to manual review. Each row commits together with its stage deletion and counters. A COPY failure stays `ERROR` without automatic retry. `FULL` means all staged rows reached landing; `PARTIAL` means some went to manual review. Both require an empty stage and reconciled counts.
+Every `FAILED` file is queued, including access failures and unknown causes. Before staging and when resuming, the worker reads the current Oracle file status and admits only a recognized deterministic data cause. `COMPLETED` closes tracking as `PIPELINE_LOADED`, distinct from our `FULL`; running, pending, missing or ambiguous status defers insertion. Outstanding classifications are reevaluated by the existing coordinator even when their original discovery window has passed.
+
+One `COPY_DATA` call stages an admitted failed file. Decimal/UTC conversion and JSON parsing precede each landing insert. `OCI_FOCUS_REMED_ROW_API` owns the same insertion logic for normal processing and interruption recovery. A landing-PK conflict first receives automatic file-qualified reference handling; other deterministic row failures retain original evidence for manual review. Operational or unknown row failures retain the pending stage for diagnosis. The landing insert, durable row provenance, stage deletion and inserted counter share one commit; a failed accounting step rolls back the landing insert. Manual evidence, stage deletion and manual counter likewise commit together. `FULL` requires an empty stage, reconciled counts and every row inserted or manually resolved into landing; waived rows do not produce `FULL`.
+
+A malformed CSV can fail before the row loop. COPY errors are recorded without bypassing the parser. A later coordinator run may requeue a failed copy only after establishing an empty stage, zero row outcomes, absent caller/operation sessions and no nonterminal matching load operation. Recovery decisions remain audited. An ambiguous attempt stays visible as `DEFERRED`.
 
 Recovery compares file/stage accounting, load-operation and session evidence: a completed COPY resumes, a dead empty attempt requeues, and ambiguity blocks automatic action. Manual resolution validates the landing key before closing the item. The common daily job handles up to 2,000 files per pipeline, without imposing a per-file deadline, and optionally sends the combined report. Overlapping coordinator calls skip under the Core lock.
 
@@ -68,7 +85,7 @@ The [retention API](#oci_focus_retention_api) and [monthly job](#oci_focus_reten
 
 ![OCI ingestion entity relationship diagram with complete table names](diagrams/02-oci-ingestion.svg)
 
-The [full-size SVG](diagrams/02-oci-ingestion.svg) is the **physical ERD** for the OCI ingestion tables. It shows the remediation-file foreign key. Rolling retention additionally declares `OCI_FOCUS_RETENTION_MONTH.RUN_ID` referencing `OCI_FOCUS_RETENTION_RUN.RUN_ID`, documented in the table definitions below; their logical associations are listed below and their processing sequence is shown in the workflow diagram.
+The [full-size SVG](diagrams/02-oci-ingestion.svg) is the **physical ERD** for the OCI ingestion tables. It shows the remediation-file and row-provenance foreign keys. Rolling retention additionally declares `OCI_FOCUS_RETENTION_MONTH.RUN_ID` referencing `OCI_FOCUS_RETENTION_RUN.RUN_ID`, documented in the table definitions below; their logical associations are listed below and their processing sequence is shown in the workflow diagram.
 
 | Parent | Child or target | Relationship |
 | --- | --- | --- |
@@ -77,10 +94,11 @@ The [full-size SVG](diagrams/02-oci-ingestion.svg) is the **physical ERD** for t
 | `OCI_FOCUS_FAIL_SCAN_CURSOR` | `OCI_FOCUS_FAIL_FILE`, `OCI_FOCUS_FAIL_SCAN_RUN` | Logical link by pipeline and generation; no declared FK. |
 | `OCI_FOCUS_FAIL_FILE` | `OCI_FOCUS_REMED_FILE` | Declared composite FK on `(PIPELINE_NAME, GENERATION_NO, SOURCE_NAME_HASH)`. |
 | `OCI_FOCUS_REMED_FILE` | `OCI_FOCUS_REMED_MANUAL`, `OCI_FOCUS_COPY_RECOVERY` | Logical file identity; no declared FK. |
-| `OCI_FOCUS_REMED_FILE` | `OCI_FOCUS_REPORTS` | Successful row insertion; landing has no source-file FK. |
+| `OCI_FOCUS_REMED_FILE` | `OCI_FOCUS_REMED_ROW` | Declared composite FK on the three-part file identity. |
+| `OCI_FOCUS_REMED_ROW` | `OCI_FOCUS_REPORTS` | Logical link on original charge period and final reference; no FK, so rolling retention remains independent. |
 | `OCI_FOCUS_REMED_TARGET_CONFIG` | `OCI_FOCUS_REPORTS` | Configured target table name; no declared FK. |
 
-File identity is `(PIPELINE_NAME, GENERATION_NO, SOURCE_NAME_HASH)`. The source name itself is also stored and checked to guard against a hash collision. A pipeline reset changes its status table/operation identity; the detector advances `GENERATION_NO` and can process failures in the new generation. Oracle-generated status tables are read only and are never purged by remediation.
+File identity is `(PIPELINE_NAME, GENERATION_NO, SOURCE_NAME_HASH)`. The source name itself is also stored and checked to guard against a hash collision. A pipeline reset changes its status table/operation identity; the detector advances `GENERATION_NO`. An immutable source already `FULL` is never automatically replayed, including across generations; a repeated failure is deferred with the prior completion reason. Resets and source replacement are outside normal operation. Oracle-generated status tables are read only and are never purged by remediation.
 
 ## Landing and source pipelines
 
@@ -95,6 +113,7 @@ File identity is `(PIPELINE_NAME, GENERATION_NO, SOURCE_NAME_HASH)`. The source 
 | [OCI_FOCUS_FAIL_SCAN_RUN](#oci_focus_fail_scan_run) | Table | Discovery-scan audit. |
 | [OCI_FOCUS_REMED_FILE](#oci_focus_remed_file) | Table | Per-file remediation state and row counters. |
 | [OCI_FOCUS_REMED_MANUAL](#oci_focus_remed_manual) | Table | Rejected rows awaiting or recording manual resolution. |
+| [OCI_FOCUS_REMED_ROW](#oci_focus_remed_row) | Table | Durable per-file original/final key provenance and original row evidence. |
 | [OCI_FOCUS_REMED_RUN](#oci_focus_remed_run) | Table | Per-pipeline remediation-run audit. |
 | [OCI_FOCUS_COPY_RECOVERY](#oci_focus_copy_recovery) | Table | Durable interrupted-`COPY_DATA` decisions. |
 | [OCI_FOCUS_REMED_TARGET_CONFIG](#oci_focus_remed_target_config) | Table | Approved landing target and enablement. |
@@ -102,6 +121,7 @@ File identity is `(PIPELINE_NAME, GENERATION_NO, SOURCE_NAME_HASH)`. The source 
 | [OCI_FOCUS_FAIL_FILE_STATE_I](#oci_focus_fail_file), [OCI_FOCUS_REMED_ONE_ACTIVE](#oci_focus_remed_file) | Indexes | Select queue states and enforce one active file across OCI pipelines. |
 | [OCI_FOCUS_REMED_MANUAL_PENDING_I](#oci_focus_remed_manual), [OCI_FOCUS_COPY_RECOVERY_FILE_I](#oci_focus_copy_recovery) | Indexes | Locate unresolved rows and recovery history. |
 | [OCI_FOCUS_SOURCE_PREFIX](#oci_focus_source_prefix), [OCI_FOCUS_FILL_SOURCE_URIS](#oci_focus_fill_source_uris), [OCI_FOCUS_DISCOVER_FAILURES](#oci_focus_discover_failures) | Function and procedures | Resolve source URIs and discover new Oracle `FAILED` file statuses. |
+| [OCI_FOCUS_REMED_ROW_API](#oci_focus_remed_row_api) | Package and body | Shared admission, rechecking, provenance and landing-PK remediation. |
 | [OCI_FOCUS_REMED_MUTEX](#oci_focus_remed_mutex) | Package and body | Serializes use of the shared stage and remediation worker. |
 | [OCI_FOCUS_REMED_NUMBER](#oci_focus_remed_number), [OCI_FOCUS_REMED_TIMESTAMP](#oci_focus_remed_timestamp), [OCI_FOCUS_REMEDIATE_FILES](#oci_focus_remediate_files) | Functions and procedure | Convert raw values and route each staged row to landing or manual review. |
 | [OCI_FOCUS_COPY_RECOVERY_DECIDE](#oci_focus_copy_recovery_decide), [OCI_FOCUS_RECOVER_COPYING](#oci_focus_recover_copying), [OCI_FOCUS_RECOVER_ACTIVE_FILE](#oci_focus_recover_active_file) | Function and procedures | Decide and apply safe recovery of interrupted file work. |
@@ -255,7 +275,7 @@ PK `PIPELINE_NAME`. Tracks the current Oracle status-table generation and increm
 
 **Index:** `OCI_FOCUS_FAIL_FILE_STATE_I` on `(FILE_STATE, PIPELINE_NAME, GENERATION_NO)`.
 
-PK on the three-part file identity. `FILE_STATE` is `NEW`, `IN_PROGRESS`, `FULL`, `PARTIAL`, `MANUAL`, or `ERROR`. Index `OCI_FOCUS_FAIL_FILE_STATE_I` supports queue selection.
+PK on the three-part file identity. `FILE_STATE` is `NEW`, `IN_PROGRESS`, `FULL`, `PARTIAL`, `MANUAL`, `ERROR`, `EXCLUDED`, `DIAGNOSE`, `DEFERRED`, or `PIPELINE_LOADED`. Index `OCI_FOCUS_FAIL_FILE_STATE_I` supports queue selection.
 
 | Column | Type |
 | --- | --- |
@@ -294,7 +314,7 @@ Identity PK. Durable audit of each discovery scan.
 
 **Index:** `OCI_FOCUS_REMED_ONE_ACTIVE` on `(CASE WHEN STATE IN ('COPYING','STAGED','PROCESSING') THEN 1 END)`.
 
-PK/file FK on the three-part identity. `STATE`: `NEW`, `COPYING`, `STAGED`, `PROCESSING`, `FULL`, `PARTIAL`, `ERROR`. Unique function-based index `OCI_FOCUS_REMED_ONE_ACTIVE` permits only one active file across all OCI pipelines.
+PK/file FK on the three-part identity. `STATE`: `NEW`, `COPYING`, `STAGED`, `PROCESSING`, `FULL`, `PARTIAL`, `ERROR`, `PIPELINE_LOADED`. Unique function-based index `OCI_FOCUS_REMED_ONE_ACTIVE` permits only one active file across all OCI pipelines.
 
 | Column | Type |
 | --- | --- |
@@ -314,6 +334,22 @@ PK/file FK on the three-part identity. `STATE`: `NEW`, `COPYING`, `STAGED`, `PRO
 | `ERROR_MESSAGE` | `VARCHAR2(4000)` |
 | `STARTED_AT` | `TIMESTAMP WITH TIME ZONE` |
 | `FINISHED_AT` | `TIMESTAMP WITH TIME ZONE` |
+
+### `OCI_FOCUS_REMED_ROW`
+
+The PK is the three-part file identity plus original charge period and reference. The file FK references `OCI_FOCUS_REMED_FILE`. Original source evidence is retained for every inserted row, including automatically modified references. This ledger is durable and is not purged by rolling landing retention. A missing landing row for an existing ledger is diagnosed rather than reinserted; authorized retention does not authorize replay.
+
+| Column | Type |
+| --- | --- |
+| `PIPELINE_NAME` | `VARCHAR2(128)` |
+| `GENERATION_NO` | `NUMBER` |
+| `SOURCE_NAME_HASH` | `RAW(32)` |
+| `ORIGINAL_CHARGEPERIODSTART` | `TIMESTAMP(6)` |
+| `ORIGINAL_REFERENCE` | `VARCHAR2(512)` |
+| `FINAL_REFERENCE` | `VARCHAR2(512)` |
+| `OUTCOME` | `VARCHAR2(20)` — `INSERTED` or `REKEYED` |
+| `RAW_ROW_JSON` | `CLOB`, JSON checked, original 49 source values |
+| `CREATED_AT` | `TIMESTAMP WITH TIME ZONE` |
 
 ### `OCI_FOCUS_REMED_MANUAL`
 
@@ -454,11 +490,45 @@ Converts one raw decimal field using explicit decimal characters.
 
 Converts UTC ISO 8601 minute, second or fractional-second forms to a UTC `TIMESTAMP` for every period field.
 
+### `OCI_FOCUS_REMED_ROW_API`
+
+Internal `AUTHID DEFINER` package. Callers hold `OCI_FOCUS_REMED_MUTEX` and own commits; the package has no autonomous transaction or commit. `CLASSIFY(code, message)` applies a conservative allowlist. `CHECK_FILE(pipeline, generation, hash, state OUT)` validates current pipeline ID, operation, status-table creation and generation before reading an exact source name. `REFRESH_FILES(pipeline)` rechecks outstanding tracking and safely requeues proven inactive failed copies. `INSERT_ROW(target, pipeline, generation, hash, stage_rowid)` inserts or reconciles one staged row and writes provenance. Conversion functions keep their existing decimal and UTC semantics.
+
+The first attempt uses the original reference. Only `ORA-00001` naming the exact owner-qualified `OCI_FOCUS_REPORTS_PK` permits a second insert with `original_reference || '~' || RAWTOHEX(SOURCE_NAME_HASH)`. The suffix is always the same complete 64-character SHA256 of `SOURCE_NAME`, never a content hash or retry counter. The result must fit both 512 characters and 512 bytes; otherwise the original row goes to manual review without truncation. The retry repeats the complete conversion/insert, so resolving the PK cannot conceal another format, JSON, length or constraint failure. Another unique constraint never enables this rewrite.
+
+A row already recorded for this file/original PK is accepted only if the original JSON matches and the final landing key is present. An occupied qualified key without this provenance is retained for manual diagnosis; no additional suffix is invented. A provenance write failure retains the stage and defers the attempt after rolling back the landing insert. The operator's existing manual procedure remains the audit for manual outcomes; this API does not automatically replay pending manual rows.
+
+#### Admission and diagnostic states
+
+| Evidence from the current Oracle failure | Queue state and action |
+| --- | --- |
+| Recognized conversion, format, length or integrity error | `NEW`; eligible for one-file staging and per-row handling. |
+| Credential, permission, missing/invalid source, connection or HTTP access/service error | `EXCLUDED`; no data load, retained in report and checked again. |
+| Generic reject-limit/external-table wrapper or unknown error without attributable evidence | `DIAGNOSE`; inspect log/bad metadata, no assumed data cause. |
+| `RUNNING`, `PENDING`, missing/ambiguous metadata, generation mismatch, unsafe COPY retry | `DEFERRED`; no insert, reevaluate on later coordinator runs. |
+| Exact source currently `COMPLETED` | `PIPELINE_LOADED`; close without remediation insertion or counting it as `FULL`. |
+
+The data allowlist is `ORA-00001`, `01400`, `01438`, `01722`, `01830`, `01840`, `01841`, `01843`, `01847`, `01849`, `01850`, `01851`, `01858`, `01859`, `01861`, `01862`, `02290`, `02291`, `02292`, `12899`, `40441`, `40597`, and `KUP-04021/04023/04025/04026`. Operational evidence takes precedence: `ORA-01017/01031/12154`, the `125xx` connection family, `20004/20010/20011/20025`, `20401/20403/20404`, and `20450` through `20499`. All unlisted failures remain diagnostic rather than data-admitted, including an unlisted accompanying error beside a recognized data code. Only generic `ORA-06512/12801/20000/20003/29913/30653` stack, parallel and load wrappers may accompany an admitted data error. The row loop also recognizes its own unsupported-timestamp, qualified-reference overflow and provenance-conflict errors for manual review.
+
+`ORA-20003`, `ORA-30653` and `ORA-29913` alone are inconclusive. The pipeline operation identifies its log and bad tables through `USER_LOAD_OPERATIONS`. Automatic evidence use requires an exact structured source-name column (`NAME`, `FILE_NAME`, `FILENAME`, or `SOURCE_NAME`) and a structured error field (`ERROR_MESSAGE` or `ERROR_TEXT`); it scans attributable entries with operational precedence. Unstructured shared log text, raw bad CSV values, inaccessible/missing diagnostics or layouts without these fields cannot establish a per-file cause. The file remains `DIAGNOSE` with diagnostic table names or a diagnostic-read reason for operator investigation. Reporting includes the last check, cause and all outstanding-state counts, with bounded detail plus a full-list query.
+
+#### Operating premises and runtime acceptance
+
+This is a fresh-installation contract, with no upgrade or migration scripts. Each object name/path identifies one immutable object in its configured origin: no renamed copies, replacements or pipeline resets occur in normal operation. The provider supplies uniqueness of the reference within a CSV, but no guaranteed cross-file business key. A row from another file is valid even when all 49 values equal an existing row; content equality never blocks it or requires approval.
+
+The accepted premise is that a failed pipeline load rolls back the entire file. This premise still requires runtime verification in the target ADB; local static checks do not establish it. Deterministic data failures remain reproducible while the file, configuration and causative data are unchanged, constraining a concurrent pipeline retry. The product mutex serializes our entry points, including manual resolution, but does not lock Oracle's pipeline. Oracle can retry failed files twice on later pipeline runs; there is no public exhausted state or retry counter. Neither a two-hour wait nor poll counting proves exclusion. The pipeline is not automatically stopped.
+
+If Oracle becomes `COMPLETED` before any remediation outcome, recovery closes `PIPELINE_LOADED` and removes the now-unneeded stage only after COPY/session reconciliation. Completion after committed remediation outcomes is inconsistent with these premises: recovery retains remaining stage and reports `DIAGNOSE` for provenance reconciliation. An interrupted file otherwise resumes only its remaining stage rows after count reconciliation. A nonparseable CSV stays a COPY failure; no row-level bypass is attempted.
+
+Target-ADB acceptance must cover PL/SQL compilation and inventory gates, the full-file rollback premise, Oracle status/log layouts, original and qualified inserts, a row with both conversion and PK errors, two files with identical content, 512-byte boundaries, interrupted row/COPY recovery, access repair, and concurrent pipeline/worker behavior. No ADB execution is implied by this design.
+
+References: [Oracle pipeline monitoring and retries](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/pipelines-monitor.html), [DBMS_CLOUD exceptions](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-exceptions.html), [unique-constraint diagnostics](https://docs.oracle.com/en/error-help/db/ora-00001/), [column-length diagnostics](https://docs.oracle.com/en/error-help/db/ora-12899/), [external-table format diagnostics](https://docs.oracle.com/html/E10880_02/kupus.htm), and [format options, including default rejectlimit 0](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/format-options.html). Pipeline format and reject limit are unchanged.
+
 ### `OCI_FOCUS_REMEDIATE_FILES`
 
 `OCI_FOCUS_REMEDIATE_FILES(pipeline_name, max_files, source_name)`
 
-Processes up to 2000 queued failed files for one pipeline, one file at a time. `COPY_DATA` fills the shared stage; each row is inserted into landing or recorded for manual resolution, with a durable counter and stage deletion. Optional source name narrows an operator diagnostic.
+Processes up to 2000 queued failed files for one pipeline, one file at a time. `COPY_DATA` fills the shared stage; each row is inserted into landing or recorded for manual resolution, through the shared row API with provenance, a durable counter and stage deletion. Optional source name narrows an operator diagnostic.
 
 ### `OCI_FOCUS_COPY_RECOVERY_DECIDE`
 

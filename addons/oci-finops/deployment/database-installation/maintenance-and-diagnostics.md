@@ -12,6 +12,7 @@ Diagnostic reports are read-only. Rescheduling, capacity changes, MV rebuilds an
 - [SQL maintenance session inputs](#sql-maintenance-session-inputs)
 - [Enable, change or disable core notifications](#enable-change-or-disable-core-notifications)
 - [Coordinator and notification diagnostics](#coordinator-and-notification-diagnostics)
+- [OCI failed files and automatic PK remediation](#oci-failed-files-and-automatic-pk-remediation)
 - [ADB stop and restart windows](#adb-stop-and-restart-windows)
 - [Optional defined-tag catch-up capacity](#optional-defined-tag-catch-up-capacity)
 - [Rebuild and publish the OAC cost-detail MV](#rebuild-and-publish-the-oac-cost-detail-mv)
@@ -131,6 +132,35 @@ WHERE JOB_NAME = 'FINOPS_CORE_DAILY';
 ```
 
 `FINOPS_CORE_REPORT(NULL)` uses the latest audit and asks enabled providers for their status. `EMAIL_STATUS='SENT'` records successful publication; confirm receipt in the subscribed mailbox.
+
+## OCI failed files and automatic PK remediation
+
+The existing combined report includes `EXCLUDED`, `DIAGNOSE`, `DEFERRED` and `PIPELINE_LOADED` counts and a bounded list of outstanding files with their last check and cause. `PIPELINE_LOADED` means Oracle completed the file; it is distinct from remediation `FULL`. Every failed file remains tracked, including access and unknown failures. Later coordinator runs recheck outstanding cases; do not reset a pipeline or edit Oracle-owned status tables to retry them.
+
+```sql
+SELECT PIPELINE_NAME, GENERATION_NO, SOURCE_NAME, FILE_STATE,
+       ERROR_CODE, ERROR_MESSAGE
+FROM OCI_FOCUS_FAIL_FILE
+WHERE FILE_STATE IN ('EXCLUDED','DIAGNOSE','DEFERRED','ERROR')
+ORDER BY FIRST_SEEN_AT;
+
+SELECT PIPELINE_NAME, GENERATION_NO, RAWTOHEX(SOURCE_NAME_HASH) FILE_HASH,
+       ORIGINAL_CHARGEPERIODSTART, ORIGINAL_REFERENCE, FINAL_REFERENCE,
+       OUTCOME, CREATED_AT
+FROM OCI_FOCUS_REMED_ROW
+WHERE OUTCOME = 'REKEYED'
+ORDER BY CREATED_AT DESC;
+
+SELECT P.PIPELINE_NAME, P.STATUS_TABLE, O.LOGFILE_TABLE, O.BADFILE_TABLE
+FROM USER_CLOUD_PIPELINES P
+LEFT JOIN USER_LOAD_OPERATIONS O ON O.ID = P.OPERATION_ID;
+```
+
+Use the returned Oracle table names for read-only inspection of the exact file's status and diagnostic evidence. Generic reject-limit wrappers are insufficient to admit data remediation. Automatic classification uses only structured, attributable error fields; other diagnostic layouts remain `DIAGNOSE` for investigation. Access/permission/connectivity failures are excluded from data loading, not removed from tracking. COPY errors requeue only with empty stage, zero outcomes, absent sessions and terminal matching operations; otherwise their defer reason remains visible. `OCI_FOCUS_COPY_RECOVERY` retains requeue evidence.
+
+A conflict on the exact landing PK is automatically retried with `original_reference || '~' || RAWTOHEX(SOURCE_NAME_HASH)`. The original 49-field row remains in `OCI_FOCUS_REMED_ROW.RAW_ROW_JSON`; the landing and MV shapes are unchanged. References exceeding 512 characters/bytes, an occupied qualified key without matching provenance, or other deterministic row failures remain in `OCI_FOCUS_REMED_MANUAL`. Use the existing manual resolution procedure after inserting/verifying the intended landing row. Never create another suffix or truncate evidence. Unknown or operational row failures retain stage rather than becoming manual data corrections.
+
+The [ingestion design](../../design/02-oci-ingestion.md#oci_focus_remed_row_api) specifies provenance, atomic commits, allowed causes and recovery. Do not purge the row ledger with landing retention. Normal operation assumes immutable uniquely named objects and full rollback of a failed pipeline file; the rollback premise and race/recovery behavior require acceptance testing on the target ADB. The mutex serializes product workers, not Oracle pipeline retries, and elapsed retry intervals do not establish exhaustion. These changes target new installations; there is no migration procedure.
 
 ## ADB stop and restart windows
 
