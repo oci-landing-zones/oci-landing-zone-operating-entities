@@ -2,7 +2,7 @@
     "name"                           : "oci-landingzone-studio",
     "type"                           : "module",
     "private"                        : true,
-    "version"                        : "0.1.0",
+    "version"                        : "0.6.2",
 
     "dependencies": {
         "@xyflow/react"              : "^12.11.0",
