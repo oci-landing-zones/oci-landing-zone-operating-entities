@@ -1,11 +1,13 @@
-// workload extension published security-zone configs match One-OE by CIS level
+// Workload-extension security zones retain the generic composition by CIS level.
 local security_zones(doc) = doc.security_zones_configuration;
 
+local profiles = import 'gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet';
+local baseline = (import 'gen/landing_zone.libsonnet')(profiles.hub_a.config);
 local oneoe = {
-  cis1_pre: import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1_pre.jsonnet',
-  cis1: import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1.jsonnet',
-  cis2_pre: import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_security_cis2_pre.jsonnet',
-  cis2: import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_security_cis2.jsonnet',
+  cis1_pre: baseline.security_cis1_pre,
+  cis1: baseline.security_cis1,
+  cis2_pre: baseline.security_cis2_pre,
+  cis2: baseline.security_cis2,
 };
 
 {

@@ -14,6 +14,16 @@ The deployment menu includes several Hub architectures, each with distinct netwo
 
 &nbsp; 
 
+### Security baseline and optional zones
+
+The published blueprint creates only **Security Zone Recipe 01**, applied to `cmp-landingzone` with the selected CIS level. Use `oneoe_security_cis1.json` or `oneoe_security_cis2.json` from the initial deployment onwards; retain it during subsequent updates. Cloud Guard, Vulnerability Scanning and CIS2 Vault resources remain part of that file.
+
+For optional Recipe 02 per selected environment, use the [OCI Security Zones add-on](../../../../addons/oci-security-zones/README.md) in a separate stack. The base stack continues managing Recipe 01. Observability retains its existing pre/final deployment stages.
+
+### Existing deployments
+
+Earlier final security configurations also managed additional Security Zones and recipes. Replacing those files with this reduced baseline can schedule their destruction. Keep the existing deployed configuration until you have reviewed its plan and prepared any required state migration. Existing resources must have exactly one owning state; do not recreate them through the add-on while the base stack still manages them. A state migration requires separate planning and approval and is not performed by these blueprint files.
+
 ### One-OE Landing Zone Deployment Menu
 
 | [**One-OE + Hub A**](one_oe_hub_a.md) | [**One-OE + Hub B**](one_oe_hub_b.md) | [**One-OE + Hub C**](one_oe_hub_c.md) | [**One-OE + Hub E**](one_oe_hub_e.md) |

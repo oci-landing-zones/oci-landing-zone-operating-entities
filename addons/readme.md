@@ -20,6 +20,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-finops/images/finops_icon.png" height="30" align="center"> | **[OCI FinOps](./oci-finops/README.md)**| A set of **OCI FinOps** configurations with FOCUS to enable cost visibility, governance, and optimization. |
 | <img src="oci-lz-dr/images/dr.png" height="30" align="center"> | **[OCI LZ BCDR](./oci-lz-dr/README.md)** | Deployable **Business Continuity and Disaster Recovery** patterns and configuration guidance for OCI Landing Zones. |
 | <img src="oci-bastion/images/bastion-icon.svg" alt="OCI Bastion" height="30" align="center"> | **[OCI Bastion Access](./oci-bastion/README.md)** | Enable native OCI Bastion service and use dynamic SOCKS5 sessions for private web interface and VM access. Including macOS and Windows guides. |
+| | **[OCI Security Zones](./oci-security-zones/README.md)** | Add optional Recipe 02 Security Zones per environment in separate stacks while One-OE retains its Recipe 01 baseline. |
 | <img src="oci-hybrid-connectivity/images/hc.png" height="30" align="center"> | **[OCI Hybrid Connectivity](./oci-hybrid-connectivity/README.md)** | Configurations and deployment guidance for connecting an OCI Landing Zone to on-premises networks and other clouds using **Site-to-Site VPN** and **FastConnect**. |
 
 &nbsp; 
