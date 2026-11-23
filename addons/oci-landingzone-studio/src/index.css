@@ -802,6 +802,7 @@ a:focus:not(:focus-visible) {
 
   .studio-topbar-brand + span,
   .studio-topbar-brand + span + span,
+  .studio-topbar-version,
   .studio-topbar-debug-space {
     display: none !important;
   }

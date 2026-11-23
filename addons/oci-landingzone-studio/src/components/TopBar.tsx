@@ -6,6 +6,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { oracle } from '../theme';
+import { CURRENT_VERSION } from '../changelog';
 
 const css = {
   bar: { position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', gap: 14, height: 52, padding: '0 24px', background: oracle.nav, color: '#fff', boxShadow: '0 1px 4px rgba(32,31,28,0.18)' } as React.CSSProperties,
@@ -14,6 +15,7 @@ const css = {
   word: { fontSize: 15, fontWeight: 700, letterSpacing: 0.2 } as React.CSSProperties,
   divider: { width: 1, height: 22, background: 'rgba(255,255,255,0.25)' } as React.CSSProperties,
   sub: { fontSize: 13, color: 'rgba(255,255,255,0.78)' } as React.CSSProperties,
+  version: { fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10, padding: '1px 8px', whiteSpace: 'nowrap' } as React.CSSProperties,
   center: { position: 'absolute', left: '50%', top: 0, bottom: 0, transform: 'translateX(-50%)', display: 'flex', alignItems: 'center' } as React.CSSProperties,
   // A real, non-overlapping blank strip between the brand and centred controls.
   // Keeping it out of the flex remainder avoids the centred toggle intercepting
@@ -46,6 +48,9 @@ export default function TopBar({ center, right, onEmptySpaceClick }: {
       </Link>
       <span style={css.divider} />
       <span style={css.sub}>OCI Landing Zone Studio</span>
+      <Link to="/changelog" style={css.version} className="studio-topbar-version" title="What's new — changelog">
+        v{CURRENT_VERSION}
+      </Link>
       <span
         className="studio-topbar-debug-space"
         style={css.debugSpace}
