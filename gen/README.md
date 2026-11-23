@@ -285,3 +285,7 @@ base + {
 - [Jsonnet Official Documentation](https://jsonnet.org/)
 - [Language Reference](https://jsonnet.org/ref/language.html)
 - [Standard Library](https://jsonnet.org/ref/stdlib.html)
+
+## Separate Home and Primary deployments
+
+Config mode supports `stack_scope: 'home'` and `'primary'` alongside the existing `complete` and `regional` scopes. Use these when tenancy Home controls and Primary regional resources need separate stacks. Home requires paired `primary_region` and `primary_region_short_name` in addition to its own Home region fields. See [region and stack settings](../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#1-region-stack-scope-and-security-settings) for ownership and dependency requirements. Generate each source independently; do not mix their outputs in one Terraform state.

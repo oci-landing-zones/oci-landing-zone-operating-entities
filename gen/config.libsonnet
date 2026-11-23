@@ -18,7 +18,7 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
   },
   local supported_hub_kinds = std.objectFields(hub_subnet_order),
   local supported_realms = std.objectFields(constants),
-  local supported_stack_scopes = ['complete', 'regional'],
+  local supported_stack_scopes = ['complete', 'regional', 'home', 'primary'],
 
   local spoke_subnet_names = ['web', 'app', 'db', 'infra'],
 
@@ -147,6 +147,7 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     },
 
   normalize(config)::
+    assert std.length((import 'lib/identity_domain.libsonnet').name(config)) > 0;
     local hub = validation.required_object(config, 'hub', 'config.hub');
     local hub_kind = validation.required(hub, 'kind', 'config.hub.kind');
     assert std.member(supported_hub_kinds, hub_kind) :
@@ -184,6 +185,11 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     local region_short_name =
       if has_region_short_name then config.region_short_name
       else 'fra';
+    local primary_region = optional_non_empty_string(config, 'primary_region', 'config.primary_region');
+    local tenancy_home_region = optional_non_empty_string(config, 'tenancy_home_region', 'config.tenancy_home_region');
+    local primary_region_short_name = optional_non_empty_string(config, 'primary_region_short_name', 'config.primary_region_short_name');
+    assert (primary_region == null) == (primary_region_short_name == null) :
+           'config.primary_region and config.primary_region_short_name must be provided together';
     local dr_region = optional_non_empty_string(config, 'dr_region', 'config.dr_region');
     assert dr_region == null || (
       std.length(std.split(dr_region, '-')) >= 3 &&
@@ -212,6 +218,10 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     local cis_level =
       if raw_cis_level == 1 || raw_cis_level == '1' then 1
       else 2;
+    assert !std.objectHas(config, 'enable_landing_zone_security_zone') || std.type(config.enable_landing_zone_security_zone) == 'boolean' :
+           'config.enable_landing_zone_security_zone must be a boolean';
+    assert !std.objectHas(config, 'enable_shared_network_security_zone') || std.type(config.enable_shared_network_security_zone) == 'boolean' :
+           'config.enable_shared_network_security_zone must be a boolean';
     local recipe1_level = if std.objectHas(config, 'security_zone_recipe1_cis_level') then config.security_zone_recipe1_cis_level else null;
     assert recipe1_level == null || std.member([1, 2], recipe1_level) :
            'config.security_zone_recipe1_cis_level must be 1 or 2';
@@ -222,6 +232,8 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     assert std.member(supported_stack_scopes, stack_scope) :
            'config.stack_scope must be one of: %s' %
            std.join(', ', supported_stack_scopes);
+    assert stack_scope != 'home' || primary_region != null :
+           'config.stack_scope home requires primary_region and primary_region_short_name';
 
     local notification_emails =
       if std.objectHas(config, 'notification_emails') && config.notification_emails != null then
@@ -506,6 +518,7 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       bastion: bastion_contract.normalize(if std.objectHas(config, 'bastion') then config.bastion else null),
       [if std.objectHas(config, 'hybrid_connectivity') then 'hybrid_connectivity']: hybrid,
       region: region,
+      [if tenancy_home_region != null then 'tenancy_home_region']: tenancy_home_region,
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,

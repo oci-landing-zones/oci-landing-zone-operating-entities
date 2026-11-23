@@ -252,6 +252,7 @@ local extension_components = import 'lib/extension_components.libsonnet';
       config_params: pe.platform_config.extension.params,
       platform_config: pe.platform_config,
       cis_level: inputs.cis_level,
+      identity_domain_name: (import 'lib/identity_domain.libsonnet').name(inputs),
       bastion: if std.objectHas(inputs, 'bastion') then inputs.bastion else null,
       network:
         if ext_meta.has_network then

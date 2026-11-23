@@ -1,3 +1,4 @@
+local identity_domain = import '../lib/identity_domain.libsonnet';
 // gen/builders/security.libsonnet
 // Security builder: cloud guard, scanning, security zones, and vaults.
 //
@@ -11,6 +12,8 @@
 local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(config, n, realm_constants, topo)
+  local landing_zone_enabled = !std.objectHas(config, 'enable_landing_zone_security_zone') || config.enable_landing_zone_security_zone;
+  local shared_network_zone_enabled = !std.objectHas(config, 'enable_shared_network_security_zone') || config.enable_shared_network_security_zone;
   local security_target_env_names = topo.security_target_env_names();
   local szp = realm_constants.security_zone_policy_ocids;
   local cis_label(cis_level) = 'L%s' % cis_level;
@@ -21,14 +24,14 @@ function(config, n, realm_constants, topo)
     if std.objectHas(config, 'security_zone_recipe1_cis_level') && config.security_zone_recipe1_cis_level != null then
       config.security_zone_recipe1_cis_level else cis_level;
   local recipe_set(cis_level) = {
-    [cis_recipe_key(recipe1_level(cis_level))]: {
+    [if landing_zone_enabled then cis_recipe_key(recipe1_level(cis_level))]: {
       name: n.display_global('sz-rcp', ['01', 'cis', cis_label(recipe1_level(cis_level))]),
       description: 'Recipe 01 CIS Level %s' % recipe1_level(cis_level),
       compartment_id: n.key_global('CMP', ['SECURITY']),
       cis_level: '%s' % recipe1_level(cis_level),
     },
 
-    [shared_network_recipe_key]: {
+    [if shared_network_zone_enabled then shared_network_recipe_key]: {
       name: n.display_global('sz-rcp', ['02', 'shared', 'network']),
       description: 'Recipe 02 Shared Network',
       compartment_id: n.key_global('CMP', ['SECURITY']),
@@ -127,7 +130,7 @@ function(config, n, realm_constants, topo)
   local cis1_pre = base(1) {
     security_zones_configuration+: {
       security_zones: {
-        [n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(1))])]: {
+        [if landing_zone_enabled then n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(1))])]: {
           name: n.display_global('sz-tgt', ['cis', std.asciiLower(cis_label(recipe1_level(1)))]),
           compartment_id: 'CMP-LANDINGZONE-KEY',
           recipe_key: cis_recipe_key(recipe1_level(1)),
@@ -140,7 +143,7 @@ function(config, n, realm_constants, topo)
   // The topology helper decides which environments are security targets.
   // Config mode defaults this to all environments; published profiles can pin a narrower list.
   local env_zone_targets = {
-    [n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
+    [if shared_network_zone_enabled then n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
       name: n.display_global('sz-tgt', ['shared', 'network']),
       compartment_id: n.key_global('CMP', ['NETWORK']),
       recipe_key: shared_network_recipe_key,
@@ -165,7 +168,7 @@ function(config, n, realm_constants, topo)
   local cis2_pre = base(2) {
     security_zones_configuration+: {
       security_zones: {
-        [n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(2))])]: {
+        [if landing_zone_enabled then n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(2))])]: {
           name: n.display_global('sz-tgt', ['cis', std.asciiLower(cis_label(recipe1_level(2)))]),
           compartment_id: 'CMP-LANDINGZONE-KEY',
           recipe_key: cis_recipe_key(recipe1_level(2)),
@@ -188,7 +191,11 @@ function(config, n, realm_constants, topo)
           protection_mode: 'SOFTWARE',
           vault_key: n.key_global('VLT', ['SHARED', 'SECURITY']),
           service_grantees: [realm_constants.service_identifiers.objectstorage(config.region)],
-          group_grantees: [n.display_global('grp', ['security', 'admin'])],
+          group_grantees: [
+            local group = n.display_global('grp', ['security', 'admin']);
+            if identity_domain.name(config) == identity_domain.default_name then group
+            else identity_domain.group(identity_domain.name(config), group)
+          ],
           versions: ['1', '2'],
         },
       },

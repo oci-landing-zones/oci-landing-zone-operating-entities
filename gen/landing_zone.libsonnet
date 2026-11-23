@@ -129,6 +129,7 @@ function(raw_config)
   } else {};
 
   local extension_state = extensions.resolve({
+    identity_domain_name: (import 'lib/identity_domain.libsonnet').name(config),
     bastion: config.bastion,
     extension_registry: extension_registry,
     extension_entries: extension_entries,

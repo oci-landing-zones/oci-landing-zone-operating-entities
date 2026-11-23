@@ -173,7 +173,7 @@ function(ctx)
         ],
       },
     } + project_policies(ctx) + remote_peering_policies(ctx)
-    + bastion_policies(ctx.bastion, n, bastion_users) + {
+    + bastion_policies(ctx.bastion, n, bastion_users, domain_name=ctx.domain_display) + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(

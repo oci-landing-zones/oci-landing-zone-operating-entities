@@ -133,17 +133,31 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 |---|---|---:|---|---|
 | `region` | string | No* | `eu-frankfurt-1` | OCI region used by generated configuration. |
 | `region_short_name` | string | No* | `fra` | Short region label used by resource naming. |
+| `tenancy_home_region` | string | No | Omitted | Studio metadata preserving the tenancy Home selection on import. Ownership follows `stack_scope`. |
+| `primary_region`, `primary_region_short_name` | strings | For `home` scope | Omitted | Paired Primary deployment region and naming code, used to derive Home-owned IAM and governance for that topology. |
 | `dr_region` | string | No | Omitted | DR region whose Object Storage service must be authorized by complete home IAM. Must differ from `region`. |
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
+| `identity_domain_name` | string | No | `id_lz_common` | Display name of the landing-zone identity domain: 1–100 letters, numbers, hyphens, periods or underscores. Domain-qualified IAM policies and key grants follow this name; logical key `COMMON-DOMAIN` remains stable. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
 | `security_zone_recipe1_cis_level` | number | No | `cis_level` | Optional CIS `1` or `2` override for Security Zone Recipe 01 and its root target only. |
 | `enable_cloud_guard` | boolean | No | `true` | Include Cloud Guard configuration and its dedicated event rule and topic. Set `false` only when Cloud Guard is already enabled and managed externally; the baseline Security Zones require it. Regional output always excludes Cloud Guard. |
-| `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
+| `stack_scope` | `complete`, `regional`, `home` or `primary` | No | `complete` | Declares which resource domains this source config owns. |
+| `enable_landing_zone_security_zone` | boolean | No | `true` | Include Recipe 01 and its `cmp-landingzone` Security Zone in pre/final files. Independent of shared-network and environment zones, Cloud Guard and encryption. |
+| `enable_shared_network_security_zone` | boolean | No | `true` | Include Recipe 02 and its separate `cmp-lz-network` Security Zone. New Studio configurations explicitly set `false`. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
 | `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |
 | `cost_governance` | object | No | Omitted | Opts the complete Home stack into One-OE cost Tag Defaults and its eight inherited budgets, with optional overrides. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
+
+### Separate Home and Primary stacks
+
+For different Home and Primary regions, generate two sources independently:
+
+- Home uses `stack_scope: 'home'`, its own `region`/`region_short_name`, and paired `primary_region`/`primary_region_short_name`. It owns IAM, governance, Cloud Guard, Home events and their notification topics.
+- Primary uses `stack_scope: 'primary'` and its own region pair. It owns networks, Security Zones, regional keys and key-specific IAM grants, observability including Service Connector Hub, and workloads. Keep its key grants even when they use the `oci.home` provider alias.
+
+Deploy Home first with `save_output = true`. Import its runtime `compartments_output.json` into the separate Primary stack. These files support a new installation and do not migrate existing state. Keep the same topology in both sources; configure and generate the same `dr_region` in both when using DR. Complete Primary before the separate regional DR stack; DR imports compartments from Home and network output from Primary. External RPC requesters can additionally require the acceptor's network output. Use separate private sources and Terraform states for each deployment.
 
 ### Cost tags and inherited budgets
 
@@ -207,7 +221,7 @@ notification_emails: {
 
 Optional `security_zone_recipe1_cis_level: 1` or `2` overrides only Recipe 01 and its landing-zone target. When omitted or null, Recipe 01 follows `cis_level`. Shared-network and environment recipes, CMEKs, Vaults and workload security continue to use `cis_level`. A different Recipe 01 level therefore does not establish compliance with that CIS level for the complete landing zone. Review compatibility between the selected restrictions and the resources you deploy.
 
-Studio exposes this override under **Security → Security Zones → Recipe 01 — CIS level**. New designs follow Security baseline until a level is chosen explicitly; **Use baseline level** restores that behavior. New Studio environments have their optional Security Zone toggles off and export `security_targets: []`; baseline landing-zone and shared-network zones remain generated. Saved environment selections are preserved.
+Studio always uses the Security baseline CIS level for Recipe 01. **Security → Security Zones** shows the inherited level and an On/Off switch, enabled by default. Turning it off exports `enable_landing_zone_security_zone: false` and omits Recipe 01 and its target; baseline encryption and Advanced zones are unchanged. Independent recipe-level overrides remain supported by Blueprint Factory sources, but Studio normalizes imported overrides to the baseline and warns when the level changes. New Studio configurations generate only Recipe 01 and its `cmp-landingzone` zone: they export `enable_shared_network_security_zone: false` and `security_targets: []`. **Advanced** reveals independent controls for Recipe 02 / shared network and environment zones. Enabling an additional zone includes its recipe and target; opening or closing Advanced preserves selections. Older saved/imported configurations retain the factory default shared-network zone unless explicitly disabled. Omission of the new field preserves the factory default of `true`; published blueprints are unchanged.
 
 ## 2. Hub
 

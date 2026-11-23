@@ -47,6 +47,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
     local platform_db_key = exadb_project_db.platform_db_key(product, n, scope);
     local platform_db_name = exadb_project_db.platform_db_name(product, scope);
     local iam = exadb_iam.render({
+      identity_domain_name: (import '../../lib/identity_domain.libsonnet').name(params),
       product: product,
       naming: n,
       descriptions: descriptions,

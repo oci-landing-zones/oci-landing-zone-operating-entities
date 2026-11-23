@@ -1,3 +1,4 @@
+local identity_domain = import '../../../lib/identity_domain.libsonnet';
 local cost_scope = import '../../../lib/cost_scope.libsonnet';
 // OKE identity output builder.
 
@@ -5,6 +6,7 @@ local desc = import '../../../descriptions.libsonnet';
 local bastion_policies = import '../../../builders/iam/bastion_policies.libsonnet';
 
 function(ctx) {
+  local domain_name = identity_domain.name(ctx.params),
   local n = ctx.n,
   // Do not derive names through `self`: this object is merged across OKE
   // platforms, and self can resolve to a later platform's context.
@@ -51,7 +53,8 @@ function(ctx) {
       n,
       [group_names.admins],
       ctx.key_segments,
-      ownership=cost_scope.value(ctx.scope.scope_name)
+      ownership=cost_scope.value(ctx.scope.scope_name),
+      domain_name=domain_name
     ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
         _cost_scope:: cost_scope.value(ctx.scope.scope_name),
@@ -64,17 +67,17 @@ function(ctx) {
         compartment_id: 'TENANCY-ROOT',
 
         statements: [
-          "allow group 'id_lz_common'/'%s' to read all-resources in compartment %s" % [group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to manage cluster-family in compartment %s" % [group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to manage instance-family in compartment %s" % [group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to inspect compartments in compartment %s" % [group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to read virtual-network-family in compartment %s" % [group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use subnets in compartment %s" % [group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use network-security-groups in compartment %s" % [group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to manage private-ips in compartment %s" % [group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use compute-capacity-reservations in compartment %s" % [group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to read all-resources in compartment %s" % [domain_name, group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to manage cluster-family in compartment %s" % [domain_name, group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to manage instance-family in compartment %s" % [domain_name, group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to use vnics in compartment %s" % [domain_name, group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to inspect compartments in compartment %s" % [domain_name, group_names.admins, cmp_path],
+          "allow group '%s'/'%s' to read virtual-network-family in compartment %s" % [domain_name, group_names.admins, net_path],
+          "allow group '%s'/'%s' to use subnets in compartment %s" % [domain_name, group_names.admins, net_path],
+          "allow group '%s'/'%s' to use network-security-groups in compartment %s" % [domain_name, group_names.admins, net_path],
+          "allow group '%s'/'%s' to use vnics in compartment %s" % [domain_name, group_names.admins, net_path],
+          "allow group '%s'/'%s' to manage private-ips in compartment %s" % [domain_name, group_names.admins, net_path],
+          "allow group '%s'/'%s' to use compute-capacity-reservations in compartment %s" % [domain_name, group_names.admins, cmp_path],
         ],
       },
 
@@ -89,8 +92,8 @@ function(ctx) {
         compartment_id: 'TENANCY-ROOT',
 
         statements: [
-          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [group_names.rbac_admin, cmp_path],
-          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [group_names.rbac_viewer, cmp_path],
+          "allow group '%s'/'%s' to use cluster in compartment %s" % [domain_name, group_names.rbac_admin, cmp_path],
+          "allow group '%s'/'%s' to use cluster in compartment %s" % [domain_name, group_names.rbac_viewer, cmp_path],
         ],
       },
 
@@ -133,7 +136,8 @@ function(ctx) {
         compartment_id: ctx.cmp_key,
 
         statements: (if ctx.public_load_balancer then [
-          "allow group 'id_lz_common'/'%s' to manage leaf-certificate-family in compartment %s" % [
+          "allow group '%s'/'%s' to manage leaf-certificate-family in compartment %s" % [
+            domain_name,
             n.display_global('grp', ['security', 'admin']),
             cmp_name,
           ],
@@ -149,7 +153,8 @@ function(ctx) {
           // The platform compartment contains one OKE cluster and one
           // cluster-specific key. Compartment placement is the target boundary;
           // no key OCID or target-key tag condition is required.
-          "allow group 'id_lz_common'/'%s' to manage keys in compartment %s" % [
+          "allow group '%s'/'%s' to manage keys in compartment %s" % [
+            domain_name,
             n.display_global('grp', ['security', 'admin']),
             cmp_name,
           ],

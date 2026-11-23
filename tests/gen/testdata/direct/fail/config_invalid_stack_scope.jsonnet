@@ -1,5 +1,5 @@
 // stack_scope rejects unknown ownership modes
-// error_contains: config.stack_scope must be one of: complete, regional
+// error_contains: config.stack_scope must be one of: complete, regional, home, primary
 local config = import 'gen/config.libsonnet';
 
 config.normalize({

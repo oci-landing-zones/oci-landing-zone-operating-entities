@@ -72,7 +72,7 @@ local cost_scope = import '../../lib/cost_scope.libsonnet';
       default_freeform_tags: null,
       identity_domains: {
         'COMMON-DOMAIN': {
-          display_name: 'id_lz_common',
+          display_name: ctx.domain_display,
           description: 'One-OE LZ common Identity Domain',
           compartment_id: null,
           admin_email: null,

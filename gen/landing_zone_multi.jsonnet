@@ -2,9 +2,14 @@
 // Usage: jsonnet --multi output/ --tla-code-file config=my_config.libsonnet gen/landing_zone_multi.jsonnet
 function(config)
   local lz = import 'landing_zone.libsonnet';
-  local result = lz(config);
-  local cis_level = result.cis_level;
   local normalized = (import 'config.libsonnet').normalize(config);
+  // Home owns globals for the Primary topology, including region-qualified RPC IAM.
+  local render_config = if normalized.stack_scope != 'home' then config else config + {
+    stack_scope: 'complete', region: normalized.primary_region,
+    region_short_name: normalized.primary_region_short_name,
+  };
+  local result = lz(render_config);
+  local cis_level = result.cis_level;
   local label_tags = std.objectHas(normalized, 'cost_governance') && normalized.cost_governance.tag_resource_labels;
   local security_output(phase) =
     local security = result['security_cis%d%s' % [cis_level, phase]];
@@ -38,7 +43,7 @@ function(config)
       if key != 'home_region_events_configuration'
     };
 
-  {
+  local outputs = {
     'network.json': result.network,
     ['security_cis%d_pre.json' % cis_level]: security_output('_pre'),
     ['security_cis%d.json' % cis_level]: security_output(''),
@@ -50,4 +55,7 @@ function(config)
        'iam.json': result.iam,
        'governance.json': if label_tags then (import 'lib/governance_resource_tags.libsonnet')(result.governance, normalized) else result.governance,
        [if label_tags then 'governance_pre.json']: result.governance,
-     } else {})
+     } else {});
+  if std.member(['home', 'primary'], normalized.stack_scope) then
+    (import 'lib/deployment_scopes.libsonnet')(outputs, normalized.stack_scope, normalized.region)
+  else outputs

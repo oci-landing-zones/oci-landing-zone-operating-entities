@@ -38,7 +38,7 @@ function(config, n, realm_constants, topo)
     // GRP-LZ-{ENV}-{PROJ}-ADMIN-KEY -> n.key_global('GRP', [env, proj, 'ADMIN'])
     // PCY-LZ-{ENV}-{PROJ}-ADMIN-KEY -> n.key_global('PCY', [env, proj, 'ADMIN'])
 
-    domain_display:: 'id_lz_common',
+    domain_display:: (import '../../lib/identity_domain.libsonnet').name(config_input),
 
     // --- Group name constants (kept in sync with naming module to prevent group/policy drift) ---
     grp_auditors:: naming.display_tenancy('GRP', ['AUDITORS', 'ADMIN']),

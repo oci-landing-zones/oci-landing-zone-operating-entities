@@ -128,6 +128,7 @@ local common = import 'hub/hub_common.libsonnet';
         assert !hub_has_spoke_natgw || config.hub.kind == 'hub_e' :
           'Spoke NAT gateways are supported only with Hub E';
       {
+        identity_domain_name: (import 'lib/identity_domain.libsonnet').name(config),
         naming: n,
         hub_vcn_cidr: config.hub.network.vcn,
         hub_lb_cidr: config.hub.network.subnets.lb,

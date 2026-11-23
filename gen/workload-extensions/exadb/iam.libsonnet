@@ -26,7 +26,7 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
       !is_shared_scope && (components.infrastructure || components.database);
     local has_environment_db_group = !is_shared_scope && components.database;
     local product_upper = std.asciiUpper(product.code);
-    local domain_display = 'id_lz_common';
+    local domain_display = (import '../../lib/identity_domain.libsonnet').name(inputs);
     local domain_grp(grp_name) = "'%s'/'%s'" % [domain_display, grp_name];
     local tag_allow(grp_name, verb, resource, tag_value) =
       "allow group %s to %s %s in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.%s, ('%s'))" % [
@@ -431,7 +431,8 @@ local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
           n,
           [groups[key].name for key in std.objectFields(groups)],
           scope.key_segments + ['PLATFORM', scope.platform_name],
-          ownership=cost_scope.value(scope.scope_name)
+          ownership=cost_scope.value(scope.scope_name),
+          domain_name=domain_display
         ),
     },
 }
