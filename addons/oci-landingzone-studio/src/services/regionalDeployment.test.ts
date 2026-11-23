@@ -38,6 +38,14 @@ describe('regional designs in the standard model', () => {
     expect(validateOkeModel(model)).toEqual([]);
     expect(validatePlatformContracts(model)).toEqual([]);
   });
+  it('requires linked CIS2 secondary authorization to match its selected region', () => {
+    const primary = emptyLzModel();
+    const secondary = createRegionalModel();
+    Object.assign(secondary.foundation, { cisLevel: 2, region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
+    expect(validateRegionalDeployment(secondary, primary).join(' ')).toContain('Select this secondary region in the primary design');
+    primary.foundation.drRegion = 'eu-amsterdam-1';
+    expect(validateRegionalDeployment(secondary, primary)).toEqual([]);
+  });
   it('starts blank without environments and requires distinct Home and DR regions', () => {
     const model = createRegionalModel();
     expect(model.environments).toEqual([]);

@@ -41,18 +41,18 @@ const persistent = ['iam.json', 'governance.json'];
  * Builds the rms-facade input sets without ever placing pre and final variants
  * of the same root configuration family in one operation.
  */
-export function deploymentStages(availableFiles: string[], completionNetwork: 'network.json' | 'network_backends.json' = 'network.json'): DeploymentStage[] {
+export function deploymentStages(availableFiles: string[], completionNetwork: 'network.json' | 'network_backends.json' = 'network.json', deferSecurityZones = true): DeploymentStage[] {
   const deployable = availableFiles.filter((file) => file.endsWith('.json')
     && !file.endsWith('_output.json') && !file.includes('/') && file !== 'network_pre.json');
   const available = new Set(deployable);
   if (!available.has(completionNetwork)) throw new Error(`Generate ${completionNetwork} before selecting it for deployment.`);
   const keep = (files: string[]) => [...new Set(files.filter((file) => available.has(file)))];
-  const pre = [...available].filter((file) => file.endsWith('_pre.json'));
+  const pre = [...available].filter((file) => file.endsWith('_pre.json') && (deferSecurityZones || !file.startsWith('security_cis') || !available.has(file.replace(/_pre\.json$/, '.json'))));
   const finalCore = deployable.filter((file) =>
     (file.startsWith('security_cis') || file.startsWith('observability_cis'))
     && !file.endsWith('_pre.json'),
   );
-  const initialCore = finalCore.filter((file) => !available.has(file.replace(/\.json$/, '_pre.json')));
+  const initialCore = finalCore.filter((file) => !pre.includes(file.replace(/\.json$/, '_pre.json')));
   const extensionFiles = deployable.filter((file) =>
     !persistent.includes(file)
     && file !== 'network.json'
@@ -63,7 +63,7 @@ export function deploymentStages(availableFiles: string[], completionNetwork: 'n
     && !file.endsWith('_pre.json'),
   );
 
-  return [
+  const stages = [
     {
       title: '1. Create the landing zone',
       description: 'Create the network and routing together. Files ending in _pre establish prerequisites; include complete control files when no _pre variant is generated.',
@@ -75,4 +75,8 @@ export function deploymentStages(availableFiles: string[], completionNetwork: 'n
       files: keep([...persistent, completionNetwork, ...finalCore, ...extensionFiles]),
     },
   ];
+  if (stages[0].files.length === stages[1].files.length && stages[0].files.every((file) => stages[1].files.includes(file))) {
+    return [{ ...stages[0], description: 'Create the landing zone with the final configuration files in one plan and apply.' }];
+  }
+  return stages;
 }

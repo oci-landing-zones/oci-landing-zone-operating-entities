@@ -173,11 +173,11 @@ describe('observability and cost settings', () => {
     expect(budgets).toContain('Alert threshold (%)');
   });
 
-  it('explains that DR reuses Home Region governance', () => {
+  it('explains that DR reuses Primary deployment governance', () => {
     const model = taggedModel();
     model.foundation.stackScope = 'regional';
     const section = render(model).match(/<section[^>]*aria-labelledby="cost-budgets-title"[\s\S]*?<\/section>/)?.[0];
-    expect(section).toContain('Tags and budgets are managed in the Home Region.');
+    expect(section).toContain('Tags and budgets are managed by the primary deployment.');
   });
 
   it('locks Home-owned cost governance in DR without notification settings', () => {
@@ -206,12 +206,13 @@ it('keeps IAM role tags and compartment budgets explained when FinOps tags are d
   expect(html).not.toContain('budget-cost-center-cc12345');
 });
 
-it('starts with FinOps tags unchecked and shared budget alerts checked', () => {
+it('starts with FinOps tags unchecked and a direct email field for its single budget', () => {
   const html = render(emptyLzModel());
   const checkbox = html.match(/<input[^>]*id="cost-finops-enabled"[^>]*>/)?.[0];
   expect(checkbox).toContain('type="checkbox"');
   expect(checkbox).not.toContain('checked=""');
-  expect(html).toMatch(/<label[^>]*><input[^>]*checked=""[^>]*\/>Use one email for all budget alerts<\/label>/);
+  expect(html).not.toContain('Use one email for all budget alerts');
+  expect(html).toContain('id="cost-budget-shared-email"');
   expect(html).not.toContain('id="cost-budget-BUDGET-LANDINGZONE-KEY-recipients"');
   expect(html).toMatch(/<label[^>]*>[\s\S]*?id="cost-finops-enabled"[^>]*\/>Enable FinOps tags<\/label>/);
   expect(html).not.toContain('aria-label="Cost governance tags"');
@@ -234,7 +235,7 @@ it.each([true, false])('clears budget email errors after entering valid recipien
   const model = emptyLzModel();
   const cfg = model.foundation.costGovernance!;
   cfg.useSingleRecipient = shared;
-  const id = shared ? 'cost-budget-shared-email' : 'cost-budget-BUDGET-LANDINGZONE-KEY-recipients';
+  const id = 'cost-budget-shared-email';
   const input = (html: string) => html.match(new RegExp(`<input[^>]*id="${id}"[^>]*>`))?.[0];
   cfg.recipients = 'invalid';
   cfg.budgets['BUDGET-LANDINGZONE-KEY'].recipients = 'invalid';
@@ -297,4 +298,24 @@ it('associates missing business-unit assignments with their cost-center selector
   expect(selector).toContain('aria-invalid="true"');
   expect(selector).toContain('aria-describedby="cost-business-unit-IT-error"');
   expect(html).toContain('id="cost-business-unit-IT-error"');
+});
+
+it('keeps a single budget’s individual recipients editable below the budget when shared emails are disabled', () => {
+  const model = emptyLzModel();
+  const cfg = model.foundation.costGovernance!;
+  cfg.useSingleRecipient = false;
+  cfg.budgets['BUDGET-LANDINGZONE-KEY'] = { ...defaultCostGovernance().budgets['BUDGET-LANDINGZONE-KEY'], recipients: 'budget-owner@customer.test' };
+  const html = render(model);
+  expect(html).not.toContain('Use one email for all budget alerts');
+  expect(html).toMatch(/id="cost-budget-shared-email"[^>]*value="budget-owner@customer.test"/);
+  expect(html).not.toContain('id="cost-budget-BUDGET-LANDINGZONE-KEY-recipients"');
+});
+
+it('offers shared or individual email configuration when multiple budgets are present', () => {
+  const model = taggedModel();
+  model.foundation.costGovernance!.useSingleRecipient = false;
+  const html = render(model);
+  expect(html).toContain('Use one email for all budget alerts');
+  expect(html).toContain('id="cost-budget-BUDGET-LANDINGZONE-KEY-recipients"');
+  expect(html).not.toContain('id="cost-budget-shared-email"');
 });

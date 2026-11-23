@@ -1,3 +1,4 @@
+import { DEPLOYMENT_STACK_COLORS } from '../diagram/deploymentStackStyle';
 import type { DiagramModel, DiagramNode } from '../model/types';
 import { oracle } from '../theme';
 import { SHIELD_SVG } from '../diagram/shieldSvg';
@@ -8,6 +9,7 @@ import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } f
 import { flowGroup, labelAnchor, marksAlong, type Point } from '../diagram/flowOverlayGeometry';
 import { createFlowPlayback, flowHopMarkers } from '../diagram/flowPlayback';
 import { resourceGroupSvg } from '../diagram/resourceGroups';
+import { foundationResourceSvg } from '../diagram/foundationResources';
 import { compartmentStyle } from '../diagram/compartmentStyle';
 import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from '../diagram/firewallBackends';
 import { ATTACHMENT_LABEL, DRG_CAPTION, OSN_ICON_SIZE } from '../diagram/layoutPolicy';
@@ -160,8 +162,10 @@ function nodeStyle(node: DiagramNode): string {
   const containerTop = 'whiteSpace=wrap;html=1;container=1;collapsible=0;verticalAlign=top;align=left;spacingLeft=6;spacingTop=4;fontStyle=1;';
   const compTop = 'whiteSpace=wrap;html=1;verticalAlign=middle;align=left;spacingLeft=8;';
   switch (node.kind) {
-    case 'region':
-      return `rounded=0;${containerTop}fillColor=#fbfbfb;strokeColor=${oracle.borderStrong};fontColor=${oracle.ink};`;
+    case 'region': {
+      const palette = node.deploymentStack ? DEPLOYMENT_STACK_COLORS[node.deploymentStack] : undefined;
+      return `rounded=0;${containerTop}fillColor=${palette?.fill ?? '#fbfbfb'};strokeColor=${palette?.stroke ?? oracle.borderStrong};fontColor=${oracle.ink};`;
+    }
     case 'tenancy':
       return `rounded=0;${containerTop}dashed=1;dashPattern=8 6;strokeWidth=2;fillColor=none;strokeColor=${oracle.ink};fontColor=${oracle.ink};`;
     case 'landingzone':
@@ -195,6 +199,7 @@ function nodeStyle(node: DiagramNode): string {
     case 'rtdot':
       return `ellipse;html=1;fillColor=${node.rtDotConfigured === false ? '#b0aca8' : RT_TONE_COLORS[node.rtDotTone ?? 'hub']};strokeColor=#ffffff;strokeWidth=1.5;`;
     case 'resourcegroup':
+      if (node.foundationResource) return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(foundationResourceSvg(node.foundationResource, node.width))};`;
       return `shape=image;imageAspect=0;noLabel=1;image=${svgUri(resourceGroupSvg(node.resourceKind!, node.resourceItems ?? [], node.width))};`;
     case 'vpn':
     case 'premises':

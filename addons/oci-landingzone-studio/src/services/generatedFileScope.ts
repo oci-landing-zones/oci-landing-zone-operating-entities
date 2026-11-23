@@ -20,7 +20,7 @@ function hasIamGrants(value: unknown): boolean {
 
 /** Classify emitted resource blocks, rather than assuming a file has one domain. */
 export function generatedFileScope(filename: string, contents: string, region: 'HR' | 'DR'): string {
-  const regionLabel = region === 'HR' ? 'Home region' : region;
+  const regionLabel = region === 'HR' ? 'Primary deployment' : region;
   if (filename === 'config.jsonnet') return `Source · ${regionLabel}`;
   try {
     const resource = JSON.parse(contents) as unknown;

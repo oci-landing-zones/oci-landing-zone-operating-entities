@@ -26,11 +26,16 @@ describe('Studio config import', () => {
       hub: { ...config.hub, network: { ...config.hub.network, custom_subnets: {} } } };
     expect(buildConfig(importConfig(input).model)).toEqual(config);
   });
-  it.each([1, 2] as const)('round trips an explicit Recipe 01 CIS %s override', async (level) => {
+  it.each([1, 2] as const)('normalizes a legacy Recipe 01 CIS %s override to the baseline', async (level) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = level === 1 ? 2 : 1;
     model.foundation.securityZoneRecipe1CisLevel = level;
-    expect((await roundTrip(model)).model.foundation.securityZoneRecipe1CisLevel).toBe(level);
+    const restored = (await roundTrip(model)).model;
+    expect(restored.foundation.securityZoneRecipe1CisLevel).toBeUndefined();
+    expect(restored.foundation.cisLevel).toBe(model.foundation.cisLevel);
+    const imported = importConfig({ ...buildConfig(model), security_zone_recipe1_cis_level: level });
+    expect(imported.warnings.join(' ')).toContain('Recipe 01 now follows');
+    expect(buildConfig(imported.model)).not.toHaveProperty('security_zone_recipe1_cis_level');
   });
 
   it('restores root Bastion settings without changing the exported configuration', async () => {

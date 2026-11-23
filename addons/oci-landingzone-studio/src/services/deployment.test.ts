@@ -1,11 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { DEPLOY_TO_OCI_URL, ORCHESTRATOR_RELEASE_URL, deploymentReadme, deploymentPrerequisites, deploymentSettings, deploymentCliSteps, expectedDeploymentFiles } from './deployment';
+import { DEPLOY_TO_OCI_URL, ORCHESTRATOR_RELEASE_URL, plannedDeploymentStages, deploymentReadme, deploymentPrerequisites, deploymentSettings, deploymentCliSteps, expectedDeploymentFiles } from './deployment';
 import { emptyLzModel } from '../model/defaults';
 import { buildConfig } from './lzConfig';
 import { newPlatform } from './platforms';
 import { emptyHybridConnectivity, newVpn } from './hybridConnectivity';
 
 describe('default deployment settings', () => {
+  it('uses one apply with final files when additional Security Zones are disabled', () => {
+    const config = buildConfig(emptyLzModel());
+    const guide = deploymentReadme(config, expectedDeploymentFiles(config));
+    expect(guide).not.toContain('Update and apply phase 2');
+    expect(guide).not.toContain('security_cis1_pre.json');
+    expect(guide).toContain('security_cis1.json');
+    expect(guide).not.toContain('before starting phase 2');
+    expect(guide).not.toContain('with the phase 2 list');
+  });
+
   it('expects complete observability without an obsolete pre file', () => {
     const files = expectedDeploymentFiles(buildConfig(emptyLzModel()));
     expect(files).toContain('observability_cis1.json');
@@ -13,9 +23,10 @@ describe('default deployment settings', () => {
   });
   it('presents preparation, phase 1 inputs and apply, then phase 2 inputs and apply in execution order', () => {
     const config = buildConfig(emptyLzModel());
+    config.enable_shared_network_security_zone = true;
     const guide = deploymentReadme(config, expectedDeploymentFiles(config));
     const prepare = guide.indexOf('1. Prepare the files');
-    const create = guide.indexOf('2. Create and apply phase 1');
+    const create = guide.indexOf('2. Create and apply');
     const firstInputs = guide.indexOf('  security_cis1_pre.json');
     const firstApply = guide.indexOf('Select Create');
     const update = guide.indexOf('3. Update and apply phase 2');
@@ -52,6 +63,7 @@ describe('default deployment settings', () => {
 
   it('packages the default settings and exact phase file lists without design values', () => {
     const config = buildConfig(emptyLzModel());
+    config.enable_shared_network_security_zone = true;
     const guide = deploymentReadme(config, ['iam.json', 'governance.json', 'network.json',
       'security_cis2_pre.json', 'security_cis2.json', 'observability_cis2_pre.json', 'observability_cis2.json']);
     expect(guide).toContain('rms-facade');
@@ -91,18 +103,18 @@ describe('default deployment settings', () => {
     expect(steps.includes('encryption keys')).toBe(cis === 2);
     expect(deploymentCliSteps(config).join('\n').replaceAll('`', '')).toContain('local_dependency_file_paths to the absolute paths of compartments_output.json and network_output.json');
     const guide = deploymentReadme(config, expectedDeploymentFiles(config));
-    expect(guide.indexOf('On Home, set save_output')).toBeLessThan(guide.indexOf('2. Create and apply phase 1'));
+    expect(guide.indexOf('Set save_output = true on the prerequisite stacks')).toBeLessThan(guide.indexOf('2. Create and apply'));
     expect(guide.indexOf('Set oci_dependency_objects')).toBeLessThan(guide.indexOf('Select Create'));
     expect(guide).not.toContain('Set save_output = true to write runtime outputs');
   });
 
-  it('sets Home output publishing before applying and collects outputs after phase 2', () => {
+  it('sets Home output publishing before applying and collects outputs after the final apply', () => {
     const config = buildConfig(emptyLzModel());
     config.dr_region = 'eu-amsterdam-1';
     const guide = deploymentReadme(config, expectedDeploymentFiles(config));
-    expect(guide.indexOf('Set save_output = true')).toBeGreaterThan(guide.indexOf('2. Create and apply phase 1'));
+    expect(guide.indexOf('Set save_output = true')).toBeGreaterThan(guide.indexOf('2. Create and apply'));
     expect(guide.indexOf('Set save_output = true')).toBeLessThan(guide.indexOf('Select Create'));
-    expect(guide.indexOf('Retain compartments_output.json and network_output.json')).toBeGreaterThan(guide.indexOf('Save the updated variables'));
+    expect(guide.indexOf('Retain compartments_output.json and network_output.json')).toBeGreaterThan(guide.indexOf('Select Create'));
     expect(guide).not.toContain('oci_dependency_objects');
   });
 
@@ -140,4 +152,18 @@ describe('default deployment settings', () => {
     const bgp = buildConfig(model);
     expect(deploymentReadme(bgp, expectedDeploymentFiles(bgp))).toContain('For the BGP tunnels');
   });
+});
+
+it.each(['shared-zone', 'environment-zone', 'governance-tags', 'workload', 'firewall-backends'])('retains a second apply for %s', (reason) => {
+  const model = emptyLzModel();
+  if (reason === 'shared-zone') model.foundation.sharedNetworkSecurityZone = true;
+  if (reason === 'environment-zone') model.environments[0].securityZone = true;
+  if (reason === 'firewall-backends') model.network.hubKind = 'hub_c';
+  const config = buildConfig(model);
+  const files = [...expectedDeploymentFiles(config), ...(reason === 'governance-tags' ? ['governance_pre.json'] : []), ...(reason === 'workload' ? ['oke.json'] : [])];
+  const stages = plannedDeploymentStages(config, files);
+  expect(stages).toHaveLength(2);
+  if (reason.endsWith('-zone')) expect(stages[0].files).toContain('security_cis1_pre.json');
+  else expect(stages[0].files).toContain('security_cis1.json');
+  expect(deploymentReadme(config, files)).toContain('Update and apply phase 2');
 });

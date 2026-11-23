@@ -32,6 +32,18 @@ const inventory = (): GeneratedResourceInventory => ({
 });
 
 describe('generated diagram resource groups', () => {
+  it('hides Security Zone shields and recipes for the IAM view while retaining them in other views', () => {
+    const model = emptyLzModel();
+    model.environments[0].securityZone = true;
+    const source = inventory();
+    const iam = buildGraph(model, 1, { showSecurityZones: false }, undefined, [], source);
+    expect(iam.nodes.some((node) => node.secure)).toBe(false);
+    expect(iam.nodes.some((node) => node.resourceKind === 'securityrecipes')).toBe(false);
+    const security = buildGraph(model, 1, {}, undefined, [], source);
+    expect(security.nodes.some((node) => node.secure)).toBe(true);
+    expect(security.nodes.some((node) => node.resourceKind === 'securityrecipes')).toBe(true);
+  });
+
   it.each([1, 5])('places a full-width identity-domain panel inside its owner at step %s', (step) => {
     const source = inventory();
     source.groups.push({ id: 'identitydomain:COMMON', kind: 'identitydomain', compartmentKey: 'root',

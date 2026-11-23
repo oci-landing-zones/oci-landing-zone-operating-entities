@@ -1,5 +1,5 @@
 /**
- * WizardStepper — navigation across the seven-step wizard.
+ * WizardStepper — navigation across the nine-step wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */
@@ -16,17 +16,19 @@ export interface WizardStep {
 
 export const WIZARD_STEPS: WizardStep[] = [
   { id: 1, label: 'Foundation' },
-  { id: 2, label: 'Security' },
-  { id: 3, label: 'Hub Network' },
-  { id: 4, label: 'Projects' },
-  { id: 5, label: 'Platforms' },
-  { id: 6, label: 'Governance' },
-  { id: 7, label: 'Review' },
+  { id: 2, label: 'IAM' },
+  { id: 3, label: 'Security' },
+  { id: 4, label: 'Observability' },
+  { id: 5, label: 'Hub Network' },
+  { id: 6, label: 'Projects' },
+  { id: 7, label: 'Platforms' },
+  { id: 8, label: 'Governance' },
+  { id: 9, label: 'Review' },
 ];
 
-/** Security shares Foundation's preview phase; later steps retain their existing layers. */
+/** IAM, Security and Observability share Foundation's preview phase; later steps retain their existing layers. */
 export function previewPhase(step: number): number {
-  return step > 1 ? step - 1 : 1;
+  return step > 3 ? step - 3 : 1;
 }
 
 const css = {

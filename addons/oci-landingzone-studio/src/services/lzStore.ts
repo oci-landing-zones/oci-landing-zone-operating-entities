@@ -191,13 +191,29 @@ export function createLZ(name?: string, model: LzModel = emptyLzModel(), clock: 
 
 export function createDrLZ(homeId: string): CreateLzResult {
   const home = readHomeRecord(homeId);
-  if (!home) return { ok: false, message: 'Choose an available Home Region design with valid environments as the Home source.' };
+  if (!home) return { ok: false, message: 'Choose an available primary deployment design with valid environments as the primary source.' };
   const model = structuredClone(home.model);
   const region = findRegion(model.foundation.realm, model.foundation.drRegion ?? '');
   model.foundation = { ...model.foundation, stackScope: 'regional', homeRegion: home.model.foundation.region,
     region: region && region.id !== home.model.foundation.region ? region.id : '',
     regionShortName: region && region.id !== home.model.foundation.region ? region.shortName : '', drRegion: undefined };
+  delete model.foundation.deploymentMode;
   return createRecord(`${home.name} DR`, model, new Date(), home.id);
+}
+
+/** Prepare the primary's DR authorization before creating or reopening its linked secondary. */
+export function configureSecondaryLZ(primaryId: string, secondaryRegion: string): CreateLzResult {
+  const primary = readHomeRecord(primaryId);
+  if (!primary) return { ok: false, message: 'Choose an available primary design.' };
+  if (!findRegion(primary.model.foundation.realm, secondaryRegion) || secondaryRegion === primary.model.foundation.region) {
+    return { ok: false, message: 'Choose a secondary region in the same realm, different from the primary region.' };
+  }
+  const model = structuredClone(primary.model);
+  model.foundation = { ...model.foundation, drRegion: secondaryRegion, deploymentMode: 'primary-secondary' };
+  const saved = saveLZ(primaryId, model);
+  if (!saved.ok) return saved;
+  const existing = listLZs().map((meta) => getLZ(meta.id)).find((record) => record?.homeLzId === primaryId && record.model.foundation.region === secondaryRegion);
+  return existing ? { ok: true, record: existing } : createDrLZ(primaryId);
 }
 
 /** Persist the canonical model for an existing record; stamps updatedAt. */
@@ -206,7 +222,7 @@ export function saveLZ(id: string, model: LzModel): StoreResult {
   const existing = getLZ(id);
   if (!stored || !existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
   const home = linkedHomeRecord(existing);
-  if (existing.homeLzId && !home) return { ok: false, message: 'The linked Home Region design is unavailable or no longer uses the Home Region deployment type. This DR design was not changed.' };
+  if (existing.homeLzId && !home) return { ok: false, message: 'The linked Primary deployment design is unavailable or no longer uses the primary deployment type. This DR design was not changed.' };
   const updated: LzRecord = { ...existing, model: stripInlineSecrets(home ? syncDrEnvironments(model, home.model) : model), updatedAt: now() };
   if (existing.disasterRecovery) {
     updated.previousCombinedDesign = { home: existing.model, ...existing.disasterRecovery };

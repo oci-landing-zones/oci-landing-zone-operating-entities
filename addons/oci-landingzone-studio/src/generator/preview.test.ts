@@ -4,6 +4,7 @@ import { emptyLzModel } from '../model/defaults';
 import { generateOutputs } from './generate';
 import { generatePreview } from './preview';
 import { setAssetLoader } from './jsonnetVm';
+import { extractFoundationResources } from '../services/foundationInventory';
 import { extractGeneratedResources } from '../services/generatedResources';
 import { newPlatform } from '../services/platforms';
 import { defaultCostGovernance } from '../services/costGovernance';
@@ -50,7 +51,10 @@ describe('canonical diagram preview', () => {
     const final = outputs[`security_cis${cisLevel}.json`].bastions_configuration;
     const pre = outputs[`security_cis${cisLevel}_pre.json`].bastions_configuration;
     expect(pre).toEqual(final);
-    const { inventory, network } = await generatePreview(model);
+    const { inventory, network, foundationResources } = await generatePreview(model);
+    expect(foundationResources).toEqual(extractFoundationResources(outputs));
+    expect(foundationResources.regional.includes('vault')).toBe(cisLevel === 2);
+    expect(foundationResources.regional).toContain('bastion');
     expect(network).toEqual(outputs['network.json']);
     expect(inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
     if (cisLevel === 2) {
@@ -124,7 +128,10 @@ describe('canonical diagram preview', () => {
   it('honors regional output filtering while retaining Home compartment references for placement', async () => {
     const model = emptyLzModel();
     Object.assign(model.foundation, { cisLevel: 2, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
-    const { inventory } = await generatePreview(model);
+    const { inventory, foundationResources } = await generatePreview(model);
+    expect(foundationResources.home).toEqual([]);
+    expect(foundationResources.regional).not.toContain('securityzones');
+    expect(foundationResources.regional).toContain('vault');
     expect(inventory.groups.some((group) => group.kind === 'securityrecipes' || group.compartmentKey === 'TENANCY-ROOT')).toBe(false);
     expect(inventory.groups.some((group) => group.kind === 'vault')).toBe(true);
     expect(inventory.compartments).toContainEqual({ key: 'CMP-LZ-PROD-SECURITY-KEY', name: 'cmp-lz-prod-security', parentKey: 'CMP-LZ-PROD-KEY' });

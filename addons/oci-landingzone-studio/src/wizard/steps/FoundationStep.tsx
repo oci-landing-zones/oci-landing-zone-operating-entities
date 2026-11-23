@@ -1,26 +1,19 @@
 /**
- * FoundationStep — step 1 inputs: realm / region / region short name, plus the
- * environments table. Writes straight into the
+ * FoundationStep — step 1 inputs: realm / Home, Primary and Secondary regions. Writes straight into the
  * canonical model via the wizard context; the diagram and JSON re-derive.
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
-import NotificationsSection from './NotificationsSection';
-import DeleteButton from '../../components/DeleteButton';
 import FieldError from '../../components/FieldError';
 import InfoButton from '../../components/InfoButton';
-import { configKeyError, fieldErrorProps } from '../../services/fieldErrors';
-import { createModelId, envNetworkDefaults } from '../../model/defaults';
-import { configuredVcnCidrs } from '../../services/exadata';
-import { customDefaultSubnets } from '../../services/platforms';
-import { environmentPlatformCidr } from '../../services/oneOeCidrs';
+import { fieldErrorProps } from '../../services/fieldErrors';
 import { oracle } from '../../theme';
 import {
-  findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS, regionShortNameError,
+  findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS,
 } from '../../services/regions';
-import type { Environment, FoundationConfig } from '../../model/types';
+import { foundationDeploymentStacks } from '../../services/deploymentTopology';
+import type { FoundationConfig } from '../../model/types';
 import { s as form } from './networkEditorStyles';
 
 const s: Record<string, React.CSSProperties> = {
@@ -29,54 +22,84 @@ const s: Record<string, React.CSSProperties> = {
   accent:  { height: 3, background: oracle.red, borderRadius: '8px 8px 0 0' },
   body:    { padding: 20 },
   title:   form.title,
+  sectionHeading: { ...form.docH, margin: '0 0 12px' },
+  sectionDivider: { marginTop: 20, paddingTop: 16, borderTop: `1px solid ${oracle.border}` },
   help:    form.help,
-  locationGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 14 },
+  locationGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: 14, marginBottom: 14 },
   label:   form.label,
+  regionLabelRow: { display: 'flex', alignItems: 'center', gap: 4, minHeight: 32, marginBottom: 6 },
   input:   form.input,
   field:   { marginBottom: 14 },
 
-  tableHead: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '10px 12px', background: oracle.surfaceAlt, border: `1px solid ${oracle.border}`, borderRadius: '6px 6px 0 0', fontSize: 12, fontWeight: 600, color: oracle.textMuted },
-  row:     { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '10px 12px', borderLeft: `1px solid ${oracle.border}`, borderRight: `1px solid ${oracle.border}`, borderBottom: `1px solid ${oracle.border}` },
-  rowInput:form.rowInput,
-  empty:   { padding: '16px 12px', border: `1px dashed ${oracle.border}`, borderTop: 'none', color: oracle.textMuted, fontSize: 13 },
-
-  addRow:  { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 64px', gap: 12, alignItems: 'center', padding: '0 12px', borderLeft: '1px solid transparent', borderRight: '1px solid transparent' },
-  addBtn:  { ...form.addBtn, padding: '9px 8px' },
-  addLabel:{ ...form.label, margin: '20px 12px 8px' },
 };
 
-export default function FoundationStep({ name, onNameChange, onNameBlur, nameError }: {
+function RegionReferenceLink({ region }: { region: 'Home' | 'Primary' }) {
+  return <a className="guide-link" href={`${import.meta.env.BASE_URL}reference/regions`} target="_blank" rel="noopener noreferrer"
+    aria-label={`View region reference for ${region} region (opens in a new tab)`} title="View region reference"
+    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, flexShrink: 0, borderRadius: 4 }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  </a>;
+}
+
+export default function FoundationStep({ name, onNameChange, onNameBlur, nameError, primaryDesigns = [], onUsePrimary, onConfigureSecondary, deploymentError }: {
   name: string;
   onNameChange: (name: string) => void;
   onNameBlur: () => void;
   nameError?: string | null;
+  primaryDesigns?: { id: string; name: string; realm: string; region: string; secondaryRegion?: string }[];
+  onUsePrimary?: (id: string, secondaryRegion: string) => void;
+  onConfigureSecondary?: () => void;
+  deploymentError?: string | null;
 }) {
   const { model, setField, homeSource } = useWizard();
   const f = model.foundation;
   const regional = f.stackScope === 'regional';
-  const envs = model.environments;
 
-  const [newName, setNewName] = useState('');
+  const [choosePrimary, setChoosePrimary] = useState(false);
+  const [primaryId, setPrimaryId] = useState('');
+  const [existingSecondaryRegion, setExistingSecondaryRegion] = useState('');
+  const selectedPrimary = primaryDesigns.find((primary) => primary.id === primaryId);
+  const selectedSecondaryRegion = existingSecondaryRegion || selectedPrimary?.secondaryRegion || '';
+  const deploymentType = regional || choosePrimary ? 'secondary-existing' : f.deploymentMode ?? (f.drRegion ? 'primary-secondary' : 'primary-only');
 
   const regionOptions = getRegionsForRealm(f.realm);
-  const regionError = !findRegion(f.realm, f.region) ? 'Select a region in this realm.' : null;
-  const shortNameError = regionShortNameError(f.regionShortName);
+  const tenancyHomeRegion = homeSource?.model?.foundation.tenancyHomeRegion ?? f.tenancyHomeRegion ?? '';
+  const tenancyHomeRegionError = !tenancyHomeRegion ? 'Select a tenancy home region.'
+    : !findRegion(f.realm, tenancyHomeRegion) ? 'Select a tenancy home region in this realm.' : null;
+  const regionError = !f.region ? (regional ? 'Select a secondary region.' : 'Select a primary region.')
+    : !findRegion(f.realm, f.region) ? 'Select a region in this realm.' : null;
   const homeRegionError = regional && (!findRegion(f.realm, f.homeRegion ?? '') || f.homeRegion === f.region)
-    ? 'Select a Home Region different from the DR region.' : null;
-  const newNameError = newName.trim() ? configKeyError(newName, envs.map((env) => env.name)) : null;
+    ? 'Select a primary region different from the DR region.' : null;
+  const secondaryRegionError = !f.drRegion ? 'Select a secondary region.'
+    : !findRegion(f.realm, f.drRegion) || f.drRegion === f.region ? 'Select a secondary region in this realm, different from the Primary region.' : null;
+
+  const hasSecondary = regional || deploymentType === 'primary-secondary';
+  const summaryReady = !tenancyHomeRegionError && !regionError
+    && (regional ? !homeRegionError : !hasSecondary || !secondaryRegionError);
+  const configurationCount = hasSecondary ? 2 : 1;
+  const stackCount = foundationDeploymentStacks({ ...f, tenancyHomeRegion,
+    drRegion: hasSecondary && !regional ? f.drRegion : undefined }).length;
+  const deploymentSummary = summaryReady
+    ? `${configurationCount} Studio configuration${configurationCount === 1 ? '' : 's'} · ${stackCount} deployment stack${stackCount === 1 ? '' : 's'}`
+    : null;
 
   function setFoundation(patch: Partial<FoundationConfig>) {
     setField('foundation', { ...f, ...patch });
   }
-  function setDeploymentType(stackScope: 'complete' | 'regional') {
-    const region = stackScope === 'complete' && !f.region ? getDefaultRegionForRealm(f.realm) : undefined;
-    setFoundation({ stackScope,
-      ...(region ? { region: region.id, regionShortName: region.shortName } : {}) });
+  function onDeploymentType(value: string) {
+    setChoosePrimary(value === 'secondary-existing');
+    if (value === 'secondary-existing') return;
+    const region = regional ? findRegion(f.realm, f.homeRegion ?? '') ?? getDefaultRegionForRealm(f.realm) : findRegion(f.realm, f.region);
+    setFoundation({ stackScope: 'complete', deploymentMode: value as 'primary-only' | 'primary-secondary',
+      ...(region ? { region: region.id, regionShortName: region.shortName } : {}),
+      homeRegion: undefined, drRegion: value === 'primary-only' ? undefined : regional ? f.region : f.drRegion });
   }
   function onRealm(realm: string) {
-    const def = getDefaultRegionForRealm(realm);
-    setFoundation({ realm, region: regional ? '' : def?.id ?? '', regionShortName: regional ? '' : def?.shortName ?? '',
-      homeRegion: undefined, drRegion: undefined });
+    setFoundation({ realm, region: '', regionShortName: '',
+      homeRegion: undefined, drRegion: undefined, tenancyHomeRegion: undefined });
   }
   function onRegion(region: string) {
     const r = findRegion(f.realm, region);
@@ -84,186 +107,153 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
       ...(region === f.drRegion ? { drRegion: undefined } : {}) });
   }
 
-  function setEnvs(next: Environment[]) { setField('environments', next); }
-  function updateEnv(i: number, patch: Partial<Environment>) {
-    setEnvs(envs.map((e, idx) => (idx === i ? { ...e, ...patch } : e)));
-  }
-  function deleteEnv(i: number) {
-    const deletedId = envs[i].id;
-    setField('projects', model.projects.map((project) => project.environments === 'all' ? project : {
-      ...project, environments: project.environments.filter((id) => id !== deletedId),
-    }));
-    setField('platforms', model.platforms.map((platform) => {
-      const overrides = { ...platform.overrides };
-      delete overrides[deletedId];
-      return {
-        ...platform,
-        environments: platform.environments === 'all' ? 'all' : platform.environments.filter((id) => id !== deletedId),
-        overrides,
-      };
-    }));
-    setEnvs(envs.filter((_, idx) => idx !== i));
-  }
-  function addEnv() {
-    const name = newName.trim();
-    if (!name || newNameError) return;
-    const occupied = configuredVcnCidrs(model);
-    const network = envNetworkDefaults(envs.length, name, occupied);
-    const id = createModelId('environment');
-    if (network.vcnCidr) occupied.push(network.vcnCidr);
-    setField('platforms', model.platforms.map((platform) => {
-      if (platform.type === 'oke_simple' || platform.environments !== 'all') return platform;
-      const vcnCidr = environmentPlatformCidr(name, occupied);
-      if (vcnCidr) occupied.push(vcnCidr);
-      return { ...platform, overrides: { ...platform.overrides, [id]: {
-        vcnCidr, ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}),
-      } } };
-    }));
-    setEnvs([...envs, { id, name, securityZone: false, network }]);
-    setNewName('');
-  }
+  const deploymentSelector = <select id="lz-deployment-type" disabled={!!homeSource} value={deploymentType} onChange={(event) => onDeploymentType(event.target.value)} aria-describedby="lz-deployment-type-help">
+    <option value="primary-only">Only Primary</option>
+    <option value="primary-secondary">Primary + Secondary</option>
+    {(regional || choosePrimary) && <option value="secondary-existing" hidden>Secondary (DR)</option>}
+  </select>;
+
+  if (choosePrimary && !homeSource) return <div className="studio-foundation-step" style={s.col}><section style={s.panel}><div style={s.body}>
+    <h2 style={s.title}>Foundation</h2>
+    <label style={s.label} htmlFor="lz-deployment-type">Deployment type</label>
+    {deploymentSelector}
+    <p id="lz-deployment-type-help" style={s.help}>Choose a saved Home and Primary Studio configuration. Studio will open a separate linked Secondary (DR) Studio configuration and retain this configuration.</p>
+    <label style={{ ...s.label, marginTop: 16 }} htmlFor="lz-existing-primary">Existing primary</label>
+    <select id="lz-existing-primary" value={primaryId} onChange={(event) => { setPrimaryId(event.target.value); setExistingSecondaryRegion(''); }}>
+      <option value="">Select a saved Primary Studio configuration</option>
+      {primaryDesigns.map((design) => <option key={design.id} value={design.id}>{design.name}</option>)}
+    </select>
+    {selectedPrimary && <>
+      <label style={{ ...s.label, marginTop: 16 }} htmlFor="lz-existing-secondary-region">Secondary region (input 3)</label>
+      <select id="lz-existing-secondary-region" value={selectedSecondaryRegion} onChange={(event) => setExistingSecondaryRegion(event.target.value)}>
+        <option value="">Select secondary deployment region</option>
+        {getRegionsForRealm(selectedPrimary.realm).filter((region) => region.id !== selectedPrimary.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+      </select>
+      <p style={s.help}>Studio updates the Home and Primary Studio configuration for this Secondary region. If its deployment stacks already exist, review and apply the updated deployment files before deploying Secondary.</p>
+    </>}
+    {!primaryDesigns.length && <p style={s.help}>Create or import a Home and Primary Studio configuration first.</p>}
+    <button type="button" style={{ ...form.addBtn, marginTop: 14 }} disabled={!primaryId || !selectedSecondaryRegion || !onUsePrimary} onClick={() => onUsePrimary?.(primaryId, selectedSecondaryRegion)}>Configure secondary deployment</button>
+    <FieldError id="lz-deployment-error" error={deploymentError} />
+  </div></section></div>;
 
   return (
-    <div style={s.col}>
-      <section style={s.panel}>
+    <div className="studio-foundation-step" style={s.col}>
+      <section style={s.panel} aria-labelledby="lz-general-title">
         <div style={s.accent} />
         <div style={s.body}>
-          <h2 style={s.title}>Foundation</h2>
-          <p style={form.intro}>Choose the deployment type, OCI location and environments.</p>
-          <div style={s.field}>
-            <label style={s.label} htmlFor="saved-lz-name">Design name</label>
-            <input
-              id="saved-lz-name"
-              style={s.input}
-              value={name}
-              onChange={(e) => onNameChange(e.target.value)}
-              onBlur={onNameBlur}
-              aria-invalid={!!nameError}
-              aria-describedby={`saved-lz-name-help${nameError ? ' saved-lz-name-error' : ''}`}
-            />
-            <div id="saved-lz-name-help" style={{ ...s.help, marginTop: 6 }}>Used for saved designs and download filenames. OCI resource names are generated separately.</div>
-            <FieldError id="saved-lz-name-error" error={nameError} />
-          </div>
-          <div>
-            <div>
-              <label style={s.label} htmlFor="lz-realm">Realm</label>
-              <select id="lz-realm" value={f.realm} disabled={!!homeSource} onChange={(e) => onRealm(e.target.value)} aria-describedby="lz-realm-help">
-                {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
-              </select>
-              <div id="lz-realm-help" style={{ ...s.help, marginTop: 6 }}>Use the realm that contains your tenancy.</div>
-            </div>
-          </div>
-          <div style={{ ...s.field, marginTop: 14 }}>
-            <div className="studio-info-heading"><label style={s.label} htmlFor="lz-deployment-type">Deployment type</label>
-              <InfoButton title="Deployment type"><p><strong>Home Region</strong> creates compartments, IAM and governance, along with resources in the selected region.</p><p><strong>DR</strong> creates recovery resources in another region and reuses the Home Region's compartments, IAM and governance. Use matching environment names. Review lists the required Home Region dependency outputs.</p><p>Changing this field keeps the inputs already in your design. It does not deploy or copy running resources.</p></InfoButton>
-            </div>
-            <select id="lz-deployment-type" value={f.stackScope ?? 'complete'} disabled={!!homeSource} onChange={(event) => setDeploymentType(event.target.value as 'complete' | 'regional')} aria-describedby="lz-deployment-type-help">
-              <option value="complete">Home Region</option>
-              <option value="regional">DR</option>
-            </select>
-            <div id="lz-deployment-type-help" style={{ ...s.help, marginTop: 6 }}>{regional
-              ? 'DR creates recovery resources in another region. It reuses the compartments, IAM and governance from your Home Region deployment.'
-              : 'Home Region creates compartments, IAM and governance, plus resources in the selected region.'}</div>
-          </div>
-          <div style={s.locationGrid} className="foundation-location-grid">
-            <div>
-              <label style={s.label} htmlFor="lz-region">{regional ? 'DR region' : 'Region'}</label>
-              <select id="lz-region" {...fieldErrorProps('lz-region-error', regionError)} value={f.region} onChange={(e) => onRegion(e.target.value)}>
-                {regional && <option value="">Select region</option>}
-                {regionOptions.filter((region) => !regional || region.id !== f.homeRegion).map((r) => (
-                  <option key={r.id} value={r.id}>{r.id}</option>
-                ))}
-              </select>
-              <FieldError id="lz-region-error" error={regionError} />
+            <h2 id="lz-general-title" style={s.title}>General</h2>
+            <div style={s.field}>
+              <label style={s.label} htmlFor="saved-lz-name">Configuration name</label>
+              <input
+                id="saved-lz-name"
+                style={s.input}
+                value={name}
+                onChange={(e) => onNameChange(e.target.value)}
+                onBlur={onNameBlur}
+                aria-invalid={!!nameError}
+                aria-describedby={`saved-lz-name-help${nameError ? ' saved-lz-name-error' : ''}`}
+              />
+              <div id="saved-lz-name-help" style={{ ...s.help, marginTop: 6 }}>Used to identify this Studio configuration and name downloaded files. OCI resource names are generated separately.</div>
+              <FieldError id="saved-lz-name-error" error={nameError} />
             </div>
             <div>
-              <label style={s.label} htmlFor="lz-region-short-name">Region short name</label>
-              <input id="lz-region-short-name" style={s.input} value={f.regionShortName}
-                onChange={(event) => setFoundation({ regionShortName: event.target.value })}
-                {...fieldErrorProps('lz-region-short-name-error', shortNameError)} maxLength={3} placeholder="e.g. fra" />
-              <FieldError id="lz-region-short-name-error" error={shortNameError} />
+              <div>
+                <label style={s.label} htmlFor="lz-realm">Realm</label>
+                <select id="lz-realm" value={f.realm} disabled={!!homeSource} onChange={(e) => onRealm(e.target.value)} aria-describedby="lz-realm-help">
+                  {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+                </select>
+                <div id="lz-realm-help" style={{ ...s.help, marginTop: 6 }}>Use the realm that contains your tenancy.</div>
+              </div>
             </div>
-            <div>
-              <label style={s.label} htmlFor={regional ? 'lz-home-region' : 'lz-dr-region'}>{regional ? 'Home Region' : 'DR region'}</label>
-              {regional ? <><select id="lz-home-region" {...fieldErrorProps('lz-home-region-error', homeRegionError)} disabled={!!homeSource} value={f.homeRegion ?? ''} onChange={(event) => setFoundation({ homeRegion: event.target.value })}>
-                <option value="">Select region</option>
-                {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
-              </select><FieldError id="lz-home-region-error" error={homeRegionError} /></> : <select id="lz-dr-region" value={f.drRegion ?? ''} onChange={(event) => setFoundation({ drRegion: event.target.value || undefined })} aria-describedby="lz-dr-region-help">
-                <option value="">No DR region</option>
-                {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
-              </select>}
+        </div>
+      </section>
+      <section style={s.panel} aria-labelledby="lz-deployment-title">
+        <div style={s.accent} />
+        <div style={s.body}>
+            <h2 id="lz-deployment-title" style={s.title}>Deployment</h2>
+            <p style={form.intro}>Review the deployment type, then choose the OCI location.</p>
+            <div style={s.field}>
+              <div className="studio-info-heading"><label style={s.label} htmlFor="lz-deployment-type">Deployment type</label>
+                <InfoButton title="Deployment type"><p>The <strong>Home and Primary Studio configuration</strong> defines compartments, IAM, governance and regional resources. Its deployment files support one or two deployment stacks, depending on whether Home and Primary share a region.</p><p>The <strong>Secondary (DR) Studio configuration</strong> defines recovery resources in another region and reuses the compartments, IAM and governance from Home and Primary. Use matching environment names. Review lists the deployment files and runtime dependencies required by the Secondary deployment stack.</p><p>Choose Only Primary to configure Home and Primary, or Primary + Secondary to add a linked Secondary (DR) Studio configuration.</p></InfoButton>
+              </div>
+              {deploymentSelector}
+              <div id="lz-deployment-type-help" style={{ ...s.help, marginTop: 6 }}>{regional
+                ? 'The Secondary (DR) Studio configuration reuses the compartments, IAM and governance defined in the Home and Primary Studio configuration.'
+                : deploymentType === 'primary-secondary' ? 'Complete Home and Primary in this Studio configuration, then finish Secondary (DR) in its linked Studio configuration.' : 'Configure Home and Primary in this Studio configuration. Its deployment files include compartments, IAM, governance and regional resources.'}</div>
             </div>
-          </div>
-          {!regional && <p id="lz-dr-region-help" style={s.help}>Selecting a DR region allows its Object Storage service to use this landing zone's encryption keys. To prepare the DR deployment, return to the dashboard and select Create DR on this design's card. This creates a linked DR design in Studio. Deploy its files in a separate stack from this Home Region deployment.</p>}
+            {regional && !homeSource && <button type="button" style={{ ...form.addBtn, marginTop: 12 }} onClick={() => setChoosePrimary(true)}>Choose saved primary</button>}
+            <div style={s.locationGrid} className="foundation-location-grid">
+              <div>
+                <div style={s.regionLabelRow}>
+                  <label style={{ ...s.label, marginBottom: 0 }} htmlFor="lz-tenancy-home-region">Home region (input 1)</label>
+                  <RegionReferenceLink region="Home" />
+                </div>
+                <select id="lz-tenancy-home-region" required value={tenancyHomeRegion} disabled={!!homeSource}
+                  onChange={(event) => setFoundation({ tenancyHomeRegion: event.target.value || undefined })}
+                  {...fieldErrorProps('lz-tenancy-home-region-error', tenancyHomeRegionError, 'lz-region-help')}>
+                  <option value="">Select tenancy home region</option>
+                  {regionOptions.map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+                </select>
+                <FieldError id="lz-tenancy-home-region-error" error={tenancyHomeRegionError} />
+              </div>
+              <div>
+                <div style={s.regionLabelRow}>
+                  <label style={{ ...s.label, marginBottom: 0 }} htmlFor={regional ? 'lz-home-region' : 'lz-region'}>Primary region (input 2)</label>
+                  <RegionReferenceLink region="Primary" />
+                </div>
+                {regional ? <><select id="lz-home-region" required {...fieldErrorProps('lz-home-region-error', homeRegionError, 'lz-region-help')} disabled={!!homeSource} value={f.homeRegion ?? ''} onChange={(event) => setFoundation({ homeRegion: event.target.value })}>
+                  <option value="">Select primary region</option>
+                  {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+                </select><FieldError id="lz-home-region-error" error={homeRegionError} /></> : <><select id="lz-region" required {...fieldErrorProps('lz-region-error', regionError, 'lz-region-help')} value={f.region} onChange={(event) => onRegion(event.target.value)}>
+                  <option value="">Select primary region</option>
+                  {regionOptions.map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+                </select><FieldError id="lz-region-error" error={regionError} /></>}
+              </div>
+              {(regional || deploymentType === 'primary-secondary') && <div>
+                <div style={s.regionLabelRow}>
+                  <label style={{ ...s.label, marginBottom: 0 }} htmlFor={regional ? 'lz-region' : 'lz-dr-region'}>Secondary region (input 3)</label>
+                </div>
+                {regional ? <><select id="lz-region" required {...fieldErrorProps('lz-region-error', regionError)} value={f.region} onChange={(event) => onRegion(event.target.value)}>
+                  <option value="">Select secondary region</option>
+                  {regionOptions.filter((region) => region.id !== f.homeRegion).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+                </select><FieldError id="lz-region-error" error={regionError} /></> : <><select id="lz-dr-region" required value={f.drRegion ?? ''} onChange={(event) => setFoundation({ drRegion: event.target.value || undefined })}
+                  {...fieldErrorProps('lz-dr-region-error', secondaryRegionError, 'lz-dr-region-help')}>
+                  <option value="">Select secondary region</option>
+                  {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+                </select><FieldError id="lz-dr-region-error" error={secondaryRegionError} /></>}
+              </div>}
+            </div>
+            {deploymentSummary && <p role="status" aria-label="Deployment summary" style={{ ...s.help, color: oracle.ink, marginBottom: 14 }}>
+              <strong>{deploymentSummary}</strong>
+            </p>}
+            <p id="lz-region-help" style={s.help}>
+              <strong>Home region:</strong> Your tenancy's Home region, where global resources are managed.<br />
+              <strong>Primary region:</strong> The region where this landing zone's regional resources are deployed. Home and Primary may be the same region.
+              {(regional || deploymentType === 'primary-secondary') && <><br /><strong>Secondary region:</strong> The region where disaster recovery resources are deployed. It must be different from the Primary region.</>}
+            </p>
+          {!regional && deploymentType === 'primary-secondary' && (
+            <section aria-labelledby="lz-dr-configuration-title" style={s.sectionDivider}>
+              <h3 id="lz-dr-configuration-title" style={s.sectionHeading}>Disaster recovery</h3>
+              <p id="lz-dr-region-help" style={s.help}>Requires <strong>two linked Studio configurations</strong>, each with its own deployment files.</p>
+              <ol style={{ margin: '14px 0', paddingLeft: 20, display: 'grid', gap: 14, fontSize: 13, lineHeight: 1.5 }}>
+                <li>
+                  <strong>Complete Home and Primary</strong>
+                  <p style={{ ...s.help, marginTop: 4 }}>Complete this Studio configuration before continuing to Secondary.</p>
+                </li>
+                <li>
+                  <strong>Configure Secondary (DR)</strong>
+                  <p style={{ ...s.help, marginTop: 4 }}>Create or open the linked Secondary (DR) Studio configuration and complete its settings.</p>
+                  <button type="button" style={{ ...form.addBtn, marginTop: 8 }} disabled={!!secondaryRegionError || !onConfigureSecondary} onClick={onConfigureSecondary}>Configure secondary deployment</button>
+                </li>
+              </ol>
+              <p style={s.help}>You can also access Secondary from "Your Landing Zones" using <strong>Create DR</strong> or <strong>Edit DR</strong>.</p>
+            </section>
+          )}
+          <FieldError id="lz-deployment-error" error={deploymentError} />
+
         </div>
       </section>
 
-      <section style={s.panel}>
-        <div style={s.accent} />
-        <div style={s.body}>
-          <div className="studio-info-heading"><h2 style={s.title}>{regional ? 'Home Region environments' : 'Environments'}</h2>
-            {regional ? <InfoButton title="Home Region environments"><p>These environments are expected to be deployed in the Home Region. DR reuses their existing compartments, IAM and governance.</p><p>{homeSource ? 'Environment names and membership sync from the Home Region design. Edit them there.' : 'Use the same environment names as your Home Region deployment.'}</p></InfoButton>
-              : <InfoButton title="Environments"><p>Environments separate stages such as production and development. Projects and workload platforms are placed within the environments you select.</p><p>You can remove every environment to design a hub with shared services only.</p></InfoButton>}
-          </div>
-          {homeSource ? <>
-            <p id="foundation-environments-help" style={form.intro}>{homeSource.model
-              ? <>Environments sync automatically from <strong>{homeSource.name}</strong>. Edit them in the Home Region design.</>
-              : 'The Home Region design is unavailable. These environments are from the last saved version. Restore the Home Region design to resume syncing and saving.'}</p>
-            {homeSource.model && <Link to={`/lz/${encodeURIComponent(homeSource.id)}`} target="_blank" rel="noopener noreferrer"
-              aria-label="Open Home Region (opens in a new tab)"
-              style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, padding: '8px 14px', marginBottom: 14, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, color: oracle.ink, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Open Home Region</Link>}
-            {envs.length ? <ul aria-label="Environments synced from Home Region" style={{ listStyle: 'none', padding: 0, margin: 0, borderTop: `1px solid ${oracle.border}` }}>
-              {envs.map((env) => <li key={env.id} style={{ padding: '12px 0', borderBottom: `1px solid ${oracle.border}`, fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere' }}>{env.name}</li>)}
-            </ul> : <p style={s.help}>No environments in the Home Region design. Hub and shared services only.</p>}
-          </> : <>
-          <p id="foundation-environments-help" style={form.intro}>{regional
-            ? 'Use the same environment names as your Home Region deployment.'
-            : 'Separate stages such as production and development. You can rename or remove the defaults, including all environments.'}</p>
-
-          <div style={s.tableHead} className="foundation-environment-grid">
-            <span>{regional ? 'Environment' : 'Name'}</span>
-            <span>Actions</span>
-          </div>
-          {envs.length === 0 && <div style={s.empty}>{regional
-            ? 'No Home Region environments. Hub and shared services only.'
-            : 'Hub and shared services only. Environments are optional.'}</div>}
-          {envs.map((env, i) => (
-            <div key={i} style={s.row} className="foundation-environment-grid">
-              <div><input
-                aria-label={`Environment ${i + 1} name`}
-                {...fieldErrorProps(`environment-${env.id}-error`, configKeyError(env.name, envs.filter((_, index) => index !== i).map((other) => other.name)), regional ? 'foundation-environments-help' : undefined)}
-                style={s.rowInput}
-                value={env.name}
-                onChange={(e) => updateEnv(i, { name: e.target.value })}
-              /><FieldError id={`environment-${env.id}-error`} error={configKeyError(env.name, envs.filter((_, index) => index !== i).map((other) => other.name))} /></div>
-              <DeleteButton label={regional ? `Remove ${env.name || `environment ${i + 1}`} from DR` : `Delete environment ${env.name || i + 1}`} onClick={() => deleteEnv(i)} />
-            </div>
-          ))}
-
-          {!regional && <p style={{ ...s.help, marginTop: 12 }}>Network ranges are assigned automatically. You can change them in Projects.</p>}
-          <label style={s.addLabel} htmlFor="new-environment-name">Add environment</label>
-          <div style={s.addRow} className="foundation-add-grid">
-            <div><input
-              aria-label="New environment name"
-              id="new-environment-name"
-              {...fieldErrorProps('new-environment-error', newNameError, regional ? 'foundation-environments-help' : undefined)}
-              style={s.rowInput}
-              placeholder={regional ? 'e.g. prod' : 'e.g. staging'}
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') addEnv(); }}
-            /><FieldError id="new-environment-error" error={newNameError} /></div>
-            <button type="button" style={newNameError ? { ...s.addBtn, ...form.addBtnDisabled } : s.addBtn} disabled={!!newNameError} onClick={addEnv}>Add</button>
-          </div>
-          </>}
-          {regional && <details style={{ ...s.help, marginTop: 12 }}>
-            <summary style={{ cursor: 'pointer', padding: '12px 0', minHeight: 44 }}>How DR uses these environments</summary>
-            <p>DR networks and platforms use the matching compartments from your Home Region. IAM permissions and Security Zones are managed there. {homeSource ? 'Configure DR networks and platforms in the following steps.' : 'Changes here affect only this DR design.'}</p>
-          </details>}
-        </div>
-      </section>
-
-      <NotificationsSection />
     </div>
   );
 }

@@ -10,7 +10,6 @@
   display: grid;
   gap: 8px;
   margin-bottom: 8px;
-  max-width: 65ch;
 }
 
 .cost-governance-actions {

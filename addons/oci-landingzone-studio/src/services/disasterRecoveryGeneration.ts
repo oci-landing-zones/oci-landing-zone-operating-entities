@@ -6,6 +6,7 @@ import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './
 import { validateCloudGuard } from './cloudGuard';
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
+import { deploymentDownloadFiles, shouldSplitHomePrimary } from './homePrimaryDeployment';
 import { deploymentReadme } from './deployment';
 import { costCenterReferenceErrors, defaultCostGovernance, ownerEmail, ownerEmailError } from './costGovernance';
 import { regionalCostGovernanceConfig } from './regionalCostGovernance';
@@ -180,11 +181,15 @@ export async function generateDrFileBundle(model: LzModel, draft: DrDesignDraft,
   onProgress?.('Generating Stack 2 · DR…');
   const drConfig = serialize(dr);
   const drFiles = await generateFromConfigCode(drConfig);
+  const splitModel = { ...model, foundation: { ...model.foundation, drRegion: draft.region } };
+  const split = shouldSplitHomePrimary(splitModel);
+  const primaryPackage = split
+    ? await deploymentDownloadFiles(splitModel, { config: homeConfig, files: homeFiles }, home)
+    : { 'config.jsonnet': homeConfig, ...homeFiles, 'README.txt': deploymentReadme(home, Object.keys(homeFiles)) };
   return {
-    ...Object.fromEntries(Object.entries({ 'config.jsonnet': homeConfig, ...homeFiles,
-      'README.txt': deploymentReadme(home, Object.keys(homeFiles)) }).map(([name, body]) => [`Home/${name}`, body])),
+    ...Object.fromEntries(Object.entries(primaryPackage).map(([name, body]) => [`Home/${name}`, body])),
     ...Object.fromEntries(Object.entries({ 'config.jsonnet': drConfig, ...drFiles,
       'README.txt': deploymentReadme(dr, Object.keys(drFiles)) }).map(([name, body]) => [`DR/${name}`, body])),
-    'README.txt': 'Deploy Home first using Home/README.txt. Then deploy DR in a separate stack/state using DR/README.txt. Always pass compartments_output.json and network_output.json from the successful Home deployment to DR. These runtime dependencies are not included in this ZIP.\n',
+    'README.txt': split ? 'Three stacks: deploy Home and then Primary following Home/README.txt. Then deploy Secondary using DR/README.txt. Pass compartments_output.json from Home and network_output.json from Primary to Secondary. These runtime dependencies are not included in this ZIP.\n' : 'Deploy Home first using Home/README.txt. Then deploy DR in a separate stack/state using DR/README.txt. Always pass compartments_output.json and network_output.json from the successful Home deployment to DR. These runtime dependencies are not included in this ZIP.\n',
   };
 }

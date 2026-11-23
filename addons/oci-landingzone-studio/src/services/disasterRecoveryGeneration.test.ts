@@ -68,11 +68,25 @@ describe('DR file generation', () => {
     expect(files['DR/security_cis2.json']).not.toContain('cloud_guard_configuration');
     expect(files['DR/observability_cis2.json']).toContain('dr@example.com');
     expect(files['README.txt']).toContain('Home');
-    expect(files['Home/README.txt']).toContain('Home Region deployment');
+    expect(files['Home/README.txt']).toContain('Primary deployment');
     expect(files['Home/README.txt']).toContain('save_output = true');
     expect(files['DR/README.txt']).toContain('DR deployment');
     expect(files['DR/README.txt']).toContain('compartments_output.json and network_output.json');
     expect(files['DR/README.txt']).toContain('oci_dependency_objects');
+  }, 60000);
+
+  it('packages three stacks when tenancy Home, Primary and DR all differ', async () => {
+    const { model, draft } = design();
+    model.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    const files = await generateDrFileBundle(model, draft);
+    expect(files['Home/home_mad/iam.json']).toBeDefined();
+    expect(files['Home/home_mad/network.json']).toBeUndefined();
+    expect(files['Home/primary_fra/network.json']).toBeDefined();
+    expect(files['Home/primary_fra/iam.json']).toBeUndefined();
+    expect(files['DR/network.json']).toBeDefined();
+    expect(files['README.txt']).toContain('Three stacks');
+    expect(files['DR/README.txt']).toContain('Primary (network_output.json)');
+    expect(JSON.parse(files['Home/home_mad/config.jsonnet']).dr_region).toBe(draft.region);
   }, 60000);
 
   it('keeps customer FinOps labels in the regional bundle with only selected scope rules', async () => {

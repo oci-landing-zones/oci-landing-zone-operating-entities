@@ -69,12 +69,12 @@ describe('diagram downloads', () => {
     const home = emptyLzModel();
     vi.mocked(loadDiagramPreview).mockResolvedValue(preview);
     const html = renderReview(true, { id: 'home', model: home });
-    expect(html).toContain('separate DR and Home Region pages');
+    expect(html).toContain('separate DR and Primary deployment pages');
     await button('Export diagram (.drawio)')();
     const xml = vi.mocked(downloadTextFile).mock.calls[0][1];
     expect(xml.match(/<diagram\b/g)).toHaveLength(2);
     expect(xml).toContain('name="DR"');
-    expect(xml).toContain('name="Home Region"');
+    expect(xml).toContain('name="Primary deployment"');
     expect(xml).toContain('Visible DR diagram');
     expect(xml).toContain('sn-fra-lz-prod-web');
     expect(xml).not.toContain('cmp-env-0-vcn-sn-0-ep-icon');
@@ -84,7 +84,7 @@ describe('diagram downloads', () => {
 
   it.each([false, true])('exports a single page without inventing a Home source: regional=%s', async (regional) => {
     const html = renderReview(regional);
-    if (regional) expect(html).toContain('no linked Home Region');
+    if (regional) expect(html).toContain('no linked Primary deployment');
     await button('Export diagram (.drawio)')();
     const xml = vi.mocked(downloadTextFile).mock.calls[0][1];
     expect(xml.match(/<diagram\b/g)).toHaveLength(1);

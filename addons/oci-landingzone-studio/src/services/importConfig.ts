@@ -1,3 +1,4 @@
+import { identityDomainNameError } from './identityDomains';
 /** Reconstruct only configurations that Studio can edit without losing values. */
 import { emptyLzModel } from '../model/defaults';
 import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
@@ -192,6 +193,7 @@ function restoreExadata(model: LzModel, type: 'exacc' | 'exacs', shared: ObjectV
 }
 
 export function importConfig(value: unknown): ImportedConfig {
+  const warnings: string[] = [];
   const config = object(value, 'config');
   const model = emptyLzModel();
   if (config.enable_cloud_guard !== undefined && typeof config.enable_cloud_guard !== 'boolean') invalid('enable_cloud_guard');
@@ -205,6 +207,8 @@ export function importConfig(value: unknown): ImportedConfig {
   };
   if (config.stack_scope !== undefined) model.foundation.stackScope = choice(config.stack_scope, ['complete', 'regional'] as const, 'stack_scope');
   if (config.dr_region !== undefined) model.foundation.drRegion = text(config.dr_region, 'dr_region');
+  if (model.foundation.stackScope === 'regional' && config.primary_region !== undefined) model.foundation.homeRegion = text(config.primary_region, 'primary_region');
+  if (config.tenancy_home_region !== undefined) model.foundation.tenancyHomeRegion = text(config.tenancy_home_region, 'tenancy_home_region');
   const bastion = config.bastion == null ? undefined : object(config.bastion, 'bastion');
   if (bastion) {
     model.bastion = { enabled: true,
@@ -233,10 +237,19 @@ export function importConfig(value: unknown): ImportedConfig {
       cloudguard: recipients('cloudguard'), iam: recipients('iam'), network: recipients('network'), security: recipients('security'),
     };
   }
+  if (config.identity_domain_name !== undefined) {
+    const name = text(config.identity_domain_name, 'identity_domain_name');
+    if (identityDomainNameError(name)) invalid('identity_domain_name');
+    model.foundation.identityDomainName = name;
+  }
+  if (config.enable_landing_zone_security_zone !== undefined && typeof config.enable_landing_zone_security_zone !== 'boolean') invalid('enable_landing_zone_security_zone');
+  model.foundation.landingZoneSecurityZone = config.enable_landing_zone_security_zone !== false;
+  if (config.enable_shared_network_security_zone !== undefined && typeof config.enable_shared_network_security_zone !== 'boolean') invalid('enable_shared_network_security_zone');
+  model.foundation.sharedNetworkSecurityZone = config.enable_shared_network_security_zone !== false;
   if (config.security_zone_recipe1_cis_level !== undefined && config.security_zone_recipe1_cis_level !== null) {
     const level = number(config.security_zone_recipe1_cis_level, 'security_zone_recipe1_cis_level');
     if (level !== 1 && level !== 2) invalid('security_zone_recipe1_cis_level');
-    model.foundation.securityZoneRecipe1CisLevel = level;
+    if (level !== model.foundation.cisLevel) warnings.push('Recipe 01 now follows the Security baseline CIS level in Studio. Its independent CIS override was removed.');
   }
   const hub = object(config.hub, 'hub');
   const hubKind = choice<HubKind>(hub.kind, ['hub_a', 'hub_b', 'hub_c', 'hub_e'], 'hub.kind');
@@ -286,9 +299,8 @@ export function importConfig(value: unknown): ImportedConfig {
     if (restored.type === 'oke_simple') invalid(`${path}.extension.type`);
     model.sharedPlatforms.push({ ...restored, type: restored.type });
   }
-  const warnings: string[] = [];
-  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Foundation before generating a new package.');
-  if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
+  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Observability before generating a new package.');
+  if (model.foundation.stackScope === 'regional') warnings.push('Choose the primary region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
   const costSettings = config.cost_governance === undefined ? {} : object(config.cost_governance, 'cost_governance');
@@ -317,13 +329,15 @@ export function importConfig(value: unknown): ImportedConfig {
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
   if (config.enable_cloud_guard === true) delete expected.enable_cloud_guard;
+  if (config.enable_shared_network_security_zone === true) delete expected.enable_shared_network_security_zone;
   if ((model.foundation.cloudGuardEnabled === false || model.foundation.stackScope === 'regional') && expected.notification_emails) {
     expected.notification_emails = { ...object(expected.notification_emails, 'notification_emails') };
     delete (expected.notification_emails as ObjectValue).cloudguard;
     if (!Object.keys(expected.notification_emails as ObjectValue).length) delete expected.notification_emails;
   }
   if (config.bastion === null) delete expected.bastion;
-  if (config.security_zone_recipe1_cis_level === null) delete expected.security_zone_recipe1_cis_level;
+  delete expected.security_zone_recipe1_cis_level;
+  if (config.enable_landing_zone_security_zone === true) delete expected.enable_landing_zone_security_zone;
   const expectedHubNetwork = { ...object(hub.network, 'hub.network') };
   if (expectedHubNetwork.custom_subnets && Object.keys(object(expectedHubNetwork.custom_subnets, 'hub.network.custom_subnets')).length === 0) {
     delete expectedHubNetwork.custom_subnets;

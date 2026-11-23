@@ -17,6 +17,17 @@ function render(model: LzModel, homeSource?: HomeRegionSource) {
 
 afterEach(() => vi.restoreAllMocks());
 
+function renderControls(): ReactNode {
+  let tree: ReactNode;
+  function Capture() {
+    tree = SecurityStep();
+    return tree;
+  }
+  renderToStaticMarkup(<MemoryRouter><Capture /></MemoryRouter>);
+  return tree;
+}
+
+
 function findControl(node: ReactNode, predicate: (props: Record<string, unknown>, type: unknown) => boolean): Record<string, unknown> | undefined {
   let found: Record<string, unknown> | undefined;
   Children.forEach(node, (child) => {
@@ -27,39 +38,58 @@ function findControl(node: ReactNode, predicate: (props: Record<string, unknown>
 }
 
 describe('Security settings', () => {
+  it('starts with Recipe 01 only and additional zones under collapsed Advanced controls', () => {
+    const model = emptyLzModel();
+    expect(model.foundation.sharedNetworkSecurityZone).toBe(false);
+    const html = render(model);
+    expect(html).toMatch(/<div[^>]*id="lz-security-zones-advanced"[^>]*hidden=""/);
+    expect(html).toContain('aria-expanded="false" aria-controls="lz-security-zones-advanced"');
+    expect(html).toContain('Advanced');
+    expect(html).toContain('Recipe 02 — Shared network');
+    expect(html).toContain('Recipe 03 — prod');
+    expect(html).toContain('Recipe 03 — preprod');
+    expect(html).toMatch(/role="switch" aria-checked="false" aria-label="Security zone for shared network"/);
+  });
+
+  it('keeps Advanced collapsed with saved additional zones and preserves their independent selection', () => {
+    const model = emptyLzModel();
+    model.foundation.sharedNetworkSecurityZone = true;
+    expect(render(model)).toMatch(/<div[^>]*id="lz-security-zones-advanced"[^>]*hidden=""/);
+    const setField = vi.fn();
+    vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+    const control = findControl(renderControls(), (props, type) => type === Switch && props.ariaLabel === 'Security zone for shared network');
+    (control!.onChange as (enabled: boolean) => void)(false);
+    expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, sharedNetworkSecurityZone: false });
+    expect(model.environments.every((env) => !env.securityZone)).toBe(true);
+  });
+
   it.each([1, 2] as const)('defaults Recipe 01 to baseline CIS %s and places Cloud Guard after zones', (level) => {
     const model = emptyLzModel();
     model.foundation.cisLevel = level;
     const html = render(model);
-    const select = html.match(/<select[^>]*id="lz-recipe1-cis-level"[\s\S]*?<\/select>/)?.[0];
-    expect(select).toContain(`<option value="${level}" selected="">`);
+    expect(html).toContain(`Recipe 01 — CIS Level ${level}`);
+    expect(html).toMatch(/role="switch" aria-checked="true" aria-label="Enable Recipe 01 Security Zone"/);
+    expect(html).not.toContain('id="lz-recipe1-cis-level"');
     expect(html.indexOf('id="security-zones-title"')).toBeLessThan(html.indexOf('id="security-cloud-guard-title"'));
   });
 
-  it('persists an explicit Recipe 01 override without changing the baseline', () => {
+  it('toggles Recipe 01 without changing the baseline or additional zones', () => {
     const model = emptyLzModel();
-    model.foundation.cisLevel = 2;
     const setField = vi.fn();
     vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
-    const control = findControl(SecurityStep(), (props) => props.id === 'lz-recipe1-cis-level');
-    expect(control).toBeDefined();
-    (control!.onChange as (event: ChangeEvent<HTMLSelectElement>) => void)({ target: { value: '1' } } as ChangeEvent<HTMLSelectElement>);
-    expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, securityZoneRecipe1CisLevel: 1 });
-    model.foundation.securityZoneRecipe1CisLevel = 1;
-    expect(render(model)).toMatch(/<select[^>]*id="lz-recipe1-cis-level"[\s\S]*?<option value="1" selected="">/);
+    const control = findControl(renderControls(), (props, type) => type === Switch && props.ariaLabel === 'Enable Recipe 01 Security Zone');
+    (control!.onChange as (enabled: boolean) => void)(false);
+    expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, landingZoneSecurityZone: false });
+    expect(model.environments.every((env) => !env.securityZone)).toBe(true);
   });
 
-  it('restores following the baseline after an explicit Recipe 01 override', () => {
+  it('uses the baseline when an older saved design has an independent recipe level', () => {
     const model = emptyLzModel();
     model.foundation.cisLevel = 2;
     model.foundation.securityZoneRecipe1CisLevel = 1;
-    const setField = vi.fn();
-    vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
-    const control = findControl(SecurityStep(), (props) => props.id === 'lz-recipe1-use-baseline');
-    (control!.onClick as () => void)();
-    const foundation = setField.mock.calls[0][1];
-    expect(foundation.cisLevel).toBe(2);
-    expect(foundation).not.toHaveProperty('securityZoneRecipe1CisLevel');
+    const html = render(model);
+    expect(html).toContain('Recipe 01 — CIS Level 2');
+    expect(html).not.toContain('Use baseline level');
   });
 
   it('enables Cloud Guard by default and requests external confirmation when excluded', () => {
@@ -71,7 +101,7 @@ describe('Security settings', () => {
     expect(html).toContain('Cloud Guard is already enabled');
     model.foundation.stackScope = 'regional';
     expect(render(model)).not.toContain('aria-label="Enable Cloud Guard"');
-    expect(render(model)).toContain('Cloud Guard is managed in the Home Region');
+    expect(render(model)).toContain('Cloud Guard is managed by the primary deployment');
   });
 
   it('updates the saved CIS field and only the selected environment zone', () => {
@@ -79,7 +109,7 @@ describe('Security settings', () => {
     const original = structuredClone(model);
     const setField = vi.fn();
     vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
-    const tree = SecurityStep();
+    const tree = renderControls();
     const cis = findControl(tree, (props) => props.id === 'lz-cis-level');
     (cis?.onChange as (event: ChangeEvent<HTMLSelectElement>) => void)({ target: { value: '1' } } as ChangeEvent<HTMLSelectElement>);
     expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, cisLevel: 1 });
@@ -136,7 +166,7 @@ describe('Security settings', () => {
   it('explains how to add environments for an empty design', () => {
     const model = emptyLzModel();
     model.environments = [];
-    expect(render(model)).toContain('Add environments in Foundation to configure Security Zones.');
+    expect(render(model)).toContain('Add environments in IAM to configure Security Zones.');
   });
 
   it('shows Home zone choices as read-only in linked DR', () => {
@@ -145,7 +175,7 @@ describe('Security settings', () => {
     const dr = emptyLzModel();
     dr.foundation.stackScope = 'regional';
     const html = render(dr, { id: 'saved-home', name: 'Primary', model: home });
-    expect(html).toContain('Security Zones are managed in the Home Region');
+    expect(html).toContain('Security Zones are managed by the primary deployment');
     expect(html).not.toContain('aria-label="Security zone for');
     expect(html).toContain('prod');
     expect(html).toContain('On');
@@ -157,9 +187,9 @@ describe('Security settings', () => {
     const model = emptyLzModel();
     model.foundation.stackScope = 'regional';
     const html = render(model);
-    expect(html).toContain('Security Zones are managed in the Home Region');
+    expect(html).toContain('Security Zones are managed by the primary deployment');
     expect(html).not.toContain('aria-label="Security zone for');
-    expect(html).not.toContain('Open Home Region');
+    expect(html).not.toContain('Open primary deployment');
   });
 
   it('retains zone status when the linked Home design is unavailable', () => {
@@ -167,7 +197,7 @@ describe('Security settings', () => {
     model.foundation.stackScope = 'regional';
     model.environments[0].securityZone = true;
     const html = render(model, { id: 'missing' });
-    expect(html).toContain('Home Region design is unavailable');
+    expect(html).toContain('Primary deployment design is unavailable');
     expect(html).toContain('prod');
     expect(html).not.toContain('href="/lz/missing"');
     expect(html).not.toContain('aria-label="Security zone for');

@@ -220,6 +220,7 @@ describe('generator-aligned graph', () => {
   it('marks every explicit Security Zone target and no unrelated compartment', () => {
     const model: LzModel = {
       ...emptyLzModel(),
+      foundation: { ...emptyLzModel().foundation, sharedNetworkSecurityZone: true },
       environments: [env('prod', true, 0), env('preprod', false, 1)],
     };
     const graph = buildGraph(model, 4);
@@ -604,4 +605,17 @@ describe('OKE animation configuration', () => {
     graph = buildGraph(model, 4, { showFlows: true, allFlows: true }, undefined, await generatedRouteTables(model));
     expect(graph.edges.filter((edge) => edge.animated && edge.id.startsWith('flow-prod/oke:')).every((edge) => (edge.id.includes(':services:') || edge.id.includes(':api:')))).toBe(true);
   });
+});
+
+it('shows only the landing-zone Security Zone shield by default and adds selected zone shields', () => {
+  const model = emptyLzModel();
+  let graph = buildGraph(model, 1);
+  expect(graph.nodes.filter((node) => node.secure).map((node) => node.id)).toEqual(['landingzone']);
+  model.foundation.sharedNetworkSecurityZone = true;
+  model.environments[0].securityZone = true;
+  graph = buildGraph(model, 1);
+  expect(graph.nodes.filter((node) => node.secure).map((node) => node.id).sort()).toEqual(['cmp-env-0', 'cmp-network', 'landingzone']);
+  model.foundation.landingZoneSecurityZone = false;
+  graph = buildGraph(model, 1);
+  expect(graph.nodes.filter((node) => node.secure).map((node) => node.id).sort()).toEqual(['cmp-env-0', 'cmp-network']);
 });

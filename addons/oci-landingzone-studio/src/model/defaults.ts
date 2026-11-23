@@ -49,6 +49,8 @@ export function emptyLzModel(): LzModel {
       regionShortName: region?.shortName ?? 'fra',
       cisLevel: 1,
       cloudGuardEnabled: true,
+      sharedNetworkSecurityZone: false,
+      landingZoneSecurityZone: true,
       costGovernance: { ...defaultCostGovernance(), tagsEnabled: false },
       notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
@@ -153,6 +155,9 @@ export function normalizeModel(stored: unknown): LzModel {
     || !candidate.foundation
     || (candidate.foundation.cisLevel !== 1 && candidate.foundation.cisLevel !== 2)
     || (candidate.foundation.securityZoneRecipe1CisLevel !== undefined && candidate.foundation.securityZoneRecipe1CisLevel !== 1 && candidate.foundation.securityZoneRecipe1CisLevel !== 2)
+    || (candidate.foundation.landingZoneSecurityZone !== undefined && typeof candidate.foundation.landingZoneSecurityZone !== 'boolean')
+    || (candidate.foundation.sharedNetworkSecurityZone !== undefined && typeof candidate.foundation.sharedNetworkSecurityZone !== 'boolean')
+    || (candidate.foundation.identityDomainName !== undefined && typeof candidate.foundation.identityDomainName !== 'string')
     || !candidate.network
     || !Array.isArray(candidate.environments)
     || !Array.isArray(candidate.projects)
@@ -162,5 +167,6 @@ export function normalizeModel(stored: unknown): LzModel {
     || candidate.environments.some((env) => !env.id)
     || candidate.projects.some((project) => !project.id)
   ) return emptyLzModel();
-  return splitOkePlacements(reconcileExadata(candidate as LzModel));
+  const { securityZoneRecipe1CisLevel: _legacyRecipeLevel, ...foundation } = candidate.foundation;
+  return splitOkePlacements(reconcileExadata({ ...candidate, foundation } as LzModel));
 }

@@ -1,5 +1,6 @@
+import { validateRegionalDeployment } from '../services/regionalDeployment';
 /**
- * SavedLzList — the grid of saved Landing Zones, with open, Create DR and
+ * SavedLzList — the grid of saved Landing Zones, with open, Create/Edit DR and
  * delete. Saved names are intentionally read-only here; Foundation owns naming.
  *
  * When `currentId` is set the matching card is marked as the one being edited and
@@ -8,18 +9,23 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
-import { createDrLZ, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
-import { buildConfig, serializeConfig } from '../services/lzConfig';
-import { deploymentReadme } from '../services/deployment';
-import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
+import { createDrLZ, linkedHomeRecord, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
+import { serializeConfig } from '../services/lzConfig';
+import { deploymentDownloadFiles } from '../services/homePrimaryDeployment';
+import { isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
 import { drRegionOptions } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint, isCurrentDrOutputSet } from '../services/disasterRecoverySavedDesign';
 import { ErrorNotice } from './FieldError';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
+
+const cardAction: React.CSSProperties = {
+  minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  boxSizing: 'border-box', lineHeight: 1.25, textDecoration: 'none',
+};
 
 const s: Record<string, React.CSSProperties> = {
   sectionHead: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, margin: '0 0 16px', paddingBottom: 12, borderBottom: `1px solid ${oracle.border}` },
@@ -46,10 +52,10 @@ const s: Record<string, React.CSSProperties> = {
   outRow:  { display: 'flex', gap: 6, flexWrap: 'wrap' },
   zipBtn:  { padding: '5px 11px', fontSize: 11.5, fontWeight: 800, background: oracle.surfaceAlt, color: oracle.ink, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, cursor: 'pointer', fontFamily: FONT },
 
-  actions:{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '0 18px 16px' },
-  open:   { padding: '7px 14px', fontSize: 13, background: oracle.red, color: '#fff', border: `1px solid ${oracle.redDark}`, borderRadius: 4, cursor: 'pointer', fontWeight: 700, fontFamily: FONT },
-  btn:    { padding: '7px 12px', fontSize: 13, background: oracle.surface, color: oracle.text, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, cursor: 'pointer', fontWeight: 600, fontFamily: FONT },
-  danger: { padding: '7px 12px', fontSize: 13, background: '#fffafa', color: '#9f1d1d', border: '1px solid #d0a2a2', borderRadius: 4, cursor: 'pointer', fontWeight: 600, marginLeft: 'auto', fontFamily: FONT },
+  actions:{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', padding: '0 18px 16px' },
+  open:   { ...cardAction, padding: '7px 14px', fontSize: 13, background: oracle.red, color: '#fff', border: `1px solid ${oracle.redDark}`, borderRadius: 4, cursor: 'pointer', fontWeight: 700, fontFamily: FONT },
+  btn:    { ...cardAction, padding: '7px 12px', fontSize: 13, background: oracle.surface, color: oracle.text, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, cursor: 'pointer', fontWeight: 600, fontFamily: FONT },
+  danger: { ...cardAction, padding: '7px 12px', fontSize: 13, background: '#fffafa', color: '#9f1d1d', border: '1px solid #d0a2a2', borderRadius: 4, cursor: 'pointer', fontWeight: 600, marginLeft: 'auto', fontFamily: FONT },
 };
 
 function formatTime(iso: string): string {
@@ -65,8 +71,8 @@ function summaryChips(id: string): string[] {
   const envs = (m.environments ?? []).filter((e) => e.name?.trim()).length;
   const projects = (m.projects ?? []).length;
   const platforms = (m.platforms ?? []).length;
-  const chips: string[] = [];
-  if (region) chips.push(rec.disasterRecovery ? `Home: ${region}` : region);
+  const chips: string[] = [`Deployment type: ${m.foundation.stackScope === 'regional' ? 'Secondary' : 'Primary'}`];
+  if (region) chips.push(rec.disasterRecovery ? `Primary: ${region}` : region);
   if (rec.disasterRecovery) {
     const draft = rec.disasterRecovery.draft;
     chips.push(`DR: ${drRegionOptions(m).find((item) => item.id === draft.region)?.shortName ?? draft.region}`);
@@ -134,6 +140,9 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   const descriptions = useMemo(() => Object.fromEntries(records.map((record) => [record.id, getLZ(record.id)?.model.foundation.description?.trim() ?? ''])), [records]);
   const combinedDesigns = useMemo(() => new Set(records.filter((record) => getLZ(record.id)?.disasterRecovery).map((record) => record.id)), [records]);
 
+  const linkedSecondaries = useMemo(() => records.map((meta) => getLZ(meta.id))
+    .filter((record) => record?.homeLzId && record.model.foundation.stackScope === 'regional'), [records]);
+
   async function downloadConfig(id: string, scope?: 'Home' | 'DR') {
     if (downloading) return;
     const record = getLZ(id);
@@ -141,6 +150,12 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
     setDownloading({ id, scope });
     setStorageError(null);
     try {
+      if (record.homeLzId) {
+        const primary = linkedHomeRecord(record);
+        if (!primary) throw new Error('Restore the primary design before downloading its linked secondary.');
+        const issues = validateRegionalDeployment(record.model, primary.model);
+        if (issues.length) throw new Error(issues.join(' '));
+      }
       let files: Record<string, string>;
       let config: string;
       if (record.disasterRecovery) {
@@ -155,8 +170,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
       const downloadable = scope ? Object.fromEntries(Object.entries(files)
         .filter(([path]) => path.startsWith(`${scope}/`) || (path === 'README.txt' && !Object.hasOwn(files, `${scope}/README.txt`)))
         .map(([path, body]) => [path.replace(`${scope}/`, ''), body]))
-        : { [CONFIG_FILENAME]: config, ...files,
-          'README.txt': deploymentReadme(buildConfig(record.model), Object.keys(files)) };
+        : record.disasterRecovery ? files : await deploymentDownloadFiles(record.model, { config, files });
       downloadBlob(bundleFilename(`${record.name}${scope ? `-${scope.toLowerCase()}` : ''}`), zipTextFiles(downloadable));
       setStorageError(persisted.ok ? null : persisted.message ?? 'The configuration was downloaded, but its files could not be retained in browser storage.');
       reload();
@@ -202,6 +216,8 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
           const combined = combinedDesigns.has(r.id);
           const record = getLZ(r.id);
           const regional = record?.model.foundation.stackScope === 'regional';
+          const secondaries = linkedSecondaries.filter((secondary) => secondary?.homeLzId === r.id);
+          const secondary = secondaries.find((item) => item?.model.foundation.region === record?.model.foundation.drRegion) ?? secondaries[0];
           return (
             <div key={r.id} style={isCurrent ? { ...s.card, ...s.cardCurrent } : s.card}>
               <div style={s.accent} />
@@ -259,7 +275,9 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                 {!isCurrent && (
                   <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
                 )}
-                {record && !combined && !regional && <button type="button" style={{ ...s.btn, minHeight: 44 }} onClick={() => handleCreateDr(r.id)}>Create DR</button>}
+                {record && !combined && !regional && (secondary
+                  ? <Link to={`/lz/${secondary.id}`} style={s.btn}>Edit DR</Link>
+                  : <button type="button" style={s.btn} onClick={() => handleCreateDr(r.id)}>Create DR</button>)}
                 <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
               </div>
             </div>

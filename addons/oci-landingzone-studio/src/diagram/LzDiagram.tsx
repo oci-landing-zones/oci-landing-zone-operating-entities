@@ -51,6 +51,8 @@ import { oracle } from '../theme';
 import { attachCooperativeGestures, type DiagramGestureHint } from './cooperativeGestures';
 import { absoluteNodeRects, diagramBounds } from './flowGeometry';
 import { resourceGroupSvg } from './resourceGroups';
+import { foundationResourceSvg } from './foundationResources';
+import { DEPLOYMENT_STACK_COLORS } from './deploymentStackStyle';
 import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
 import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBackends';
@@ -75,8 +77,10 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
   //   Landing zone— red dotted container
   //   compartment — yellow (shared) or green (environment) block
   switch (node.kind) {
-    case 'region':
-      return { background: '#fbfbfb', border: `1.5px solid ${oracle.borderStrong}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
+    case 'region': {
+      const palette = node.deploymentStack ? DEPLOYMENT_STACK_COLORS[node.deploymentStack] : undefined;
+      return { background: palette?.fill ?? '#fbfbfb', border: `1.5px solid ${palette?.stroke ?? oracle.borderStrong}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
+    }
     case 'tenancy':
       return { background: 'transparent', border: `2px dashed ${oracle.ink}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
     case 'landingzone':
@@ -304,6 +308,8 @@ function RouteTableNode({ id, data }: NodeProps) {
 /** Route-table dot (ONTV-style): click to open/close its table; a line runs to the open box. */
 function ResourceGroupNode({ data }: NodeProps) {
   const d = data as unknown as DiagramNode;
+  if (d.foundationResource) return <div role="img" aria-label={d.label}
+    dangerouslySetInnerHTML={{ __html: foundationResourceSvg(d.foundationResource, d.width) }} />;
   if (!d.resourceKind) return null;
   return <div style={{ position: 'relative', width: '100%', height: '100%' }}>
     <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
@@ -368,7 +374,7 @@ function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker:
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, routingNote: n.routingNote, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
+    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, routingNote: n.routingNote, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, foundationResource: n.foundationResource, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -464,7 +470,7 @@ export function DiagramZoomControls({ disabled = false }: { disabled?: boolean }
   );
 }
 
-export default function LzDiagram({ diagram, tagScope, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.05 }: {
+export default function LzDiagram({ diagram, tagScope, options, onOptionsChange, flowSteps, showMiniMap = true, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.05 }: {
   diagram: DiagramModel;
   tagScope?: CostTagScope | null;
   minZoom?: number;
@@ -474,6 +480,7 @@ export default function LzDiagram({ diagram, tagScope, options, onOptionsChange,
   flowSteps?: Record<string, number | null>;
   /** Whether the selected hub topology has a packet-flow adapter. */
   showFlowControl?: boolean;
+  showMiniMap?: boolean;
   /** Flow or hop hovered in the flow picker: fades the other flows. */
   flowFocus?: FlowFocus | null;
   /** Click a flow path to select it (again, or on empty canvas, to clear). */
@@ -662,14 +669,14 @@ export default function LzDiagram({ diagram, tagScope, options, onOptionsChange,
             onSelect={onFlowSelect} onHover={onFlowHover} onRulesChange={setActiveRules} />
         </ViewportPortal>
       )}
-      <MiniMap
+      {showMiniMap && <MiniMap
         nodeColor={miniMapNodeColor}
         nodeStrokeColor={oracle.ink}
         nodeStrokeWidth={2}
         pannable={!cooperative}
         zoomable={!cooperative}
         style={{ width: 140, height: 96, border: `1px solid ${oracle.border}`, borderRadius: 6, pointerEvents: cooperative ? 'none' : undefined }}
-      />
+      />}
       {onOptionsChange && (
         <Panel position="top-right" className="diagram-layer-controls">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100vw - 64px)' }}>

@@ -6,7 +6,7 @@ import type { UncoveredCostResource } from '../../services/costCenterCoverage';
 
 export default function ObservabilityCostStep({ selectedTag, onTagSelect, uncoveredCostResources, tagsOnly = false, tagConfigurationAction }: { tagConfigurationAction?: ReactNode; tagsOnly?: boolean; selectedTag?: string | null; onTagSelect?: (tagName: string) => void; uncoveredCostResources?: readonly UncoveredCostResource[] }) {
   const { model, setField, homeSource } = useWizard();
-  return <div style={form.col}>
+  return <div className="studio-governance-step" style={form.col}>
     <CostGovernanceSection model={homeSource?.model ?? model} regional={model.foundation.stackScope === 'regional'}
       tagsOnly={tagsOnly} tagConfigurationAction={tagConfigurationAction} selectedTag={selectedTag} onTagSelect={onTagSelect}
       uncoveredCostResources={uncoveredCostResources}

@@ -32,6 +32,14 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('preserves tenancy Home metadata separately from the Primary deployment region', () => {
+    const original = emptyLzModel();
+    const reference = structuredClone(original);
+    reference.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    reference.foundation.deploymentMode = 'primary-secondary';
+    expect(buildConfig(reference)).toEqual({ ...buildConfig(original), tenancy_home_region: 'eu-madrid-1' });
+    expect(buildConfig(reference).region).toBe(original.foundation.region);
+  });
   it('leaves new environment zones off and emits an explicit empty target list', () => {
     const fresh = emptyLzModel();
     expect(fresh.environments.every((environment) => !environment.securityZone)).toBe(true);
@@ -179,6 +187,7 @@ describe('serializeConfig', () => {
       "  region: 'eu-frankfurt-1',",
       "  region_short_name: 'fra',",
       '  cis_level: 1,',
+      '  enable_shared_network_security_zone: false,',
       '  environments: { prod: {}, preprod: {} },',
       "  security_targets: [],",
       '}',

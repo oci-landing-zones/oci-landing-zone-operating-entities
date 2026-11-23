@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { emptyLzModel } from '../model/defaults';
-import { createLZ, saveDisasterRecoveryLZ, saveOutputs } from '../services/lzStore';
+import { createDrLZ, createLZ, deleteLZ, saveDisasterRecoveryLZ, saveOutputs } from '../services/lzStore';
 import { createDrDraft } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint } from '../services/disasterRecoverySavedDesign';
 import SavedLzList from './SavedLzList';
@@ -19,6 +19,18 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
+  it.each([undefined, 'complete', 'regional'] as const)('shows deployment type with region and environment metadata: %s', (scope) => {
+    const model = emptyLzModel();
+    model.foundation.stackScope = scope;
+    createLZ('Saved configuration', model);
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    const type = `Deployment type: ${scope === 'regional' ? 'Secondary' : 'Primary'}`;
+    expect(html).toContain(type);
+    expect(html.indexOf(type)).toBeGreaterThan(html.indexOf('Saved configuration'));
+    expect(html.indexOf(type)).toBeLessThan(html.indexOf('2 envs'));
+    expect(html).toContain('fra');
+  });
+
   it('renders a saved design with cached outputs and a deleted cost-center reference', () => {
     const model = emptyLzModel();
     model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
@@ -47,6 +59,25 @@ describe('saved combined Landing Zone cards', () => {
     expect(html.match(/>Delete<\/button>/g)).toHaveLength(3);
   });
 
+  it('links Edit DR to the existing Secondary configuration of its Primary', () => {
+    const primary = createLZ('Primary with DR', emptyLzModel()).record!;
+    const secondary = createDrLZ(primary.id).record!;
+    createLZ('Another Primary', emptyLzModel());
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toMatch(new RegExp(`<a[^>]*href="/lz/${secondary.id}"[^>]*>Edit DR</a>`));
+    expect(html.match(/>Edit DR<\/a>/g)).toHaveLength(1);
+    expect(html.match(/>Create DR<\/button>/g)).toHaveLength(1);
+  });
+
+  it('offers Create DR again when the linked Secondary configuration is deleted', () => {
+    const primary = createLZ('Primary', emptyLzModel()).record!;
+    const secondary = createDrLZ(primary.id).record!;
+    deleteLZ(secondary.id);
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toContain('>Create DR</button>');
+    expect(html).not.toContain('Edit DR');
+  });
+
   it('keeps Create DR available on the current complete design without reopening it', () => {
     const saved = createLZ('Current Home', emptyLzModel()).record!;
     const html = renderToStaticMarkup(<MemoryRouter><SavedLzList currentId={saved.id} /></MemoryRouter>);
@@ -73,7 +104,7 @@ describe('saved combined Landing Zone cards', () => {
     } });
     const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
     expect(html).not.toContain('>Home + DR + RPC<');
-    expect(html).toContain('Home: fra');
+    expect(html).toContain('Primary: fra');
     expect(html).toContain('DR: ams');
     expect(html).toContain('Download LZ config');
     expect(html).toContain('Download LZ DR config');

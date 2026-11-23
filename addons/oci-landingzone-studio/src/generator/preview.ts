@@ -1,3 +1,4 @@
+import { extractFoundationResources, type FoundationResourceInventory } from '../services/foundationInventory';
 import type { LzModel } from '../model/types';
 import { serializeConfig } from '../services/lzConfig';
 import { extractGeneratedResources, type GeneratedResourceInventory } from '../services/generatedResources';
@@ -8,6 +9,7 @@ import { costCenterReferenceErrors } from '../services/costGovernance';
 
 export interface GeneratedPreview {
   network: unknown;
+  foundationResources: FoundationResourceInventory;
   inventory: GeneratedResourceInventory;
   files: string[];
   uncoveredCostResources: UncoveredCostResource[];
@@ -46,6 +48,6 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
     throw new Error('The generated diagram preview is incomplete.');
   }
   const artifacts = preview.artifacts as Record<string, unknown>;
-  return { network: preview.network, inventory: extractGeneratedResources(artifacts, preview.compartments), files: preview.files,
+  return { network: preview.network, foundationResources: extractFoundationResources({ ...artifacts, 'network.json': preview.network }), inventory: extractGeneratedResources(artifacts, preview.compartments), files: preview.files,
     uncoveredCostResources: costCenterCoverage({ ...artifacts, 'network.json': preview.network }) };
 }

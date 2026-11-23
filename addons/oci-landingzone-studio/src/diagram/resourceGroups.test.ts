@@ -6,6 +6,7 @@ describe('shared resource block rendering', () => {
     const items = [{ key: 'COMMON', name: 'id_lz_common' }, ...Array.from({ length: 8 }, (_, i) => ({ key: `GROUP-${i}`, name: `grp-long-project-name-${i}-admin` }))];
     const wide = resourceGroupLayout('identitydomain', items, 1100);
     const narrow = resourceGroupLayout('identitydomain', items, 400);
+    expect([...new Set(wide.rows.map((row) => row.y))].map((y) => wide.rows.filter((row) => row.y === y).length)).toEqual([4, 4]);
     expect(narrow.height).toBeGreaterThan(wide.height);
     const svg = resourceGroupSvg('identitydomain', items, 1100);
     expect(svg).toContain('Identity Domain');

@@ -3,6 +3,7 @@ import type { BusinessUnitScope, CostBudget, CostGovernance, LzModel } from '../
 import { setFinOpsTagsEnabled, activeProjectNames, budgetTagValues, budgetDefinitions, budgetFieldError, budgetRecipientError, costTagDefinitions, defaultCostGovernance, ownerEmail, ownerEmailError, businessUnitAssignments, unassignedCostCenterErrors, assignCostCenterBusinessUnit, syncBusinessUnitAssignments, businessUnitScopeOptions, inheritedCostTagNames, studioExcludedBudgetKeys, inactiveBusinessUnitBudgetKeys, tagValueLists, parseTagValues, costCenterFilter, costCenterReferenceErrors, syncCostCenterBudgets, addCostCenters, removeCostCenter, customBudgetError } from '../../services/costGovernance';
 import { fieldErrorProps } from '../../services/fieldErrors';
 import FieldError from '../../components/FieldError';
+import InfoButton from '../../components/InfoButton';
 import CostCenterCoverageNotice from '../../components/CostCenterCoverageNotice';
 import CostTagHelp from '../../components/CostTagHelp';
 import type { UncoveredCostResource } from '../../services/costCenterCoverage';
@@ -23,10 +24,14 @@ const fields = [
   ['name', 'Budget name'], ['amount', 'Monthly amount'], ['thresholdValue', 'Alert threshold (%)'], ['recipients', 'Notification emails'],
 ] as const;
 
-function GovernancePanel({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+function GovernancePanel({ id, title, help, children }: { id: string; title: string; help?: ReactNode; children: ReactNode }) {
   return <section style={form.panel} aria-labelledby={id}>
     <div style={form.accent} />
-    <div style={form.body}><h2 id={id} style={form.title}>{title}</h2>{children}</div>
+    <div style={form.body}>
+      {help ? <div className="studio-info-heading"><h2 id={id} style={form.title}>{title}</h2><InfoButton title={title}>{help}</InfoButton></div>
+        : <h2 id={id} style={form.title}>{title}</h2>}
+      {children}
+    </div>
   </section>;
 }
 
@@ -103,7 +108,9 @@ export default function CostGovernanceSection({ model, regional = model.foundati
   const removed = allRemoved.filter((key) => keys.includes(key));
   const restorable = removed.filter((key) => key !== 'BUDGET-COST-CENTER-CC12345-KEY' || costCenters.includes('CC12345'));
   const activeKeys = keys.filter((key) => !removed.includes(key));
-  const sharedError = activeKeys.length ? budgetRecipientError(cfg.recipients, true) : null;
+  const onlyBudget = activeKeys.length === 1 ? cfg.additionalBudgets?.[activeKeys[0]] ?? cfg.budgets[activeKeys[0]] ?? defaults.budgets[activeKeys[0]] : undefined;
+  const notificationEmails = cfg.useSingleRecipient ? cfg.recipients : onlyBudget?.recipients ?? '';
+  const sharedError = activeKeys.length ? budgetRecipientError(notificationEmails, true) : null;
   function patch(value: Partial<CostGovernance>) { onChange({ ...cfg, ...value }); }
   function updateTagValues(name: string, raw: string) {
     patch({ tagValueLists: { ...cfg.tagValueLists, [name]: raw } });
@@ -141,12 +148,12 @@ export default function CostGovernanceSection({ model, regional = model.foundati
   }
 
   return <div className="cost-governance" style={{ ...form.col, ...governanceTheme }}>
-    <GovernancePanel id="cost-governance-tags-title" title="FinOps/Governance tags">
+    <GovernancePanel id="cost-governance-tags-title" title="FinOps/Governance tags" help={!tagsOnly ? <>
+      <p>The blueprint includes IAM role tags for tag-based access control (TBAC) in IAM policies and compartment-based budgets by default. Both remain available with or without FinOps tags.</p>
+      <p id="cost-tags-enabled-help">Select <strong>Enable FinOps tags</strong> to include six additional tags—Cost Center, Business Unit, Owner, Platform, Environment and Project—with required values and their associated tag-based budgets in generated JSON.</p>
+    </> : undefined}>
       {!tagsOnly && <>
-        <div className="cost-governance-intro">
-          <p style={{ ...form.intro, margin: 0 }}>The blueprint includes IAM role tags for tag-based access control (TBAC) in IAM policies and compartment-based budgets by default. Both remain available with or without FinOps tags.</p>
-          <p id="cost-tags-enabled-help" style={{ ...form.intro, margin: 0 }}>Select <strong>Enable FinOps tags</strong> to include six additional tags—Cost Center, Business Unit, Owner, Platform, Environment and Project—with required values and their associated tag-based budgets in generated JSON.</p>
-        </div>
+        <p style={form.intro}>Add cost allocation tags and tag-based budgets to your landing zone.</p>
         <div className="cost-governance-actions">
           <label style={{ ...choice, justifyContent: 'flex-start', minHeight: 44, cursor: regional ? 'default' : 'pointer' }}>
             <input id="cost-finops-enabled" type="checkbox" disabled={regional} checked={tagsEnabled} aria-describedby="cost-tags-enabled-help"
@@ -290,21 +297,9 @@ export default function CostGovernanceSection({ model, regional = model.foundati
       </fieldset>}
     </GovernancePanel>
     {!tagsOnly && <GovernancePanel id="cost-budgets-title" title="Budgets">
-      {regional && <p style={form.intro}>Tags and budgets are managed in the Home Region. DR does not create budgets.</p>}
+      {regional && <p style={form.intro}>Tags and budgets are managed by the primary deployment. DR does not create budgets.</p>}
       <fieldset aria-labelledby="cost-budgets-title" disabled={regional} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
-        <p style={{ ...form.help, margin: '0 0 12px' }}>{tagsEnabled ? 'Monthly budgets inherited from One-OE, plus one for each additional project assigned to an environment. Editing a name does not change its target compartment or tags.' : 'Compartment-based budgets remain available when FinOps tags are disabled.'}</p>
-        <label style={choice}>
-          <input type="checkbox" checked={cfg.useSingleRecipient} onChange={(event) => patch({ useSingleRecipient: event.target.checked })} />
-          Use one email for all budget alerts
-        </label>
-        {cfg.useSingleRecipient && <div style={{ marginTop: 14 }}>
-          <label style={form.label} htmlFor="cost-budget-shared-email">Notification emails</label>
-          <input id="cost-budget-shared-email" type="email" required={activeKeys.length > 0} style={form.input} value={cfg.recipients} placeholder="Enter at least one notification email address."
-            onChange={(event) => patch({ recipients: event.target.value })} {...fieldErrorProps('cost-budget-shared-email-error', sharedError)} aria-invalid={!!sharedError} />
-          <FieldError id="cost-budget-shared-email-error" error={sharedError} />
-        </div>}
-        <p style={{ ...form.help, margin: '8px 0 12px' }}>Alerts compare actual spending with each budget.</p>
-        <p style={{ ...form.help, margin: '8px 0 12px' }}>Remove a budget to exclude it from generated configuration. Inherited budgets can be restored below.</p>
+        <p style={{ ...form.help, margin: '0 0 12px' }}>{tagsEnabled ? 'Monthly budgets inherited from One-OE, plus one for each additional project assigned to an environment. Editing a name does not change its target compartment or tags.' : 'The blueprint includes a compartment-based budget by default. Set its monthly amount and alert threshold below.'}</p>
         {activeKeys.length === 0 && <p style={form.help}>No budgets selected for this design.</p>}
         {activeKeys.map((key) => {
           const budget = cfg.additionalBudgets?.[key] ?? cfg.budgets[key] ?? defaults.budgets[key];
@@ -312,7 +307,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
           const targetValues = custom ? budgetTagValues(model, custom.tagName) : [];
           const targetError = custom ? customBudgetError(custom, targetValues) : null;
           const definition = definitions[key];
-          const issueCount = fields.filter(([field]) => field !== 'recipients' || !cfg.useSingleRecipient)
+          const issueCount = fields.filter(([field]) => field !== 'recipients' || (!cfg.useSingleRecipient && activeKeys.length > 1))
             .filter(([field]) => budgetFieldError(field, budget[field])).length + (targetError ? 1 : 0);
           return <div key={key} className="cost-budget-card">
             <details open={newBudgetKey === key}>
@@ -342,7 +337,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
                   <FieldError id={`budget-tag-value-${key}-error`} error={targetError} /></div>
               </div>}
               <div className="cost-budget-fields" style={{ display: 'grid', gap: 14, alignItems: 'end', marginBottom: 18 }}>
-                {fields.filter(([field]) => field !== 'recipients' || !cfg.useSingleRecipient).map(([field, label]) => {
+                {fields.filter(([field]) => field !== 'recipients' || (!cfg.useSingleRecipient && activeKeys.length > 1)).map(([field, label]) => {
                   const id = `cost-budget-${key}-${field}`;
                   const numeric = field === 'amount' || field === 'thresholdValue';
                   const error = budgetFieldError(field, budget[field]);
@@ -363,6 +358,7 @@ export default function CostGovernanceSection({ model, regional = model.foundati
             <DeleteButton label={`Remove budget ${budget.name}`} style={{ width: 44, height: 44, position: 'absolute', top: 12, right: 12 }} onClick={() => removeBudget(key)} />
           </div>;
         })}
+        <p style={{ ...form.help, margin: '8px 0 12px' }}>Remove a budget to exclude it from generated configuration. Inherited budgets can be restored below.</p>
         {tagsEnabled && <button type="button" style={{ ...form.addBtn, minHeight: 44, marginTop: 16 }} onClick={addBudget}>Add tag-based budget</button>}
         {restorable.length > 0 && <details style={{ marginTop: 14 }}>
           <summary style={{ cursor: 'pointer', padding: '12px 0', fontSize: 13, color: oracle.ink }}>Removed budgets ({restorable.length})</summary>
@@ -371,6 +367,19 @@ export default function CostGovernanceSection({ model, regional = model.foundati
             <button type="button" style={{ ...form.addBtn, minHeight: 44 }} aria-label={`Restore budget ${cfg.additionalBudgets?.[key]?.name ?? cfg.budgets[key]?.name ?? key}`} onClick={() => patch({ removedBudgets: allRemoved.filter((item) => item !== key) })}>Restore</button>
           </div>)}
         </details>}
+        {activeKeys.length > 0 && <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${oracle.border}` }}>
+          {activeKeys.length > 1 && <label style={choice}>
+            <input type="checkbox" checked={cfg.useSingleRecipient} onChange={(event) => patch({ useSingleRecipient: event.target.checked })} />
+            Use one email for all budget alerts
+          </label>}
+          {(cfg.useSingleRecipient || onlyBudget) && <div style={{ marginTop: activeKeys.length > 1 ? 14 : 0 }}>
+            <label style={form.label} htmlFor="cost-budget-shared-email">Notification emails</label>
+            <input id="cost-budget-shared-email" type="email" required={activeKeys.length > 0} style={form.input} value={notificationEmails} placeholder="Enter at least one notification email address."
+              onChange={(event) => cfg.useSingleRecipient ? patch({ recipients: event.target.value }) : updateBudget(activeKeys[0], 'recipients', event.target.value)} {...fieldErrorProps('cost-budget-shared-email-error', sharedError)} aria-invalid={!!sharedError} />
+            <FieldError id="cost-budget-shared-email-error" error={sharedError} />
+          </div>}
+          <p style={{ ...form.help, margin: '8px 0 12px' }}>Receive an alert when actual spending reaches the configured percentage of your monthly budget. Budgets do not limit spending.</p>
+        </div>}
       </fieldset>
     </GovernancePanel>}
   </div>;

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  createLZ, createDrLZ, linkedHomeRecord, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs, restoreCombinedDesign,
+  createLZ, createDrLZ, configureSecondaryLZ, linkedHomeRecord, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs, restoreCombinedDesign,
 } from './lzStore';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { createDrDraft } from './disasterRecoveryDesign';
@@ -249,6 +249,30 @@ describe('lzStore', () => {
 
 
 describe('linked DR records', () => {
+  it('prepares DR authorization for an existing primary and reuses its matching secondary', () => {
+    const primary = createLZ('Existing primary').record!;
+    const result = configureSecondaryLZ(primary.id, 'eu-amsterdam-1');
+    expect(result.ok).toBe(true);
+    expect(result.record!.model.foundation).toMatchObject({ region: 'eu-amsterdam-1', regionShortName: 'ams' });
+    expect(buildConfig(getLZ(primary.id)!.model).dr_region).toBe('eu-amsterdam-1');
+    expect(getLZ(primary.id)!.model.foundation.deploymentMode).toBe('primary-secondary');
+    expect(configureSecondaryLZ(primary.id, 'eu-amsterdam-1').record!.id).toBe(result.record!.id);
+    expect(configureSecondaryLZ(primary.id, 'eu-frankfurt-1').ok).toBe(false);
+  });
+
+  it('creates a separate linked secondary while preserving the primary workflow and tenancy reference', () => {
+    const model = emptyLzModel();
+    model.foundation.deploymentMode = 'primary-secondary';
+    model.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    model.foundation.drRegion = 'eu-amsterdam-1';
+    const primary = createLZ('Primary', model).record!;
+    const secondary = createDrLZ(primary.id).record!;
+    expect(secondary.homeLzId).toBe(primary.id);
+    expect(secondary.model.foundation).toMatchObject({ stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1', tenancyHomeRegion: 'eu-madrid-1' });
+    expect(secondary.model.foundation.deploymentMode).toBeUndefined();
+    expect(getLZ(primary.id)!.model.foundation.deploymentMode).toBe('primary-secondary');
+  });
+
   it('copies all Home inputs with stable identities and no cached outputs', () => {
     const model = emptyLzModel();
     model.foundation.drRegion = 'eu-amsterdam-1';
@@ -361,7 +385,7 @@ describe('linked DR records', () => {
     expect(getLZ(dr.id)?.homeLzId).toBe(home.id);
     expect(getLZ(dr.id)?.model).toEqual(dr.model);
     expect(linkedHomeRecord(dr)).toBeNull();
-    expect(saveLZ(dr.id, { ...dr.model, environments: [] })).toMatchObject({ ok: false, message: expect.stringMatching(/Home.*unavailable/) });
+    expect(saveLZ(dr.id, { ...dr.model, environments: [] })).toMatchObject({ ok: false, message: expect.stringMatching(/primary deployment.*unavailable/i) });
     expect(window.localStorage.getItem(`lzng.lz.${dr.id}`)).toBe(before);
     deleteLZ(home.id);
     expect(getLZ(dr.id)?.homeLzId).toBe(home.id);

@@ -29,7 +29,7 @@ describe('deploymentStages', () => {
   it('keeps design, guide, diagram and runtime dependency files out of both phases', () => {
     const stages = deploymentStages(['network.json', 'config.jsonnet', 'README.txt', 'design.drawio',
       'compartments_output.json', 'network_output.json']);
-    expect(stages.map((stage) => stage.files)).toEqual([['network.json'], ['network.json']]);
+    expect(stages.map((stage) => stage.files)).toEqual([['network.json']]);
   });
 
   it.each(shapes.filter((shape) => shape.backends))('retains ready Hub C backends for $regional/$cis/$oke', ({ regional, cis, oke }) => {

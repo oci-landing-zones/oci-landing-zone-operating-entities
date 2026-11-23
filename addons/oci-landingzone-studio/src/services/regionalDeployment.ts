@@ -14,12 +14,14 @@ export function createRegionalModel(): LzModel {
   return model;
 }
 
-export function validateRegionalDeployment(model: LzModel): string[] {
+export function validateRegionalDeployment(model: LzModel, primary?: LzModel | null): string[] {
   if (model.foundation.stackScope !== 'regional') return [];
   const { realm, region, homeRegion } = model.foundation;
   return [
     ...(!findRegion(realm, region) ? ['Choose a DR region.'] : []),
-    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different Home Region in the same realm.'] : []),
+    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different primary region in the same realm.'] : []),
+    ...(primary && model.foundation.cisLevel === 2 && primary.foundation.drRegion !== region
+      ? ['Select this secondary region in the primary design before generating CIS Level 2 files. Review and apply the updated primary deployment first.'] : []),
   ];
 }
 

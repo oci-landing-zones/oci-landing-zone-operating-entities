@@ -19,7 +19,8 @@ export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
   const next: LzModel = {
     ...source,
     foundation: { ...source.foundation, stackScope: 'regional', realm: home.foundation.realm,
-      homeRegion: home.foundation.region, drRegion: undefined },
+      identityDomainName: home.foundation.identityDomainName,
+      homeRegion: home.foundation.region, tenancyHomeRegion: home.foundation.tenancyHomeRegion, drRegion: undefined },
     environments,
     projects: source.projects.map((project) => project.environments === 'all' ? project : {
       ...project, environments: project.environments.filter((id) => ids.has(id)),

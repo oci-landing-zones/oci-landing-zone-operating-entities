@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform } from '../services/platforms';
 import { WizardProvider } from '../wizard/wizardContext';
-import FoundationStep from '../wizard/steps/FoundationStep';
+import IamStep from '../wizard/steps/IamStep';
 import ExadataStep from '../wizard/steps/ExadataStep';
 import OkeSettingsFields from './OkeSettingsFields';
 import ValidatedInput from './ValidatedInput';
@@ -54,7 +54,7 @@ describe('consistent field feedback', () => {
   it('marks duplicate environment names individually and leaves empty designs valid', () => {
     const model = emptyLzModel();
     model.environments[1].name = model.environments[0].name;
-    const render = () => renderToStaticMarkup(<WizardProvider initialModel={model}><FoundationStep name="Test" onNameChange={() => {}} onNameBlur={() => {}} /></WizardProvider>);
+    const render = () => renderToStaticMarkup(<WizardProvider initialModel={model}><IamStep /></WizardProvider>);
     const html = render();
     for (const env of model.environments) expect(html).toContain(`aria-describedby="environment-${env.id}-error"`);
     model.environments = [];

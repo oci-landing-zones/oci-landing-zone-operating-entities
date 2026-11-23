@@ -1,3 +1,4 @@
+import { findRegion } from './regions';
 import { getHubKind } from './hubKinds';
 /**
  * lzConfig — derives the Landing Zone config object from the canonical model and
@@ -54,7 +55,10 @@ export interface EnvConfigEntry {
 export interface LzConfig {
   cost_governance?: import('./costGovernance').CostGovernanceConfig;
   bastion?: { client_cidr_block_allow_list: string[]; max_session_ttl_in_seconds: number };
-  stack_scope?: 'complete' | 'regional';
+  stack_scope?: 'complete' | 'regional' | 'home' | 'primary';
+  primary_region?: string;
+  primary_region_short_name?: string;
+  tenancy_home_region?: string;
   dr_region?: string;
   remote_peering_connections?: Record<string, {
     remote_cidrs: string[];
@@ -68,7 +72,9 @@ export interface LzConfig {
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
-  security_zone_recipe1_cis_level?: 1 | 2;
+  identity_domain_name?: string;
+  enable_landing_zone_security_zone?: boolean;
+  enable_shared_network_security_zone?: boolean;
   enable_cloud_guard?: boolean;
   notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
@@ -216,6 +222,8 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
 
   return {
     ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(f.tenancyHomeRegion ? { tenancy_home_region: f.tenancyHomeRegion } : {}),
+    ...(f.stackScope === 'regional' && f.homeRegion && findRegion(f.realm, f.homeRegion) ? { primary_region: f.homeRegion, primary_region_short_name: findRegion(f.realm, f.homeRegion)!.shortName } : {}),
     ...(model.bastion?.enabled ? { bastion: {
       client_cidr_block_allow_list: bastionClientCidrs(model.bastion),
       max_session_ttl_in_seconds: model.bastion.maxSessionTtlInSeconds,
@@ -232,7 +240,9 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
-    ...(f.securityZoneRecipe1CisLevel !== undefined ? { security_zone_recipe1_cis_level: f.securityZoneRecipe1CisLevel } : {}),
+    ...(f.identityDomainName !== undefined ? { identity_domain_name: f.identityDomainName } : {}),
+    ...(f.sharedNetworkSecurityZone === false ? { enable_shared_network_security_zone: false } : {}),
+    ...(f.landingZoneSecurityZone === false ? { enable_landing_zone_security_zone: false } : {}),
     ...(f.cloudGuardEnabled === false ? { enable_cloud_guard: false } : {}),
     cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
@@ -418,8 +428,12 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     `  realm: ${quote(c.realm)},`,
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
+    ...(c.tenancy_home_region ? [`  tenancy_home_region: ${quote(c.tenancy_home_region)},`] : []),
+    ...(c.primary_region ? [`  primary_region: ${quote(c.primary_region)},`, `  primary_region_short_name: ${quote(c.primary_region_short_name!)},`] : []),
     `  cis_level: ${c.cis_level},`,
-    ...(c.security_zone_recipe1_cis_level !== undefined ? [`  security_zone_recipe1_cis_level: ${c.security_zone_recipe1_cis_level},`] : []),
+    ...(c.identity_domain_name !== undefined ? [`  identity_domain_name: ${quote(c.identity_domain_name)},`] : []),
+    ...(c.enable_shared_network_security_zone !== undefined ? [`  enable_shared_network_security_zone: ${c.enable_shared_network_security_zone},`] : []),
+    ...(c.enable_landing_zone_security_zone !== undefined ? [`  enable_landing_zone_security_zone: ${c.enable_landing_zone_security_zone},`] : []),
     ...(c.enable_cloud_guard === false ? ['  enable_cloud_guard: false,'] : []),
     ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),

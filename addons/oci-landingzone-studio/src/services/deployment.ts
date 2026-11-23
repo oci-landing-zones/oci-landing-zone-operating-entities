@@ -19,11 +19,18 @@ export function completionNetwork(config: LzConfig): 'network.json' | 'network_b
   return config.hub.kind === 'hub_c' ? 'network_backends.json' : 'network.json';
 }
 
+export function plannedDeploymentStages(config: LzConfig, files: string[]) {
+  const additionalZones = config.stack_scope !== 'regional' && (
+    config.enable_shared_network_security_zone !== false || (config.security_targets ?? Object.keys(config.environments)).length > 0
+  );
+  return deploymentStages(files, completionNetwork(config), additionalZones);
+}
+
 export function expectedDeploymentFiles(config: LzConfig): string[] {
   const cis = config.cis_level;
   const hasOke = Object.values(config.environments).some((env) => Object.values(env.platforms).some((platform) => platform.extension?.type === 'oke_simple'));
   return [
-    ...(config.stack_scope === 'regional' ? [] : ['iam.json', 'governance.json']), 'network.json',
+    ...(config.stack_scope === 'regional' ? [] : ['iam.json', 'governance.json', ...(config.cost_governance?.tag_resource_labels ? ['governance_pre.json'] : [])]), 'network.json',
     `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
     `observability_cis${cis}.json`,
     ...(config.hub.kind === 'hub_c' ? ['network_backends.json'] : []),
@@ -39,9 +46,9 @@ export function deploymentPrerequisites(config: LzConfig): string[] {
     ...(config.stack_scope !== 'regional' && config.enable_cloud_guard === false
       ? ['Cloud Guard must already be enabled and managed externally before deploying Security Zones. This package excludes Cloud Guard configuration and its dedicated event rule and notification topic.'] : []),
     ...(regional ? [
-      'Deploy the Home Region stack first with matching compartments, project and platform IAM, and governance.'
+      'Deploy the primary deployment stack first with matching compartments, project and platform IAM, and governance.'
         + (config.cis_level === 2 ? ' Select this DR region in Home to grant Object Storage access to its encryption keys.' : ''),
-      'On Home, set `save_output = true` and complete its deployment to obtain `compartments_output.json` and `network_output.json`. These runtime outputs are not included in the Studio download.',
+      'Set `save_output = true` on the prerequisite stacks. Complete Home for `compartments_output.json` and Primary for `network_output.json`; when Home and Primary share a stack, both files come from that stack. These runtime outputs are not included in the Studio download.',
     ] : []),
     ...(peers.length ? [
       ...(peers.some((peer) => peer.peer_id) ? ['RPC requester: deploy the acceptor first. Use its RPC OCID or the RPC resource key from its `network_output.json` as the peer ID.'] : []),
@@ -67,7 +74,7 @@ export function deploymentSettings(config: LzConfig): string[] {
   const dependencies = dependencyFiles(config);
   const names = dependencies.map((file) => '`' + file + '`').join(' and ');
   return [
-    ...(dependencies.length ? [`Copy ${names} from the completed ${config.stack_scope === 'regional' ? 'Home' : 'RPC acceptor'} deployment to this stack's private configuration bucket. Set \`oci_dependency_objects\` to ${names}. Keep these files out of \`oci_configuration_objects\`.`] : []),
+    ...(dependencies.length ? [`Copy ${names} from the completed ${config.stack_scope === 'regional' ? 'Home (compartments_output.json) and Primary (network_output.json)' : 'RPC acceptor'} deployment to this stack's private configuration bucket. Set \`oci_dependency_objects\` to ${names}. Keep these files out of \`oci_configuration_objects\`.`] : []),
     ...(outputFiles(config).length ? [`Set \`save_output = true\` to write runtime outputs for the ${config.dr_region ? 'DR stack' : 'RPC requester'}.`] : []),
   ];
 }
@@ -99,53 +106,55 @@ export function deploymentHandover(config: LzConfig): string[] {
   ];
 }
 
-export function deploymentCliSteps(config: LzConfig): string[] {
+export function deploymentCliSteps(config: LzConfig, hasSecondStage = plannedDeploymentStages(config, expectedDeploymentFiles(config)).length > 1): string[] {
   const dependencies = dependencyFiles(config);
   const outputs = outputFiles(config);
   const dependencyNames = dependencies.map((file) => '`' + file + '`').join(' and ');
   const outputNames = outputs.map((file) => '`' + file + '`').join(' and ');
   return [
     `Download and extract Orchestrator ${ORCHESTRATOR_VERSION}. Use \`rms-facade\` as the working directory, with your approved OCI authentication and Terraform state. Keep the generated JSON files locally instead of uploading them to a bucket.`,
-    'In a private `deployment.tfvars` file, set `configuration_source = "file"`, `tenancy_ocid` and `region`. Set `local_config_file_paths` to absolute paths for the phase 1 files listed above.',
-    ...(dependencies.length ? [`Set \`local_dependency_file_paths\` to the absolute paths of ${dependencyNames} from the completed ${config.stack_scope === 'regional' ? 'Home' : 'RPC acceptor'} deployment.`] : []),
+    'In a private `deployment.tfvars` file, set `configuration_source = "file"`, `tenancy_ocid` and `region`. Set `local_config_file_paths` to absolute paths for the ' + (hasSecondStage ? 'phase 1' : 'deployment') + ' files listed above.',
+    ...(dependencies.length ? [`Set \`local_dependency_file_paths\` to the absolute paths of ${dependencyNames} from the completed ${config.stack_scope === 'regional' ? 'Home (compartments_output.json) and Primary (network_output.json)' : 'RPC acceptor'} deployment.`] : []),
     ...(outputs.length ? [`Set \`save_output = true\`. Retain ${outputNames} written locally for the separate ${config.dr_region ? 'DR stack' : 'RPC requester'}.`] : []),
     'Run `terraform init`, then `terraform plan -var-file=deployment.tfvars -out=deployment.tfplan`. Review the plan, then run `terraform apply deployment.tfplan`.',
-    `After phase 1 succeeds, ${config.hub.kind === 'hub_c' ? 'prepare the firewall backends and edit `network_backends.json` as described above. Then ' : ''}replace \`local_config_file_paths\` with the phase 2 list. Save \`deployment.tfvars\`, then plan, review and apply again using the same commands and state.`,
+    ...(hasSecondStage ? [`After phase 1 succeeds, ${config.hub.kind === 'hub_c' ? 'prepare the firewall backends and edit `network_backends.json` as described above. Then ' : ''}replace \`local_config_file_paths\` with the phase 2 list. Save \`deployment.tfvars\`, then plan, review and apply again using the same commands and state.`] : []),
   ];
 }
 
 export function deploymentReadme(config: LzConfig, files: string[]): string {
-  const scope = config.stack_scope === 'regional' ? 'DR' : 'Home Region';
-  const [first, second] = deploymentStages(files, completionNetwork(config));
+  const scope = config.stack_scope === 'regional' ? 'DR deployment' : 'Primary deployment';
+  const [first, second] = plannedDeploymentStages(config, files);
   const handover = deploymentHandover(config);
   return [
-    `${scope} deployment (${config.region})`,
+    `${scope} (${config.region})`,
     `Landing Zone Orchestrator ${ORCHESTRATOR_VERSION}: ${ORCHESTRATOR_RELEASE_URL}`,
     '',
     'Deploy with OCI Resource Manager',
-    'Use one stack for both phases.',
+    second ? 'Use one stack for both phases.' : 'Deploy the final files in one stack with one plan and apply.',
     '',
     '1. Prepare the files',
     ...deploymentPrerequisites(config),
     PRIVATE_SOURCE_STEP,
     'Upload only the generated deployment JSON files; do not mix them with published blueprint files.',
     '',
-    '2. Create and apply phase 1',
+    second ? '2. Create and apply phase 1' : '2. Create and apply',
     `Open ${DEPLOY_TO_OCI_URL} and select rms-facade as the working directory.`,
-    'Confirm configuration_source = "ocibucket". Enter your bucket in oci_configuration_bucket and set oci_configuration_objects to exactly these phase 1 files:',
+    'Confirm configuration_source = "ocibucket". Enter your bucket in oci_configuration_bucket and set oci_configuration_objects to exactly these ' + (second ? 'phase 1' : 'deployment') + ' files:',
     ...first.files.map((file) => `  ${file}`),
     ...deploymentSettings(config),
-    APPLY_STEP,
+    second ? APPLY_STEP : APPLY_STEP.replace(' Wait for a successful apply before starting phase 2.', ' Wait for a successful apply.'),
     '',
-    '3. Update and apply phase 2',
-    ...(config.hub.kind === 'hub_c' ? HUB_C_BACKEND_STEPS : []),
-    'In the same stack, edit the variables. Replace oci_configuration_objects with exactly these phase 2 files. Retain complete control files and replace each _pre file with its final counterpart:',
-    ...second.files.map((file) => `  ${file}`),
-    UPDATE_STEP,
+    ...(second ? [
+      '3. Update and apply phase 2',
+      ...(config.hub.kind === 'hub_c' ? HUB_C_BACKEND_STEPS : []),
+      'In the same stack, edit the variables. Replace oci_configuration_objects with exactly these phase 2 files. Retain complete control files and replace each _pre file with its final counterpart:',
+      ...second.files.map((file) => `  ${file}`),
+      UPDATE_STEP,
+    ] : []),
     ...deploymentOutputs(config),
-    ...(handover.length ? ['', '4. Complete external setup', ...handover] : []),
+    ...(handover.length ? ['', `${second ? 4 : 3}. Complete external setup`, ...handover] : []),
     '', 'Updating an existing landing zone', EXISTING_DEPLOYMENT_STEP,
-    '', 'Alternative: Terraform CLI or CI/CD', ...deploymentCliSteps(config).map((step, i) => `${i + 1}. ${step}`),
+    '', 'Alternative: Terraform CLI or CI/CD', ...deploymentCliSteps(config, !!second).map((step, i) => `${i + 1}. ${step}`),
     '',
   ].join('\n').replaceAll('`', '');
 }

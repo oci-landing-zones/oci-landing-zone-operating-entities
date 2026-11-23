@@ -349,6 +349,8 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   projectEnvironmentIds?: string[];
   environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
 }, routeTables: RouteTable[] = [], inventory?: GeneratedResourceInventory): DiagramModel {
+  const showSecurityZones = opts.showSecurityZones !== false;
+  if (inventory && !showSecurityZones) inventory = { ...inventory, groups: inventory.groups.filter((group) => group.kind !== 'securityrecipes') };
   if (inventory && upToStep < 5) inventory = { ...inventory, groups: inventory.groups.filter((group) => !['budgets', 'requiredtags'].includes(group.kind)) };
   const hybrid = upToStep >= 2 ? hybridRoutes(model) : [];
   const vpns = hybrid.filter((connection) => connection.type === 'VPN');
@@ -544,7 +546,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
       sourceId: e.id,
       name,
       label: generatorNames.environmentCompartment(name),
-      secure: model.foundation.stackScope !== 'regional' && e.securityZone,
+      secure: showSecurityZones && model.foundation.stackScope !== 'regional' && e.securityZone,
       netLabel: generatorNames.environmentChildCompartment(name, 'network'),
       vcnLabel: `${generatorNames.environmentVcn(regionTok, name)}\n${net.vcnCidr}`,
       subnets,
@@ -669,7 +671,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   const nodes: DiagramNode[] = [
     { id: 'region', kind: 'region', label: region ? `OCI Region · ${region}` : 'OCI Region', x: 0, y: 0, width: regWidth, height: regHeight },
     { id: 'tenancy', kind: 'tenancy', label: 'OCI Tenancy', parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
-    { id: 'landingzone', kind: 'landingzone', secure: f.stackScope !== 'regional', container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
+    { id: 'landingzone', kind: 'landingzone', secure: showSecurityZones && f.stackScope !== 'regional' && f.landingZoneSecurityZone !== false, container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
   const pushExadataChildren = (parentId: string, parentLabel: string, parentWidth: number, children: Array<'db' | 'infra'>) => {
@@ -682,7 +684,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   };
 
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
-  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: f.stackScope !== 'regional', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
+  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: showSecurityZones && f.stackScope !== 'regional' && f.sharedNetworkSecurityZone !== false, container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
     const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets, centeredVcnX);
     // Gateways straddle the left boundary: IGW by the first subnet,
