@@ -19,10 +19,10 @@ describe('deploymentStages', () => {
     expect(stages[1].files).toEqual([...persistent, 'network.json', ...final, ...workloads]);
   });
 
-  it('replaces governance bootstrap with the final labelled governance without duplicate families', () => {
+  it('ignores obsolete governance bootstrap and retains final governance in both phases', () => {
     const stages = deploymentStages(['iam.json', 'governance_pre.json', 'governance.json', 'network.json', 'security_cis2_pre.json', 'security_cis2.json']);
-    expect(stages[0].files).toContain('governance_pre.json');
-    expect(stages[0].files).not.toContain('governance.json');
+    expect(stages[0].files).not.toContain('governance_pre.json');
+    expect(stages[0].files).toContain('governance.json');
     expect(stages[1].files).toContain('governance.json');
     expect(stages[1].files).not.toContain('governance_pre.json');
   });
@@ -70,4 +70,14 @@ describe('isCurrentOutputSet', () => {
     expect(isCurrentOutputSet(saved, '{ cis_level: 1 }')).toBe(false);
     expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, 'network_pre.json': '{}' } }, saved.config)).toBe(false);
   });
+});
+
+it('requires regeneration of cached governance bootstrap bundles', () => {
+  expect(isCurrentOutputSet({ config: 'same', files: { 'network.json': '{}', 'governance_pre.json': '{}', 'governance.json': '{}' } }, 'same')).toBe(false);
+});
+
+it('regenerates redundant cached security variants but retains genuinely phased bundles', () => {
+  const files = { 'network.json': '{}', 'security_cis1_pre.json': '{"zones":1}', 'security_cis1.json': '{"zones":1}' };
+  expect(isCurrentOutputSet({ config: 'same', files }, 'same')).toBe(false);
+  expect(isCurrentOutputSet({ config: 'same', files: { ...files, 'security_cis1.json': '{"zones":2}' } }, 'same')).toBe(true);
 });

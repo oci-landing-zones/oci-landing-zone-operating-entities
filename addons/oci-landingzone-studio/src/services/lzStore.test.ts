@@ -435,3 +435,19 @@ describe('linked DR records', () => {
     expect(keys.filter((key) => /^lzng\.lz\.(?!index)/.test(key))).toHaveLength(3);
   });
 });
+
+it('marks both Primary and linked DR outputs stale when the Primary VSS selection changes', () => {
+  const primary = createSaved('Primary'); const dr = createDrLZ(primary.id).record!;
+  const initialPrimary = getLZ(primary.id)!;
+  saveOutputs(primary.id, { config: serializeConfig(initialPrimary.model), files: { 'network.json': '{}' } });
+  saveOutputs(dr.id, { config: serializeConfig(dr.model), files: { 'network.json': '{}' } });
+  expect(isCurrentOutputSet(getOutputs(dr.id), serializeConfig(getLZ(dr.id)!.model))).toBe(true);
+  initialPrimary.model.foundation.vulnerabilityScanningEnabled = false;
+  expect(saveLZ(primary.id, initialPrimary.model).ok).toBe(true);
+  const updatedDr = getLZ(dr.id)!;
+  expect(updatedDr.model.foundation.vulnerabilityScanningEnabled).toBe(false);
+  for (const id of [primary.id, dr.id]) expect(isCurrentOutputSet(getOutputs(id), serializeConfig(getLZ(id)!.model))).toBe(false);
+  updatedDr.model.foundation.vulnerabilityScanningEnabled = true;
+  saveLZ(dr.id, updatedDr.model);
+  expect(getLZ(dr.id)!.model.foundation.vulnerabilityScanningEnabled).toBe(false);
+});

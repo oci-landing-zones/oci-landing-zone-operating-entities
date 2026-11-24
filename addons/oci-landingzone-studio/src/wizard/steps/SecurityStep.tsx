@@ -15,7 +15,10 @@ export default function SecurityStep() {
   const f = model.foundation;
   const regional = f.stackScope === 'regional';
   const recipe1Foundation = regional && homeSource?.model ? homeSource.model.foundation : f;
-  const sharedNetworkZone = recipe1Foundation.sharedNetworkSecurityZone !== false;
+  const environmentRecipe = recipe1Foundation.environmentSecurityZoneRecipeNumber === 2 ? '02' : '03';
+  const legacySharedNetworkZone = recipe1Foundation.sharedNetworkSecurityZone !== false;
+  const inheritedVss = regional && !!homeSource;
+  const vssEnabled = (inheritedVss && homeSource?.model ? homeSource.model.foundation : f).vulnerabilityScanningEnabled !== false;
   const cloudGuardError = validateCloudGuard(model)[0] ?? null;
 
   return (
@@ -54,7 +57,7 @@ export default function SecurityStep() {
               <h2 id="security-zones-title" style={{ ...s.title, marginBottom: 0 }}>Security Zones</h2>
               <InfoButton title="Security Zones">
                 <p><strong>Recipe 01</strong> applies to cmp-landingzone and its subcompartments. It is enabled by default and always uses the CIS level selected in Security baseline. Turn it off to omit this recipe and its zone; encryption and the baseline level stay unchanged.</p>
-                <p><strong>Advanced</strong> lets you enable Recipe 02 for the shared network and Recipe 03 for selected environments. These additional zones are disabled by default in new designs.</p>
+                <p><strong>Advanced</strong> lets you enable additional Security Zones for selected environments. These additional zones are disabled by default in new designs. Shared network, platform and security compartments inherit Recipe 01.</p>
                 <p>Manage these settings in the Home and Primary Studio configuration, and environment names in IAM.</p>
               </InfoButton>
             </div>
@@ -75,20 +78,12 @@ export default function SecurityStep() {
           {regional && homeSource && !homeSource.model && <p style={s.help}>The Primary deployment design is unavailable. These Security Zone settings are from the last saved version.</p>}
           {regional && homeSource?.model && <Link to={`/lz/${encodeURIComponent(homeSource.id)}`} target="_blank" rel="noopener noreferrer"
             aria-label="Open primary deployment (opens in a new tab)" className="guide-link">Open primary deployment</Link>}
+          {legacySharedNetworkZone && <p style={s.help} role="status"><strong>Legacy shared-network Security Zone.</strong> This saved configuration retains its existing zone. Studio no longer offers this option. Review the owning stack and its Terraform plan before removing it outside Studio.</p>}
           <div id="lz-security-zones-advanced" hidden={!zonesAdvancedOpen} style={{ marginTop: 14 }}>
             <p style={s.help}>Optional additional Security Zones use their own recipes.</p>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 0', marginTop: 10, borderTop: `1px solid ${oracle.border}` }}>
-              <div>
-                <h3 style={{ ...s.docH, margin: 0 }}>Recipe 02 — Shared network</h3>
-                <p style={s.help}>Apply a separate Security Zone to cmp-lz-network.</p>
-              </div>
-              {regional ? <span style={{ ...s.help, flex: '0 0 auto' }}>{sharedNetworkZone ? 'On' : 'Off'}</span> : <Switch
-                checked={sharedNetworkZone} ariaLabel="Security zone for shared network" label={sharedNetworkZone ? 'On' : 'Off'}
-                onChange={(sharedNetworkSecurityZone) => setField('foundation', { ...f, sharedNetworkSecurityZone })} />}
-            </div>
             {model.environments.length ? <ul aria-label="Environment Security Zones" style={{ listStyle: 'none', padding: 0, margin: '14px 0 0' }}>
               {model.environments.map((env, index) => <li key={env.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '10px 0', borderTop: `1px solid ${oracle.border}` }}>
-                <span style={{ fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere', minWidth: 0 }}>{`Recipe 03 — ${env.name || `Environment ${index + 1}`}`}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere', minWidth: 0 }}>{`Recipe ${environmentRecipe} — ${env.name || `Environment ${index + 1}`}`}</span>
                 {regional ? <span style={{ ...s.help, flex: '0 0 auto' }}>{env.securityZone ? 'On' : 'Off'}</span> : <Switch
                   checked={env.securityZone}
                   onChange={(securityZone) => setField('environments', model.environments.map((current) => current.id === env.id ? { ...current, securityZone } : current))}
@@ -130,6 +125,27 @@ export default function SecurityStep() {
             <p id="existing-cloud-guard-help" style={{ ...s.help, marginTop: 8 }}>Security Zones require Cloud Guard, including the landing zone baseline zones. This choice omits Cloud Guard configuration and its dedicated event rule and notification topic from the generated files. Review the Terraform plan when updating an existing deployment.</p>
             <FieldError id="existing-cloud-guard-error" error={cloudGuardError} />
           </>}
+        </div>
+      </section>
+
+      <section style={s.panel} aria-labelledby="security-vss-title">
+        <div style={s.accent} />
+        <div style={s.body}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+            <div className="studio-info-heading">
+              <h2 id="security-vss-title" style={s.title}>Vulnerability Scanning (VSS)</h2>
+              <InfoButton title="Vulnerability Scanning">
+                <p>VSS checks hosts for vulnerabilities using scanning recipes and targets. Studio includes a host scanning recipe and a target for the landing-zone compartment in this region.</p>
+                <p>Linked DR inherits the Primary selection. Each deployment manages its own regional scanning resources; changing the design does not update existing OCI resources until you apply its files.</p>
+              </InfoButton>
+            </div>
+            {inheritedVss ? <span style={{ ...s.help, flex: '0 0 auto' }}>{vssEnabled ? 'On' : 'Off'}</span> : <Switch checked={vssEnabled} ariaLabel="Enable Vulnerability Scanning"
+              label={vssEnabled ? 'On' : 'Off'}
+              onChange={(vulnerabilityScanningEnabled) => setField('foundation', { ...f, vulnerabilityScanningEnabled })} />}
+          </div>
+          <p style={s.intro}>{inheritedVss ? 'VSS is inherited from the Primary configuration. Change it in Primary, then regenerate and apply the files for both affected deployments.' : 'Include host vulnerability scanning in this deployment. Enabled by default.'}</p>
+          {inheritedVss && !homeSource?.model && <p style={s.help}>The Primary configuration is unavailable. Showing the last saved VSS selection.</p>}
+          {!vssEnabled && <p style={s.help}>Scanning recipes and targets are excluded from the generated files. For an existing deployment, review the Terraform plan: this removes the scanning resources managed by this stack.</p>}
         </div>
       </section>
 

@@ -281,9 +281,10 @@ it('summarizes Recipe 01 and only selected additional zones before deployment', 
   const summary = html.split('Deploy with OCI Resource Manager')[0];
   expect(summary).toContain('Security Zone Recipe 01');
   expect(summary).toContain('On · CIS Level 2');
-  expect(summary).toContain('Recipe 02 — Shared network');
-  expect(summary).toContain('Recipe 03 — prod');
-  expect(summary).not.toContain('Recipe 03 — preprod');
+  expect(summary).toContain('Legacy shared-network zone');
+  expect(summary).not.toContain('Recipe 02 — Shared network');
+  expect(summary).toContain('Recipe 02 — prod');
+  expect(summary).not.toContain('Recipe 02 — preprod');
 });
 
 it('reports disabled Recipe 01 and no additional zones in the summary', () => {
@@ -302,5 +303,25 @@ it('uses the linked Primary settings for DR Security Zone summaries', () => {
   dr.foundation.stackScope = 'regional';
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={dr} homeSource={{ id: 'primary', model: primary }}><ReviewStep designName="DR zones" /></WizardProvider></MemoryRouter>);
   expect(html).toContain('Primary: Off');
-  expect(html).toContain('Primary: Recipe 03 — prod');
+  expect(html).toContain('Primary: Recipe 02 — prod');
+});
+
+it('explains the extra applies when an environment Security Zone is selected', () => {
+  const model = emptyLzModel(); model.environments[0].securityZone = true;
+  const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Environment zones" /></WizardProvider></MemoryRouter>);
+  expect(html).toContain('before enabling additional environment Security Zones');
+  expect(html).toContain('Never include both security files');
+  expect(html).toContain('security_cis1_pre.json');
+  expect(html).toContain('security_cis1.json');
+  expect(html).toContain('Update and apply phase 2');
+});
+
+it('asks to regenerate and reapply when a saved deployment configuration changes', () => {
+  const previous = emptyLzModel();
+  stored.outputs.dr = { config: serializeConfig(previous), files: { 'network.json': '{}' } };
+  const changed = structuredClone(previous); changed.foundation.vulnerabilityScanningEnabled = false;
+  const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={changed}><ReviewStep designName="Changed VSS" /></WizardProvider></MemoryRouter>);
+  expect(html).toContain('Deployment update required.');
+  expect(html).toContain('reapply any affected stacks already deployed');
+  expect(html).toContain('Studio does not check live OCI deployment status');
 });

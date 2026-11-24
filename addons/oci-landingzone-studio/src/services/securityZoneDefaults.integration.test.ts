@@ -27,7 +27,8 @@ describe('Security Zone defaults and Advanced selections', () => {
     const restored = importConfig(config).model;
     expect(normalizeModel(restored).foundation).toHaveProperty('landingZoneSecurityZone', false);
     const generated = await generateOutputs(restored);
-    for (const phase of ['', '_pre']) {
+    expect(generated.files[`security_cis${cisLevel}_pre.json`]).toBeUndefined();
+    for (const phase of ['']) {
       const security = JSON.parse(generated.files[`security_cis${cisLevel}${phase}.json`]);
       expect(security.security_zones_configuration.recipes).toEqual({});
       expect(security.security_zones_configuration.security_zones).toEqual({});
@@ -48,12 +49,13 @@ describe('Security Zone defaults and Advanced selections', () => {
     const current = model();
     current.foundation.cisLevel = cisLevel;
     const generated = await generateOutputs(current);
-    for (const phase of ['', '_pre']) {
+    expect(generated.files[`security_cis${cisLevel}_pre.json`]).toBeUndefined();
+    for (const phase of ['']) {
       const zones = JSON.parse(generated.files[`security_cis${cisLevel}${phase}.json`]).security_zones_configuration;
       expect(Object.keys(zones.recipes)).toHaveLength(1);
       expect(Object.values(zones.security_zones)).toEqual([expect.objectContaining({ compartment_id: 'CMP-LANDINGZONE-KEY' })]);
     }
-    expect(JSON.parse(generated.files[`security_cis${cisLevel}_pre.json`])).toEqual(JSON.parse(generated.files[`security_cis${cisLevel}.json`]));
+    expect(generated.files[`security_cis${cisLevel}_pre.json`]).toBeUndefined();
     const stages = plannedDeploymentStages(buildConfig(current), Object.keys(generated.files));
     expect(stages).toHaveLength(1);
     expect(stages[0].files).toContain(`security_cis${cisLevel}.json`);
@@ -88,3 +90,34 @@ describe('Security Zone defaults and Advanced selections', () => {
     expect(() => importConfig({ ...buildConfig(previous), enable_shared_network_security_zone: 'false' })).toThrow('enable_shared_network_security_zone');
   });
 });
+
+it.each([1, 2] as const)('uses two security phases only for selected environment Recipe 02 at CIS%d', async (cisLevel) => {
+  const current = model(); current.foundation.cisLevel = cisLevel;
+  current.environments[0].securityZone = true;
+  const output = await generateOutputs(current);
+  const pre = `security_cis${cisLevel}_pre.json`, final = `security_cis${cisLevel}.json`;
+  const initial = JSON.parse(output.files[pre]).security_zones_configuration;
+  const complete = JSON.parse(output.files[final]).security_zones_configuration;
+  expect(Object.values(initial.security_zones)).toHaveLength(1);
+  expect(Object.values(complete.security_zones)).toHaveLength(2);
+  expect(complete.recipes['SZ-RCP-LZ-02-PROD-ENVIRONMENT-KEY']).toBeDefined();
+  expect(complete.recipes['SZ-RCP-LZ-03-PROD-ENVIRONMENT-KEY']).toBeUndefined();
+  const stages = plannedDeploymentStages(buildConfig(current), Object.keys(output.files));
+  expect(stages).toHaveLength(2);
+  expect(stages[0].files).toContain(pre); expect(stages[0].files).not.toContain(final);
+  expect(stages[1].files).toContain(final); expect(stages[1].files).not.toContain(pre);
+  expect(stages[0].description).toContain('before enabling additional environment Security Zones');
+  expect(stages[1].description).toContain('Never include both security files');
+}, 60000);
+
+it('preserves Recipe 03 identities when reopening an older environment-zone source', async () => {
+  const old = buildConfig(model()); delete old.security_zone_environment_recipe_number;
+  old.security_targets = ['prod'];
+  const restored = importConfig(old).model;
+  expect(restored.foundation.environmentSecurityZoneRecipeNumber).toBe(3);
+  expect(buildConfig(restored).security_zone_environment_recipe_number).toBeUndefined();
+  const output = await generateOutputs(restored);
+  const zones = JSON.parse(output.files['security_cis1.json']).security_zones_configuration;
+  expect(zones.recipes['SZ-RCP-LZ-03-PROD-ENVIRONMENT-KEY']).toBeDefined();
+  expect(zones.recipes['SZ-RCP-LZ-02-PROD-ENVIRONMENT-KEY']).toBeUndefined();
+}, 60000);

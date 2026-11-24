@@ -49,7 +49,9 @@ export function emptyLzModel(): LzModel {
       regionShortName: region?.shortName ?? 'fra',
       cisLevel: 1,
       cloudGuardEnabled: true,
+      vulnerabilityScanningEnabled: true,
       sharedNetworkSecurityZone: false,
+      environmentSecurityZoneRecipeNumber: 2,
       landingZoneSecurityZone: true,
       costGovernance: { ...defaultCostGovernance(), tagsEnabled: false },
       notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
@@ -156,6 +158,8 @@ export function normalizeModel(stored: unknown): LzModel {
     || (candidate.foundation.cisLevel !== 1 && candidate.foundation.cisLevel !== 2)
     || (candidate.foundation.securityZoneRecipe1CisLevel !== undefined && candidate.foundation.securityZoneRecipe1CisLevel !== 1 && candidate.foundation.securityZoneRecipe1CisLevel !== 2)
     || (candidate.foundation.landingZoneSecurityZone !== undefined && typeof candidate.foundation.landingZoneSecurityZone !== 'boolean')
+    || (candidate.foundation.environmentSecurityZoneRecipeNumber !== undefined && candidate.foundation.environmentSecurityZoneRecipeNumber !== 2 && candidate.foundation.environmentSecurityZoneRecipeNumber !== 3)
+    || (candidate.foundation.vulnerabilityScanningEnabled !== undefined && typeof candidate.foundation.vulnerabilityScanningEnabled !== 'boolean')
     || (candidate.foundation.sharedNetworkSecurityZone !== undefined && typeof candidate.foundation.sharedNetworkSecurityZone !== 'boolean')
     || (candidate.foundation.identityDomainName !== undefined && typeof candidate.foundation.identityDomainName !== 'string')
     || !candidate.network

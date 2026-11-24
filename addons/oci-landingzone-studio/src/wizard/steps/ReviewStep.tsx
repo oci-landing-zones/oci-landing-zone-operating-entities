@@ -40,7 +40,7 @@ import {
   plannedDeploymentStages, APPLY_STEP, DEPLOY_TO_OCI_URL, EXISTING_DEPLOYMENT_STEP, HUB_C_BACKEND_STEPS, ORCHESTRATOR_VERSION, UPDATE_STEP,
   ORCHESTRATOR_URL as LANDING_ZONE_ORCHESTRATOR_URL,
   ORCHESTRATOR_RELEASE_URL as LANDING_ZONE_ORCHESTRATOR_RELEASE_URL,
-  PRIVATE_SOURCE_STEP, RESOURCE_MANAGER_STACKS_URL, completionNetwork,
+  PRIVATE_SOURCE_STEP, RESOURCE_MANAGER_STACKS_URL, completionNetwork, DEPLOYMENT_UPDATE_NOTICE,
   deploymentCliSteps, deploymentHandover, deploymentOutputs, deploymentPrerequisites, deploymentSettings, expectedDeploymentFiles,
 } from '../../services/deployment';
 import { ErrorNotice } from '../../components/FieldError';
@@ -292,8 +292,8 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
   const zoneOwner = regional && zoneModel ? 'Primary: ' : '';
   const recipe1Summary = !zoneModel ? 'Managed by primary deployment' : zoneOwner + (zoneModel.foundation.landingZoneSecurityZone === false ? 'Off' : `On · CIS Level ${zoneModel.foundation.cisLevel}`);
   const additionalZones = zoneModel ? [
-    ...(zoneModel.foundation.sharedNetworkSecurityZone !== false ? ['Recipe 02 — Shared network'] : []),
-    ...zoneModel.environments.filter((env) => env.securityZone).map((env) => `Recipe 03 — ${env.name}`),
+    ...(zoneModel.foundation.sharedNetworkSecurityZone !== false ? ['Legacy shared-network zone (retained)'] : []),
+    ...zoneModel.environments.filter((env) => env.securityZone).map((env) => `Recipe ${zoneModel.foundation.environmentSecurityZoneRecipeNumber === 2 ? '02' : '03'} — ${env.name}`),
   ] : null;
   const additionalZonesSummary = additionalZones ? zoneOwner + (additionalZones.join(', ') || 'None') : 'Managed by primary deployment';
 
@@ -312,6 +312,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               ['Tenancy home region', model.foundation.tenancyHomeRegion || 'Not specified'],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
               ['Cloud Guard', regional ? 'Managed by primary deployment' : model.foundation.cloudGuardEnabled === false ? (model.foundation.cloudGuardExistingConfirmed ? 'Managed externally' : 'Excluded; confirmation required') : 'Included'],
+              ['Vulnerability Scanning', model.foundation.vulnerabilityScanningEnabled === false ? 'Excluded' : 'Included'],
               ['Security Zone Recipe 01', recipe1Summary],
               ['Additional Security Zones', additionalZonesSummary],
               ['Hub', hub?.label ?? model.network.hubKind],
@@ -341,6 +342,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           <div style={local.note}>
             Download this design and its deployment files as a ZIP. Review the files and replace placeholders before deploying.
           </div>
+          {stale && <p role="status" style={local.note}><strong>Deployment update required.</strong> {DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.</p>}
           {contractErrors.length > 0 && (
             <ErrorNotice title="Complete these settings before downloading">
               <ul>{contractErrors.map((message) => <li key={message}>{message}</li>)}</ul>
@@ -394,6 +396,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             <h3>{secondStage ? '2. Create and apply phase 1' : '2. Create and apply'}</h3>
             <p>Open <a className="guide-link" href={DEPLOY_TO_OCI_URL} target="_blank" rel="noreferrer">Deploy to OCI ↗</a> for a prefilled <strong>Create Stack</strong> wizard using the Landing Zone Orchestrator and private Object Storage configuration source. Select <code className="deployment-code">rms-facade</code> as the working directory.</p>
             <p>In the stack variables, confirm <Setting name="configuration_source" value="ocibucket" />. Enter your bucket name in <Setting name="oci_configuration_bucket" /> and set <Setting name="oci_configuration_objects" /> to exactly these {secondStage ? 'phase 1' : 'deployment'} files:</p>
+            {firstStage.files.some((file) => /^security_cis[12]_pre\.json$/.test(file)) && <p>{firstStage.description}</p>}
             <ul className="deployment-files" aria-label={secondStage ? 'Phase 1 files' : 'Deployment files'}>{firstStage.files.map((file) => <li key={file}><code className="deployment-file">{file}</code></li>)}</ul>
             {deploymentSettings(deploymentConfig).map((step) => <p key={step}><DeploymentText text={step} /></p>)}
             <p>{secondStage ? APPLY_STEP : APPLY_STEP.replace(' Wait for a successful apply before starting phase 2.', ' Wait for a successful apply.')}</p>
@@ -401,6 +404,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           </div>
           {secondStage && <div className="deployment-step">
             <h3>3. Update and apply phase 2</h3>
+            {firstStage.files.some((file) => /^security_cis[12]_pre\.json$/.test(file)) && <p>{secondStage.description}</p>}
             {model.network.hubKind === 'hub_c' && <ul className="deployment-list">
               {HUB_C_BACKEND_STEPS.map((step) => <li key={step}><DeploymentText text={step} /></li>)}
             </ul>}

@@ -19,7 +19,9 @@ function(config, n, realm_constants, topo)
   local cis_label(cis_level) = 'L%s' % cis_level;
   local cis_recipe_key(cis_level) = n.key_global('SZ-RCP', ['01', 'CIS', cis_label(cis_level)]);
   local shared_network_recipe_key = n.key_global('SZ-RCP', ['02', 'SHARED', 'NETWORK']);
-  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', ['03', env_name, 'ENVIRONMENT']);
+  // Preserve existing Recipe 03 identities unless the source explicitly selects the new numbering.
+  local environment_recipe_segment = if std.objectHas(config, 'security_zone_environment_recipe_number') && config.security_zone_environment_recipe_number == 2 then '02' else '03';
+  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', [environment_recipe_segment, env_name, 'ENVIRONMENT']);
   local recipe1_level(cis_level) =
     if std.objectHas(config, 'security_zone_recipe1_cis_level') && config.security_zone_recipe1_cis_level != null then
       config.security_zone_recipe1_cis_level else cis_level;
@@ -41,8 +43,8 @@ function(config, n, realm_constants, topo)
   } + {
     [environment_recipe_key(env_name)]: {
       _cost_scope:: cost_scope.value(env_name),
-      name: n.display_global('sz-rcp', ['03', env_name, 'environment']),
-      description: 'Recipe 03 %s Environment' % topo.env_display(env_name),
+      name: n.display_global('sz-rcp', [environment_recipe_segment, env_name, 'environment']),
+      description: 'Recipe %s %s Environment' % [environment_recipe_segment, topo.env_display(env_name)],
       compartment_id: n.key_global('CMP', ['SECURITY']),
       cis_level: '%s' % cis_level,
       security_policies_ocids: szp.environment,
@@ -68,7 +70,7 @@ function(config, n, realm_constants, topo)
       },
     },
 
-    scanning_configuration: {
+    [if !std.objectHas(config, 'enable_vulnerability_scanning') || config.enable_vulnerability_scanning then 'scanning_configuration']: {
       default_compartment_id: n.key_global('CMP', ['SECURITY']),
 
       host_recipes: {

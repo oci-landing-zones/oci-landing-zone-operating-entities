@@ -27,22 +27,16 @@ local disabled_dr = generate(finops_config + {
   cost_governance: { enable_tags: false, require_tag_values: false, tag_resource_labels: false },
 });
 local prefix = 'tagns-lz-cost-governance.tag-lz-';
-local bootstrap = finops['governance_pre.json'];
 local final = finops['governance.json'];
-assert bootstrap.budgets_configuration == final.budgets_configuration;
-assert std.foldl(function(ok, key)
-  local original = bootstrap.tags_configuration.namespaces[key];
-  local namespace = final.tags_configuration.namespaces[key];
-  ok && !std.objectHas(original, 'defined_tags') &&
-    std.foldl(function(untagged, tag) untagged && !std.objectHas(tag, 'defined_tags'), std.objectValues(original.tags), true) &&
-    std.foldl(function(tagged, resource)
-      tagged && resource.defined_tags[prefix + 'platform'] == 'governance' &&
-      resource.defined_tags[prefix + 'environment'] == 'shared' &&
-      resource.defined_tags[prefix + 'project'] == 'notapplicable' &&
-      resource.defined_tags[prefix + 'owner'] == 'owner@example.com' &&
-      resource.defined_tags[prefix + 'cost-center'] == 'CC12345',
-      [namespace] + std.objectValues(namespace.tags), true),
-  std.objectFields(final.tags_configuration.namespaces), true);
+local baseline = (import 'gen/landing_zone.libsonnet')(finops_config).governance;
+assert !std.objectHas(finops, 'governance_pre.json');
+assert final == baseline;
+assert std.foldl(function(ok, namespace)
+  ok && !std.objectHas(namespace, 'defined_tags') &&
+    std.foldl(function(untagged, tag) untagged && !std.objectHas(tag, 'defined_tags'), std.objectValues(namespace.tags), true),
+  std.objectValues(final.tags_configuration.namespaces), true);
+assert std.length(std.objectFields(final.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags)) == 6;
+assert finops['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags[prefix + 'owner'] == 'owner@example.com';
 assert !std.objectHas(legacy, 'governance_pre.json');
 assert !std.objectHas(legacy['governance.json'].tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'], 'defined_tags');
 assert !std.objectHas(disabled_dr, 'iam.json') && !std.objectHas(disabled_dr, 'governance.json') && !std.objectHas(disabled_dr, 'governance_pre.json');
@@ -52,7 +46,6 @@ local expected_regional = [
   'network_backends.json',
   'observability_cis2.json',
   'security_cis2.json',
-  'security_cis2_pre.json',
 ];
 
 {

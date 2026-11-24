@@ -3,12 +3,11 @@ import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { buildConfig } from '../services/lzConfig';
-import { completionNetwork } from '../services/deployment';
+import { plannedDeploymentStages } from '../services/deployment';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform } from '../services/platforms';
 import { generateOutputs } from './generate';
 import { setAssetLoader } from './jsonnetVm';
-import { deploymentStages } from './outputNames';
 import { defaultCostGovernance } from '../services/costGovernance';
 
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
@@ -30,20 +29,21 @@ describe('canonical deployment file sets', () => {
     model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com', tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' } };
     const result = await generateOutputs(model);
     expect(Object.keys(result.files).filter((file) => /^(security|observability)_cis/.test(file)).sort()).toEqual([
-      `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
+      `security_cis${cis}.json`,
       `observability_cis${cis}.json`,
     ].sort());
-    const stages = deploymentStages(Object.keys(result.files), completionNetwork(buildConfig(model)));
+    const stages = plannedDeploymentStages(buildConfig(model), Object.keys(result.files));
     expect(stages[0].files).toContain(`observability_cis${cis}.json`);
     for (const stage of stages) {
       const roots = stage.files.flatMap((file) => Object.keys(JSON.parse(result.files[file])));
       expect(new Set(roots).size).toBe(roots.length);
       expect(stage.files.includes('iam.json')).toBe(!regional);
-      expect(stage.files.includes('governance.json') || stage.files.includes('governance_pre.json')).toBe(!regional);
+      expect(stage.files.includes('governance.json')).toBe(!regional);
+      expect(stage.files).not.toContain('governance_pre.json');
     }
-    expect(stages[1].files.includes('oke.json')).toBe(oke);
-    expect(stages[1].files).not.toContain('oke_clusters.json');
-    expect(stages[1].files).not.toContain('oke_workers.json');
-    expect(stages[1].files.includes('network_backends.json')).toBe(hub === 'hub_c');
+    expect(stages[stages.length - 1].files.includes('oke.json')).toBe(oke);
+    expect(stages[stages.length - 1].files).not.toContain('oke_clusters.json');
+    expect(stages[stages.length - 1].files).not.toContain('oke_workers.json');
+    expect(stages[stages.length - 1].files.includes('network_backends.json')).toBe(hub === 'hub_c');
   }, 60_000);
 });

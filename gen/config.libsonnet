@@ -206,6 +206,8 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
     assert std.member(supported_realms, realm) :
            'config.realm must be one of: %s' % std.join(', ', supported_realms);
 
+    assert !std.objectHas(config, 'enable_vulnerability_scanning') || std.type(config.enable_vulnerability_scanning) == 'boolean' :
+           'config.enable_vulnerability_scanning must be a boolean';
     local enable_cloud_guard = if std.objectHas(config, 'enable_cloud_guard') then config.enable_cloud_guard else true;
     assert std.type(enable_cloud_guard) == 'boolean' : 'config.enable_cloud_guard must be a boolean';
 
@@ -222,6 +224,8 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
            'config.enable_landing_zone_security_zone must be a boolean';
     assert !std.objectHas(config, 'enable_shared_network_security_zone') || std.type(config.enable_shared_network_security_zone) == 'boolean' :
            'config.enable_shared_network_security_zone must be a boolean';
+    assert !std.objectHas(config, 'security_zone_environment_recipe_number') || std.member([2, 3], config.security_zone_environment_recipe_number) :
+           'config.security_zone_environment_recipe_number must be 2 or 3';
     local recipe1_level = if std.objectHas(config, 'security_zone_recipe1_cis_level') then config.security_zone_recipe1_cis_level else null;
     assert recipe1_level == null || std.member([1, 2], recipe1_level) :
            'config.security_zone_recipe1_cis_level must be 1 or 2';

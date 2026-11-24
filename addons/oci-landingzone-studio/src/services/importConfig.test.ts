@@ -264,3 +264,11 @@ it('normalizes earlier Studio OKE image expressions into the released contract',
   expect(current.environments.prod.platforms.oke.extension!.params!.worker_image).toBe('9');
   expect(current.environments.prod.platforms.oke.extension!.params!).not.toHaveProperty('module_version');
 });
+
+it('warns about legacy shared-network zones without removing their exported ownership', () => {
+  const current = buildConfig(emptyLzModel());
+  const imported = importConfig({ ...current, enable_shared_network_security_zone: true });
+  expect(imported.model.foundation.sharedNetworkSecurityZone).toBe(true);
+  expect(buildConfig(imported.model).enable_shared_network_security_zone).not.toBe(false);
+  expect(imported.warnings.join(' ')).toContain('legacy shared-network Security Zone');
+});

@@ -10,6 +10,8 @@ export const DEPLOY_TO_OCI_URL = `${RESOURCE_MANAGER_STACKS_URL}/create?${new UR
   zipUrlVariables: JSON.stringify({ configuration_source: 'ocibucket' }),
 })}`;
 
+export const DEPLOYMENT_UPDATE_NOTICE = 'Configuration changed. Regenerate the files, then review a Terraform plan and reapply any affected stacks already deployed.';
+
 export const PRIVATE_SOURCE_STEP = 'Unzip the download and review the generated JSON files. Replace any required placeholders, then upload the JSON files to your private Object Storage bucket.';
 export const APPLY_STEP = 'Select Create without running an apply. From the stack details page, select Plan, review the changes and policy impact, then select Apply. Wait for a successful apply before starting phase 2.';
 export const UPDATE_STEP = 'Save the updated variables. Run Plan, review the changes, then Apply in the same stack. Wait for a successful apply.';
@@ -19,19 +21,28 @@ export function completionNetwork(config: LzConfig): 'network.json' | 'network_b
   return config.hub.kind === 'hub_c' ? 'network_backends.json' : 'network.json';
 }
 
-export function plannedDeploymentStages(config: LzConfig, files: string[]) {
-  const additionalZones = config.stack_scope !== 'regional' && (
+function hasAdditionalSecurityZones(config: LzConfig): boolean {
+  return config.stack_scope !== 'regional' && config.stack_scope !== 'home' && (
     config.enable_shared_network_security_zone !== false || (config.security_targets ?? Object.keys(config.environments)).length > 0
   );
-  return deploymentStages(files, completionNetwork(config), additionalZones);
+}
+
+export function plannedDeploymentStages(config: LzConfig, files: string[]) {
+  const stages = deploymentStages(files, completionNetwork(config), hasAdditionalSecurityZones(config));
+  const pre = stages[0].files.find((file) => /^security_cis[12]_pre\.json$/.test(file));
+  if (!pre || stages.length < 2) return stages;
+  const final = pre.replace('_pre.json', '.json');
+  return stages.map((stage, index) => ({ ...stage, description: stage.description + (index === 0
+    ? ` Use ${pre} to deploy the landing-zone resources before enabling additional environment Security Zones.`
+    : ` Replace ${pre} with ${final} to enable the selected additional Security Zones in the same stack and Terraform state. Never include both security files in the same operation.`) }));
 }
 
 export function expectedDeploymentFiles(config: LzConfig): string[] {
   const cis = config.cis_level;
   const hasOke = Object.values(config.environments).some((env) => Object.values(env.platforms).some((platform) => platform.extension?.type === 'oke_simple'));
   return [
-    ...(config.stack_scope === 'regional' ? [] : ['iam.json', 'governance.json', ...(config.cost_governance?.tag_resource_labels ? ['governance_pre.json'] : [])]), 'network.json',
-    `security_cis${cis}_pre.json`, `security_cis${cis}.json`,
+    ...(config.stack_scope === 'regional' ? [] : ['iam.json', 'governance.json']), 'network.json',
+    ...(hasAdditionalSecurityZones(config) ? [`security_cis${cis}_pre.json`] : []), `security_cis${cis}.json`,
     `observability_cis${cis}.json`,
     ...(config.hub.kind === 'hub_c' ? ['network_backends.json'] : []),
     ...(hasOke ? ['oke.json'] : []),
@@ -138,6 +149,7 @@ export function deploymentReadme(config: LzConfig, files: string[]): string {
     'Upload only the generated deployment JSON files; do not mix them with published blueprint files.',
     '',
     second ? '2. Create and apply phase 1' : '2. Create and apply',
+    first.description,
     `Open ${DEPLOY_TO_OCI_URL} and select rms-facade as the working directory.`,
     'Confirm configuration_source = "ocibucket". Enter your bucket in oci_configuration_bucket and set oci_configuration_objects to exactly these ' + (second ? 'phase 1' : 'deployment') + ' files:',
     ...first.files.map((file) => `  ${file}`),
@@ -146,6 +158,7 @@ export function deploymentReadme(config: LzConfig, files: string[]): string {
     '',
     ...(second ? [
       '3. Update and apply phase 2',
+      second.description,
       ...(config.hub.kind === 'hub_c' ? HUB_C_BACKEND_STEPS : []),
       'In the same stack, edit the variables. Replace oci_configuration_objects with exactly these phase 2 files. Retain complete control files and replace each _pre file with its final counterpart:',
       ...second.files.map((file) => `  ${file}`),

@@ -20,7 +20,7 @@ local topic_subset(document, home) =
     },
   };
 if scope == 'home' then
-  { [key]: outputs[key] for key in ['iam.json', 'governance.json', 'governance_pre.json'] if std.objectHas(outputs, key) }
+  { [key]: outputs[key] for key in ['iam.json', 'governance.json'] if std.objectHas(outputs, key) }
   + {
     [key]: {
       cloud_guard_configuration: outputs[key].cloud_guard_configuration + { reporting_region: home_region },
@@ -48,5 +48,5 @@ else {
     } + { notifications_configuration: topic_subset(document, false) }
     else document
   for key in std.objectFields(outputs)
-  if !std.member(['iam.json', 'governance.json', 'governance_pre.json'], key)
+  if !std.member(['iam.json', 'governance.json'], key)
 }

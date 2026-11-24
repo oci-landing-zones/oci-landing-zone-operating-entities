@@ -12,19 +12,20 @@ import { generateOutputs } from '../generator/generate';
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
 
 describe('real Home and Primary deployment generation', () => {
-  it('keeps FinOps governance bootstrap and final phases in Home only', async () => {
+  it('creates FinOps governance in one Home phase only', async () => {
     const model = emptyLzModel();
     Object.assign(model.foundation, { region: 'eu-amsterdam-1', regionShortName: 'ams', tenancyHomeRegion: 'eu-frankfurt-1' });
     model.foundation.costGovernance = { ...defaultCostGovernance(), tagsEnabled: true, tagResourceLabels: true, ownerEmail: 'owner@customer.test', recipients: 'budgets@customer.test' };
     const files = await deploymentDownloadFiles(model, { config: serializeConfig(model), files: {} });
-    expect(files['home_fra/governance_pre.json']).toBeDefined();
+    expect(files['home_fra/governance_pre.json']).toBeUndefined();
+    expect(files['home_fra/governance.json']).toBeDefined();
     expect(files['primary_ams/governance_pre.json']).toBeUndefined();
     const [home, primary] = homePrimaryDeploymentPlan(model);
-    expect(home.stages).toHaveLength(2);
-    expect(home.stages[0].files).toContain('governance_pre.json');
-    expect(home.stages[0].files).not.toContain('governance.json');
-    expect(home.stages[1].files).toContain('governance.json');
-    expect(home.stages[1].files).not.toContain('governance_pre.json');
+    expect(home.stages).toHaveLength(1);
+    expect(home.stages[0].files).toContain('governance.json');
+    expect(home.stages[0].files).not.toContain('governance_pre.json');
+    expect(files['home_fra/README.txt']).not.toContain('Phase 2');
+    expect(files['home_fra/README.txt']).not.toContain('governance_pre.json');
     expect(primary.stages.flatMap((stage) => stage.files).some((file) => file.startsWith('governance'))).toBe(false);
   }, 60000);
 
@@ -79,7 +80,7 @@ describe('real Home and Primary deployment generation', () => {
     expect(files['primary_ams/iam.json']).toBeUndefined();
     expect(files['primary_ams/governance.json']).toBeUndefined();
     expect(files['primary_ams/network.json']).toBeDefined();
-    expect(files[`primary_ams/security_cis${cisLevel}_pre.json`]).toBeDefined();
+    expect(files[`primary_ams/security_cis${cisLevel}_pre.json`]).toBeUndefined();
     expect(files[`primary_ams/security_cis${cisLevel}.json`]).not.toContain('cloud_guard_configuration');
     expect(files[`primary_ams/observability_cis${cisLevel}.json`]).not.toContain('TOPIC-IAM-KEY');
   }, 60000);

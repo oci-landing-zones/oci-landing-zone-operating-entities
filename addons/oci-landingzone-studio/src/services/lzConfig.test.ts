@@ -187,6 +187,7 @@ describe('serializeConfig', () => {
       "  region: 'eu-frankfurt-1',",
       "  region_short_name: 'fra',",
       '  cis_level: 1,',
+      '  security_zone_environment_recipe_number: 2,',
       '  enable_shared_network_security_zone: false,',
       '  environments: { prod: {}, preprod: {} },',
       "  security_targets: [],",

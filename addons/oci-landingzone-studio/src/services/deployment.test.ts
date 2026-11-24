@@ -73,7 +73,8 @@ describe('default deployment settings', () => {
     const [first, second] = guide.split('3. Update and apply phase 2');
     expect(first).toContain('security_cis2_pre.json');
     expect(second).toContain('security_cis2.json');
-    expect(second).not.toContain('security_cis2_pre.json');
+    expect(second.split('\n').filter((line) => line.startsWith('  '))).not.toContain('  security_cis2_pre.json');
+    expect(second).toContain('Never include both security files');
     expect(guide).not.toContain('save_output');
     expect(guide).not.toContain('oci_dependency_objects');
     expect(guide).not.toContain('private GitHub');
@@ -154,13 +155,13 @@ describe('default deployment settings', () => {
   });
 });
 
-it.each(['shared-zone', 'environment-zone', 'governance-tags', 'workload', 'firewall-backends'])('retains a second apply for %s', (reason) => {
+it.each(['shared-zone', 'environment-zone', 'workload', 'firewall-backends'])('retains a second apply for %s', (reason) => {
   const model = emptyLzModel();
   if (reason === 'shared-zone') model.foundation.sharedNetworkSecurityZone = true;
   if (reason === 'environment-zone') model.environments[0].securityZone = true;
   if (reason === 'firewall-backends') model.network.hubKind = 'hub_c';
   const config = buildConfig(model);
-  const files = [...expectedDeploymentFiles(config), ...(reason === 'governance-tags' ? ['governance_pre.json'] : []), ...(reason === 'workload' ? ['oke.json'] : [])];
+  const files = [...expectedDeploymentFiles(config), ...(reason === 'workload' ? ['oke.json'] : [])];
   const stages = plannedDeploymentStages(config, files);
   expect(stages).toHaveLength(2);
   if (reason.endsWith('-zone')) expect(stages[0].files).toContain('security_cis1_pre.json');

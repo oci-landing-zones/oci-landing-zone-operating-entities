@@ -29,11 +29,7 @@ export interface HomePrimaryDeployment {
 
 function homeStages(files: string[]): DeploymentStage[] {
   const final = files.filter((file) => file.endsWith('.json') && !file.endsWith('_pre.json') && !file.endsWith('_output.json') && !file.includes('/'));
-  if (!files.includes('governance_pre.json')) return [{ title: 'Create Home controls', description: 'Create shared IAM, governance and Home controls. No networks or workloads are created here.', files: final }];
-  return [
-    { title: 'Create Home prerequisites', description: 'Create shared IAM and tag definitions before applying tags to the definitions.', files: final.filter((file) => file !== 'governance.json').concat('governance_pre.json') },
-    { title: 'Complete Home governance', description: 'Retain Home controls and replace governance_pre.json with governance.json in the same Home stack.', files: final },
-  ];
+  return [{ title: 'Create Home controls', description: 'Create shared IAM, governance and Home controls. No networks or workloads are created here.', files: final }];
 }
 
 /** Uses actual scoped outputs when available; otherwise supplies a design preview. */
@@ -42,7 +38,6 @@ export function homePrimaryDeploymentPlan(model: LzModel, scopedFiles?: { home?:
   if (!configs) return [];
   const cis = configs.home.cis_level;
   const homeFiles = scopedFiles?.home ?? ['iam.json', 'governance.json',
-    ...(configs.home.cost_governance?.tag_resource_labels ? ['governance_pre.json'] : []),
     ...(configs.home.enable_cloud_guard === false ? [] : [`security_cis${cis}.json`]), `observability_cis${cis}.json`];
   const primaryFiles = scopedFiles?.primary ?? expectedDeploymentFiles(configs.primary).filter((file) => !['iam.json', 'governance.json', 'governance_pre.json'].includes(file));
   return [
@@ -74,7 +69,7 @@ export function homePrimaryReadme(operation: HomePrimaryDeployment): string {
     `${operation.name} stack (${operation.config.region}) — ${operation.folder}/`,
     `Landing Zone Orchestrator ${ORCHESTRATOR_VERSION}: ${ORCHESTRATOR_RELEASE_URL}`,
     '',
-    home ? 'Deploy this Home stack first. It creates shared IAM, governance and Home controls, without networks or workloads.' : 'Deploy this separate Primary stack only after Home has completed all its phases. It creates regional networks, controls and workloads.',
+    home ? 'Deploy this Home stack first. It creates shared IAM, governance and Home controls, without networks or workloads.' : 'Deploy this separate Primary stack only after Home has completed. It creates regional networks, controls and workloads.',
     'This package is for a new installation. It does not migrate resources or Terraform state from an existing deployment.',
     '', 'OCI Resource Manager with private Object Storage',
     'Review these generated files and upload only this folder’s deployment JSON files to your customer-controlled private Object Storage bucket. Keep config.jsonnet for reproducibility; do not select it as deployment input.',
@@ -140,7 +135,7 @@ export async function deploymentDownloadFiles(model: LzModel, generated: { confi
     'README.txt': [
       `Home and Primary deployment — two separate stacks${configs.primary.dr_region ? '; Secondary uses a third separate stack' : ''}`,
       'This package is for a new installation. It does not automatically migrate resources or existing Terraform state.',
-      `1. Deploy ${plan[0].folder}/ in ${configs.home.region} and finish all Home phases first.`,
+      `1. Deploy ${plan[0].folder}/ in ${configs.home.region} and finish the Home deployment first.`,
       'Set save_output = true on Home and retain compartments_output.json.',
       `2. Deploy ${plan[1].folder}/ in ${configs.primary.region}, using only compartments_output.json from Home as a dependency.`,
       ...(requiresExternalRpcOutput(configs.primary) ? ['Primary also requires network_output.json from the completed external RPC acceptor to resolve logical peer IDs. Include both runtime files in oci_dependency_objects (Object Storage) or local_dependency_file_paths (CLI), following the Primary README.'] : []),

@@ -35,7 +35,7 @@ local check(cis, labels) =
   assert home['iam.json'] == complete['iam.json'];
   assert std.objectHas(home['iam.json'].policies_configuration.supplied_policies, 'PCY-AMS-LZ-HUB-RPC-OTHER-KEY');
   assert home['governance.json'] == complete['governance.json'];
-  assert std.objectHas(home, 'governance_pre.json') == labels;
+  assert !std.objectHas(home, 'governance_pre.json');
   assert std.objectFields(home[security]) == ['cloud_guard_configuration'];
   assert home[security].cloud_guard_configuration.reporting_region == 'eu-frankfurt-1';
   assert !std.objectHas(primary, 'iam.json') && !std.objectHas(primary, 'governance.json');

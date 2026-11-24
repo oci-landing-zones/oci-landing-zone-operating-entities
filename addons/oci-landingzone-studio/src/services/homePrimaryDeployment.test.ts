@@ -6,7 +6,7 @@ import { buildHomePrimaryConfigs, shouldSplitHomePrimary, deploymentDownloadFile
 vi.mock('../generator/generate', () => ({ generateFromConfigCode: vi.fn(async (source: string) => {
   const config = JSON.parse(source);
   return config.stack_scope === 'home'
-    ? { 'iam.json': '{}', 'governance_pre.json': '{}', 'governance.json': '{}', 'observability_cis1.json': '{}' }
+    ? { 'iam.json': '{}', 'governance.json': '{}', 'observability_cis1.json': '{}' }
     : { 'network.json': '{}', 'security_cis1_pre.json': '{}', 'security_cis1.json': '{}', 'observability_cis1.json': '{}', 'oke.json': '{}' };
 }) }));
 
@@ -62,7 +62,9 @@ describe('Home and Primary deployment packaging', () => {
     expect(JSON.parse(files['home_fra/config.jsonnet']).stack_scope).toBe('home');
     const homeGuide = files['home_fra/README.txt'];
     expect(homeGuide).toContain('save_output = true');
-    expect(homeGuide).toContain('governance_pre.json');
+    expect(homeGuide).toContain('governance.json');
+    expect(homeGuide).not.toContain('governance_pre.json');
+    expect(homeGuide).not.toContain('Phase 2');
     expect(homeGuide).not.toContain('network_output.json');
     const primaryGuide = files['primary_ams/README.txt'];
     expect(primaryGuide).toContain('compartments_output.json');

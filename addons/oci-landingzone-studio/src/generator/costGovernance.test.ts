@@ -211,25 +211,26 @@ it('does not reintroduce Retail through inherited budgets when Studio only defin
 }, 60_000);
 
 
-it('labels tag definitions in the final phase and assigns Business Unit through Cost Center', async () => {
+it('creates governance once without self-tagging while retaining FinOps on other resources', async () => {
   const model = emptyLzModel(); model.environments = []; model.projects = [];
   model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
   model.foundation.costGovernance = { ...defaultCostGovernance(), requireTagValues: true,
     tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' },
   };
   const output = await generateOutputs(ready(model));
-  const final = JSON.parse(output.files['governance.json']);
-  const pre = JSON.parse(output.files['governance_pre.json']);
-  expect(final.budgets_configuration).toEqual(pre.budgets_configuration);
-  const platform = 'tagns-lz-cost-governance.tag-lz-platform';
-  const unit = 'tagns-lz-cost-governance.tag-lz-business-unit';
-  for (const [key, namespace] of Object.entries(final.tags_configuration.namespaces) as [string, { defined_tags: Record<string, string>; tags: Record<string, { defined_tags: Record<string, string> }> }][]) {
-    expect(namespace.defined_tags).toMatchObject({ [platform]: 'governance', [unit]: 'IT', 'tagns-lz-cost-governance.tag-lz-environment': 'shared' });
-    expect(pre.tags_configuration.namespaces[key].defined_tags).toBeUndefined();
-    expect(Object.values(namespace.tags).every((tag) => tag.defined_tags[unit] === 'IT')).toBe(true);
+  const governance = JSON.parse(output.files['governance.json']);
+  expect(output.files['governance_pre.json']).toBeUndefined();
+  for (const namespace of Object.values(governance.tags_configuration.namespaces) as { defined_tags?: unknown; tags: Record<string, { defined_tags?: unknown }> }[]) {
+    expect(namespace.defined_tags).toBeUndefined();
+    expect(Object.values(namespace.tags).every((tag) => tag.defined_tags === undefined)).toBe(true);
   }
+  const costTags = governance.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags;
+  expect(Object.keys(costTags)).toHaveLength(6);
+  expect(Object.values(costTags).every((tag) => Object.values((tag as { tag_defaults: Record<string, { is_user_required: boolean }> }).tag_defaults).every((value) => value.is_user_required))).toBe(true);
+  expect(Object.values(costTags).some((tag) => Object.keys((tag as { tag_defaults?: object }).tag_defaults ?? {}).length > 0)).toBe(true);
+  expect(Object.keys(governance.budgets_configuration.budgets).length).toBeGreaterThan(1);
   const iam = JSON.parse(output.files['iam.json']);
-  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags[unit]).toBe('IT');
+  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags['tagns-lz-cost-governance.tag-lz-business-unit']).toBe('IT');
 }, 60_000);
 
 

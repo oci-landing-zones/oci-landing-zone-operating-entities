@@ -37,9 +37,13 @@ export interface FoundationConfig {
   securityZoneRecipe1CisLevel?: 1 | 2;
   /** Recipe 01 and its landing-zone target are enabled unless explicitly false. */
   landingZoneSecurityZone?: boolean;
-  /** Omitted preserves the shared-network zone in older saved configurations. */
+  /** Legacy ownership only; omitted preserves older zones. New designs set false; no UI toggle. */
   sharedNetworkSecurityZone?: boolean;
+  /** New designs use Recipe 02; omitted preserves Recipe 03 identities in saved designs. */
+  environmentSecurityZoneRecipeNumber?: 2 | 3;
   cloudGuardEnabled?: boolean;
+  /** Include regional host scanning recipes and targets; enabled unless explicitly false. */
+  vulnerabilityScanningEnabled?: boolean;
   /** Browser confirmation that Cloud Guard is enabled outside this Home deployment. */
   cloudGuardExistingConfirmed?: boolean;
   /** One-OE notification topic recipients; blank fields keep the published placeholder. */

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { emptyLzModel } from '../model/defaults';
-import { createDrLZ, createLZ, deleteLZ, saveDisasterRecoveryLZ, saveOutputs } from '../services/lzStore';
+import { createDrLZ, createLZ, deleteLZ, saveDisasterRecoveryLZ, saveOutputs, saveLZ, getLZ } from '../services/lzStore';
 import { createDrDraft } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint } from '../services/disasterRecoverySavedDesign';
 import SavedLzList from './SavedLzList';
@@ -123,4 +123,15 @@ describe('saved combined Landing Zone cards', () => {
     expect(html).toContain('Download LZ DR config');
     expect(html).toContain('2 saved');
   });
+});
+
+it('asks to regenerate and reapply both linked designs after a Primary VSS change', () => {
+  const primary = createLZ('Primary', emptyLzModel()).record!;
+  const dr = createDrLZ(primary.id).record!;
+  for (const id of [primary.id, dr.id]) saveOutputs(id, { config: serializeConfig(getLZ(id)!.model), files: { 'network.json': '{}' } });
+  const changed = getLZ(primary.id)!.model; changed.foundation.vulnerabilityScanningEnabled = false;
+  saveLZ(primary.id, changed);
+  const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html.match(/>Update required<\/span>/g)).toHaveLength(2);
+  expect(html).toContain('reapply');
 });

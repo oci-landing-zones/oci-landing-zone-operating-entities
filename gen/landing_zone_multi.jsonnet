@@ -10,7 +10,6 @@ function(config)
   };
   local result = lz(render_config);
   local cis_level = result.cis_level;
-  local label_tags = std.objectHas(normalized, 'cost_governance') && normalized.cost_governance.tag_resource_labels;
   local security_output(phase) =
     local security = result['security_cis%d%s' % [cis_level, phase]];
     if result.stack_scope != 'regional' then security else {
@@ -43,18 +42,19 @@ function(config)
       if key != 'home_region_events_configuration'
     };
 
+  local security_pre = security_output('_pre');
+  local security_final = security_output('');
   local outputs = {
     'network.json': result.network,
-    ['security_cis%d_pre.json' % cis_level]: security_output('_pre'),
-    ['security_cis%d.json' % cis_level]: security_output(''),
+    [if security_pre != security_final then 'security_cis%d_pre.json' % cis_level]: security_pre,
+    ['security_cis%d.json' % cis_level]: security_final,
     ['observability_cis%d.json' % cis_level]: observability_output,
   }
   + (if std.objectHas(result, 'network_backends') && result.network_backends != null then { 'network_backends.json': result.network_backends } else {})
   + (if std.objectHas(result, 'extra') then { [key + '.json']: result.extra[key] for key in std.objectFields(result.extra) } else {})
   + (if result.stack_scope == 'complete' then {
        'iam.json': result.iam,
-       'governance.json': if label_tags then (import 'lib/governance_resource_tags.libsonnet')(result.governance, normalized) else result.governance,
-       [if label_tags then 'governance_pre.json']: result.governance,
+       'governance.json': result.governance,
      } else {});
   if std.member(['home', 'primary'], normalized.stack_scope) then
     (import 'lib/deployment_scopes.libsonnet')(outputs, normalized.stack_scope, normalized.region)

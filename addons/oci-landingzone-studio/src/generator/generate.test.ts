@@ -256,7 +256,8 @@ describe('generator (go-jsonnet wasm)', () => {
     const out = await generateOutputs(model);
     expect(out.files['iam.json']).toBeUndefined();
     expect(out.files['governance.json']).toBeUndefined();
-    expect(out.files['security_cis2_pre.json']).toContain('vaults');
+    expect(out.files['security_cis2.json']).toContain('vaults');
+    expect(out.files['security_cis2_pre.json']).toBeUndefined();
     const security = JSON.stringify(JSON.parse(out.files['security_cis2.json']));
     expect(security).not.toContain('security_zones');
     expect(security).not.toContain('cloud_guard');
@@ -381,8 +382,8 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.secondary).toContain('security_cis2.json');
     expect(out.secondary).toContain('observability_cis2.json');
     expect(out.secondary).not.toContain('network.json');
-    expect(out.secondary).toContain('governance_pre.json');
-    expect(Object.keys(out.files).length).toBe(7);
+    expect(out.secondary).not.toContain('governance_pre.json');
+    expect(Object.keys(out.files).length).toBe(5);
     expect(out.config).toContain("kind: 'hub_a'");
 
     const net = JSON.parse(out.files['network.json']).network_configuration;

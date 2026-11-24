@@ -75,7 +75,9 @@ export interface LzConfig {
   identity_domain_name?: string;
   enable_landing_zone_security_zone?: boolean;
   enable_shared_network_security_zone?: boolean;
+  security_zone_environment_recipe_number?: 2 | 3;
   enable_cloud_guard?: boolean;
+  enable_vulnerability_scanning?: boolean;
   notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
     kind: HubKind;
@@ -241,8 +243,10 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
     ...(f.identityDomainName !== undefined ? { identity_domain_name: f.identityDomainName } : {}),
+    ...(f.environmentSecurityZoneRecipeNumber === 2 ? { security_zone_environment_recipe_number: 2 as const } : {}),
     ...(f.sharedNetworkSecurityZone === false ? { enable_shared_network_security_zone: false } : {}),
     ...(f.landingZoneSecurityZone === false ? { enable_landing_zone_security_zone: false } : {}),
+    ...(f.vulnerabilityScanningEnabled === false ? { enable_vulnerability_scanning: false } : {}),
     ...(f.cloudGuardEnabled === false ? { enable_cloud_guard: false } : {}),
     cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
@@ -432,8 +436,10 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     ...(c.primary_region ? [`  primary_region: ${quote(c.primary_region)},`, `  primary_region_short_name: ${quote(c.primary_region_short_name!)},`] : []),
     `  cis_level: ${c.cis_level},`,
     ...(c.identity_domain_name !== undefined ? [`  identity_domain_name: ${quote(c.identity_domain_name)},`] : []),
+    ...(c.security_zone_environment_recipe_number !== undefined ? [`  security_zone_environment_recipe_number: ${c.security_zone_environment_recipe_number},`] : []),
     ...(c.enable_shared_network_security_zone !== undefined ? [`  enable_shared_network_security_zone: ${c.enable_shared_network_security_zone},`] : []),
     ...(c.enable_landing_zone_security_zone !== undefined ? [`  enable_landing_zone_security_zone: ${c.enable_landing_zone_security_zone},`] : []),
+    ...(c.enable_vulnerability_scanning === false ? ['  enable_vulnerability_scanning: false,'] : []),
     ...(c.enable_cloud_guard === false ? ['  enable_cloud_guard: false,'] : []),
     ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),

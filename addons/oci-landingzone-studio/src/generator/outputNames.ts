@@ -12,21 +12,22 @@ export const CONFIG_FILENAME = 'config.jsonnet';
 
 /** What each surfaced artifact is for, so a reviewer knows which to deploy first. */
 export const OUTPUT_BLURB: Record<string, string> = {
-  'governance_pre.json': 'Creates tag namespaces, definitions and defaults before applying tags to those definitions.',
-  'governance.json': 'Applies governance tags to the existing namespaces and definitions, retaining budgets and defaults.',
+  'governance.json': 'Creates tag namespaces, definitions, defaults and budgets in one operation.',
   'network.json': 'Creates the network and routing, resolving firewall and NLB targets from resource keys.',
 };
 
-/** Obsolete network, observability or OKE bundles must be regenerated even when their config matches. */
+/** Obsolete governance, network, observability or OKE bundles must be regenerated even when their config matches. */
 export function isCurrentOutputSet(output: { config: string; files: Record<string, string> } | null, config: string): boolean {
   return output !== null
     && output.config === config
     && Object.hasOwn(output.files, 'network.json')
+    && !Object.hasOwn(output.files, 'governance_pre.json')
     && !Object.hasOwn(output.files, 'network_pre.json')
     && !Object.hasOwn(output.files, 'observability_cis1_pre.json')
     && !Object.hasOwn(output.files, 'observability_cis2_pre.json')
     && !Object.hasOwn(output.files, 'oke_clusters.json')
-    && !Object.hasOwn(output.files, 'oke_workers.json');
+    && !Object.hasOwn(output.files, 'oke_workers.json')
+    && Object.entries(output.files).every(([name, body]) => !/^security_cis[12]_pre\.json$/.test(name) || body !== output.files[name.replace('_pre.json', '.json')]);
 }
 
 export interface DeploymentStage {
@@ -43,7 +44,7 @@ const persistent = ['iam.json', 'governance.json'];
  */
 export function deploymentStages(availableFiles: string[], completionNetwork: 'network.json' | 'network_backends.json' = 'network.json', deferSecurityZones = true): DeploymentStage[] {
   const deployable = availableFiles.filter((file) => file.endsWith('.json')
-    && !file.endsWith('_output.json') && !file.includes('/') && file !== 'network_pre.json');
+    && !file.endsWith('_output.json') && !file.includes('/') && file !== 'network_pre.json' && file !== 'governance_pre.json');
   const available = new Set(deployable);
   if (!available.has(completionNetwork)) throw new Error(`Generate ${completionNetwork} before selecting it for deployment.`);
   const keep = (files: string[]) => [...new Set(files.filter((file) => available.has(file)))];

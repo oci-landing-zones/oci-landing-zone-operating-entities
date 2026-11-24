@@ -49,8 +49,8 @@ describe('canonical diagram preview', () => {
     const generated = await generateOutputs(model);
     const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
     const final = outputs[`security_cis${cisLevel}.json`].bastions_configuration;
-    const pre = outputs[`security_cis${cisLevel}_pre.json`].bastions_configuration;
-    expect(pre).toEqual(final);
+    expect(outputs[`security_cis${cisLevel}_pre.json`]).toBeUndefined();
+    expect(final).toBeDefined();
     const { inventory, network, foundationResources } = await generatePreview(model);
     expect(foundationResources).toEqual(extractFoundationResources(outputs));
     expect(foundationResources.regional.includes('vault')).toBe(cisLevel === 2);

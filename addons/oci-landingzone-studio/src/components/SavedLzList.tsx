@@ -12,6 +12,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
 import { createDrLZ, linkedHomeRecord, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
+import { DEPLOYMENT_UPDATE_NOTICE } from '../services/deployment';
 import { serializeConfig } from '../services/lzConfig';
 import { deploymentDownloadFiles } from '../services/homePrimaryDeployment';
 import { isCurrentOutputSet } from '../generator/outputNames';
@@ -240,10 +241,11 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
-                        ? <span style={s.staleTag} title="The design or deployment format changed. Open Review to regenerate these files.">Stale</span>
+                        ? <span style={s.staleTag} title={`${DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.`}>Update required</span>
                         : <span style={s.outMeta}>Last generated {formatTime(out.generatedAt)}</span>}
                     </div>
                   )}
+                  {out?.stale && <p role="status" style={{ margin: '8px 0', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted }}>{DEPLOYMENT_UPDATE_NOTICE}</p>}
                   <div style={s.outRow}>
                     {combined && <>
                       <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'Home' ? 0.5 : 1 }} disabled={!!downloading}

@@ -45,22 +45,21 @@ describe('Security settings', () => {
     expect(html).toMatch(/<div[^>]*id="lz-security-zones-advanced"[^>]*hidden=""/);
     expect(html).toContain('aria-expanded="false" aria-controls="lz-security-zones-advanced"');
     expect(html).toContain('Advanced');
-    expect(html).toContain('Recipe 02 — Shared network');
-    expect(html).toContain('Recipe 03 — prod');
-    expect(html).toContain('Recipe 03 — preprod');
-    expect(html).toMatch(/role="switch" aria-checked="false" aria-label="Security zone for shared network"/);
+    expect(html).not.toContain('Recipe 02 — Shared network');
+    expect(html).toContain('Recipe 02 — prod');
+    expect(html).toContain('Recipe 02 — preprod');
+    expect(html).not.toContain('aria-label="Security zone for shared network"');
   });
 
-  it('keeps Advanced collapsed with saved additional zones and preserves their independent selection', () => {
+  it.each([true, undefined])('preserves legacy shared-network ownership without an editable control (%s)', (value) => {
     const model = emptyLzModel();
-    model.foundation.sharedNetworkSecurityZone = true;
-    expect(render(model)).toMatch(/<div[^>]*id="lz-security-zones-advanced"[^>]*hidden=""/);
-    const setField = vi.fn();
-    vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
-    const control = findControl(renderControls(), (props, type) => type === Switch && props.ariaLabel === 'Security zone for shared network');
-    (control!.onChange as (enabled: boolean) => void)(false);
-    expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, sharedNetworkSecurityZone: false });
-    expect(model.environments.every((env) => !env.securityZone)).toBe(true);
+    model.foundation.sharedNetworkSecurityZone = value;
+    const html = render(model);
+    expect(html).toContain('Legacy shared-network Security Zone');
+    expect(html).not.toContain('Recipe 02 — Shared network');
+    expect(html).not.toContain('aria-label="Security zone for shared network"');
+    expect(model.foundation.sharedNetworkSecurityZone).toBe(value);
+    expect(html).toMatch(/<div[^>]*id="lz-security-zones-advanced"[^>]*hidden=""/);
   });
 
   it.each([1, 2] as const)('defaults Recipe 01 to baseline CIS %s and places Cloud Guard after zones', (level) => {
@@ -202,4 +201,34 @@ describe('Security settings', () => {
     expect(html).not.toContain('href="/lz/missing"');
     expect(html).not.toContain('aria-label="Security zone for');
   });
+});
+
+it('places VSS below Cloud Guard, enabled by default, and lets it be excluded independently', () => {
+  const model = emptyLzModel();
+  const html = render(model);
+  expect(html).toContain('Vulnerability Scanning (VSS)');
+  expect(html.indexOf('id="security-vss-title"')).toBeGreaterThan(html.indexOf('id="security-cloud-guard-title"'));
+  expect(html.indexOf('id="security-vss-title"')).toBeLessThan(html.indexOf('id="foundation-bastion-title"'));
+  expect(html).toMatch(/role="switch" aria-checked="true" aria-label="Enable Vulnerability Scanning"/);
+  const setField = vi.fn();
+  vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+  const control = findControl(renderControls(), (props, type) => type === Switch && props.ariaLabel === 'Enable Vulnerability Scanning');
+  (control!.onChange as (enabled: boolean) => void)(false);
+  expect(setField).toHaveBeenCalledWith('foundation', { ...model.foundation, vulnerabilityScanningEnabled: false });
+});
+
+it('allows the regional deployment to configure its own VSS selection', () => {
+  const model = emptyLzModel(); model.foundation.stackScope = 'regional';
+  const html = render(model);
+  expect(html).toContain('aria-label="Enable Vulnerability Scanning"');
+});
+
+it('shows linked DR VSS as inherited from Primary without an independent switch', () => {
+  const primary = emptyLzModel(); primary.foundation.vulnerabilityScanningEnabled = false;
+  const dr = emptyLzModel(); dr.foundation.stackScope = 'regional';
+  const html = render(dr, { id: 'primary', model: primary });
+  expect(html).toContain('VSS is inherited from the Primary configuration');
+  expect(html).not.toContain('aria-label="Enable Vulnerability Scanning"');
+  const section = html.match(/<section[^>]*aria-labelledby="security-vss-title"[\s\S]*?<\/section>/)?.[0];
+  expect(section).toContain('Off');
 });
