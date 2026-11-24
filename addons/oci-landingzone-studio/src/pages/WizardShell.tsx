@@ -1,5 +1,8 @@
 import { foundationResourcesByRegion } from '../services/foundationInventory';
 import { syncDrEnvironments } from '../services/linkedDr';
+import { autofillRemotePeeringCidrs } from '../services/remotePeering';
+import { configuredVcnCidrs } from '../services/exadata';
+import { overlaps } from '../services/cidr';
 import { s as editorStyles } from '../wizard/steps/networkEditorStyles';
 /**
  * WizardShell — Milestone 0 vertical slice, styled in the Oracle Redwood / OCI
@@ -12,7 +15,7 @@ import React, { useMemo } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ReactFlowProvider } from '@xyflow/react';
 import { WizardProvider, useWizard, type HomeRegionSource } from '../wizard/wizardContext';
-import { getLZ, linkedHomeRecord, renameLZ, saveLZ, listLZs, configureSecondaryLZ } from '../services/lzStore';
+import { getLZ, linkedHomeRecord, renameLZ, saveLZ, listLZs, configureSecondaryLZ, reallocateLinkedDrNetworks } from '../services/lzStore';
 import { normalizeModel } from '../model/defaults';
 import { legacyRegionalModel } from '../services/regionalDeployment';
 import type { DiagramOptions, LzModel } from '../model/types';
@@ -108,10 +111,11 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   saveState: 'saved' | 'error';
   saveRevision: number;
 }) {
-  const { model, reset, homeSource } = useWizard();
+  const { model, reset, homeSource, setField } = useWizard();
   const { id: designId } = useParams();
   const navigate = useNavigate();
   const [deploymentError, setDeploymentError] = React.useState<string | null>(null);
+  const [networkRepairMessage, setNetworkRepairMessage] = React.useState<string | null>(null);
   const primaryDesigns = listLZs().flatMap((meta) => {
     const record = getLZ(meta.id);
     return record && !record.homeLzId && !record.disasterRecovery && record.model.foundation.stackScope !== 'regional' ? [{ id: record.id, name: record.name, realm: record.model.foundation.realm, region: record.model.foundation.region, secondaryRegion: record.model.foundation.drRegion }] : [];
@@ -210,16 +214,34 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   };
   const routing = useDiagramPreview(model, editingDiagramInput);
   const snapshot = routing.snapshot;
-  const linkedFoundationModel = useMemo(() => {
-    if (activeStep !== 1 && activeStep !== 2) return undefined;
-    if (activeStep === 1 && !showDiagram) return undefined;
-    if (homeSource?.model) return homeSource.model;
-    if (activeStep === 2) return undefined;
+  const linkedSecondary = useMemo(() => {
+    if (homeSource) return undefined;
     if (!designId || !model.foundation.drRegion) return undefined;
-    const secondary = listLZs().map((meta) => getLZ(meta.id)).find((record) => record?.homeLzId === designId
+    const secondaries = listLZs().map((meta) => getLZ(meta.id)).filter((record) => record?.homeLzId === designId
       && record.model.foundation.stackScope === 'regional' && record.model.foundation.region === model.foundation.drRegion);
-    return secondary ? syncDrEnvironments(secondary.model, model) : undefined;
-  }, [activeStep, showDiagram, homeSource?.model, designId, model]);
+    return secondaries.length === 1 ? secondaries[0]! : undefined;
+  }, [homeSource, designId, model]);
+  const linkedRpcModel = useMemo(() => homeSource?.model
+    ?? (linkedSecondary ? syncDrEnvironments(linkedSecondary.model, model) : undefined), [homeSource?.model, linkedSecondary, model]);
+  const linkedNetworksOverlap = linkedRpcModel && configuredVcnCidrs(model).some((cidr) => configuredVcnCidrs(linkedRpcModel).some((other) => overlaps(cidr, other)));
+  function repairDrNetworks() {
+    const drId = homeSource ? designId : linkedSecondary?.id;
+    if (!drId) return;
+    const result = reallocateLinkedDrNetworks(drId);
+    if (!result.ok || !result.record) {
+      setNetworkRepairMessage(result.message ?? 'Could not update DR networks.');
+      return;
+    }
+    const refreshed = homeSource ? result.record.model : getLZ(designId!)!.model;
+    for (const key of ['network', 'environments', 'platforms', 'sharedPlatforms', 'exadata', 'remotePeeringConnections'] as const) setField(key, refreshed[key]);
+    setNetworkRepairMessage('DR VCNs and subnets updated. Review the suggested ranges and regenerate the deployment files for both configurations.');
+  }
+  React.useEffect(() => {
+    const filled = autofillRemotePeeringCidrs(model, linkedRpcModel);
+    if (filled !== model) setField('remotePeeringConnections', filled.remotePeeringConnections);
+  }, [model, linkedRpcModel, setField]);
+  const linkedFoundationModel = (activeStep === 1 && showDiagram) || (activeStep === 2 && homeSource?.model)
+    ? linkedRpcModel : undefined;
   const linkedFoundationPreview = useDiagramPreview(linkedFoundationModel ?? model, !linkedFoundationModel || editingDiagramInput);
   const foundationResources = useMemo(() => foundationResourcesByRegion([
     ...(routing.status === 'ready' && snapshot?.model === model && snapshot.preview.foundationResources
@@ -459,7 +481,14 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 4 ? (
                   <NotificationsSection />
                 ) : activeStep === 5 ? (
-                  <HubNetworkStep />
+                  <>
+                    {linkedNetworksOverlap && <section style={editorStyles.card} aria-label="Linked DR network ranges">
+                      <p style={editorStyles.intro}>Primary and Secondary share VCN ranges. RPC requires non-overlapping networks. For designs that have not been deployed, you can assign new DR ranges and adjust their subnets.</p>
+                      <button type="button" style={editorStyles.addBtn} onClick={repairDrNetworks}>Assign non-overlapping DR CIDRs</button>
+                    </section>}
+                    {networkRepairMessage && <p role="status" style={editorStyles.help}>{networkRepairMessage}</p>}
+                    <HubNetworkStep />
+                  </>
                 ) : activeStep === 6 ? (
                   <EnvNetworkStep />
                 ) : activeStep === 7 ? (

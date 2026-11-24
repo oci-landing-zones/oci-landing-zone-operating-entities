@@ -21,6 +21,7 @@ import { emptyLzModel, LZ_MODEL_VERSION, normalizeModel } from '../model/default
 import type { DrDesignDraft } from './disasterRecoveryDesign';
 import { findRegion } from './regions';
 import { syncDrEnvironments } from './linkedDr';
+import { allocateDrNetworks, refreshLinkedRpcCidrs } from './drNetworkAllocation';
 import { serializeConfig } from './lzConfig';
 import { isCurrentOutputSet } from '../generator/outputNames';
 import { containsInlineSecrets, stripInlineSecrets } from './hybridConnectivity';
@@ -42,6 +43,8 @@ export interface LzRecord extends LzMeta {
   model: LzModel;
   /** Browser-local source relationship; excluded from deployment configuration. */
   homeLzId?: string;
+  /** False after an explicit DR rename; legacy linked names follow Primary by default. */
+  nameFollowsPrimary?: boolean;
   disasterRecovery?: { draft: DrDesignDraft; sourceLabel: string };
   previousCombinedDesign?: { home: LzModel; draft: DrDesignDraft; sourceLabel: string };
 }
@@ -198,7 +201,11 @@ export function createDrLZ(homeId: string): CreateLzResult {
     region: region && region.id !== home.model.foundation.region ? region.id : '',
     regionShortName: region && region.id !== home.model.foundation.region ? region.shortName : '', drRegion: undefined };
   delete model.foundation.deploymentMode;
-  return createRecord(`${home.name} DR`, model, new Date(), home.id);
+  try {
+    return createRecord(`${home.name} DR`, allocateDrNetworks(model, home.model), new Date(), home.id);
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : 'Could not allocate DR networks.' };
+  }
 }
 
 /** Prepare the primary's DR authorization before creating or reopening its linked secondary. */
@@ -214,6 +221,35 @@ export function configureSecondaryLZ(primaryId: string, secondaryRegion: string)
   if (!saved.ok) return saved;
   const existing = listLZs().map((meta) => getLZ(meta.id)).find((record) => record?.homeLzId === primaryId && record.model.foundation.region === secondaryRegion);
   return existing ? { ok: true, record: existing } : createDrLZ(primaryId);
+}
+
+/** Explicit draft-only repair; opening a saved design must never renumber its VCNs. */
+export function reallocateLinkedDrNetworks(drId: string): CreateLzResult {
+  const dr = getLZ(drId);
+  const primary = dr ? linkedHomeRecord(dr) : null;
+  if (!dr || !primary) return { ok: false, message: 'Choose a DR design with an available linked Primary configuration.' };
+  const keys = [recordKey(primary.id), recordKey(dr.id), INDEX_KEY];
+  const snapshots = keys.map((key) => window.localStorage.getItem(key));
+  try {
+    const model = allocateDrNetworks(dr.model, primary.model);
+    const homeModel = refreshLinkedRpcCidrs(primary.model, dr.model, model);
+    if (homeModel !== primary.model) {
+      const saved = saveLZ(primary.id, homeModel);
+      if (!saved.ok) throw new Error(saved.message);
+    }
+    const saved = saveLZ(dr.id, model);
+    if (!saved.ok) throw new Error(saved.message);
+    return { ok: true, record: getLZ(dr.id)! };
+  } catch (error) {
+    keys.forEach((key, index) => {
+      try {
+        const previous = snapshots[index];
+        if (previous === null) window.localStorage.removeItem(key);
+        else window.localStorage.setItem(key, previous);
+      } catch { /* best-effort rollback; report the original error */ }
+    });
+    return { ok: false, message: error instanceof Error ? error.message : STORAGE_FAILURE };
+  }
 }
 
 /** Persist the canonical model for an existing record; stamps updatedAt. */
@@ -266,16 +302,37 @@ export function renameLZ(id: string, name: string): StoreResult {
   if (!trimmed) return { ok: false, message: 'Landing Zone name cannot be empty.' };
   const existing = getLZ(id);
   if (!existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
-  const updated: LzRecord = { ...existing, name: trimmed, updatedAt: now() };
+  const timestamp = now();
+  const linked = existing.homeLzId ? [] : readIndex().flatMap((meta) => {
+    const record = readRecord(meta.id);
+    return record?.homeLzId === id && record.nameFollowsPrimary !== false ? [record] : [];
+  });
+  const stored = readRecord(id)!;
+  const updates: LzRecord[] = [
+    { ...stored, name: trimmed, updatedAt: timestamp, ...(existing.homeLzId ? { nameFollowsPrimary: false } : {}) },
+    ...linked.map((record) => ({ ...record, name: `${trimmed} DR`, updatedAt: timestamp })),
+  ];
+  const keys = [...updates.map((record) => recordKey(record.id)), INDEX_KEY];
+  const snapshots = keys.map((key) => window.localStorage.getItem(key));
   try {
-    window.localStorage.setItem(recordKey(id), JSON.stringify(updated));
+    for (const record of updates) window.localStorage.setItem(recordKey(record.id), JSON.stringify(record));
+    const changed = new Map(updates.map((record) => [record.id, record]));
+    const indexed = writeIndex(readIndex().map((meta) => {
+      const record = changed.get(meta.id);
+      return record ? { ...meta, name: record.name, updatedAt: timestamp } : meta;
+    }));
+    if (!indexed.ok) throw new Error(indexed.message);
+    return { ok: true };
   } catch {
+    keys.forEach((key, index) => {
+      try {
+        const previous = snapshots[index];
+        if (previous === null) window.localStorage.removeItem(key);
+        else window.localStorage.setItem(key, previous);
+      } catch { /* best-effort rollback; report the original storage error */ }
+    });
     return { ok: false, message: STORAGE_FAILURE };
   }
-  const indexed = upsertMeta({ id, name: trimmed, createdAt: updated.createdAt, updatedAt: updated.updatedAt });
-  if (indexed.ok) return indexed;
-  try { window.localStorage.setItem(recordKey(id), JSON.stringify(existing)); } catch { /* original error remains authoritative */ }
-  return indexed;
 }
 
 export function duplicateLZ(id: string): CreateLzResult {

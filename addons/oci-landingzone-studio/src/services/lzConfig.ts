@@ -1,3 +1,4 @@
+import { remotePeeringPeerRegion } from './remotePeering';
 import { findRegion } from './regions';
 import { getHubKind } from './hubKinds';
 /**
@@ -233,7 +234,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
     ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
       remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
-      peer_region_name: connection.peerRegionName,
+      peer_region_name: remotePeeringPeerRegion(model, connection),
       ...(connection.role === 'requester' ? { peer_id: connection.peerId?.trim() } : {}),
       ...(connection.peerTenancyOcid?.trim() ? { peer_tenancy_ocid: connection.peerTenancyOcid.trim() } : {}),
       ...(connection.role === 'acceptor' && connection.requestorGroupOcid?.trim() ? { requestor_group_ocid: connection.requestorGroupOcid.trim() } : {}),

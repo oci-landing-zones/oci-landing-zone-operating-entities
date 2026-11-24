@@ -1,7 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { Children, isValidElement, type ReactElement } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { validateRemotePeering } from '../services/remotePeering';
+import * as wizardContext from '../wizard/wizardContext';
 import { WizardProvider } from '../wizard/wizardContext';
 import RemotePeeringEditor from './RemotePeeringEditor';
 
@@ -27,4 +29,47 @@ describe('X-RPC validation feedback', () => {
     expect(html).toContain('class="rpc-connection-header"');
     expect(html).not.toContain('<legend');
   });
+});
+
+it('prefills the actual Add RPC action without changing existing editable names', () => {
+  const model = emptyLzModel();
+  model.remotePeeringConnections = [{ id: 'existing', name: 'custom-peer', role: 'acceptor', peerRegionName: '', remoteCidrs: [] }];
+  const setField = vi.fn();
+  const mock = vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+  try {
+    const tree = RemotePeeringEditor();
+    const button = Children.toArray(tree.props.children).find((node) => isValidElement<{ children: string }>(node) && node.type === 'button' && node.props.children === 'Add remote connection') as ReactElement<{ onClick: () => void }>;
+    button.props.onClick();
+    expect(setField).toHaveBeenCalledWith('remotePeeringConnections', [model.remotePeeringConnections[0], expect.objectContaining({ name: 'rpc-2' })]);
+    expect(model.remotePeeringConnections[0].name).toBe('custom-peer');
+  } finally { mock.mockRestore(); }
+});
+
+it.each([
+  ['complete', 'primary-secondary', 'eu-amsterdam-1'],
+  ['complete', undefined, 'eu-amsterdam-1'],
+  ['regional', undefined, 'eu-frankfurt-1'],
+  ['complete', 'primary-only', 'eu-amsterdam-1'],
+] as const)('defaults the peer region for %s / %s without replacing existing peers', (stackScope, deploymentMode, expected) => {
+  const model = emptyLzModel();
+  Object.assign(model.foundation, { stackScope, deploymentMode, drRegion: 'eu-amsterdam-1', homeRegion: 'eu-frankfurt-1' });
+  model.remotePeeringConnections = [{ id: 'existing', name: 'other-peer', role: 'acceptor', peerRegionName: 'us-phoenix-1', remoteCidrs: [] }];
+  const setField = vi.fn();
+  const mock = vi.spyOn(wizardContext, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+  try {
+    const tree = RemotePeeringEditor();
+    const button = Children.toArray(tree.props.children).find((node) => isValidElement<{ children: string }>(node) && node.type === 'button' && node.props.children === 'Add remote connection') as ReactElement<{ onClick: () => void }>;
+    button.props.onClick();
+    expect(setField).toHaveBeenCalledWith('remotePeeringConnections', [model.remotePeeringConnections[0], expect.objectContaining({ peerRegionName: expected })]);
+    expect(model.remotePeeringConnections[0].peerRegionName).toBe('us-phoenix-1');
+  } finally { mock.mockRestore(); }
+});
+
+it('fills the visible peer region for an existing blank RPC from the known Secondary', () => {
+  const model = emptyLzModel(); model.foundation.drRegion = 'eu-amsterdam-1';
+  model.remotePeeringConnections = [{ id: 'existing', name: 'rpc-1', role: 'acceptor', peerRegionName: '', remoteCidrs: ['172.20.0.0/16'] }];
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><RemotePeeringEditor /></WizardProvider>);
+  const region = html.match(/<select id="rpc-region-existing"[\s\S]*?<\/select>/)?.[0];
+  expect(region).toContain('<option value="eu-amsterdam-1" selected="">');
+  expect(region).not.toContain('aria-invalid="true"');
 });

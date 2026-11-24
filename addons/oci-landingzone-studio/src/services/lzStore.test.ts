@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  createLZ, createDrLZ, configureSecondaryLZ, linkedHomeRecord, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs, restoreCombinedDesign,
+  createLZ, createDrLZ, reallocateLinkedDrNetworks, configureSecondaryLZ, linkedHomeRecord, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs, restoreCombinedDesign,
 } from './lzStore';
+import { allocateDrNetworks } from './drNetworkAllocation';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { createDrDraft } from './disasterRecoveryDesign';
 import { legacyRegionalModel } from './regionalDeployment';
@@ -273,7 +274,7 @@ describe('linked DR records', () => {
     expect(getLZ(primary.id)!.model.foundation.deploymentMode).toBe('primary-secondary');
   });
 
-  it('copies all Home inputs with stable identities and no cached outputs', () => {
+  it('copies Home inputs with separate DR networks, stable identities and no cached outputs', () => {
     const model = emptyLzModel();
     model.foundation.drRegion = 'eu-amsterdam-1';
     model.network.hubVcnCidr = '10.42.0.0/21';
@@ -286,7 +287,7 @@ describe('linked DR records', () => {
     const dr = result.record!;
     expect(dr).toMatchObject({ name: 'Home DR', homeLzId: home.id });
     expect(dr.id).not.toBe(home.id);
-    expect(dr.model).toEqual({ ...model, foundation: { ...model.foundation, stackScope: 'regional', homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams', drRegion: undefined } });
+    expect(dr.model).toEqual({ ...allocateDrNetworks(model, model), foundation: { ...model.foundation, stackScope: 'regional', homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams', drRegion: undefined } });
     expect(dr.model.network).not.toBe(model.network);
     expect(dr.model.environments[0].network).not.toBe(model.environments[0].network);
     expect(getOutputs(dr.id)).toBeNull();
@@ -450,4 +451,78 @@ it('marks both Primary and linked DR outputs stale when the Primary VSS selectio
   updatedDr.model.foundation.vulnerabilityScanningEnabled = true;
   saveLZ(dr.id, updatedDr.model);
   expect(getLZ(dr.id)!.model.foundation.vulnerabilityScanningEnabled).toBe(false);
+});
+
+
+it('repairs existing cloned DR networks and refreshes full-inventory Primary RPC routes', () => {
+  const primary = createSaved('Primary');
+  primary.model.foundation.drRegion = 'eu-amsterdam-1';
+  saveLZ(primary.id, primary.model);
+  const dr = createDrLZ(primary.id).record!;
+  dr.model.network = structuredClone(primary.model.network);
+  dr.model.environments = structuredClone(primary.model.environments);
+  saveLZ(dr.id, dr.model);
+  const oldCidrs = [dr.model.network.hubVcnCidr, ...dr.model.environments.map((env) => env.network.vcnCidr)];
+  primary.model.remotePeeringConnections = [{ id: 'rpc', name: 'rpc-1', role: 'acceptor', peerRegionName: dr.model.foundation.region, remoteCidrs: oldCidrs }];
+  saveLZ(primary.id, primary.model);
+  const result = reallocateLinkedDrNetworks(dr.id);
+  expect(result.ok).toBe(true);
+  expect(result.record!.model.network.hubVcnCidr).not.toBe(primary.model.network.hubVcnCidr);
+  const updated = getLZ(primary.id)!.model;
+  expect(updated.network).toEqual(primary.model.network);
+  expect(updated.remotePeeringConnections![0].remoteCidrs).toEqual([result.record!.model.network.hubVcnCidr, ...result.record!.model.environments.map((env) => env.network.vcnCidr)]);
+});
+
+it('rolls back both designs if saving repaired DR networks fails', () => {
+  const primary = createSaved('Primary');
+  primary.model.foundation.drRegion = 'eu-amsterdam-1';
+  saveLZ(primary.id, primary.model);
+  const dr = createDrLZ(primary.id).record!;
+  dr.model.network = structuredClone(primary.model.network);
+  dr.model.environments = structuredClone(primary.model.environments);
+  saveLZ(dr.id, dr.model);
+  primary.model.remotePeeringConnections = [{ id: 'rpc', name: 'rpc-1', role: 'acceptor', peerRegionName: dr.model.foundation.region,
+    remoteCidrs: [dr.model.network.hubVcnCidr, ...dr.model.environments.map((env) => env.network.vcnCidr)] }];
+  saveLZ(primary.id, primary.model);
+  const before = [getLZ(primary.id), getLZ(dr.id), listLZs()];
+  const storage = window.localStorage;
+  const write = storage.setItem.bind(storage);
+  storage.setItem = (key, value) => { if (key === `lzng.lz.${dr.id}`) throw new Error('quota'); write(key, value); };
+  expect(reallocateLinkedDrNetworks(dr.id).ok).toBe(false);
+  expect([getLZ(primary.id), getLZ(dr.id), listLZs()]).toEqual(before);
+});
+
+it('renames linked DR records with Primary without changing configs or generated files', () => {
+  const primary = createSaved('Original');
+  const dr = createDrLZ(primary.id).record!;
+  const other = createSaved('Unrelated');
+  const config = serializeConfig(dr.model);
+  saveOutputs(dr.id, { config, files: { 'network.json': '{}' } });
+  expect(renameLZ(primary.id, ' Customer ').ok).toBe(true);
+  expect(getLZ(primary.id)!.name).toBe('Customer');
+  expect(getLZ(dr.id)!.name).toBe('Customer DR');
+  expect(listLZs().find((item) => item.id === dr.id)!.name).toBe('Customer DR');
+  expect(getLZ(other.id)!.name).toBe('Unrelated');
+  expect(serializeConfig(getLZ(dr.id)!.model)).toBe(config);
+  expect(getOutputs(dr.id)!.config).toBe(config);
+});
+
+it('preserves an explicitly customized DR name when Primary is renamed', () => {
+  const primary = createSaved('Original');
+  const dr = createDrLZ(primary.id).record!;
+  expect(renameLZ(dr.id, 'Recovery Europe').ok).toBe(true);
+  expect(renameLZ(primary.id, 'Customer').ok).toBe(true);
+  expect(getLZ(dr.id)!.name).toBe('Recovery Europe');
+  expect(getLZ(dr.id)!.homeLzId).toBe(primary.id);
+});
+
+it.each(['record', 'index'])('rolls back the names and index if a linked DR rename fails at %s', (failure) => {
+  const primary = createSaved('Original');
+  const dr = createDrLZ(primary.id).record!;
+  const before = [getLZ(primary.id), getLZ(dr.id), listLZs()];
+  const storage = window.localStorage;
+  const write = storage.setItem.bind(storage);
+  storage.setItem = (key, value) => { if (key === (failure === 'index' ? 'lzng.lz.index' : `lzng.lz.${dr.id}`)) throw new Error('quota'); write(key, value); };
+  expect(renameLZ(primary.id, 'Customer').ok).toBe(false);
+  expect([getLZ(primary.id), getLZ(dr.id), listLZs()]).toEqual(before);
 });
