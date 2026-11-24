@@ -12,6 +12,10 @@ function(profile)
          'Security Zones profile.recipe_compartment_id must identify an existing non-root compartment';
   assert std.objectHas(profile, 'target_compartment_id') && compartment(profile.target_compartment_id) :
          'Security Zones profile.target_compartment_id must identify an existing non-root compartment';
+  assert !std.member([
+    'CMP-LANDINGZONE-KEY', 'CMP-LZ-NETWORK-KEY', 'CMP-LZ-PLATFORM-KEY', 'CMP-LZ-SECURITY-KEY',
+  ], profile.target_compartment_id) :
+         'Security Zones profile.target_compartment_id must not reference the landing-zone or shared compartments';
   local realm = if std.objectHas(profile, 'realm') then profile.realm else 'oc1';
   assert !std.objectHas(profile, 'recipe_scope') :
          'Security Zones environment profiles do not accept recipe_scope';
