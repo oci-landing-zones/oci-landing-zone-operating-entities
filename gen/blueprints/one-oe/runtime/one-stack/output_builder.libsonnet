@@ -17,7 +17,8 @@ function(profile) {
   local rendered = lz(profile.config),
   local enabled = !std.objectHas(profile.config, 'cost_governance') ||
     !std.objectHas(profile.config.cost_governance, 'enable_tags') || profile.config.cost_governance.enable_tags,
-  local securityTags = rendered.security_cis1.scanning_configuration.default_defined_tags,
+  // This configuration remains present even when all zone targets are disabled.
+  local securityTags = rendered.security_cis1.security_zones_configuration.default_defined_tags,
   local observabilityTags = rendered.observability_cis1.notifications_configuration.default_defined_tags,
   iam: rendered.iam,
   network: rendered.network,

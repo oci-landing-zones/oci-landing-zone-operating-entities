@@ -1,3 +1,4 @@
+// Opting out of the shared-network zone leaves only the landing-zone baseline by default.
 // contains: "verified": true
 local render = import 'gen/landing_zone_multi.jsonnet';
 local base = { hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } }, environments: { prod: {} }, security_targets: [] };

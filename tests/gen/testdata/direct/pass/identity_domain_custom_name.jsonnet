@@ -1,3 +1,4 @@
+// Custom identity domain names propagate consistently to IAM groups and workload references.
 // contains: "verified": true
 local lz = import 'gen/landing_zone.libsonnet';
 local profiles = import 'gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet';
