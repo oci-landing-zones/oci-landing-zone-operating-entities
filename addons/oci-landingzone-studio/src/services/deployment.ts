@@ -10,7 +10,7 @@ export const DEPLOY_TO_OCI_URL = `${RESOURCE_MANAGER_STACKS_URL}/create?${new UR
   zipUrlVariables: JSON.stringify({ configuration_source: 'ocibucket' }),
 })}`;
 
-export const DEPLOYMENT_UPDATE_NOTICE = 'Configuration changed. Regenerate the files, then review a Terraform plan and reapply any affected stacks already deployed.';
+export const DEPLOYMENT_UPDATE_NOTICE = 'Regenerate the deployment files for the current design. If already deployed, review a Terraform plan and reapply the affected stacks.';
 
 export const PRIVATE_SOURCE_STEP = 'Unzip the download and review the generated JSON files. Replace any required placeholders, then upload the JSON files to your private Object Storage bucket.';
 export const APPLY_STEP = 'Select Create without running an apply. From the stack details page, select Plan, review the changes and policy impact, then select Apply. Wait for a successful apply before starting phase 2.';

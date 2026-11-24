@@ -342,7 +342,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           <div style={local.note}>
             Download this design and its deployment files as a ZIP. Review the files and replace placeholders before deploying.
           </div>
-          {stale && <p role="status" style={local.note}><strong>Deployment update required.</strong> {DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.</p>}
+          {stale && <p role="status" style={local.note}><strong>Files out of date.</strong> {DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.</p>}
           {contractErrors.length > 0 && (
             <ErrorNotice title="Complete these settings before downloading">
               <ul>{contractErrors.map((message) => <li key={message}>{message}</li>)}</ul>

@@ -321,7 +321,7 @@ it('asks to regenerate and reapply when a saved deployment configuration changes
   stored.outputs.dr = { config: serializeConfig(previous), files: { 'network.json': '{}' } };
   const changed = structuredClone(previous); changed.foundation.vulnerabilityScanningEnabled = false;
   const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={changed}><ReviewStep designName="Changed VSS" /></WizardProvider></MemoryRouter>);
-  expect(html).toContain('Deployment update required.');
-  expect(html).toContain('reapply any affected stacks already deployed');
+  expect(html).toContain('Files out of date.');
+  expect(html).toContain('If already deployed, review a Terraform plan and reapply the affected stacks');
   expect(html).toContain('Studio does not check live OCI deployment status');
 });

@@ -19,16 +19,17 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
-  it.each([undefined, 'complete', 'regional'] as const)('shows deployment type with region and environment metadata: %s', (scope) => {
+  it.each([undefined, 'complete', 'regional'] as const)('shows the deployment badge beside the name without duplicate type metadata: %s', (scope) => {
     const model = emptyLzModel();
     model.foundation.stackScope = scope;
     createLZ('Saved configuration', model);
     const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
-    const type = `Deployment type: ${scope === 'regional' ? 'Secondary' : 'Primary'}`;
+    const type = `>${scope === 'regional' ? 'DR' : 'Primary'}</span>`;
     expect(html).toContain(type);
     expect(html.indexOf(type)).toBeGreaterThan(html.indexOf('Saved configuration'));
     expect(html.indexOf(type)).toBeLessThan(html.indexOf('2 envs'));
     expect(html).toContain('fra');
+    expect(html).not.toContain('Deployment type:');
   });
 
   it('renders a saved design with cached outputs and a deleted cost-center reference', () => {
@@ -132,6 +133,25 @@ it('asks to regenerate and reapply both linked designs after a Primary VSS chang
   const changed = getLZ(primary.id)!.model; changed.foundation.vulnerabilityScanningEnabled = false;
   saveLZ(primary.id, changed);
   const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
-  expect(html.match(/>Update required<\/span>/g)).toHaveLength(2);
+  expect(html.match(/>Files out of date<\/span>/g)).toHaveLength(2);
   expect(html).toContain('reapply');
+  expect(html).toContain('Why are these files out of date?');
+  expect(html).toContain('Security settings changed.');
+  expect(html).toContain('Last generated');
+  expect(html).toContain('Studio does not check live OCI deployment status.');
+  expect(html).toContain(`/lz/${primary.id}?step=review`);
+});
+
+
+it('keeps the change explanation hidden by default and omits it for current outputs', () => {
+  const record = createLZ('Current', emptyLzModel()).record!;
+  saveOutputs(record.id, { config: serializeConfig(record.model), files: { 'network.json': '{}' } });
+  let html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html).not.toContain('Why are these files out of date?');
+  const changed = record.model; changed.foundation.vulnerabilityScanningEnabled = false;
+  saveLZ(record.id, changed);
+  html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html).toContain('<details');
+  expect(html).not.toMatch(/<details[^>]*\sopen/);
+  expect(html).toContain('Open Review');
 });

@@ -12,6 +12,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
 import { createDrLZ, linkedHomeRecord, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
+import { outputChangeReasons } from '../services/outputChanges';
 import { DEPLOYMENT_UPDATE_NOTICE } from '../services/deployment';
 import { serializeConfig } from '../services/lzConfig';
 import { deploymentDownloadFiles } from '../services/homePrimaryDeployment';
@@ -72,7 +73,7 @@ function summaryChips(id: string): string[] {
   const envs = (m.environments ?? []).filter((e) => e.name?.trim()).length;
   const projects = (m.projects ?? []).length;
   const platforms = (m.platforms ?? []).length;
-  const chips: string[] = [`Deployment type: ${m.foundation.stackScope === 'regional' ? 'Secondary' : 'Primary'}`];
+  const chips: string[] = [];
   if (region) chips.push(rec.disasterRecovery ? `Primary: ${region}` : region);
   if (rec.disasterRecovery) {
     const draft = rec.disasterRecovery.draft;
@@ -85,6 +86,7 @@ function summaryChips(id: string): string[] {
 }
 
 interface CardOutputs {
+  reasons: string[];
   generatedAt: string;
   /** The design changed or the output uses an older deployment contract. */
   stale: boolean;
@@ -97,6 +99,7 @@ function cardOutputs(id: string): CardOutputs | null {
   const rec = getLZ(id);
   return {
     generatedAt: saved.generatedAt,
+    reasons: rec ? outputChangeReasons(saved.config, rec.disasterRecovery ? drDesignFingerprint(rec.model, rec.disasterRecovery.draft) : serializeConfig(rec.model)) : ['The saved design is unavailable for comparison.'],
     stale: !rec || (rec.disasterRecovery ? !isCurrentDrOutputSet(rec, saved) : !isCurrentOutputSet(saved, serializeConfig(rec.model))),
   };
 }
@@ -225,7 +228,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
               <div style={s.body}>
                 <div style={s.nameRow}>
                   <span style={s.name}>{r.name}</span>
-                  {(combined || regional) && <span style={s.badge}>DR</span>}
+                  <span style={s.badge}>{combined || regional ? 'DR' : 'Primary'}</span>
                   {isCurrent && <span style={s.badge}>This one</span>}
                 </div>
                 {descriptions[r.id] && <p style={{ margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{descriptions[r.id]}</p>}
@@ -241,11 +244,20 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
-                        ? <span style={s.staleTag} title={`${DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.`}>Update required</span>
+                        ? <span style={s.staleTag} title={`${DEPLOYMENT_UPDATE_NOTICE} Studio does not check live OCI deployment status.`}>Files out of date</span>
                         : <span style={s.outMeta}>Last generated {formatTime(out.generatedAt)}</span>}
                     </div>
                   )}
-                  {out?.stale && <p role="status" style={{ margin: '8px 0', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted }}>{DEPLOYMENT_UPDATE_NOTICE}</p>}
+                  {out?.stale && <div style={{ margin: '8px 0', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted }}>
+                    <p role="status" style={{ margin: '0 0 8px' }}>{DEPLOYMENT_UPDATE_NOTICE}</p>
+                    <details>
+                      <summary style={{ cursor: 'pointer', color: oracle.text }}>Why are these files out of date?</summary>
+                      <p style={{ margin: '8px 0' }}>Last generated {formatTime(out.generatedAt)}</p>
+                      <ul style={{ margin: '8px 0', paddingLeft: 20 }}>{out.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+                      <p style={{ margin: '8px 0' }}>Compared with the source saved at the last generation. Studio does not check live OCI deployment status.</p>
+                    </details>
+                    <Link to={`/lz/${r.id}?step=review`}>Open Review</Link>
+                  </div>}
                   <div style={s.outRow}>
                     {combined && <>
                       <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'Home' ? 0.5 : 1 }} disabled={!!downloading}
