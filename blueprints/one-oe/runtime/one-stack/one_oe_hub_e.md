@@ -8,7 +8,9 @@
 
  ### Deployment diagram
 
-The diagram provides a comprehensive visual representation of the key OCI resources - such as Identity Domains, groups, compartments, IP CIDR ranges, and route table configurations - including their exact naming conventions, as defined in the One-OE JSON configurations.
+The diagram illustrates the deployment topology, including Identity Domains, groups, compartments, IP CIDR ranges and route tables.
+
+> **Security Zones:** the current JSON files create only **Recipe 01** on `cmp-landingzone`, using the selected CIS level. Optional **Recipe 02** environment zones are managed separately through the [OCI Security Zones add-on](../../../../addons/oci-security-zones/README.md).
 
 <img src="../../design/images/oneoe_hub_e_deployment_view.png" width="900" height="value">
 

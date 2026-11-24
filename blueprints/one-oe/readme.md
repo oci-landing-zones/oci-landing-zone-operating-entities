@@ -8,6 +8,8 @@ Welcome to the **OCI Open LZ One-OE Blueprint**.
 
 This model onboards **one Operating Entity (OE)** with its **environments**, **platforms**, and **projects** in **one tenancy**. It fits any organizational scope, such as one Organization Unit, LoB, OpCo, Department, or Partner. Find below the assets available to guide your design and deployment activities.
 
+The published deployment includes only **Security Zone Recipe 01**, applied to `cmp-landingzone` with the selected CIS level. Optional **Recipe 02** zones for selected environments are deployed separately through the [OCI Security Zones add-on](../../addons/oci-security-zones/README.md). See the [runtime guide](runtime/one-stack/readme.md#security-baseline-and-optional-zones) for the baseline and existing-deployment considerations.
+
 
 &nbsp; 
 

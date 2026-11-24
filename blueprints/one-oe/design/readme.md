@@ -158,11 +158,17 @@ The following diagram presents the tenancy structure up to L5, introducing the *
 &nbsp; 
 
 
-The next two diagrams depict the **security zones** of the landing zones and the general **security posture**. For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied to each element refer to the [OCI Open LZ One-OE Drawio - Security Tabs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). 
+The published One-OE deployment creates a single **Security Zone Recipe 01**, using the selected CIS Level 1 or Level 2 restrictions. Its zone targets `cmp-landingzone` and covers its subcompartments, including the shared network, security, platform and workload environments. The recipe resource is stored in `cmp-lz-security`; this placement does not limit the zone's enforcement scope to that compartment.
+
+Additional environment zones are optional. Deploy **Recipe 02** for each selected environment through the [OCI Security Zones add-on](../../../addons/oci-security-zones/README.md) in a separate stack. These zones are not part of the base One-OE deployment. See the [runtime guide](../runtime/one-stack/readme.md#existing-deployments) before updating a deployment that already manages additional zones.
+
+The linked Drawio design may retain earlier multi-recipe labels. For the deployed Security Zone baseline, use the runtime configuration files and the scope described above.
 
 &nbsp; 
 
-<img src="images/3_security_view_security_zones.png" alt= “” width="1000" height="value">
+<img src="../../../addons/oci-security-zones/images/security-zones.png" alt="One-OE Security Zones: Recipe 01 on the landing-zone compartment and optional Recipe 02 on an environment compartment" width="1000">
+
+Recipe 01 is included in the base blueprint. The Recipe 02 zone shown for an environment is optional and requires the add-on.
 
 &nbsp; 
 
