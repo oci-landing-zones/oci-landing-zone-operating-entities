@@ -1,6 +1,6 @@
 # **OCI Security Zones**
 
-## **An OCI Open LZ Add-on for Environment Security Zones**
+## **Additional Security Zones for OCI Open LZ**
 
 &nbsp;
 
