@@ -1,5 +1,13 @@
 # ENS Guidance for the OCI Operating Entities Landing Zone
 
+## Contents
+
+- [Overview and compliance boundary](#1-overview-and-compliance-boundary)
+- [Customer responsibilities](#2-customer-responsibilities)
+- [One-OE capabilities](#3-what-the-operating-entities-landing-zone-provides)
+- [ENS High-category contributions](#31-ens-high-category-contribution-overview) ([detailed traceability](./traceability/README.md))
+- [References](#4-references)
+
 ## 1. Overview and compliance boundary
 
 Oracle Cloud Infrastructure (OCI) provides security and governance capabilities that can support the design of systems subject to Spain’s [Esquema Nacional de Seguridad (ENS)](https://ens.ccn.cni.es/es/).
@@ -35,12 +43,62 @@ The customer must retain evidence. Basic-category systems require a documented s
   <img src="./images/ens.jpg" alt="One-OE foundation capabilities, optional landing-zone add-ons, and optional OCI configuration" width="800">
 </p>
 
-| <img src="./images/1.png" alt="1" width="20" height="20"> [One-OE foundation capabilities](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) | <img src="./images/2.png" alt="2" width="20" height="20"> Optional LZ add-ons | <img src="./images/3.png" alt="3" width="20" height="20"> Optional OCI configuration |
-| --- | --- | --- |
-| • Tenancy and compartment structure.<br>• IAM groups, policies, and segregation of administrative roles.<br>• VCN topology, routing, security lists/NSGs, and private connectivity.<br>• Cloud Guard targets and detector/responder recipes, where configured.<br>• Security Zones for preventive guardrails in designated compartments.<br>• Logging, Audit integration, flow logs, Connector Hub, events, notifications, and monitoring integration.<br>• Vault and a software key for the audit-log bucket in the CIS Level 2 configuration; customer-managed-key adoption by other services requires additional configuration.<br>• Vulnerability Scanning Service (VSS), including targets and scan recipes.<br>• Architecture integration points for firewall, SIEM, and connectivity extensions.<br>• Resource tagging, inventory support, and IAM permissions for budget management. | • [DNS controls](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-private-dns).<br>• [Tag-Based Access Control (TBAC)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-tbac) for scalable, role-based IAM policies assigned through OCI tags.<br>• [Network Hub Models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) for OCI Network Firewall and third-party firewall options.<br>• [X-RPC](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-x-rpc) for optional cross-region and cross-tenancy network connectivity.<br>• [OCI Bastion](../oci-bastion/README.md) for controlled administrative access, where selected; target-side access requires additional configuration. | • Identity federation and MFA, where selected.<br>• WAF, DDoS protection, and other workload-edge services: OCI capabilities configured and operated outside the One-OE blueprint. The blueprint can provide network architecture integration points, but does not provision or operate those services.<br>• Central log export to a customer SIEM.<br>• Multi-AD/region workload resilience, backups, replication, and failover. |
-
 > [!NOTE]
 > The listed capabilities are not necessarily enabled by default; they must be selected, configured, deployed, and verified where applicable.
+
+<table width="800" align="center">
+  <thead>
+    <tr>
+      <th width="33%" align="left" valign="top">
+        <img src="./images/1.png" alt="1" width="20" height="20"><br>
+        <a href="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe">One-OE foundation capabilities</a>
+      </th>
+      <th width="33%" align="left" valign="top">
+        <img src="./images/2.png" alt="2" width="20" height="20"><br>
+        Optional LZ add-ons
+      </th>
+      <th width="33%" align="left" valign="top">
+        <img src="./images/3.png" alt="3" width="20" height="20"><br>
+        Optional OCI configuration
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="33%" valign="top">
+        <ul>
+          <li>Tenancy and compartment structure.</li>
+          <li>IAM groups, policies, and segregation of administrative roles.</li>
+          <li>VCN topology, routing, security lists/NSGs, and private connectivity.</li>
+          <li>Cloud Guard targets and detector/responder recipes, where configured.</li>
+          <li>Security Zones for preventive guardrails in designated compartments.</li>
+          <li>Logging, Audit integration, flow logs, Connector Hub, events, notifications, and monitoring integration.</li>
+          <li>Vault and a software key for the audit-log bucket in the CIS Level 2 configuration; customer-managed-key adoption by other services requires additional configuration.</li>
+          <li>Vulnerability Scanning Service (VSS), including targets and scan recipes.</li>
+          <li>Architecture integration points for firewall, SIEM, and connectivity extensions.</li>
+          <li>Resource tagging, inventory support, and IAM permissions for budget management.</li>
+        </ul>
+      </td>
+      <td width="33%" valign="top">
+        <ul>
+          <li><a href="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-private-dns">DNS controls</a>.</li>
+          <li><a href="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-tbac">Tag-Based Access Control (TBAC)</a> for scalable, role-based IAM policies assigned through OCI tags.</li>
+          <li><a href="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models">Network Hub Models</a> for OCI Network Firewall and third-party firewall options.</li>
+          <li><a href="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-x-rpc">X-RPC</a> for optional cross-region and cross-tenancy network connectivity.</li>
+          <li><a href="../oci-bastion/README.md">OCI Bastion</a> for controlled administrative access, where selected; target-side access requires additional configuration.</li>
+        </ul>
+      </td>
+      <td width="33%" valign="top">
+        <ul>
+          <li>Identity federation and MFA, where selected.</li>
+          <li>WAF, DDoS protection, and other workload-edge services: OCI capabilities configured and operated outside the One-OE blueprint. The blueprint can provide network architecture integration points, but does not provision or operate those services.</li>
+          <li>Central log export to a customer SIEM.</li>
+          <li>Multi-AD/region workload resilience, backups, replication, and failover.</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### 3.1 ENS High-category contribution overview
 
