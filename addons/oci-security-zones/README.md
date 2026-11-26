@@ -35,16 +35,14 @@ Choose **one** configuration per independent add-on stack, with the same CIS lev
 
 | Scope | CIS Level 1 | CIS Level 2 | Existing target compartment |
 |---|---|---|---|
-| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `cmp_lz_prod` |
-| Production and preproduction — one stack | [Configuration](./security_zones_prod_preprod_cis1.json) | [Configuration](./security_zones_prod_preprod_cis2.json) | `cmp_lz_prod` and `cmp_lz_preprod` |
+| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `CMP-LZ-PROD-KEY` |
+| Production and preproduction — one stack | [Configuration](./security_zones_prod_preprod_cis1.json) | [Configuration](./security_zones_prod_preprod_cis2.json) | `CMP-LZ-PROD-KEY` and `CMP-LZ-PREPROD-KEY` |
 
-Recipes are created in `cmp_lz_security`, while each zone protects its selected environment. The production example creates one recipe and zone; the combined example creates two recipes and two zones in a single configuration. Both environments must exist in the compartment dependency before deploying the combined example.
+Recipes are created in `CMP-LZ-SECURITY-KEY`, while each zone protects its selected environment. The production example creates one recipe and zone; the combined example creates two recipes and two zones in a single configuration. Both environments must exist in the compartment dependency before deploying the combined example.
 
 Use the combined file for a new stack protecting both environments, or update an existing production-only add-on stack to add an unmanaged `preprod`. Production resource keys are preserved: with the same CIS level and region settings, review that the plan retains the existing production recipe and zone and creates only the preproduction pair. Do not deploy overlapping examples in different states; consolidating existing independent stacks requires a separately reviewed state migration.
 
-Apply each Security Zone to the intended environment compartment, such as cmp_lz_prod or cmp_lz_preprod. Do not target the landing-zone parent compartment or the shared network, platform or security compartments.
-
-Before deployment, verify the target compartment in OCI and review its subcompartments to confirm the intended scope of protection. If the configuration references a compartment using a JSON object key, check that the key maps to the correct compartment OCID in compartments_output.json. If it uses an OCID directly, confirm that the OCID identifies the intended environment compartment.
+The generator rejects the known One-OE landing-zone and shared network, platform and security compartment keys as zone targets. For custom compartment keys or literal OCIDs, verify that each resolved target is the intended environment; the generator cannot establish its actual OCI hierarchy offline.
 
 The add-on uses existing compartments; it does not create IAM policies, networks, workloads, Vaults, keys or a separate Cloud Guard configuration block.
 
@@ -76,17 +74,8 @@ For the full policy lists, see [Security Zone Recipes — CIS Level 1](./sz_reci
 3. **A reviewed target compartment.** Check its existing Security Zone association, descendants, resources and Cloud Guard targets. Creating a zone replaces relevant existing Cloud Guard targets and creates a Security Zone target; review any custom detector configuration first. See [Oracle's Security Zones overview](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm).
 4. **A dedicated stack/state.** The add-on must exclusively own its recipes and zones. The base stack continues owning its compartments and other resources.
 
-Before deploying this add-on, check whether your existing One-OE or workload-extension stack already manages a Security Zone or recipe for the selected environment. Each recipe and zone must be managed by only one Terraform state, whether you deploy through Terraform CLI or an ORM stack.
-
-If the existing stack already manages these resources, do not deploy another copy through the add-on stack. Moving existing resources between stacks requires a planned Terraform state migration, which this add-on does not perform. Simply removing their configuration from the original stack and adding it to the add-on stack can cause Terraform to propose deleting and recreating them.
-
-Before updating an existing deployment, confirm which stack manages each recipe and zone, check the resource keys used in the configuration, and review the Terraform or ORM plan for unintended deletions, replacements or duplicate resources.
-
-
 > [!IMPORTANT]
-> Security Zone policies are enforced based on the recipe assigned to the Security Zone associated with a compartment. When a child compartment is assigned a different Security Zone, only the policies defined in that Security Zone's recipe are enforced for resources within the child compartment.
-
-
+> A child zone uses its own recipe rather than accumulating its parent's policies; Recipe 02 therefore includes the selected CIS baseline. Earlier One-OE versions and workload extensions can already manage an environment zone. Each recipe and zone must have one owning state: do not create duplicates or remove base-managed resources as an implicit migration. This add-on does not migrate state automatically. Review ownership, resource keys and the plan before upgrading an existing deployment.
 
 ### 3.1. Region Settings
 
