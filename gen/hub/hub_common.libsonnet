@@ -165,7 +165,7 @@
         },
       ],
 
-      ingress_rules: $._icmp_ingress_rules(hub_vcn_cidr) + [
+      ingress_rules: $._icmp_ingress_rules(hub_vcn_cidr) + (if bastion_ip == null then [] else [
         {
           description: 'EXAMPLE: Allow inbound traffic from the Bastion Service private endpoint IP address',
           src: bastion_ip,
@@ -175,7 +175,7 @@
           protocol: 'TCP',
           stateless: false,
         },
-      ],
+      ]),
     },
   },
 
@@ -224,7 +224,7 @@
         security_list_keys: [n.key('SL', ['HUB', 'LB'])],
       },
 
-      [n.key('SN', ['HUB', 'MGMT'])]: {
+      [if std.objectHas(subnets, 'mgmt') then n.key('SN', ['HUB', 'MGMT'])]: {
         display_name: n.display('sn', ['hub', 'mgmt']),
         dns_label: n.dns_label(['sn', n.region, 'hub', 'mgmt']),
         cidr_block: subnets.mgmt,
@@ -235,7 +235,7 @@
         security_list_keys: [n.key('SL', ['HUB', 'MGMT'])],
       },
 
-      [n.key('SN', ['HUB', 'MON'])]: {
+      [if std.objectHas(subnets, 'mon') then n.key('SN', ['HUB', 'MON'])]: {
         display_name: n.display('sn', ['hub', 'mon']),
         dns_label: n.dns_label(['sn', n.region, 'hub', 'mon']),
         cidr_block: subnets.mon,
@@ -247,7 +247,7 @@
       },
 
       // Fixed DNS subnet bug: was 'SN-FRA-LZ-HUB-DNS' (missing -KEY), now uses n.key()
-      [n.key('SN', ['HUB', 'DNS'])]: {
+      [if std.objectHas(subnets, 'dns') then n.key('SN', ['HUB', 'DNS'])]: {
         display_name: n.display('sn', ['hub', 'dns']),
         dns_label: n.dns_label(['sn', n.region, 'hub', 'dns']),
         cidr_block: subnets.dns,

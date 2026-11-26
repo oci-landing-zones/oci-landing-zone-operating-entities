@@ -4,7 +4,7 @@ import HubNetworkStep, { VcnEditor } from './HubNetworkStep';
 import { WizardProvider } from '../wizardContext';
 import { emptyLzModel } from '../../model/defaults';
 import { emptyHybridConnectivity } from '../../services/hybridConnectivity';
-import { HUB_KINDS, hubKindDefaults } from '../../services/hubKinds';
+import { HUB_KINDS, OPTIONAL_HUB_SUBNETS, hubKindDefaults } from '../../services/hubKinds';
 
 it('uses shared inline feedback for connectivity errors', () => {
   const model = emptyLzModel();
@@ -42,10 +42,11 @@ describe('VCN subnet validation', () => {
       const cidrInput = html.match(new RegExp(`<input[^>]*aria-label="Subnet ${index + 1} CIDR"[^>]*>`))?.[0];
       expect(cidrInput).toContain(`value="${subnet.cidr}"`);
       expect(cidrInput).not.toMatch(/readOnly|disabled/);
-      expect(html).not.toContain(`aria-label="Delete subnet ${subnet.name}"`);
+      if (OPTIONAL_HUB_SUBNETS.includes(subnet.name)) expect(html).toContain(`aria-label="Delete subnet ${subnet.name}"`);
+      else expect(html).not.toContain(`aria-label="Delete subnet ${subnet.name}"`);
     });
     expect(html).toContain('Add custom subnet');
-    expect(html).toContain('Hub subnet names are required by the selected network model. You can change their CIDR ranges.');
+    expect(html).toContain('Hub subnet names are fixed.');
   });
 
   it('keeps custom subnet controls available for unrestricted networks', () => {

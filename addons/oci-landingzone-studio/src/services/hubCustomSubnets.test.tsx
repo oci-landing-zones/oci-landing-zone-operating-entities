@@ -30,7 +30,8 @@ describe.each(HUB_KINDS)('$label custom subnets', ({ id }) => {
     expect(input).toContain('value="tools"');
     expect(input).not.toContain('readOnly');
     expect(html).toContain('Delete subnet tools');
-    expect(html).not.toContain('Delete subnet mgmt');
+    expect(html).not.toContain('Delete subnet lb');
+    expect(html).toContain('Delete subnet mgmt');
     expect(html).toContain('Private · Routing: mgmt · Security list: mgmt');
     expect(html).toContain('Add custom subnet');
   });

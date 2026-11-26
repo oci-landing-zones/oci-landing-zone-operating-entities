@@ -10,6 +10,7 @@ import { s } from './networkEditorStyles';
 export default function BastionSettings() {
   const { model, setField } = useWizard();
   const bastion = model.bastion ?? defaultBastion();
+  const hasMgmt = model.network.subnets.some((subnet) => subnet.name === 'mgmt');
   const allowlistError = bastion.enabled ? bastionAllowlistError(bastion) : null;
   const durationError = bastion.enabled ? bastionDurationError(bastion) : null;
   const update = (patch: Partial<BastionConfig>) => setField('bastion', { ...bastion, ...patch });
@@ -28,9 +29,11 @@ export default function BastionSettings() {
               <p><a className="guide-link" href={BASTION_DOCUMENTATION_URL} target="_blank" rel="noreferrer">Connect through OCI Bastion</a></p>
             </InfoButton>
           </div>
-          <Switch checked={bastion.enabled} onChange={(enabled) => update({ enabled })} label={bastion.enabled ? 'On' : 'Off'} ariaLabel="Enable OCI Bastion" />
+          <Switch checked={bastion.enabled} onChange={(enabled) => update({ enabled })} label={bastion.enabled ? 'On' : 'Off'} ariaLabel="Enable OCI Bastion"
+            disabled={!hasMgmt && !bastion.enabled} describedBy={!hasMgmt ? 'lz-bastion-mgmt-help' : undefined} />
         </div>
         <p id="foundation-bastion-intro" style={s.intro}>Access private databases and virtual machines through OCI Bastion. Studio includes the service in your deployment files. You create temporary access sessions after deployment.</p>
+        {!hasMgmt && <p id="lz-bastion-mgmt-help" style={s.help}>Restore the mgmt subnet in Hub Network before enabling OCI Bastion.</p>}
         {bastion.enabled && <div style={{ display: 'grid', gap: 16 }}>
           <div>
             <label style={s.label} htmlFor="lz-bastion-client-cidrs">Allowed public IPv4 ranges (CIDR)</label>

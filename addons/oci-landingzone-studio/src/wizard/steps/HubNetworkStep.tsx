@@ -11,7 +11,7 @@ import { useWizard } from '../wizardContext';
 import DeleteButton from '../../components/DeleteButton';
 import RemotePeeringEditor from '../../components/RemotePeeringEditor';
 import { oracle } from '../../theme';
-import { HUB_KINDS, getHubKind, hubKindDefaults, hubCustomSubnetNameError } from '../../services/hubKinds';
+import { HUB_KINDS, OPTIONAL_HUB_SUBNETS, getHubKind, hubKindDefaults, hubCustomSubnetNameError } from '../../services/hubKinds';
 import {
   BASE_RANGES, baseRangeOf, moveToBaseRange, parseCidr, shiftCidr, prefixToMask,
   totalIps, usableIps, freeRanges, suggestSubnetCidrs, validateSubnetCidr, validateVcnCidr,
@@ -156,7 +156,7 @@ export function CidrCalculator({ vcnCidr, subnets }: { vcnCidr: string; subnets:
  * subnet re-basing, the subnet table, the add-subnet suggestions, and the live
  * CIDR calculator. Used by the hub VCN and by every environment VCN.
  */
-export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conflicts = [], readOnlySubnets = false, requiredSubnetKeys = [] }: {
+export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conflicts = [], readOnlySubnets = false, requiredSubnetKeys = [], optionalSubnetKeys = [] }: {
   idPrefix: string;
   vcnCidr: string;
   subnets: Subnet[];
@@ -165,6 +165,8 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
   readOnlySubnets?: boolean;
   /** Preserve the hub's required subnet map while allowing CIDR changes. */
   requiredSubnetKeys?: string[];
+  /** Fixed-name hub subnets that may be removed and restored. */
+  optionalSubnetKeys?: string[];
   onApply: (patch: { vcnCidr?: string; subnets?: Subnet[] }) => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -216,6 +218,8 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
 
   // Add-subnet CIDR: suggestions continue counting from the allocated space.
   const suggestions = suggestSubnetCidrs(vcnCidr, subnets.map((sn) => sn.cidr));
+  const missingOptionalSubnets = optionalSubnetKeys.filter((name) => !subnets.some((subnet) => subnet.name === name));
+  const restoreCidr = suggestions[0] ?? suggestSubnetCidrs(vcnCidr, subnets.map((sn) => sn.cidr), 30)[0];
   const newSubnetCidr = cidrChoice === 'custom' ? newCidr.trim() : cidrChoice === 'auto' ? (suggestions[0] ?? '') : cidrChoice;
   const newSubnetError = newSubnetCidr
     ? validateSubnetCidr(newSubnetCidr, vcnCidr, resolvedSubnets)
@@ -282,7 +286,9 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
             ))}</tbody>
           </table>
         ) : <>
-        {requiredSubnetKeys.length > 0 && <p>Hub subnet names are required by the selected network model. You can change their CIDR ranges.</p>}
+        {requiredSubnetKeys.length > 0 && <p>{optionalSubnetKeys.length
+          ? 'Hub subnet names are fixed. You can remove mgmt, mon and dns when they are not needed, and add them again below.'
+          : 'Hub subnet names are required by the selected network model. You can change their CIDR ranges.'}</p>}
         <div style={s.tableHead} className="network-subnet-grid network-subnet-heading">
           <span>Subnet</span>
           <span>CIDR</span>
@@ -292,10 +298,11 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
         {subnets.map((sn, i) => {
           const resolved = sn.name;
           const required = requiredSubnetKeys.includes(sn.name) && subnets.findIndex((subnet) => subnet.name === sn.name) === i;
+          const canonical = (requiredSubnetKeys.includes(sn.name) || optionalSubnetKeys.includes(sn.name)) && subnets.findIndex((subnet) => subnet.name === sn.name) === i;
           const err = subnetError(i);
           const errorId = `${idPrefix}-subnet-${i}-error`;
           const nameError = configKeyError(sn.name, subnets.filter((_, index) => index !== i).map((subnet) => subnet.name))
-            || (requiredSubnetKeys.length && !required ? hubCustomSubnetNameError(sn.name) : null);
+            || (requiredSubnetKeys.length && !canonical ? hubCustomSubnetNameError(sn.name) : null);
           const suggestion = err && !vcnError ? suggestSubnetCidrs(vcnCidr, subnets.filter((_, index) => index !== i).map((subnet) => subnet.cidr), parseCidr(sn.cidr)?.prefix ?? 24)[0] : undefined;
           return (
             <div key={i} style={s.row} className="network-subnet-grid">
@@ -306,11 +313,11 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
                   {...fieldErrorProps(`${idPrefix}-subnet-${i}-name-error`, nameError)}
                   style={s.rowInput}
                   value={resolved}
-                  readOnly={required}
+                  readOnly={canonical}
                   onChange={(e) => updateSubnet(i, { name: e.target.value })}
                 />
                 <FieldError id={`${idPrefix}-subnet-${i}-name-error`} error={nameError} />
-                {requiredSubnetKeys.length > 0 && !required && <p style={s.help}>Private · Routing: mgmt · Security list: mgmt</p>}
+                {requiredSubnetKeys.length > 0 && !canonical && <p style={s.help}>Private · Routing: mgmt · Security list: mgmt</p>}
               </label>
               <div>
                 <span className="network-subnet-field-label">CIDR</span>
@@ -333,6 +340,12 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conf
             </div>
           );
         })}
+
+        {missingOptionalSubnets.length > 0 && <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+          {missingOptionalSubnets.map((name) => <button key={name} type="button" style={s.addBtn} disabled={!restoreCidr}
+            onClick={() => { if (restoreCidr) setSubnets([...subnets, { name, cidr: restoreCidr }]); }}>Add {name} subnet</button>)}
+          {!restoreCidr && <p style={s.help}>No free subnet range remains. Expand the VCN range to restore a subnet.</p>}
+        </div>}
 
         <div style={s.subCard}>
           <div style={s.subHead}>Add custom subnet</div>
@@ -462,7 +475,8 @@ export default function HubNetworkStep() {
             <>
               <VcnEditor
                 idPrefix="hub"
-                requiredSubnetKeys={kind!.defaultSubnets.map((subnet) => subnet.name)}
+                requiredSubnetKeys={kind!.defaultSubnets.map((subnet) => subnet.name).filter((name) => !OPTIONAL_HUB_SUBNETS.includes(name) || (name === 'mgmt' && model.bastion?.enabled))}
+                optionalSubnetKeys={OPTIONAL_HUB_SUBNETS}
                 conflicts={vcnErrors.hub}
                 vcnCidr={n.hubVcnCidr}
                 subnets={n.subnets}
@@ -472,6 +486,7 @@ export default function HubNetworkStep() {
                   ...(patch.subnets ? { subnets: patch.subnets } : {}),
                 })}
               />
+              {model.bastion?.enabled && <p style={s.help}>OCI Bastion requires the mgmt subnet. Disable OCI Bastion in Security before removing it.</p>}
             </>
           )}
         </div>

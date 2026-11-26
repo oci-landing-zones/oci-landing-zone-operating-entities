@@ -232,10 +232,10 @@ The hub is the landing zone's central network. Its `kind` selects the supported 
 
 | Hub kind | Description | Required subnet keys when explicitly supplied |
 |---|---|---|
-| `hub_a` | Dual-firewall hub. | `fw-dmz`, `lb`, `fw-int`, `mgmt`, `mon`, `dns` |
-| `hub_b` | Single OCI Network Firewall hub. | `lb`, `fw`, `mgmt`, `mon`, `dns` |
-| `hub_c` | Third-party firewall hub. | `untrust`, `trust`, `lb`, `mgmt`, `mon`, `dns` |
-| `hub_e` | No-firewall, DRG-based hub. | `lb`, `mgmt`, `mon`, `dns` |
+| `hub_a` | Dual-firewall hub. | `fw-dmz`, `lb`, `fw-int` |
+| `hub_b` | Single OCI Network Firewall hub. | `lb`, `fw` |
+| `hub_c` | Third-party firewall hub. | `untrust`, `trust`, `lb` |
+| `hub_e` | No-firewall, DRG-based hub. | `lb` |
 
 ```jsonnet
 hub: {
@@ -247,11 +247,15 @@ hub: {
 },
 ```
 
-`network.vcn` is always required and must be a valid CIDR. When `hub.network.subnets` is omitted, the factory allocates the canonical `/24` subnet layout. If it is supplied, it must contain the complete key set for the selected hub, use valid non-overlapping CIDRs, and remain inside the hub VCN.
+`network.vcn` is always required and must be a valid CIDR. When `hub.network.subnets` is omitted, the factory allocates the full canonical `/24` subnet layout, including `mgmt`, `mon` and `dns`. If it is supplied, it must contain the required keys above and may additionally contain any of `mgmt`, `mon` and `dns`. All CIDRs must be valid, non-overlapping and inside the hub VCN. Omitted optional entries are not generated; existing explicit maps retain their current resources and CIDRs.
+
+Studio enables these three optional subnets by default. In Hub Network, remove an unused subnet with its delete button or restore it with **Add mgmt/mon/dns subnet**. Restoring allocates an available range without moving existing subnets. OCI Bastion requires `mgmt`: disable Bastion before removing that subnet, and restore it before enabling Bastion again. Direct factory sources with Bastion enabled and no `mgmt` are rejected.
+
+When `mgmt` is absent, the factory omits the example Bastion-endpoint SSH ingress and the project NSG SSH rules sourced from that subnet. The shared MGMT route table and security list remain available to other private hub subnets. Removing `mon` or `dns` removes their subnet definitions and any generated subnet-specific routes or flow-log references. These changes do not provide an alternative management or DNS endpoint. For an already deployed landing zone, review the Terraform plan and migrate any dependent resources before applying subnet removal.
 
 ### Custom private hub subnets
 
-Use the separate optional `hub.network.custom_subnets` map for additional private subnets. Keep `subnets` limited to the complete canonical set above; canonical subnets remain mandatory. Custom names cannot reuse any hub's reserved subnet name and must use lowercase letters, digits or hyphens, starting and ending with a letter or digit. At most 99 custom subnets are supported. DNS labels use a stable hash of each custom name to remain within OCI limits; adding another subnet does not change existing labels.
+Use the separate optional `hub.network.custom_subnets` map for additional private subnets. Keep `subnets` limited to the required and optional canonical names above. Custom names cannot reuse any hub's reserved subnet name, including an omitted optional subnet, and must use lowercase letters, digits or hyphens, starting and ending with a letter or digit. At most 99 custom subnets are supported. DNS labels use a stable hash of each custom name to remain within OCI limits; adding another subnet does not change existing labels.
 
 ```jsonnet
 hub: {

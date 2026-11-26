@@ -9,6 +9,8 @@
 
 import type { HubKind, LzModel, Subnet } from '../model/types';
 
+export const OPTIONAL_HUB_SUBNETS = ['mgmt', 'mon', 'dns'];
+
 export interface HubKindDef {
   id: HubKind;
   label: string;

@@ -261,11 +261,13 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       else null;
 
     local hub_subnet_keys = hub_subnet_order[hub_kind];
+    local optional_hub_subnet_keys = ['mgmt', 'mon', 'dns'];
+    local required_hub_subnet_keys = [k for k in hub_subnet_keys if !std.member(optional_hub_subnet_keys, k)];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
     local hub_vcn = required_vcn(hub_network, 'config.hub.network');
     local hub_subnets =
       if std.objectHas(hub_network, 'subnets') then
-        subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
+        subnet_utils.validate_subnet_map(hub_network.subnets, required_hub_subnet_keys, hub_subnet_label, hub_vcn, optional_keys=optional_hub_subnet_keys)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
     local custom_label = 'config.hub.network.custom_subnets';
     local custom_subnets = validation.object(
@@ -517,9 +519,13 @@ local bastion_contract = import 'addons/oci-bastion/config.libsonnet';
       'Local and remote routed VCN CIDRs'
     );
 
+    local bastion = bastion_contract.normalize(if std.objectHas(config, 'bastion') then config.bastion else null);
+    assert bastion == null || std.objectHas(hub_subnets, 'mgmt') :
+           'OCI Bastion requires the mgmt subnet in config.hub.network.subnets';
+
     config {
       [if std.objectHas(config, 'cost_governance') then 'cost_governance']: cost_governance.normalize(config.cost_governance, projects=cost_governance.project_names({ environments: norm_envs })),
-      bastion: bastion_contract.normalize(if std.objectHas(config, 'bastion') then config.bastion else null),
+      bastion: bastion,
       [if std.objectHas(config, 'hybrid_connectivity') then 'hybrid_connectivity']: hybrid,
       region: region,
       [if tenancy_home_region != null then 'tenancy_home_region']: tenancy_home_region,

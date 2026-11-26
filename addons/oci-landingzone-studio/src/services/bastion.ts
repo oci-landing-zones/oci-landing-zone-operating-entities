@@ -30,6 +30,9 @@ export function bastionDurationError(bastion: BastionConfig): string | null {
 export function validateBastion(model: LzModel): string[] {
   const bastion = model.bastion;
   return bastion?.enabled
-    ? [bastionAllowlistError(bastion), bastionDurationError(bastion)].filter((error): error is string => error !== null)
+    ? [
+      ...(model.network.subnets.some((subnet) => subnet.name === 'mgmt') ? [] : ['OCI Bastion requires the mgmt subnet. Restore it in Hub Network.']),
+      bastionAllowlistError(bastion), bastionDurationError(bastion),
+    ].filter((error): error is string => error !== null)
     : [];
 }

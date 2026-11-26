@@ -449,6 +449,8 @@ Hybrid connectivity is a top-level add-on, not a platform or workload extension.
 
 ### Custom Hub Subnet Contract
 
+MGMT, MON and DNS are optional canonical subnets for all four hubs when an explicit `hub.network.subnets` map is supplied. Omitted maps retain the full historical automatic allocation. Keep LB/firewall subnet requirements and reserved names unchanged. Enabled Bastion requires MGMT at the config boundary and in Studio. Missing MGMT suppresses the example Bastion endpoint SSH rule and management-sourced project NSG SSH rules; retain shared MGMT RT/SL objects for the remaining private/custom subnets. Studio keeps canonical names fixed while allowing removal/restoration of the optional entries; source import/export and saved designs must preserve omissions without changing other CIDRs.
+
 `hub.network.custom_subnets` is a separate optional CIDR map. Canonical `subnets` remain exact and required when supplied. Normalize and validate the combined allocation, reject all hub-reserved names and invalid custom names, and keep custom ranges inside the hub VCN. Common hub rendering associates custom private subnets with MGMT RT/SL. A/B NAT return routes must include every custom CIDR. Studio must split and reunite canonical/custom maps on export/import and show the shared routing/security behavior. Omitted custom maps must preserve published output.
 
 `security_zone_recipe1_cis_level` optionally overrides Recipe 01 and its root target in both pre/final outputs. Absent/null preserves each CIS variant's baseline. Other recipes, encryption and extension outputs remain driven by `cis_level`.
