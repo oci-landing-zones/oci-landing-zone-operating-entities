@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">ENS guidance</title>
+  <path d="M32 4 55 13v18c0 13-9 23-23 29C18 54 9 44 9 31V13Z" fill="#2d5967"/>
+  <path d="m21 23 8 8 14-15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="32" y="47" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing=".6" text-anchor="middle">ENS</text>
+</svg>
