@@ -14,9 +14,14 @@ import type { ResourceKind } from '../services/generatedResources';
 import type { HybridConnectivity } from './hybridConnectivity';
 
 export interface FoundationConfig {
+  costGovernance?: CostGovernance;
   stackScope?: 'complete' | 'regional';
-  /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
+  /** Browser workflow for the primary design; secondary designs retain regional scope. */
+  deploymentMode?: 'primary-only' | 'primary-secondary';
+  /** Primary deployment region whose tenancy-level prerequisites a secondary design reuses. */
   homeRegion?: string;
+  /** Tenancy reference shown in Studio; separate from the deployment region and factory input. */
+  tenancyHomeRegion?: string;
   /** Complete stacks grant DR Object Storage access to their encryption keys. */
   drRegion?: string;
   /** Browser-only note for distinguishing saved designs; not a generator input. */
@@ -26,8 +31,60 @@ export interface FoundationConfig {
   regionShortName: string; // three-letter region key, e.g. fra
   /** Generator security and observability baseline. */
   cisLevel: 1 | 2;
+  /** Display name of the common identity domain; omitted uses the factory default. */
+  identityDomainName?: string;
+  /** Legacy saved input; Studio now always uses cisLevel for Recipe 01. */
+  securityZoneRecipe1CisLevel?: 1 | 2;
+  /** Recipe 01 and its landing-zone target are enabled unless explicitly false. */
+  landingZoneSecurityZone?: boolean;
+  /** Legacy ownership only; omitted preserves older zones. New designs set false; no UI toggle. */
+  sharedNetworkSecurityZone?: boolean;
+  /** New designs use Recipe 02; omitted preserves Recipe 03 identities in saved designs. */
+  environmentSecurityZoneRecipeNumber?: 2 | 3;
+  cloudGuardEnabled?: boolean;
+  /** Include regional host scanning recipes and targets; enabled unless explicitly false. */
+  vulnerabilityScanningEnabled?: boolean;
+  /** Browser confirmation that Cloud Guard is enabled outside this Home deployment. */
+  cloudGuardExistingConfirmed?: boolean;
   /** One-OE notification topic recipients; blank fields keep the published placeholder. */
   notifications?: OneOeNotifications;
+}
+
+export interface CostBudget {
+  name: string;
+  amount: number;
+  thresholdValue: number;
+  recipients: string;
+}
+
+export interface TagCostBudget extends CostBudget {
+  tagName: string;
+  tagValue: string;
+}
+
+export interface BusinessUnitScope {
+  platform: string[] | null;
+  environment: string[] | null;
+  project: string[] | null;
+}
+
+export interface CostGovernance {
+  tagsEnabled?: boolean;
+  tagResourceLabels?: boolean;
+  ownerEmail?: string;
+  costCenterBusinessUnits?: Record<string, string>;
+  costCenterFilters?: Record<string, BusinessUnitScope>;
+  businessUnitScopes?: Record<string, BusinessUnitScope>;
+  costCenterScopes?: Record<string, string>;
+  costCenterCustomScopes?: { id: string; name: string; target: string }[];
+  costCenterBudgetKeys?: Record<string, string>;
+  tagValueLists?: Record<string, string>;
+  additionalBudgets?: Record<string, TagCostBudget>;
+  removedBudgets?: string[];
+  requireTagValues: boolean;
+  useSingleRecipient: boolean;
+  recipients: string;
+  budgets: Record<string, CostBudget>;
 }
 
 export interface OneOeNotifications {
@@ -264,6 +321,7 @@ export interface DiagramNode {
   /** Semantic kind — drives styling in each renderer. */
   kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'premises' | 'vpn' | 'vpntunnel' | 'customerrouter' | 'fastconnect' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup' | 'operator';
   label: string;
+  deploymentStack?: 'home' | 'primary' | 'secondary';
   /** Compartment fill: yellow (shared), green (environment) or gray (projects). */
   tone?: 'yellow' | 'green' | 'gray' | 'platform' | 'projects';
   /** Actual compartment ancestry determines the shared/environment palette. */
@@ -280,6 +338,7 @@ export interface DiagramNode {
   firewallBackendLowerArm?: number;
   /** Caption under a subnet icon (e.g. nfw-<region>-hub-dmz). */
   caption?: string;
+  routingNote?: string;
   /** Caption colour. */
   captionTone?: 'green' | 'orange';
   /** Extra line under the caption — e.g. a firewall instance IP address. */
@@ -291,7 +350,9 @@ export interface DiagramNode {
   publicSubnet?: boolean;
   /** Resource names and grouping come from the generated deployment artifacts. */
   resourceKind?: ResourceKind;
-  resourceItems?: { key: string; name: string }[];
+  /** Service categories shown in the Foundation region overview. */
+  foundationResource?: 'iam' | 'governance' | 'budgets' | 'cloudguard' | 'networking' | 'securityzones' | 'vault' | 'scanning' | 'bastion' | 'events' | 'notifications' | 'logging' | 'alarms' | 'serviceconnectors' | 'buckets' | 'oke';
+  resourceItems?: { key: string; name: string; scope?: { platform: string; environment: string; project: string } }[];
   /** Public connectivity topology only; authentication material never enters the diagram. */
   premises?: {
     equipmentLabel: string;
@@ -381,6 +442,8 @@ export interface DiagramModel {
 
 /** Toggle layers on the diagram (route-table dots/boxes, endpoints, a flow). */
 export interface DiagramOptions {
+  /** Hide Security Zone markers and recipes in views such as IAM. */
+  showSecurityZones?: boolean;
   /** Show the route-table dots (click a dot to open its table). */
   showDots?: boolean;
   /** Ids of the route tables currently opened on the diagram. */

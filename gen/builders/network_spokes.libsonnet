@@ -4,6 +4,7 @@
 // function(inputs) -> { categories }
 
 local common = import '../hub/hub_common.libsonnet';
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(inputs)
   local n = inputs.naming;
@@ -13,7 +14,7 @@ function(inputs)
   local all_peer_vcn_entries = inputs.all_peer_vcn_entries;
   local hub_has_spoke_natgw = inputs.hub_has_spoke_natgw;
   local hub_vcn_cidr = hub_network.vcn;
-  local mgmt_cidr = hub_network.subnets.mgmt;
+  local mgmt_cidr = if std.objectHas(hub_network.subnets, 'mgmt') then hub_network.subnets.mgmt else null;
   local lb_cidr = hub_network.subnets.lb;
 
   // Builds a complete VCN category for one environment's project network.
@@ -56,6 +57,7 @@ function(inputs)
 
     local dedicated_sn(proj_name, project_index, subnet_name, subnet_index, cidr) = {
       [n.key('SN', key_segments + [proj_name, subnet_name])]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
         display_name: n.display('sn', name_segments + [proj_name, subnet_name]),
         cidr_block: cidr,
         // OCI DNS labels are limited to 15 characters. Stable sorted indexes
@@ -157,6 +159,7 @@ function(inputs)
         local proj_cmp = topo.env_project_compartment_key(entry, proj_name);
         acc {
         [web_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'web']),
           egress_rules: common._nsg_egress_all,
@@ -171,7 +174,7 @@ function(inputs)
               lb_cidr,
               443
             ),
-            ssh_22: hub_tcp_ingress_rule(
+            [if mgmt_cidr != null then 'ssh_22']: hub_tcp_ingress_rule(
               'Allow inbound traffic from Hub management subnet over SSH',
               mgmt_cidr,
               22
@@ -179,6 +182,7 @@ function(inputs)
           },
         },
         [app_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'app']),
           egress_rules: common._nsg_egress_all,
@@ -193,7 +197,7 @@ function(inputs)
               web_nsg_key,
               443
             ),
-            ssh_22: hub_tcp_ingress_rule(
+            [if mgmt_cidr != null then 'ssh_22']: hub_tcp_ingress_rule(
               'Allow inbound traffic from Hub management subnet over SSH',
               mgmt_cidr,
               22
@@ -201,6 +205,7 @@ function(inputs)
           },
         },
         [db_nsg_key]: {
+          _cost_scope:: cost_scope.value(entry.env_name, proj_name),
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'db']),
           egress_rules: common._nsg_egress_all,

@@ -1,3 +1,6 @@
+local cost_scope = import '../../../lib/cost_scope.libsonnet';
+local cost_tags = import '../../../lib/cost_tags.libsonnet';
+local explicit_flow_logs = import '../../../lib/explicit_flow_logs.libsonnet';
 local extensions = import '../../../extensions.libsonnet';
 local lz = import '../../../landing_zone.libsonnet';
 local publication_network = import '../../../lib/publication_network.libsonnet';
@@ -177,11 +180,13 @@ local products = import '../../exadb/products.libsonnet';
           n.key_global('LGRP', segments + ['VCN', 'FLOW']);
         acc + {
           [n.key_global('LOG', segments + ['SUBNET', 'FLOW'])]: {
+            _cost_scope:: cost_scope.value(scope.scope_name),
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'subnet',
           },
           [n.key_global('LOG', segments + ['VCN', 'FLOW'])]: {
+            _cost_scope:: cost_scope.value(scope.scope_name),
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'vcn',
@@ -212,7 +217,7 @@ local products = import '../../exadb/products.libsonnet';
         },
       } else {};
 
-    {
+    cost_tags.apply({
       network_pre: {
         network_configuration: {
           network_configuration_categories: network_pre_categories,
@@ -233,7 +238,9 @@ local products = import '../../exadb/products.libsonnet';
           default_identity_domain_id: 'COMMON-DOMAIN',
         },
       },
-      observability_pre: extension_observability,
-      observability: extension_observability + flow_logging_overlay,
-    },
+      observability: explicit_flow_logs(
+        { network_configuration: { network_configuration_categories: network_categories } },
+        extension_observability + flow_logging_overlay
+      ),
+    }, ctx.config),
 }

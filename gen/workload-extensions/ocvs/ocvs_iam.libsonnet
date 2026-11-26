@@ -1,7 +1,10 @@
+local identity_domain = import '../../lib/identity_domain.libsonnet';
+local cost_scope = import '../../lib/cost_scope.libsonnet';
 local desc = import '../../descriptions.libsonnet';
 local bastion_policies = import '../../builders/iam/bastion_policies.libsonnet';
 
 function(ctx) {
+  local domain_name = identity_domain.name(ctx.params),
   local n = ctx.n,
   local group_name = n.display_global('grp', ctx.display_segments + ['admins']),
   local policy_name = n.display_global('pcy', ctx.display_segments + ['admins']),
@@ -20,9 +23,12 @@ function(ctx) {
       if std.objectHas(ctx.params, 'bastion') then ctx.params.bastion else null,
       n,
       [group_name],
-      ctx.scope.key_segments + ['PLATFORM', ctx.plat]
+      ctx.scope.key_segments + ['PLATFORM', ctx.plat],
+      ownership=cost_scope.value(ctx.scope.scope_name),
+      domain_name=domain_name
     ) + {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+        _cost_scope:: cost_scope.value(ctx.scope.scope_name),
         name: policy_name,
         description: desc.policy.grants(
           group_name,
@@ -31,14 +37,14 @@ function(ctx) {
         ),
         compartment_id: 'TENANCY-ROOT',
         statements: [
-          "allow group 'id_lz_common'/'%s' to manage sddcs in compartment %s" % [group_name, ctx.scope.compartment_path],
-          "allow group 'id_lz_common'/'%s' to manage instances in compartment %s" % [group_name, ctx.scope.compartment_path],
-          "allow group 'id_lz_common'/'%s' to read virtual-network-family in compartment %s" % [group_name, ctx.scope.network_compartment_path],
-          "allow group 'id_lz_common'/'%s' to use subnets in compartment %s" % [group_name, ctx.scope.network_compartment_path],
-          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [group_name, ctx.scope.network_compartment_path],
-          "allow group 'id_lz_common'/'%s' to use vlans in compartment %s" % [group_name, ctx.scope.network_compartment_path],
-          "allow group 'id_lz_common'/'%s' to use private-ips in compartment %s" % [group_name, ctx.scope.network_compartment_path],
-          "allow group 'id_lz_common'/'%s' to use network-security-groups in compartment %s" % [group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to manage sddcs in compartment %s" % [domain_name, group_name, ctx.scope.compartment_path],
+          "allow group '%s'/'%s' to manage instances in compartment %s" % [domain_name, group_name, ctx.scope.compartment_path],
+          "allow group '%s'/'%s' to read virtual-network-family in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to use subnets in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to use vnics in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to use vlans in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to use private-ips in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
+          "allow group '%s'/'%s' to use network-security-groups in compartment %s" % [domain_name, group_name, ctx.scope.network_compartment_path],
         ],
       },
     },

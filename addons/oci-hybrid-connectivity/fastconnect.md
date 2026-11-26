@@ -4,7 +4,7 @@
 
 ### Overview
 
-The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). FastConnect provides a dedicated, private connection between your network and OCI. 
+The OCI Hybrid Connectivity addon provides guidance and configuration options for integrating [OCI FastConnect](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm) with an [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md). FastConnect provides a dedicated, private connection between your network and OCI.
 
 FastConnect supports both **Private peering** for access to VCNs and **Public peering** for access to supported public OCI services. This guide describes **IPv4 Private peering** with the One-OE Landing Zone.
 

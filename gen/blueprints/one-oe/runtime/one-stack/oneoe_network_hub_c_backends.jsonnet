@@ -1,3 +1,3 @@
 local profiles = import './profiles.libsonnet';
-local lz = import '../../../../landing_zone.libsonnet';
-lz(profiles.hub_c.config).network_backends
+local output = import './output_builder.libsonnet';
+output(profiles.hub_c).network_backends

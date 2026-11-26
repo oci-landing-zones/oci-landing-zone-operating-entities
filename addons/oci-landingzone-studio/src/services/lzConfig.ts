@@ -1,3 +1,6 @@
+import { remotePeeringPeerRegion } from './remotePeering';
+import { findRegion } from './regions';
+import { getHubKind } from './hubKinds';
 /**
  * lzConfig — derives the Landing Zone config object from the canonical model and
  * serialises it in the jsonnet style the generator expects.
@@ -26,6 +29,8 @@
  * config stays stable when the diagram-only naming context changes.
  */
 
+import { activeProjectNames, costGovernanceConfig } from './costGovernance';
+import { regionalCostGovernanceConfig } from './regionalCostGovernance';
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
@@ -49,8 +54,12 @@ export interface EnvConfigEntry {
 }
 
 export interface LzConfig {
+  cost_governance?: import('./costGovernance').CostGovernanceConfig;
   bastion?: { client_cidr_block_allow_list: string[]; max_session_ttl_in_seconds: number };
-  stack_scope?: 'complete' | 'regional';
+  stack_scope?: 'complete' | 'regional' | 'home' | 'primary';
+  primary_region?: string;
+  primary_region_short_name?: string;
+  tenancy_home_region?: string;
   dr_region?: string;
   remote_peering_connections?: Record<string, {
     remote_cidrs: string[];
@@ -64,12 +73,19 @@ export interface LzConfig {
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
+  identity_domain_name?: string;
+  enable_landing_zone_security_zone?: boolean;
+  enable_shared_network_security_zone?: boolean;
+  security_zone_environment_recipe_number?: 2 | 3;
+  enable_cloud_guard?: boolean;
+  enable_vulnerability_scanning?: boolean;
   notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
     kind: HubKind;
     network: {
       vcn: string;
       subnets: Record<string, string>;
+      custom_subnets?: Record<string, string>;
     };
   };
   environments: Record<string, EnvConfigEntry>;
@@ -142,6 +158,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   const notification_emails: NonNullable<LzConfig['notification_emails']> = {};
   const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
   for (const topic of (singleRecipient ? ['default'] : ['cloudguard', 'iam', 'network', 'security']) as Array<keyof NonNullable<LzConfig['notification_emails']>>) {
+    if (topic === 'cloudguard' && (f.cloudGuardEnabled === false || f.stackScope === 'regional')) continue;
     const recipients = (f.notifications?.[topic] ?? '').split(/[,;\n]/).map((value) => value.trim()).filter(Boolean);
     if (recipients.length) notification_emails[topic] = recipients;
   }
@@ -197,14 +214,19 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   Object.assign(shared_platforms, exadata.shared);
 
   const subnets: Record<string, string> = {};
+  const customSubnets: Record<string, string> = {};
+  const requiredKeys = getHubKind(model.network.hubKind)!.defaultSubnets.map((subnet) => subnet.name);
   for (const sn of model.network.subnets) {
     const k = sn.name.trim();
-    if (!k) continue; // skip half-typed rows
-    subnets[k] = sn.cidr.trim();
+    if (!k) continue;
+    // Keep duplicate/reserved custom names visible to factory validation rather than replacing a required subnet.
+    (requiredKeys.includes(k) && !Object.hasOwn(subnets, k) ? subnets : customSubnets)[k] = sn.cidr.trim();
   }
 
   return {
     ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(f.tenancyHomeRegion ? { tenancy_home_region: f.tenancyHomeRegion } : {}),
+    ...(f.stackScope === 'regional' && f.homeRegion && findRegion(f.realm, f.homeRegion) ? { primary_region: f.homeRegion, primary_region_short_name: findRegion(f.realm, f.homeRegion)!.shortName } : {}),
     ...(model.bastion?.enabled ? { bastion: {
       client_cidr_block_allow_list: bastionClientCidrs(model.bastion),
       max_session_ttl_in_seconds: model.bastion.maxSessionTtlInSeconds,
@@ -212,7 +234,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
     ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
       remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
-      peer_region_name: connection.peerRegionName,
+      peer_region_name: remotePeeringPeerRegion(model, connection),
       ...(connection.role === 'requester' ? { peer_id: connection.peerId?.trim() } : {}),
       ...(connection.peerTenancyOcid?.trim() ? { peer_tenancy_ocid: connection.peerTenancyOcid.trim() } : {}),
       ...(connection.role === 'acceptor' && connection.requestorGroupOcid?.trim() ? { requestor_group_ocid: connection.requestorGroupOcid.trim() } : {}),
@@ -221,12 +243,20 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(f.identityDomainName !== undefined ? { identity_domain_name: f.identityDomainName } : {}),
+    ...(f.environmentSecurityZoneRecipeNumber === 2 ? { security_zone_environment_recipe_number: 2 as const } : {}),
+    ...(f.sharedNetworkSecurityZone === false ? { enable_shared_network_security_zone: false } : {}),
+    ...(f.landingZoneSecurityZone === false ? { enable_landing_zone_security_zone: false } : {}),
+    ...(f.vulnerabilityScanningEnabled === false ? { enable_vulnerability_scanning: false } : {}),
+    ...(f.cloudGuardEnabled === false ? { enable_cloud_guard: false } : {}),
+    cost_governance: f.stackScope === 'regional' ? regionalCostGovernanceConfig(model) : costGovernanceConfig(f.costGovernance, activeProjectNames(model), model),
     ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,
       network: {
         vcn: model.network.hubVcnCidr,
         subnets,
+        ...(Object.keys(customSubnets).length ? { custom_subnets: customSubnets } : {}),
       },
     },
     environments,
@@ -388,6 +418,11 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
         '    network: {',
         `      vcn: ${quote(c.hub.network.vcn)},`,
         ...subnets,
+        ...(c.hub.network.custom_subnets ? [
+          '      custom_subnets: {',
+          ...Object.entries(c.hub.network.custom_subnets).map(([k, v]) => `        ${key(k)}: ${quote(v)},`),
+          '      },',
+        ] : []),
         '    },',
         '  },',
       ]
@@ -398,7 +433,16 @@ export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecre
     `  realm: ${quote(c.realm)},`,
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
+    ...(c.tenancy_home_region ? [`  tenancy_home_region: ${quote(c.tenancy_home_region)},`] : []),
+    ...(c.primary_region ? [`  primary_region: ${quote(c.primary_region)},`, `  primary_region_short_name: ${quote(c.primary_region_short_name!)},`] : []),
     `  cis_level: ${c.cis_level},`,
+    ...(c.identity_domain_name !== undefined ? [`  identity_domain_name: ${quote(c.identity_domain_name)},`] : []),
+    ...(c.security_zone_environment_recipe_number !== undefined ? [`  security_zone_environment_recipe_number: ${c.security_zone_environment_recipe_number},`] : []),
+    ...(c.enable_shared_network_security_zone !== undefined ? [`  enable_shared_network_security_zone: ${c.enable_shared_network_security_zone},`] : []),
+    ...(c.enable_landing_zone_security_zone !== undefined ? [`  enable_landing_zone_security_zone: ${c.enable_landing_zone_security_zone},`] : []),
+    ...(c.enable_vulnerability_scanning === false ? ['  enable_vulnerability_scanning: false,'] : []),
+    ...(c.enable_cloud_guard === false ? ['  enable_cloud_guard: false,'] : []),
+    ...(c.cost_governance ? [`  cost_governance: ${jsonnetValue(c.cost_governance)},`] : []),
     ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
     ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
     ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),

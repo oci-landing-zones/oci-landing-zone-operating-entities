@@ -1,26 +1,61 @@
 {
     "identity_domain_dynamic_groups_configuration": {
-        "default_defined_tags"                    : null,
-        "default_freeform_tags"                   : null,
-        "default_identity_domain_id"              : "COMMON-DOMAIN",
+        "default_freeform_tags"                                    : null,
+        "default_identity_domain_id"                               : "COMMON-DOMAIN",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+        },
 
         "dynamic_groups": {
             "DG-LZ-MON": {
-                "name"                            : "dg-lz-mon-dynamic-group",
-                "description"                     : "dynamic group for security functions execution, required for Logging Analytics",
-                "matching_rule"                   : "ALL {resource.type='managementagent'}"
+                "name"                                             : "dg-lz-mon-dynamic-group",
+                "description"                                      : "dynamic group for security functions execution, required for Logging Analytics",
+                "matching_rule"                                    : "ALL {resource.type='managementagent'}",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                }
             }
         }
     },
 
     "policies_configuration": {
-        "enable_cis_benchmark_checks"             : "false",
+        "enable_cis_benchmark_checks"                              : "false",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapplicable"
+        },
 
         "supplied_policies": {
             "PCY-MON-DYNAMIC-GROUP": {
-                "name"                            : "pcy-mon-dynamic-group",
-                "description"                     : "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
-                "compartment_id"                  : "TENANCY-ROOT",
+                "name"                                             : "pcy-mon-dynamic-group",
+                "description"                                      : "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
@@ -29,9 +64,18 @@
             },
 
             "PCY-MON-SERVICES": {
-                "name"                            : "pcy-mon-services",
-                "description"                     : "Policy to allow usage of Observability services in tenancy.",
-                "compartment_id"                  : "TENANCY-ROOT",
+                "name"                                             : "pcy-mon-services",
+                "description"                                      : "Policy to allow usage of Observability services in tenancy.",
+                "compartment_id"                                   : "TENANCY-ROOT",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapplicable"
+                },
 
                 "statements": [
                     "Allow service operations-insights to use ons-topics in tenancy",
@@ -43,9 +87,18 @@
             },
 
             "PCY-PREPROD-PROJ1-MON-ADMINISTRATION": {
-                "name"                            : "pcy-preprod-proj1-mon-admin",
-                "description"                     : "Policy to allow monitoring groups to manage DBCS observability resources in the Preprod proj1 compartment.",
-                "compartment_id"                  : "CMP-LZ-PREPROD-PROJ1-KEY",
+                "name"                                             : "pcy-preprod-proj1-mon-admin",
+                "description"                                      : "Policy to allow monitoring groups to manage DBCS observability resources in the Preprod proj1 compartment.",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage compartments in compartment cmp-lz-preprod-proj1",
@@ -65,9 +118,18 @@
             },
 
             "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
-                "name"                            : "pcy-prod-proj1-mon-admin",
-                "description"                     : "Policy to allow monitoring groups to manage DBCS observability resources in the Prod proj1 compartment.",
-                "compartment_id"                  : "CMP-LZ-PROD-PROJ1-KEY",
+                "name"                                             : "pcy-prod-proj1-mon-admin",
+                "description"                                      : "Policy to allow monitoring groups to manage DBCS observability resources in the Prod proj1 compartment.",
+                "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage compartments in compartment cmp-lz-prod-proj1",

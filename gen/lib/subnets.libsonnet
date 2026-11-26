@@ -6,16 +6,17 @@ local validation = import 'validation.libsonnet';
   local validate_subnet_object(subnets, label) =
     validation.object(subnets, label),
 
-  local validate_subnet_keys(subnets, required_keys, label) =
+  local validate_subnet_keys(subnets, required_keys, label, optional_keys=[]) =
     local missing = [k for k in required_keys if !std.objectHas(subnets, k)];
-    local extra = [k for k in std.objectFields(subnets) if !std.member(required_keys, k)];
+    local allowed_keys = required_keys + optional_keys;
+    local extra = [k for k in std.objectFields(subnets) if !std.member(allowed_keys, k)];
     assert std.length(missing) == 0 :
       '%s missing required keys: %s' % [label, std.join(', ', missing)];
     assert std.length(extra) == 0 :
       '%s has unsupported keys: %s. Allowed: %s' % [
         label,
         std.join(', ', extra),
-        std.join(', ', required_keys),
+        std.join(', ', allowed_keys),
       ];
     subnets,
 
@@ -74,13 +75,15 @@ local validation = import 'validation.libsonnet';
   auto_subnets_24(vcn_cidr, names)::
     self.auto_subnets(vcn_cidr, [{ name: n, size: '/24' } for n in names]),
 
-  validate_subnet_map(subnets, required_keys, label, parent_cidr=null)::
+  validate_subnet_map(subnets, required_keys, label, parent_cidr=null, optional_keys=[])::
     local checked_subnets = validate_subnet_keys(
       validate_subnet_object(subnets, label),
       required_keys,
-      label
+      label,
+      optional_keys=optional_keys
     );
-    validate_subnet_values(checked_subnets, required_keys, label, parent_cidr),
+    local keys = required_keys + [k for k in optional_keys if std.objectHas(checked_subnets, k)];
+    validate_subnet_values(checked_subnets, keys, label, parent_cidr),
 
   validate_named_subnets(subnets, label, parent_cidr=null)::
     local checked_subnets = validate_subnet_object(subnets, label);

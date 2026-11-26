@@ -1,6 +1,7 @@
 // Split Exadata notifications work without publication metadata; null One-OE recipients use defaults.
 // contains: "split_environment_notifications": true
 // contains: "null_notifications_use_defaults": true
+// contains: "base_recipients_are_independent": true
 local lz = import 'gen/landing_zone.libsonnet';
 
 local base = {
@@ -51,4 +52,21 @@ assert lz(base + { notification_emails: null }).observability_cis1.notifications
        lz(base).observability_cis1.notifications_configuration;
 assert lz(base + { notification_emails: null }).observability_cis2.notifications_configuration ==
        lz(base).observability_cis2.notifications_configuration;
-std.manifestJsonEx({ split_environment_notifications: true, null_notifications_use_defaults: true }, '  ')
+local recipients_config = base + {
+  cis_level: 1,
+  notification_emails: { default: ['ops@example.com'], security: ['security@example.com'] },
+  cost_governance: { enable_tags: false, owner_email: 'owner@example.com', budget_recipients: 'finops@example.com' },
+};
+local home = lz(recipients_config);
+local dr = (import 'gen/landing_zone_multi.jsonnet')(recipients_config + { stack_scope: 'regional' });
+local home_topics = home.observability_cis1.notifications_configuration.topics;
+local dr_topics = dr['observability_cis1.json'].notifications_configuration.topics;
+assert std.foldl(function(ok, key)
+  ok && home_topics[key].subscriptions[0].values ==
+    (if key == 'NOTT-LZ-SECURITY-KEY' then ['security@example.com'] else ['ops@example.com']),
+  std.objectFields(home_topics), true);
+assert std.objectFields(dr_topics) == ['NOTT-LZ-NETWORK-KEY', 'NOTT-LZ-SECURITY-KEY'];
+assert dr_topics['NOTT-LZ-NETWORK-KEY'].subscriptions[0].values == ['ops@example.com'];
+assert dr_topics['NOTT-LZ-SECURITY-KEY'].subscriptions[0].values == ['security@example.com'];
+assert home.governance.budgets_configuration.budgets['BUDGET-LANDINGZONE-KEY'].alert_rule.recipients == 'finops@example.com';
+std.manifestJsonEx({ split_environment_notifications: true, null_notifications_use_defaults: true, base_recipients_are_independent: true }, '  ')

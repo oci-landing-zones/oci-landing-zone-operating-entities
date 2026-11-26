@@ -1,3 +1,9 @@
+import { foundationResourcesByRegion } from '../services/foundationInventory';
+import { syncDrEnvironments } from '../services/linkedDr';
+import { autofillRemotePeeringCidrs } from '../services/remotePeering';
+import { configuredVcnCidrs } from '../services/exadata';
+import { overlaps } from '../services/cidr';
+import { s as editorStyles } from '../wizard/steps/networkEditorStyles';
 /**
  * WizardShell — Milestone 0 vertical slice, styled in the Oracle Redwood / OCI
  * look. Proves the whole pipeline end to end:
@@ -6,20 +12,27 @@
  */
 
 import React, { useMemo } from 'react';
-import { Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ReactFlowProvider } from '@xyflow/react';
 import { WizardProvider, useWizard, type HomeRegionSource } from '../wizard/wizardContext';
-import { getLZ, linkedHomeRecord, renameLZ, saveLZ } from '../services/lzStore';
+import { getLZ, linkedHomeRecord, renameLZ, saveLZ, listLZs, configureSecondaryLZ, reallocateLinkedDrNetworks } from '../services/lzStore';
 import { normalizeModel } from '../model/defaults';
 import { legacyRegionalModel } from '../services/regionalDeployment';
 import type { DiagramOptions, LzModel } from '../model/types';
-import WizardStepper, { WIZARD_STEPS } from '../wizard/WizardStepper';
+import WizardStepper, { WIZARD_STEPS, previewPhase } from '../wizard/WizardStepper';
 import FoundationStep from '../wizard/steps/FoundationStep';
+import IamStep from '../wizard/steps/IamStep';
+import SecurityStep from '../wizard/steps/SecurityStep';
+import NotificationsSection from '../wizard/steps/NotificationsSection';
+import ObservabilityCostStep from '../wizard/steps/ObservabilityCostStep';
 import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformsStep from '../wizard/steps/PlatformsStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
 import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from '../wizard/diagramGraph';
+import { foundationDeploymentStacks } from '../services/deploymentTopology';
+import { DEPLOYMENT_STACK_COLORS } from '../diagram/deploymentStackStyle';
+import { foundationGraph } from '../diagram/foundationGraph';
 import { allFlowIds, buildFlowTraces, specFromId } from '../services/flowTrace';
 import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
@@ -30,6 +43,7 @@ import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import { flowPickerEnvironments } from '../services/flowNetworks';
 import FlowSidebar from '../components/FlowSidebar';
+import TagConfigurationSidebar from '../components/TagConfigurationSidebar';
 import { hasHubLoadBalancer } from '../services/hubKinds';
 import type { FlowFocus } from '../diagram/FlowOverlay';
 import TopBar from '../components/TopBar';
@@ -39,17 +53,24 @@ import FieldError, { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
 import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
+import { costTagScope } from '../diagram/tagScope';
+import finOpsGovernanceImage from '../assets/finops-governance.png';
+import { governanceTheme } from '../wizard/steps/costGovernanceStyles';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 /** First step with spoke subnets — and therefore endpoints and traceable flows. */
-const FLOW_STEP = 3;
+const FLOW_STEP = 6;
 
 const STEP_PROGRESS_LABELS: Record<number, string> = {
-  1: 'Set deployment type, location and environments',
-  2: 'Set up the shared network',
-  3: 'Organize projects and configure environment networks',
-  4: 'Add shared services and workload platforms',
-  5: 'Review and download your files',
+  1: 'Review deployment type and set location',
+  2: 'Define the landing zone environments',
+  3: 'Choose CIS, Bastion and environment Security Zones',
+  4: 'Configure notification recipients for events and alarms',
+  5: 'Set up the shared network',
+  6: 'Organize projects and configure environment networks',
+  7: 'Add shared services and workload platforms',
+  8: 'Configure cost tags and budgets',
+  9: 'Review and download your files',
 };
 
 const layout = {
@@ -70,8 +91,8 @@ const layout = {
   panelBody: { padding: 20 } as React.CSSProperties,
   panelTitle: { fontSize: 15, fontWeight: 700, marginBottom: 16, color: oracle.ink } as React.CSSProperties,
 
-  diagramHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '14px 20px 6px' } as React.CSSProperties,
-  diagramTitle: { fontSize: 15, fontWeight: 700, color: oracle.ink } as React.CSSProperties,
+  diagramHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '20px 20px 8px' } as React.CSSProperties,
+  diagramTitle: { ...editorStyles.title, margin: 0 } as React.CSSProperties,
   diagramCanvas: { flex: 1, minHeight: 0, overflow: 'hidden', borderRadius: '0 0 8px 8px', position: 'relative' } as React.CSSProperties,
 
   actions: { display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' } as React.CSSProperties,
@@ -90,7 +111,25 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   saveState: 'saved' | 'error';
   saveRevision: number;
 }) {
-  const { model, reset, homeSource } = useWizard();
+  const { model, reset, homeSource, setField } = useWizard();
+  const { id: designId } = useParams();
+  const navigate = useNavigate();
+  const [deploymentError, setDeploymentError] = React.useState<string | null>(null);
+  const [networkRepairMessage, setNetworkRepairMessage] = React.useState<string | null>(null);
+  const primaryDesigns = listLZs().flatMap((meta) => {
+    const record = getLZ(meta.id);
+    return record && !record.homeLzId && !record.disasterRecovery && record.model.foundation.stackScope !== 'regional' ? [{ id: record.id, name: record.name, realm: record.model.foundation.realm, region: record.model.foundation.region, secondaryRegion: record.model.foundation.drRegion }] : [];
+  });
+  function configureSecondary(primaryId: string, secondaryRegion?: string) {
+    if (primaryId === designId) {
+      const saved = saveLZ(primaryId, model);
+      if (!saved.ok) { setDeploymentError(saved.message ?? 'Could not save the primary design.'); return; }
+    }
+    const result = configureSecondaryLZ(primaryId, secondaryRegion ?? getLZ(primaryId)?.model.foundation.drRegion ?? '');
+    if (!result.ok || !result.record) { setDeploymentError(result.message ?? 'Could not create the secondary design.'); return; }
+    navigate(`/lz/${result.record.id}`);
+  }
+
   const [editingDiagramInput, setEditingDiagramInput] = React.useState(false);
   const [searchParams] = useSearchParams();
   const [activeStep, setActiveStep] = React.useState(() => searchParams.get('step') === 'review' ? WIZARD_STEPS.length : 1);
@@ -98,6 +137,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
   const [flowFocus, setFlowFocus] = React.useState<FlowFocus | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
+  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
+  const [diagramWorkspace, setDiagramWorkspace] = React.useState<'overview' | 'flows' | 'tags'>('overview');
+  const tagConfigurationButton = React.useRef<HTMLButtonElement>(null);
+  const diagramPanel = React.useRef<HTMLElement>(null);
   const [debugMode, setDebugMode] = React.useState(false);
   const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
   const [diagramOpts, setDiagramOpts] = React.useState<DiagramOptions>({});
@@ -105,6 +148,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const activeStepLabel = STEP_PROGRESS_LABELS[activeStep]
     ?? WIZARD_STEPS.find((s) => s.id === activeStep)?.label
     ?? '';
+
+  const diagramTitle = activeStep === 9 ? 'Landing Zone Diagram'
+    : activeStep === 5 ? 'Network Diagram'
+    : `${WIZARD_STEPS.find((step) => step.id === activeStep)?.label ?? 'Landing Zone'} Diagram`;
 
   // Load the complete generation chunk and boot Jsonnet after the first paint.
   // Generate shares its singleton promise, so an in-flight warm-up also removes
@@ -129,10 +176,81 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     formPanel.current?.scrollTo({ top: 0 });
   }, [activeStep]);
 
-  const showForm = viewMode === 'split' || viewMode === 'form';
-  const showDiagram = viewMode === 'split' || viewMode === 'diagram';
+  const tagsEnabled = (homeSource?.model ?? model).foundation.costGovernance?.tagsEnabled !== false;
+  const tagsOpen = activeStep === 8 && tagsEnabled && viewMode === 'diagram' && diagramWorkspace === 'tags';
+  const governanceForm = activeStep === 8 && !tagsOpen;
+  const showGovernanceReference = governanceForm && tagsEnabled;
+  const workspaceView = governanceForm ? (tagsEnabled ? 'form' : 'split') : viewMode;
+  const showForm = workspaceView === 'split' || workspaceView === 'form';
+  const showDiagram = workspaceView === 'split' || workspaceView === 'diagram';
+  function changeStep(step: number) {
+    setDiagramWorkspace('overview');
+    if (step === WIZARD_STEPS.length) setViewMode('split');
+    setActiveStep(step);
+  }
+  function changeView(mode: ViewMode) {
+    setDiagramWorkspace('overview');
+    setViewMode(mode);
+  }
+  function openTagConfiguration() {
+    setDiagramWorkspace('tags');
+    setViewMode('diagram');
+  }
+  function closeTagConfiguration() {
+    setDiagramWorkspace('overview');
+    setViewMode('split');
+    requestAnimationFrame(() => tagConfigurationButton.current?.focus());
+  }
+  const editorInputHandlers: React.HTMLAttributes<HTMLDivElement> = {
+    onChangeCapture: (event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(true); },
+    onBlurCapture: (event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(false); },
+    onKeyDownCapture: (event) => {
+      if (event.key === 'Enter' && !event.nativeEvent.isComposing && isDiagramTextControl(event.target)
+        && (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        event.target.blur();
+      }
+    },
+  };
   const routing = useDiagramPreview(model, editingDiagramInput);
   const snapshot = routing.snapshot;
+  const linkedSecondary = useMemo(() => {
+    if (homeSource) return undefined;
+    if (!designId || !model.foundation.drRegion) return undefined;
+    const secondaries = listLZs().map((meta) => getLZ(meta.id)).filter((record) => record?.homeLzId === designId
+      && record.model.foundation.stackScope === 'regional' && record.model.foundation.region === model.foundation.drRegion);
+    return secondaries.length === 1 ? secondaries[0]! : undefined;
+  }, [homeSource, designId, model]);
+  const linkedRpcModel = useMemo(() => homeSource?.model
+    ?? (linkedSecondary ? syncDrEnvironments(linkedSecondary.model, model) : undefined), [homeSource?.model, linkedSecondary, model]);
+  const linkedNetworksOverlap = linkedRpcModel && configuredVcnCidrs(model).some((cidr) => configuredVcnCidrs(linkedRpcModel).some((other) => overlaps(cidr, other)));
+  function repairDrNetworks() {
+    const drId = homeSource ? designId : linkedSecondary?.id;
+    if (!drId) return;
+    const result = reallocateLinkedDrNetworks(drId);
+    if (!result.ok || !result.record) {
+      setNetworkRepairMessage(result.message ?? 'Could not update DR networks.');
+      return;
+    }
+    const refreshed = homeSource ? result.record.model : getLZ(designId!)!.model;
+    for (const key of ['network', 'environments', 'platforms', 'sharedPlatforms', 'exadata', 'remotePeeringConnections'] as const) setField(key, refreshed[key]);
+    setNetworkRepairMessage('DR VCNs and subnets updated. Review the suggested ranges and regenerate the deployment files for both configurations.');
+  }
+  React.useEffect(() => {
+    const filled = autofillRemotePeeringCidrs(model, linkedRpcModel);
+    if (filled !== model) setField('remotePeeringConnections', filled.remotePeeringConnections);
+  }, [model, linkedRpcModel, setField]);
+  const linkedFoundationModel = (activeStep === 1 && showDiagram) || (activeStep === 2 && homeSource?.model)
+    ? linkedRpcModel : undefined;
+  const linkedFoundationPreview = useDiagramPreview(linkedFoundationModel ?? model, !linkedFoundationModel || editingDiagramInput);
+  const foundationResources = useMemo(() => foundationResourcesByRegion([
+    ...(routing.status === 'ready' && snapshot?.model === model && snapshot.preview.foundationResources
+      ? [{ foundation: model.foundation, resources: snapshot.preview.foundationResources }] : []),
+    ...(linkedFoundationModel && linkedFoundationPreview.status === 'ready' && linkedFoundationPreview.snapshot?.model === linkedFoundationModel
+      && linkedFoundationPreview.snapshot.preview.foundationResources
+      ? [{ foundation: linkedFoundationModel.foundation, resources: linkedFoundationPreview.snapshot.preview.foundationResources }] : []),
+  ]), [routing.status, snapshot, model, linkedFoundationModel, linkedFoundationPreview.status, linkedFoundationPreview.snapshot]);
+
   const renderedModel = snapshot?.model ?? model;
   const bastion = useMemo(() => snapshot ? generatedBastionTopology(snapshot.model, snapshot.preview.tables, snapshot.preview.inventory) : undefined, [snapshot]);
   const flowEnvironments = useMemo(() => {
@@ -153,11 +271,11 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
   // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
   // split and form modes the diagram stays a clean overview. Endpoints live in the
-  // spoke subnets, so the layer starts at step 3 (Projects); earlier steps only
+  // spoke subnets, so the layer starts at Projects; earlier steps only
   // point there. Review downloads retain the layers chosen in diagram mode.
   const diagramOnly = viewMode === 'diagram';
-  const flowStepReached = activeStep >= FLOW_STEP;
-  const flowLayer = diagramOnly && flowStepReached;
+  const flowStepReached = activeStep >= FLOW_STEP && activeStep !== 8;
+  const flowLayer = diagramOnly && flowStepReached && !tagsOpen;
   const chosenOpts = useMemo<DiagramOptions>(
     () => {
       // Hidden flows draw nothing, so their traces cannot keep the route tables open;
@@ -189,46 +307,61 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   // area into two columns to seat it (a thin rail when collapsed).
   const flowsOpen = supportsFlowTracing && flowLayer && !!effectiveOpts.showFlows;
   // Split view has no room for the picker: one click switches to diagram-only
-  // with the picker open. Before step 3 the diagram points at step 3 instead.
+  // with the picker open. Before Projects the diagram points there instead.
   function openFlows() {
+    setDiagramWorkspace('flows');
     setDiagramOpts((o) => ({ ...o, showFlows: true }));
     setFlowsCollapsed(false);
     setViewMode('diagram');
   }
-  const flowHint = supportsFlowTracing && activeStep === 2
-    ? { label: 'Endpoints and traffic flows appear in step 3', action: 'Go to step 3 →', onClick: () => setActiveStep(FLOW_STEP) }
+  const flowHint = supportsFlowTracing && activeStep === 5
+    ? { label: `Endpoints and traffic flows appear in step ${FLOW_STEP}`, action: `Go to step ${FLOW_STEP} →`, onClick: () => setActiveStep(FLOW_STEP) }
     : undefined;
-  const gridCols = viewMode === 'split'
+  const gridCols = showGovernanceReference ? 'minmax(0, 1fr) minmax(0, 1fr)' : workspaceView === 'split'
     ? '1fr 1fr'
+    : tagsOpen
+      ? 'minmax(0, 1fr) minmax(440px, 560px)'
     : flowsOpen
       ? (flowsCollapsed ? '1fr 52px' : '1fr 320px')
       : '1fr';
   const getDiagram = useMemo(() => snapshot ? createDiagramGraph(snapshot.model, snapshot.preview) : undefined, [snapshot]);
   const diagramResult = useMemo(() => {
+    if (!showDiagram) return {};
+    if (activeStep === 1) return { diagram: foundationGraph(model.foundation, foundationResources) };
     if (!getDiagram) return {};
     try {
-      return { diagram: getDiagram(flowLayer ? WIZARD_STEPS.length : activeStep, effectiveOpts) };
+      return { diagram: getDiagram(previewPhase(flowLayer ? WIZARD_STEPS.length : activeStep), activeStep === 2 ? { ...effectiveOpts, showSecurityZones: false } : effectiveOpts) };
     } catch (error) {
       return { error: error instanceof Error && error.message ? error.message : 'The diagram layout could not be prepared.' };
     }
-  }, [getDiagram, activeStep, flowLayer, effectiveOpts]);
+  }, [getDiagram, activeStep, flowLayer, effectiveOpts, showDiagram, model.foundation, foundationResources]);
   const diagram = diagramResult.diagram;
-  const diagramError = diagramResult.error ?? routing.error;
-  const diagramStatus = diagramResult.error ? 'error' : routing.status;
+  const tagScope = useMemo(() => diagram && activeStep === 8 && tagsEnabled ? costTagScope(diagram, selectedTag, renderedModel) : null, [diagram, activeStep, selectedTag, renderedModel, tagsEnabled]);
+  function selectTag(tagName: string) {
+    setSelectedTag((previous) => previous === tagName ? null : tagName);
+    if (viewMode === 'form') setViewMode('split');
+    // On stacked layouts, bring the diagram into view after it has mounted.
+    if (window.matchMedia('(max-width: 1100px)').matches) requestAnimationFrame(() => {
+      diagramPanel.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
+  const diagramError = activeStep === 1 ? undefined : diagramResult.error ?? routing.error;
+  const diagramStatus = activeStep === 1 ? 'ready' : diagramResult.error ? 'error' : routing.status;
+  const diagramPending = activeStep !== 1 && routing.pending;
   function exportDiagram() {
     if (diagramStatus !== 'ready' || !getDiagram || snapshot?.model !== model) throw new Error('Wait for the current diagram preview before exporting.');
-    return getDiagram(WIZARD_STEPS.length, REVIEW_DIAGRAM_OPTIONS);
+    return getDiagram(previewPhase(WIZARD_STEPS.length), REVIEW_DIAGRAM_OPTIONS);
   }
   // Flow traces drive the step-by-step hop list in the sidebar (the diagram reads
   // the same traces via buildGraph). Only meaningful in diagram-only mode.
   const flowTraces = useMemo(
     () => {
-      if (!diagramOnly || !snapshot) return [];
+      if (!flowLayer || !snapshot) return [];
       return effectiveOpts.allFlows
         ? buildFlowTraces(snapshot.model, allFlowIds(snapshot.model, bastion), 'kind', snapshot.preview.tables, bastion)
         : buildFlowTraces(snapshot.model, effectiveOpts.activeFlows ?? [], 'flow', snapshot.preview.tables, bastion);
     },
-    [diagramOnly, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot, bastion],
+    [flowLayer, effectiveOpts.activeFlows, effectiveOpts.allFlows, snapshot, bastion],
   );
   // Manual packet stepping: null = auto-play, a number = that 0-based hop.
   function onFlowStep(id: string, action: 'prev' | 'next' | 'play' | 'goto', hop?: number) {
@@ -243,7 +376,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       return { ...prev, [id]: next };
     });
   }
-  const configText = useMemo(() => serializeConfig(model, activeStep, true), [model, activeStep]);
+  const configText = useMemo(() => serializeConfig(model, previewPhase(activeStep), true), [model, activeStep]);
 
   function resetWizard() {
     if (!window.confirm('Clear all inputs for this Landing Zone?')) return;
@@ -272,7 +405,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
           style={{ ...layout.secondary, justifySelf: 'start', gridColumn: 1 }}
           className="wizard-prev-button"
           aria-label={`Back to step ${prevStep.id}: ${prevStep.label}`}
-          onClick={() => setActiveStep(prevStep.id)}
+          onClick={() => changeStep(prevStep.id)}
         >
           ← Back: {prevStep.label}
         </button>
@@ -284,7 +417,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
           style={{ ...layout.primary, justifySelf: 'end', gridColumn: 3 }}
           className="wizard-next-button"
           aria-label={`Continue to step ${nextStep.id}: ${nextStep.label}`}
-          onClick={() => setActiveStep(nextStep.id)}
+          onClick={() => changeStep(nextStep.id)}
         >
           Next: {nextStep.label} →
         </button>
@@ -297,7 +430,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     <div style={layout.app}>
       <TopBar
         onEmptySpaceClick={registerTopBarDebugClick}
-        center={<ViewModeToggle mode={viewMode} onChange={setViewMode} />}
+        center={activeStep !== 8 || tagsOpen ? <ViewModeToggle mode={workspaceView} onChange={changeView} /> : undefined}
         right={(
           <>
             <span role="status" className="studio-save-status" style={{ ...layout.saveState, color: saveState === 'error' ? '#ffd1cc' : '#dff4df' }}>
@@ -310,46 +443,65 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
         )}
       />
 
-      <div style={layout.page} className={`studio-page${showDiagram ? ' studio-page--visual' : ''}`}>
+      <div style={layout.page} className={`studio-page studio-page--compact${showDiagram ? ' studio-page--visual' : ''}`}>
         {showForm && (
           <>
-            <div style={layout.header}>
-              <div>
+            <div style={layout.header} className="studio-wizard-header">
+              <div className="studio-wizard-heading">
                 <h1 style={{ ...layout.title, marginTop: 0 }}>{name}</h1>
                 <p style={layout.sub}>Step {activeStep} of {WIZARD_STEPS.length}: {activeStepLabel}</p>
               </div>
             </div>
 
-            <WizardStepper active={activeStep} onSelect={setActiveStep} />
+            <WizardStepper active={activeStep} onSelect={changeStep} />
           </>
         )}
 
         <div
-          style={{ ...layout.grid, gridTemplateColumns: gridCols }}
-          className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}`}
+          style={{ ...layout.grid, gridTemplateColumns: gridCols, ...(showGovernanceReference || tagsOpen ? governanceTheme : {}) }}
+          className={`studio-workspace${activeStep === 1 ? ' studio-workspace--foundation' : activeStep === 2 ? ' studio-workspace--iam' : activeStep === 4 ? ' studio-workspace--observability' : activeStep === 8 ? ' studio-workspace--budgets' : ''}${workspaceView === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}${tagsOpen ? ' studio-workspace--tags' : ''}${showGovernanceReference ? ' studio-workspace--governance' : ''}`}
         >
             {showForm && (
-              <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={viewMode === 'split' ? 0 : undefined}
-                onChangeCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(true); }}
-                onBlurCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(false); }}
-                onKeyDownCapture={(event) => {
-                  if (event.key === 'Enter' && !event.nativeEvent.isComposing && isDiagramTextControl(event.target)
-                    && (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey)) {
-                    event.preventDefault();
-                    event.target.blur();
-                  }
-                }}
-                style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
+              <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={workspaceView === 'split' ? 0 : undefined}
+                {...editorInputHandlers}
+                style={{ display: 'grid', gap: 14, alignContent: 'start', ...(governanceForm ? { maxWidth: 720, width: '100%' } : {}) }}>
                 {activeStep === 1 ? (
-                  <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
+                  <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError}
+                    primaryDesigns={primaryDesigns} onUsePrimary={configureSecondary}
+                    onConfigureSecondary={designId ? () => configureSecondary(designId) : undefined} deploymentError={deploymentError} />
                 ) : activeStep === 2 ? (
-                  <HubNetworkStep />
+                  <IamStep
+                    identityInventory={model.foundation.stackScope === 'regional'
+                      ? linkedFoundationModel && linkedFoundationPreview.status === 'ready' && linkedFoundationPreview.snapshot?.model === linkedFoundationModel
+                        ? linkedFoundationPreview.snapshot.preview.inventory : undefined
+                      : routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.inventory : undefined}
+                    identityDomainsLoading={(model.foundation.stackScope === 'regional' ? linkedFoundationPreview : routing).status === 'loading'} />
                 ) : activeStep === 3 ? (
-                  <EnvNetworkStep />
+                  <SecurityStep />
                 ) : activeStep === 4 ? (
-                  <PlatformsStep />
+                  <NotificationsSection />
                 ) : activeStep === 5 ? (
-                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} />
+                  <>
+                    {linkedNetworksOverlap && <section style={editorStyles.card} aria-label="Linked DR network ranges">
+                      <p style={editorStyles.intro}>Primary and Secondary share VCN ranges. RPC requires non-overlapping networks. For designs that have not been deployed, you can assign new DR ranges and adjust their subnets.</p>
+                      <button type="button" style={editorStyles.addBtn} onClick={repairDrNetworks}>Assign non-overlapping DR CIDRs</button>
+                    </section>}
+                    {networkRepairMessage && <p role="status" style={editorStyles.help}>{networkRepairMessage}</p>}
+                    <HubNetworkStep />
+                  </>
+                ) : activeStep === 6 ? (
+                  <EnvNetworkStep />
+                ) : activeStep === 7 ? (
+                  <PlatformsStep />
+                ) : activeStep === 8 ? (
+                  <ObservabilityCostStep selectedTag={selectedTag} onTagSelect={selectTag}
+                    tagConfigurationAction={tagsEnabled ? <button ref={tagConfigurationButton} type="button" className="studio-flow-button" style={{ ...layout.flowBtn, minHeight: 44, padding: '8px 10px', fontSize: 13, borderRadius: 6 }}
+                      onClick={openTagConfiguration} title="Configure tags alongside the full-width diagram">
+                      Show tag configuration ⤢
+                    </button> : undefined}
+                    uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
+                ) : activeStep === 9 ? (
+                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
                 ) : null}
                 {previewError}
               </div>
@@ -357,39 +509,88 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
             {showDiagram && (
               <ReactFlowProvider>
-              <section className="studio-diagram-panel" style={layout.panel}>
+              <section ref={diagramPanel} className="studio-diagram-panel" style={layout.panel}>
                 <div style={layout.panelAccent} />
                 <div style={layout.diagramHeader}>
                   <div className="studio-info-heading" style={{ marginBottom: 0 }}>
-                    <h2 style={layout.diagramTitle}>Network diagram</h2>
+                    <h2 style={layout.diagramTitle}>{diagramTitle}</h2>
                     {flowLayer && <InfoButton title="Routing tables and flows"><p>Tables come from the current Blueprint Factory configuration. Dynamic DRG rows preview the routes allowed by its import distributions. Remote peering routes are expectations based on the remote CIDRs you supplied.</p><p>This is a configuration preview, not live OCI routing state. The packet follows the network connection lines and briefly highlights the rule used at each hop.</p></InfoButton>}
                   </div>
-                  {viewMode === 'split' && supportsFlowTracing && flowStepReached && (
+                  {(viewMode === 'split' || tagsOpen) && supportsFlowTracing && flowStepReached && (
                     <button type="button" className="studio-flow-button" style={layout.flowBtn} onClick={openFlows} title="Show network flows in the full-width diagram">
                       Show network flows ⤢
                     </button>
                   )}
-                  <DiagramZoomControls disabled={!diagram || routing.pending} />
+                  {![2, 3, 4].includes(activeStep) && <DiagramZoomControls disabled={!diagram || diagramPending} />}
                 </div>
+                {activeStep === 1 && foundationDeploymentStacks(model.foundation).length > 0 && (
+                  <div className="studio-stack-legend" aria-label="Deployment stacks">
+                    {foundationDeploymentStacks(model.foundation).map((stack) => <span key={stack}>
+                      <i aria-hidden="true" style={{ background: DEPLOYMENT_STACK_COLORS[stack].fill, borderColor: DEPLOYMENT_STACK_COLORS[stack].stroke }} />
+                      <span><strong>Stack {stack === 'home' ? 'Home' : stack === 'primary' ? 'Primary' : 'Secondary'}</strong> · {stack === 'home' ? 'Global resources' : (stack === 'primary' && model.foundation.tenancyHomeRegion === (model.foundation.stackScope === 'regional' ? model.foundation.homeRegion : model.foundation.region)) || (stack === 'secondary' && model.foundation.tenancyHomeRegion === (model.foundation.stackScope === 'regional' ? model.foundation.region : model.foundation.drRegion)) ? 'Global & Regional resources' : 'Regional resources'}</span>
+                    </span>)}
+                  </div>
+                )}
+                {activeStep === 1 && <p role="status" style={{ margin: '0 20px 12px', fontSize: 12, color: oracle.textMuted }}>
+                  {routing.status === 'error' || (linkedFoundationModel && linkedFoundationPreview.status === 'error')
+                    ? 'Resource icons unavailable. Review the configuration to generate its JSON files.'
+                    : routing.pending || (linkedFoundationModel && linkedFoundationPreview.pending)
+                    ? 'Complete the configuration to update resource icons from generated JSON.'
+                    : model.foundation.drRegion && !linkedFoundationModel && model.foundation.stackScope !== 'regional'
+                    ? 'Icons reflect generated JSON. Configure Secondary to preview its resources.'
+                    : model.foundation.stackScope === 'regional' && !linkedFoundationModel
+                    ? 'Icons reflect this Secondary configuration. Open the linked Primary to preview Home and Primary resources.'
+                    : 'Resource types shown are present in the generated JSON.'}
+                </p>}
+                {tagScope && <div className="cost-tag-scope-notice" role="status">
+                  <div><strong>{tagScope.tagName}</strong>
+                    {tagScope.groups ? <>
+                      <p style={{ margin: '4px 0' }}>{tagScope.message ?? (tagScope.tagName === 'tag-lz-business-unit'
+                        ? 'Business units follow their assigned cost centers on generated resources.'
+                        : tagScope.tagName === 'tag-lz-project'
+                        ? 'Resources outside project areas use notapplicable. Each project area shows its project tag value.'
+                        : 'The colors identify tag values on generated resources.')}</p>
+                      <div className="cost-tag-scope-legend" aria-label={tagScope.tagName === 'tag-lz-platform' ? 'Platform tag legend' : tagScope.tagName === 'tag-lz-cost-center' ? 'Cost center tag legend' : tagScope.tagName === 'tag-lz-business-unit' ? 'Business unit tag legend' : tagScope.tagName === 'tag-lz-project' ? 'Project tag legend' : 'Environment tag legend'}>
+                        {tagScope.groups.map((group) => <span key={group.id}>
+                          <i aria-hidden="true" className={`cost-tag-scope-swatch${group.color ? '' : ` cost-tag-scope-swatch--${group.id}`}`} style={group.color ? { border: `3px solid ${group.color}` } : undefined} />
+                          {tagScope.tagName === 'tag-lz-owner' && `${group.label}: `}<code>{group.id}</code>
+                        </span>)}
+                      </div>
+                    </> : <><br />All landing zone: the tag default is inherited by child compartments. Explicit resource values can override it.</>}
+                  </div>
+                  <button type="button" onClick={() => setSelectedTag(null)}>Clear tag highlight</button>
+                </div>}
                 {!showForm && previewError}
                 {!!diagram?.flowErrors?.length && <div style={{ margin: '0 20px 12px' }}>
                   <ErrorNotice title="Flow preview unavailable">{diagram.flowErrors.map((message) => <div key={message}>{message}</div>)}</ErrorNotice>
                 </div>}
-                <div className="studio-diagram-canvas" aria-busy={routing.pending} data-preview-state={diagramStatus}
+                <div className="studio-diagram-canvas" aria-busy={diagramPending} data-preview-state={diagramStatus}
                   style={layout.diagramCanvas}>
-                  {diagram ? <div style={{ height: '100%' }} inert={routing.pending || undefined}>
-                      <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
+                  {diagram ? <div style={{ height: '100%' }} inert={diagramPending || undefined}>
+                      <LzDiagram showMiniMap={![1, 2, 3, 4].includes(activeStep)} diagram={diagram} tagScope={tagScope} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={activeStep !== 1 && supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
                         onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </div> : <div role="status" style={{ height: '100%', display: 'grid', placeItems: 'center', color: oracle.textMuted, fontSize: 13 }}>
                     {diagramStatus === 'error' ? 'Diagram unavailable' : routing.deferred ? 'Complete the network fields to prepare the diagram.' : 'Preparing diagram…'}
                   </div>}
-                  {diagram && routing.pending && <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
+                  {diagram && diagramPending && <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
                     <span role="status" style={{ position: 'absolute', top: 12, left: 12, padding: '4px 8px', background: oracle.surface, color: oracle.textMuted, fontSize: 13 }}>{routing.deferred ? 'Finish editing and complete CIDR fields to update the diagram.' : 'Updating diagram…'}</span>
                   </div>}
                 </div>
               </section>
               </ReactFlowProvider>
             )}
+
+            {showGovernanceReference && <figure className={`studio-governance-reference${tagsEnabled ? '' : ' studio-governance-reference--compact'}`}>
+              <a href={finOpsGovernanceImage} target="_blank" rel="noreferrer" aria-label="Open FinOps tagging example at full size">
+                <img src={finOpsGovernanceImage} width={1127} height={939} alt="Example of FinOps cost tags applied to network, security, platform and project resources, with compartment-based and tag-based budgets." />
+              </a>
+              <figcaption>FinOps tagging and budgets: reference example. Open the image to view it at full size.</figcaption>
+            </figure>}
+
+            {tagsOpen && <div className="studio-tag-sidebar-container" {...editorInputHandlers}>
+              <TagConfigurationSidebar selectedTag={selectedTag} onTagSelect={selectTag} onClose={closeTagConfiguration}
+                uncoveredCostResources={routing.status === 'ready' && snapshot?.model === model ? snapshot.preview.uncoveredCostResources : undefined} />
+            </div>}
 
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>

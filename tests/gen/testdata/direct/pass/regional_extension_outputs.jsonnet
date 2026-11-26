@@ -34,7 +34,6 @@ local render(kind, cis) =
   local core = lz(config);
   local outputs = generate(config);
   local security = outputs['security_cis%d.json' % cis];
-  local security_pre = outputs['security_cis%d_pre.json' % cis];
   local observability = outputs['observability_cis%d.json' % cis];
   local expected_extra = if std.objectHas(core, 'extra') then core.extra else {};
   local expected_topics = [
@@ -62,14 +61,13 @@ local render(kind, cis) =
       ok: !std.objectHas(outputs, 'iam.json') && !std.objectHas(outputs, 'governance.json') &&
           !std.objectHas(security, 'cloud_guard_configuration') &&
           !std.objectHas(security, 'security_zones_configuration') &&
-          !std.objectHas(security_pre, 'cloud_guard_configuration') &&
+          !std.objectHas(outputs, 'security_cis%d_pre.json' % cis) &&
           !std.objectHas(observability, 'home_region_events_configuration'),
     },
     {
       name: '%s CIS%d has incorrect regional Vault ownership' % [kind, cis],
       ok: if cis == 1 then !std.objectHas(security, 'vaults_configuration') else
         std.objectHas(security, 'vaults_configuration') &&
-        security_pre.vaults_configuration == security.vaults_configuration &&
         std.objectHas(security.vaults_configuration.vaults, 'VLT-LZ-SHARED-SECURITY-KEY') &&
         std.length([
           key

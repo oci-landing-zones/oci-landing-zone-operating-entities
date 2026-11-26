@@ -4,8 +4,6 @@
 // contains: "regional_vault_and_bucket_key_are_linked": true
 local observability =
   import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2.jsonnet';
-local observability_pre =
-  import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2_pre.jsonnet';
 local security = import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_security_cis2.jsonnet';
 
 local scanning = security.scanning_configuration;
@@ -46,7 +44,7 @@ local topic_keys = std.objectFields(observability.notifications_configuration.to
     ]) == 0 &&
     !std.member(topic_keys, 'NOTT-LZ-CLOUDGUARD-KEY') &&
     !std.member(topic_keys, 'NOTT-LZ-IAM-KEY') &&
-    !std.objectHas(observability_pre, 'logging_configuration') &&
+    std.length(std.objectFields(observability.logging_configuration.service_logs)) > 0 &&
     std.objectHas(observability, 'logging_configuration') &&
     std.length(std.objectFields(observability.alarms_configuration.alarms)) > 0,
 }

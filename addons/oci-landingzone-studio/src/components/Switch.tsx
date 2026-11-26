@@ -11,11 +11,15 @@ export default function Switch({
   onChange,
   label,
   ariaLabel,
+  disabled = false,
+  describedBy,
 }: {
   checked: boolean;
   onChange: (value: boolean) => void;
   label?: string;
   ariaLabel?: string;
+  disabled?: boolean;
+  describedBy?: string;
 }) {
   const track: React.CSSProperties = {
     position: 'relative',
@@ -48,7 +52,9 @@ export default function Switch({
         role="switch"
         aria-checked={checked}
         aria-label={ariaLabel ?? label}
-        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, padding: 0, border: 0, background: 'transparent', cursor: 'pointer' }}
+        aria-describedby={describedBy}
+        disabled={disabled}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, padding: 0, border: 0, background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
         onClick={() => onChange(!checked)}
       >
         <span style={track} aria-hidden="true"><span style={thumb} /></span>

@@ -4,16 +4,16 @@
 
 The CIS Oracle Cloud Infrastructure Benchmark is a community-developed set of secure configuration guidelines for OCI. In the context of this repository, CIS-aligned deployments are exposed as prebuilt JSON configuration sets that combine IAM, governance, networking, security, and observability components for specific landing zone scenarios.
 
-This document provides a simplified view of how CIS-oriented configurations are represented in the Operating Entities Landing Zone repository. It highlights the common baseline shared by both CIS variants and the main additional controls introduced when using CIS v2.
+This document provides a simplified view of how CIS-oriented configurations are represented in the Operating Entities Landing Zone repository. It highlights the common baseline shared by both CIS variants and the main additional controls introduced when using CIS Level 2.
 
 It is intended as a repository-level guide, not as a full recommendation-by-recommendation CIS compliance matrix.
 
-In this repository, `CIS v2` should be read as the `CIS v1` baseline plus additional controls and configuration components required by the `CIS v2` implementation for the same scenario.
+In this repository, CIS Level 2 extends the Level 1 baseline with additional controls for the same scenario. These are configuration profile levels, not CIS Benchmark version numbers. The selected topology and options determine the emitted controls; assess the deployed environment against the required benchmark.
 
 
-## CIS v1 vs CIS v2
+## CIS Level 1 vs CIS Level 2
 
-| Area | Common Baseline | CIS LZ Level 1 compliant  | CIS LZ Level 2 compliant |
+| Area | Common Baseline | Level 1 configuration | Level 2 configuration |
 |---|---|---|---|
 | IAM and Governance | Compartments, Groups, Identity Domain, Policies | - | - |
 | Network | DRG, VCNs, Route Tables, Security Lists, NSGs, and related network components | - | - |
@@ -21,16 +21,24 @@ In this repository, `CIS v2` should be read as the `CIS v1` baseline plus additi
 | Observability - Audit Logs | Object Storage bucket plus Service Connector for audit log export and retention | - | Adds KMS-protected bucket encryption using Vault key |
 | Security - Security Posture | Cloud Guard and Vulnerability Scanning | - | - |
 | Security - Vault | - | - | Vault and Software Key |
-| Security - Security Zones | - | Security Zones with Recipe 01 CIS Level 1 | Security Zones with Recipe 02 CIS Level 2 |
+| Security - Security Zones | - | Security Zones with Recipe 01 CIS Level 1 | Security Zones with Recipe 01 CIS Level 2 |
 
 ### Security Zone Recipes
 
-**Recipe 01 CIS Level 1**
+Recipe numbers identify resource scopes:
+
+- **Recipe 01:** the landing-zone compartment (`cmp-landingzone`) and its subcompartments. Studio enables it by default and inherits its CIS level from Security baseline. Its switch can omit the recipe and target without changing baseline encryption.
+- **Recipe 02:** a separate zone for the shared-network compartment (`cmp-lz-network`).
+- **Recipe 03:** a separate recipe and zone for each selected environment, such as prod and preprod.
+
+In new Studio designs, Recipe 02 and environment Recipe 03 zones start disabled and can be enabled under Advanced. Zone enablement in existing imports and published profiles follows their explicit selections or Blueprint Factory defaults. Recipe 02 identifies the shared-network scope independently of the selected CIS profile. Direct Blueprint Factory sources can override Recipe 01's level independently; Studio always follows its baseline.
+
+**Recipe 01 — CIS Level 1**
 
 - Object Storage buckets in a security zone cannot be public.
 - Databases in a security zone must use private subnets, not public subnets.
 
-**Recipe 02 CIS Level 2**
+**Recipe 01 — CIS Level 2**
 
 - Object Storage buckets in a security zone cannot be public.
 - Databases in a security zone must use private subnets, not public subnets.

@@ -46,10 +46,13 @@ const RtContext = createContext<(ids: string[]) => void>(() => {});
 const ActiveRulesContext = createContext<ActiveRouteRule[]>([]);
 const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
 import type { DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
+import { costTagOverlayRects, type CostTagScope } from './tagScope';
 import { oracle } from '../theme';
 import { attachCooperativeGestures, type DiagramGestureHint } from './cooperativeGestures';
 import { absoluteNodeRects, diagramBounds } from './flowGeometry';
 import { resourceGroupSvg } from './resourceGroups';
+import { foundationResourceSvg } from './foundationResources';
+import { DEPLOYMENT_STACK_COLORS } from './deploymentStackStyle';
 import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
 import { firewallBackendBridgeSvg, FIREWALL_BACKEND_GAP } from './firewallBackends';
@@ -74,8 +77,10 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
   //   Landing zone— red dotted container
   //   compartment — yellow (shared) or green (environment) block
   switch (node.kind) {
-    case 'region':
-      return { background: '#fbfbfb', border: `1.5px solid ${oracle.borderStrong}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
+    case 'region': {
+      const palette = node.deploymentStack ? DEPLOYMENT_STACK_COLORS[node.deploymentStack] : undefined;
+      return { background: palette?.fill ?? '#fbfbfb', border: `1.5px solid ${palette?.stroke ?? oracle.borderStrong}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
+    }
     case 'tenancy':
       return { background: 'transparent', border: `2px dashed ${oracle.ink}`, borderRadius: 0, color: oracle.ink, fontWeight: 800 };
     case 'landingzone':
@@ -131,7 +136,7 @@ function CompartmentNode({ data }: NodeProps) {
  * right border.
  */
 function SubnetNode({ data }: NodeProps) {
-  const d = data as { label?: string; icon?: string; caption?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
+  const d = data as { label?: string; icon?: string; caption?: string; routingNote?: string; captionTone?: 'green' | 'orange'; ipNote?: string; endpointName?: string; endpointIp?: string; publicSubnet?: boolean; container?: boolean };
   const [name = '', cidr = ''] = (d.label ?? '').split('\n');
   const iconSvg = d.icon ? ICONS[d.icon] : undefined;
   return (
@@ -144,6 +149,7 @@ function SubnetNode({ data }: NodeProps) {
       )}
       <span style={{ color: d.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName, fontWeight: 700 }}>{name}</span>
       <span style={{ color: oracle.cidrBlue, fontWeight: 600 }}>{cidr}</span>
+      {d.routingNote && <span style={{ color: oracle.text, fontSize: 11 }}>{d.routingNote}</span>}
       {iconSvg && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, marginTop: 2 }}>
           <span style={{ width: 42, height: 42, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: iconSvg.replace('width="48" height="48"', 'width="42" height="42"') }} />
@@ -302,6 +308,8 @@ function RouteTableNode({ id, data }: NodeProps) {
 /** Route-table dot (ONTV-style): click to open/close its table; a line runs to the open box. */
 function ResourceGroupNode({ data }: NodeProps) {
   const d = data as unknown as DiagramNode;
+  if (d.foundationResource) return <div role="img" aria-label={d.label}
+    dangerouslySetInnerHTML={{ __html: foundationResourceSvg(d.foundationResource, d.width) }} />;
   if (!d.resourceKind) return null;
   return <div style={{ position: 'relative', width: '100%', height: '100%' }}>
     <div role="img" aria-label={`${d.label}: ${d.resourceItems?.map((item) => item.name).join(', ') ?? ''}`}
@@ -352,19 +360,21 @@ function FloatingEdge({ id, markerStart, markerEnd, style, data }: EdgeProps) {
 
 const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 
-function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker: string): { nodes: Node[]; edges: Edge[] } {
+function toReactFlow(diagram: DiagramModel, rtLocked: boolean, attachmentMarker: string, tagScope?: CostTagScope | null): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
-    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'project' || n.kind === 'operator' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
+    const tagGroup = tagScope?.groups?.find((group) => group.nodeIds.includes(n.id));
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'vpn' || n.kind === 'premises' || n.kind === 'vpntunnel' || n.kind === 'fastconnect' || n.kind === 'customerrouter' || n.kind === 'operator' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot' || n.kind === 'resourcegroup';
     return {
     id: n.id,
+    ...(!tagScope?.overlay && tagScope?.nodeIds.includes(n.id) ? { className: `cost-tag-scope-node${tagGroup ? ` cost-tag-scope-${tagGroup.id}` : ''}`, ariaLabel: `${n.label}: ${tagGroup ? tagGroup.label + ' resources' : 'inherited scope'} of ${tagScope.tagName}` } : {}),
     position: { x: n.x, y: n.y },
     type: customType ? n.kind : undefined,
     // Dimensions on the node (not just style) so the MiniMap can size its rects.
     width: n.width,
     height: n.height,
     ...(n.parentId ? { parentId: n.parentId, ...(n.kind === 'gateway' ? {} : { extent: 'parent' as const }) } : {}),
-    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
+    data: { firewallBackendBridgeY: n.firewallBackendBridgeY, firewallBackendUpperArm: n.firewallBackendUpperArm, firewallBackendLowerArm: n.firewallBackendLowerArm, label: n.label, attachmentVertical: n.attachmentVertical, kind: n.kind, tone: n.tone, compartmentScope: n.compartmentScope, secure: n.secure, container: n.container, icon: n.icon, caption: n.caption, routingNote: n.routingNote, captionTone: n.captionTone, ipNote: n.ipNote, endpointName: n.endpointName, endpointIp: n.endpointIp, publicSubnet: n.publicSubnet, rtRows: n.rtRows, rtColumns: n.rtColumns, rtNote: n.rtNote, rtTone: n.rtTone, rtHighlight: n.rtHighlight, rtLocked, rtDotTableId: n.rtDotTableId, rtDotOpen: n.rtDotOpen, rtDotConfigured: n.rtDotConfigured, rtDotTone: n.rtDotTone, width: n.width, height: n.height, foundationResource: n.foundationResource, resourceKind: n.resourceKind, resourceItems: n.resourceItems, premises: n.premises, vpnTunnel: n.vpnTunnel, fastConnect: n.fastConnect },
     // Tables sit above the routing edges; dots above edges too so they stay clickable.
     ...(n.kind === 'routetable' ? { zIndex: 2000 } : n.kind === 'rtdot' ? { zIndex: 1500 } : {}),
     style: customType
@@ -460,8 +470,9 @@ export function DiagramZoomControls({ disabled = false }: { disabled?: boolean }
   );
 }
 
-export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.05 }: {
+export default function LzDiagram({ diagram, tagScope, options, onOptionsChange, flowSteps, showMiniMap = true, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.05 }: {
   diagram: DiagramModel;
+  tagScope?: CostTagScope | null;
   minZoom?: number;
   options?: DiagramOptions;
   onOptionsChange?: (next: DiagramOptions) => void;
@@ -469,6 +480,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   flowSteps?: Record<string, number | null>;
   /** Whether the selected hub topology has a packet-flow adapter. */
   showFlowControl?: boolean;
+  showMiniMap?: boolean;
   /** Flow or hop hovered in the flow picker: fades the other flows. */
   flowFocus?: FlowFocus | null;
   /** Click a flow path to select it (again, or on empty canvas, to clear). */
@@ -480,7 +492,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   const rtLocked = !!(options?.showFlows || options?.allFlows || options?.activeFlows?.length);
   const [activeRules, setActiveRules] = useState<ActiveRouteRule[]>([]);
   const attachmentMarker = React.useId();
-  const { nodes, edges } = useMemo(() => toReactFlow(diagram, rtLocked, attachmentMarker), [diagram, rtLocked, attachmentMarker]);
+  const { nodes, edges } = useMemo(() => toReactFlow(diagram, rtLocked, attachmentMarker, tagScope), [diagram, rtLocked, attachmentMarker, tagScope]);
   const backendBridges = useMemo(() => [...absoluteNodeRects(diagram.nodes).values()]
     .filter((rect) => rect.node.kind === 'vcn' && rect.node.firewallBackendBridgeY != null), [diagram.nodes]);
   const { setViewport, getViewport, viewportInitialized } = useReactFlow();
@@ -505,6 +517,8 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   const modelBounds = useMemo(() => diagramBounds(diagram.nodes), [diagram.nodes]);
   // Pane width — so switching view modes (or resizing the window) re-centres the
   // diagram instead of leaving it pinned to its previous-layout position.
+  const viewportZoom = useStore((s) => s.transform[2]);
+  const tagScopeRects = useMemo(() => costTagOverlayRects(tagScope, viewportZoom), [tagScope, viewportZoom]);
   const paneWidth = useStore((s) => s.width);
   const paneHeight = useStore((s) => s.height);
 
@@ -590,22 +604,25 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   const lastFitKey = useRef('');
   useLayoutEffect(() => {
     if (paneWidth <= 0 || paneHeight <= 0 || !viewportInitialized || !modelBounds.width || !modelBounds.height) return;
-    const key = `${layoutKey}|${Math.round(paneHeight)}|${flowKey}|${flowBoundsKey}`;
+    const key = `${layoutKey}|${Math.round(paneHeight)}|${flowKey}|${flowBoundsKey}|${tagScope?.tagName ?? ""}`;
     if (framed && key === lastFitKey.current) return;
     lastFitKey.current = key;
     // Model bounds are already final; fit them before revealing the first frame.
-    const bounds = flowBounds ?? modelBounds;
+    const bounds = tagScope?.bounds ?? flowBounds ?? modelBounds;
     const viewport = getViewportForBounds(bounds, paneWidth, paneHeight, minZoom, 1, FIT_PADDING);
     let cancelled = false;
-    void setViewport(viewport, { duration: framed ? (flowBounds ? 350 : 250) : 0 })
+    void setViewport(viewport, { duration: framed && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? (flowBounds ? 350 : 250) : 0 })
       .then(() => { if (!cancelled && !framed) setFramed(true); });
     return () => { cancelled = true; };
-  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, viewportInitialized, framed, modelBounds, setViewport, minZoom]);
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, viewportInitialized, framed, modelBounds, tagScope, setViewport, minZoom]);
 
   return (
     <RtContext.Provider value={toggleTables}>
     <ActiveRulesContext.Provider value={flowEdges.length ? activeRules : []}>
-    <div ref={container} data-diagram-framed={framed} style={{ visibility: framed ? 'visible' : 'hidden' }} className={`studio-diagram${cooperative ? ' studio-diagram--cooperative' : ''}`}>
+    <div ref={container} data-diagram-framed={framed} style={{ visibility: framed ? 'visible' : 'hidden',
+      '--cost-tag-scope-width': `${4 / Math.max(viewportZoom, 0.01)}px`,
+      '--cost-tag-scope-offset': `${2 / Math.max(viewportZoom, 0.01)}px`,
+    } as React.CSSProperties} className={`studio-diagram${cooperative ? ' studio-diagram--cooperative' : ''}`}>
     <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
       <defs><marker id={attachmentMarker} markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" markerUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="3" fill="#6b6660" /></marker></defs>
     </svg>
@@ -633,20 +650,33 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
             height: FIREWALL_BACKEND_GAP + (rect.node.firewallBackendUpperArm ?? 0) + (rect.node.firewallBackendLowerArm ?? 0), pointerEvents: 'none', zIndex: 1200, lineHeight: 0 }}
           dangerouslySetInnerHTML={{ __html: firewallBackendBridgeSvg(rect.width, rect.node.firewallBackendUpperArm, rect.node.firewallBackendLowerArm) }} />)}
       </ViewportPortal>}
+      {tagScope?.overlay && <ViewportPortal>
+        <svg className="cost-tag-scope-overlay" aria-label={`${tagScope.tagName} resource areas`}
+          style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 2100 }}>
+          {tagScopeRects.map((area) => <g key={area.id}><rect aria-label={area.label}
+            x={area.x} y={area.y} width={area.width} height={area.height}
+            fill="none" stroke={area.color} strokeWidth={4 / Math.max(viewportZoom, 0.01)} />
+            {['tag-lz-business-unit', 'tag-lz-cost-center'].includes(tagScope.tagName) && <text
+              x={area.x + 4 / Math.max(viewportZoom, 0.01)} y={area.y - 5 / Math.max(viewportZoom, 0.01)}
+              fill={area.color} stroke="white" strokeWidth={3 / Math.max(viewportZoom, 0.01)}
+              paintOrder="stroke" fontSize={11 / Math.max(viewportZoom, 0.01)} fontWeight={700}>{area.name}</text>}
+          </g>)}
+        </svg>
+      </ViewportPortal>}
       {flowEdges.length > 0 && (
         <ViewportPortal>
           <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={modelBounds.width} height={modelBounds.height} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}
             onSelect={onFlowSelect} onHover={onFlowHover} onRulesChange={setActiveRules} />
         </ViewportPortal>
       )}
-      <MiniMap
+      {showMiniMap && <MiniMap
         nodeColor={miniMapNodeColor}
         nodeStrokeColor={oracle.ink}
         nodeStrokeWidth={2}
         pannable={!cooperative}
         zoomable={!cooperative}
         style={{ width: 140, height: 96, border: `1px solid ${oracle.border}`, borderRadius: 6, pointerEvents: cooperative ? 'none' : undefined }}
-      />
+      />}
       {onOptionsChange && (
         <Panel position="top-right" className="diagram-layer-controls">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100vw - 64px)' }}>

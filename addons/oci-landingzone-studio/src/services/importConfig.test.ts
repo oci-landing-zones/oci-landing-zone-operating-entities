@@ -20,6 +20,24 @@ async function roundTrip(model: LzModel) {
 }
 
 describe('Studio config import', () => {
+  it('keeps omitted behavior when importing null Recipe 01 or empty custom subnets', () => {
+    const config = buildConfig(emptyLzModel());
+    const input = { ...config, security_zone_recipe1_cis_level: null,
+      hub: { ...config.hub, network: { ...config.hub.network, custom_subnets: {} } } };
+    expect(buildConfig(importConfig(input).model)).toEqual(config);
+  });
+  it.each([1, 2] as const)('normalizes a legacy Recipe 01 CIS %s override to the baseline', async (level) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = level === 1 ? 2 : 1;
+    model.foundation.securityZoneRecipe1CisLevel = level;
+    const restored = (await roundTrip(model)).model;
+    expect(restored.foundation.securityZoneRecipe1CisLevel).toBeUndefined();
+    expect(restored.foundation.cisLevel).toBe(model.foundation.cisLevel);
+    const imported = importConfig({ ...buildConfig(model), security_zone_recipe1_cis_level: level });
+    expect(imported.warnings.join(' ')).toContain('Recipe 01 now follows');
+    expect(buildConfig(imported.model)).not.toHaveProperty('security_zone_recipe1_cis_level');
+  });
+
   it('restores root Bastion settings without changing the exported configuration', async () => {
     const model = emptyLzModel();
     model.bastion = { enabled: true, clientCidrs: '203.0.113.10/32\n198.51.100.0/24', maxSessionTtlInSeconds: 3600 };
@@ -33,6 +51,12 @@ describe('Studio config import', () => {
     expect(importConfig({ ...base, bastion: null }).model.bastion).toBeUndefined();
     expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['0.0.0.0/0'] } })).toThrow('bastion');
     expect(() => importConfig({ ...base, bastion: { client_cidr_block_allow_list: ['203.0.113.10/32'], unsupported: true } })).toThrow('bastion.unsupported');
+  });
+
+  it.each([1, 2] as const)('preserves an imported CIS %s choice', (cisLevel) => {
+    const model = emptyLzModel();
+    model.foundation.cisLevel = cisLevel;
+    expect(importConfig(buildConfig(model)).model.foundation.cisLevel).toBe(cisLevel);
   });
 
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('restores %s foundation and project membership', async (hubKind) => {
@@ -239,4 +263,12 @@ it('normalizes earlier Studio OKE image expressions into the released contract',
   const current = buildConfig(importConfig(config).model);
   expect(current.environments.prod.platforms.oke.extension!.params!.worker_image).toBe('9');
   expect(current.environments.prod.platforms.oke.extension!.params!).not.toHaveProperty('module_version');
+});
+
+it('warns about legacy shared-network zones without removing their exported ownership', () => {
+  const current = buildConfig(emptyLzModel());
+  const imported = importConfig({ ...current, enable_shared_network_security_zone: true });
+  expect(imported.model.foundation.sharedNetworkSecurityZone).toBe(true);
+  expect(buildConfig(imported.model).enable_shared_network_security_zone).not.toBe(false);
+  expect(imported.warnings.join(' ')).toContain('legacy shared-network Security Zone');
 });

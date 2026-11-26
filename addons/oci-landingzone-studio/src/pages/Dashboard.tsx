@@ -14,6 +14,7 @@ import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
 import ImportLandingZoneDialog from '../components/ImportLandingZoneDialog';
 import { ErrorNotice } from '../components/FieldError';
+import { emptyLzModel } from '../model/defaults';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -33,7 +34,10 @@ export default function Dashboard() {
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
   function handleNew() {
-    const result = createLZ();
+    const model = emptyLzModel();
+    model.foundation.region = '';
+    model.foundation.regionShortName = '';
+    const result = createLZ(undefined, model);
     if (!result.ok || !result.record) { setStorageError(result.message ?? 'Could not create the Landing Zone.'); return; }
     navigate(`/lz/${result.record.id}`);
   }

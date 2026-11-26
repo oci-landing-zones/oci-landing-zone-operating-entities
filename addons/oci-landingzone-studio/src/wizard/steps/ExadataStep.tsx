@@ -41,7 +41,7 @@ function NotificationFields({ value, onChange, prefix, useCase, placement, proje
   const singleRecipient = value.useSingleRecipient ?? Boolean(value.default);
   if (linkedEnvironment && singleRecipient) return <fieldset style={styles.group}>
     <legend style={styles.legend}>Notification recipients</legend>
-    <p style={styles.hint}>Uses the email configured in Shared Platforms for all {prefix.toUpperCase()} notifications.{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</p>
+    <p style={styles.hint}>Uses the email configured in Shared Platforms for all {prefix.toUpperCase()} notifications.{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Observability.' : ''}</p>
     <div style={styles.value}>{value.default || 'Set notification emails in Shared Platforms.'}</div>
     <FieldError id={`${prefix}-linked-notification-error`} error={notificationEmailError(value.default)} />
   </fieldset>;
@@ -56,7 +56,7 @@ function NotificationFields({ value, onChange, prefix, useCase, placement, proje
       <legend style={styles.legend}>Notification recipients</legend>
       <div style={styles.hint}>Separate multiple addresses with commas. {linkedEnvironment
         ? 'Configure recipients for the selected environments. Shared infrastructure recipients and the option to use one email are managed in Shared Platforms.'
-        : 'Fill each visible topic, or use one email for all Exadata notifications.'}{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</div>
+        : 'Fill each visible topic, or use one email for all Exadata notifications.'}{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Observability.' : ''}</div>
       {!singleRecipient && <div style={styles.grid}>
         {fields.filter(({ visible }) => visible).map(({ key, label, help }) => (
           <div key={key} style={styles.field}>
@@ -208,7 +208,7 @@ function ProjectChoices({ type, selected, onChange, environments }: {
       <legend style={styles.legend}>Autonomous database project tiers</legend>
       <div style={styles.hint}>Choose only projects that need a database compartment. This does not create an extra project network.</div>
       {!environments.length && <div style={styles.hint}>Select an environment above to choose its project tiers.</div>}
-      {!model.projects.length && <div style={styles.hint}>Add a project in step 3 to configure a database tier.</div>}
+      {!model.projects.length && <div style={styles.hint}>Add a project in Projects to configure a database tier.</div>}
       {model.environments.filter((env) => environments.includes(env.id)).map((env) => {
         const eligible = model.projects.filter((project) => project.environments === 'all' || project.environments.includes(env.id));
         if (!eligible.length) return null;

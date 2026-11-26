@@ -1,6 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import { buildConfig, serializeConfig, okeExtension } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
+
+describe('cost governance configuration', () => {
+  it('omits FinOps tags by default but keeps the compartment budget recipient required', () => {
+    const config = buildConfig(emptyLzModel());
+    expect(config).toHaveProperty('cost_governance.enable_tags', false);
+    expect(config).toHaveProperty('cost_governance.require_tag_values', false);
+    expect(config).toHaveProperty('cost_governance.budget_recipients', '');
+    expect(config).toHaveProperty('cost_governance.budgets.BUDGET-LANDINGZONE-KEY.amount', 10000);
+    expect(serializeConfig(emptyLzModel())).toContain('cost_governance:');
+  });
+  it('keeps cost governance in the Home stack', () => {
+    const model = emptyLzModel(); model.foundation.stackScope = 'regional';
+    expect(buildConfig(model)).toHaveProperty('cost_governance.enable_tags', false);
+    model.foundation.costGovernance!.tagsEnabled = true;
+    expect(buildConfig(model).cost_governance).toMatchObject({ enable_tags: true, budgets: {} });
+    expect(buildConfig(model).cost_governance).not.toHaveProperty('budget_recipients');
+  });
+});
 import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
 import type { Environment, LzModel, PlatformConfig } from '../model/types';
@@ -14,6 +32,19 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('preserves tenancy Home metadata separately from the Primary deployment region', () => {
+    const original = emptyLzModel();
+    const reference = structuredClone(original);
+    reference.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    reference.foundation.deploymentMode = 'primary-secondary';
+    expect(buildConfig(reference)).toEqual({ ...buildConfig(original), tenancy_home_region: 'eu-madrid-1' });
+    expect(buildConfig(reference).region).toBe(original.foundation.region);
+  });
+  it('leaves new environment zones off and emits an explicit empty target list', () => {
+    const fresh = emptyLzModel();
+    expect(fresh.environments.every((environment) => !environment.securityZone)).toBe(true);
+    expect(buildConfig(fresh).security_targets).toEqual([]);
+  });
   it('keeps the local design description out of deployable configuration', () => {
     const original = emptyLzModel();
     const described = structuredClone(original);
@@ -97,7 +128,7 @@ describe('buildConfig', () => {
     const c = buildConfig(model({
       network: { ...base.network, subnets: [...base.network.subnets, { name: 'my-subnet', cidr: '10.0.7.0/24' }] },
     }));
-    expect(c.hub.network.subnets['my-subnet']).toBe('10.0.7.0/24');
+    expect(c.hub.network.custom_subnets?.['my-subnet']).toBe('10.0.7.0/24');
   });
 });
 
@@ -150,14 +181,16 @@ describe('serializeConfig', () => {
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
     const out = serializeConfig(model(), 1);
-    expect(out).toBe([
+    expect(out.split('\n').filter((line) => !line.trim().startsWith('cost_governance:')).join('\n')).toBe([
       '{',
       "  realm: 'oc1',",
       "  region: 'eu-frankfurt-1',",
       "  region_short_name: 'fra',",
-      '  cis_level: 2,',
+      '  cis_level: 1,',
+      '  security_zone_environment_recipe_number: 2,',
+      '  enable_shared_network_security_zone: false,',
       '  environments: { prod: {}, preprod: {} },',
-      "  security_targets: ['prod'],",
+      "  security_targets: [],",
       '}',
       '',
     ].join('\n'));

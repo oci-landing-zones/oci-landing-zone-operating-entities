@@ -392,7 +392,7 @@ export default function PlatformTemplatesStep() {
         <div style={s.body}>
           <h2 style={s.title}>Platforms</h2>
           <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
-            Choose an implemented hub model in step 2 first — platforms build on the environment networks.
+            Choose an implemented hub model in Hub Network first — platforms build on the environment networks.
           </div>
         </div>
       </section>

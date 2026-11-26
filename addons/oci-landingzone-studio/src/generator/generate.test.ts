@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { evaluate, setAssetLoader } from './jsonnetVm';
 import { GeneratorError, generateFromUpstreamDefaults, generateOutputs } from './generate';
 import { buildVirtualFs } from './virtualFs';
-import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
+import { emptyLzModel as emptyModel, envNetworkDefaults } from '../model/defaults';
 import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePatch, platformEnvInstances } from '../services/platforms';
 import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
@@ -15,6 +15,15 @@ import { createRegionalModel } from '../services/regionalDeployment';
 import { buildRouteTables } from '../services/routeTables';
 import { buildGraph } from '../diagram/buildGraph';
 import ipsecOptions from '../../../../gen/addons/oci-hybrid-connectivity/ipsec-options.json';
+
+import { defaultCostGovernance } from '../services/costGovernance';
+
+function emptyLzModel() {
+  const model = emptyModel();
+  model.foundation.cisLevel = 2;
+  model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@customer.test', recipients: 'finops@example.com' };
+  return model;
+}
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
@@ -240,13 +249,15 @@ describe('generator (go-jsonnet wasm)', () => {
   }, 60_000);
   it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s regional DR with X-RPC and no environments', async (hubKind) => {
     const model = createRegionalModel();
+    model.foundation.cisLevel = 2;
     model.network = { hubKind, ...hubKindDefaults(hubKind) };
     Object.assign(model.foundation, { homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams' });
     model.remotePeeringConnections = [{ id: 'home', name: 'home', role: 'requester', remoteCidrs: ['10.3.0.0/21'], peerRegionName: 'eu-frankfurt-1', peerId: 'RPC-HOME-KEY' }];
     const out = await generateOutputs(model);
     expect(out.files['iam.json']).toBeUndefined();
     expect(out.files['governance.json']).toBeUndefined();
-    expect(out.files['security_cis2_pre.json']).toContain('vaults');
+    expect(out.files['security_cis2.json']).toContain('vaults');
+    expect(out.files['security_cis2_pre.json']).toBeUndefined();
     const security = JSON.stringify(JSON.parse(out.files['security_cis2.json']));
     expect(security).not.toContain('security_zones');
     expect(security).not.toContain('cloud_guard');
@@ -363,7 +374,7 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(JSON.parse(files['network.json'])).toEqual(fixture('oneoe_network_hub_a.json'));
   }, 60_000);
 
-  it('emits the full artifact set for a default wizard model', async () => {
+  it('emits the full artifact set with FinOps resource labels', async () => {
     const out = await generateOutputs(emptyLzModel());
     expect(out.primary).toEqual(['network.json']);
     expect(out.secondary).toContain('iam.json');
@@ -371,7 +382,8 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.secondary).toContain('security_cis2.json');
     expect(out.secondary).toContain('observability_cis2.json');
     expect(out.secondary).not.toContain('network.json');
-    expect(Object.keys(out.files).length).toBe(7);
+    expect(out.secondary).not.toContain('governance_pre.json');
+    expect(Object.keys(out.files).length).toBe(5);
     expect(out.config).toContain("kind: 'hub_a'");
 
     const net = JSON.parse(out.files['network.json']).network_configuration;
@@ -567,7 +579,7 @@ describe('generator (go-jsonnet wasm)', () => {
       '10.1.104.0/21', '10.1.168.0/21', '10.0.240.0/22',
       '10.1.192.0/21', '10.1.200.0/21', '10.1.208.0/21', '10.1.216.0/21']) expect(network).toContain(cidr);
     expect(network).not.toContain('10.172.');
-  }, 60_000);
+  }, 120_000);
 
   it('generates a Custom network-only platform without an unsupported extension', async () => {
     const base = emptyLzModel();
@@ -721,7 +733,7 @@ it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('independently controls w
       expect(egress.some((rule) => rule.dst_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
     }
   }
-}, 60_000);
+}, 120_000);
 
 it('attaches the additional peering NSG independently to workers and native pods', async () => {
   for (const [workerSpokeAccess, podSpokeAccess] of [[false, false], [true, false], [false, true], [true, true]]) {

@@ -1,10 +1,11 @@
 import type { LzModel } from '../model/types';
+import { inheritRegionalCostGovernance } from './regionalCostGovernance';
 import { configuredVcnCidrs, reconcileExadata } from './exadata';
 import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv, customDefaultSubnets } from './platforms';
 import { environmentPlatformCidr } from './oneOeCidrs';
 import { overlaps, parseCidr } from './cidr';
 
-/** Home owns environment identities; the regional design owns their networks. */
+/** Primary owns environment identities and the VSS choice; DR owns regional networks. */
 export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
   const previous = new Map(dr.environments.map((env, index) => [env.id, { env, index }]));
   const ids = new Set(home.environments.map((env) => env.id));
@@ -18,7 +19,9 @@ export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
   const next: LzModel = {
     ...source,
     foundation: { ...source.foundation, stackScope: 'regional', realm: home.foundation.realm,
-      homeRegion: home.foundation.region, drRegion: undefined },
+      identityDomainName: home.foundation.identityDomainName,
+      vulnerabilityScanningEnabled: home.foundation.vulnerabilityScanningEnabled !== false,
+      homeRegion: home.foundation.region, tenancyHomeRegion: home.foundation.tenancyHomeRegion, drRegion: undefined },
     environments,
     projects: source.projects.map((project) => project.environments === 'all' ? project : {
       ...project, environments: project.environments.filter((id) => ids.has(id)),
@@ -54,6 +57,7 @@ export function syncDrEnvironments(dr: LzModel, home: LzModel): LzModel {
         ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) } };
     }
   }
-  const synced = reconcileExadata(next);
+  const reconciled = reconcileExadata(next);
+  const synced = { ...reconciled, foundation: { ...reconciled.foundation, costGovernance: inheritRegionalCostGovernance(home, reconciled) } };
   return JSON.stringify(synced) === JSON.stringify(dr) ? dr : synced;
 }

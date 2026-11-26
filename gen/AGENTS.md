@@ -92,7 +92,7 @@ flowchart TD
     D --> H["landing_zone_multi.jsonnet wrapper"]
     H --> I["Normalize config via config.libsonnet<br/>and auto-fill subnets when omitted"]
     I --> J["Compose full landing zone via landing_zone.libsonnet"]
-    J --> K["Fan out named files<br/>network.json, iam.json, ...<br/>selected CIS security/observability pairs"]
+    J --> K["Fan out named files<br/>network.json, iam.json, ...<br/>selected CIS security files (pre only when different) and complete observability"]
 
     F --> L["Shared composition core"]
     J --> L
@@ -120,6 +120,7 @@ flowchart TD
 - `generate.sh` handles mode selection, file discovery, Jsonnet invocation, and formatting orchestration (it invokes `format_json.py`).
 - `config.libsonnet` handles normalization and auto-subnet calculation.
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
+- `lib/cost_scope.libsonnet` owns cost-tag ownership context: resolve exact topology compartment references and attach hidden `_cost_scope` metadata where a resource's business scope differs from its containing compartment. Builders must carry environment/project context before composition; never infer ownership by matching resource names. `lib/cost_tags.libsonnet` consumes this context and reuses it for OKE-created volumes, load balancers, and workers. Hidden scope metadata must never appear in generated JSON.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
 - `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
 - Builders that need environment identity, resource key segments, display segments, DNS segments, or compartment paths should use topology entries from `topology.libsonnet` instead of passing raw environment-name strings across builder boundaries.
@@ -208,15 +209,17 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   region: 'eu-frankfurt-1',            // optional, but must be paired with region_short_name when set
   region_short_name: 'fra',            // optional, but must be paired with region when set
   realm: 'oc1' | 'oc19',                // optional, defaults to 'oc1'
+  identity_domain_name: 'id_lz_common', // optional display name; 1–100 ASCII letters, digits, hyphens, periods or underscores
   cis_level: 1 | 2,                     // optional, defaults to 2; config-mode emits only this CIS level
-  stack_scope: 'complete' | 'regional', // optional, defaults to complete
+  stack_scope: 'complete' | 'regional' | 'home' | 'primary', // optional, defaults to complete
   dr_region: 'eu-amsterdam-1',         // optional: DR Object Storage principal in home IAM
   security_targets: ['prod'],          // optional, defaults to all environments in config mode
   hub: {
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
     network: {
       vcn: '10.0.0.0/21',
-      subnets: { ... },                  // optional: auto-calculated as /24s if omitted
+      subnets: { ... },                  // optional: canonical /24s if omitted
+      custom_subnets: { ... },           // optional: private subnets sharing MGMT RT/SL
     },
   },
   environments: {
@@ -242,7 +245,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `stack_scope` defaults to `complete` and accepts `complete` or `regional`; it declares resource ownership in the source config. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security files (pre only when different) and complete observability file. `stack_scope` defaults to `complete` and accepts `complete`, `regional`, `home`, or `primary`; it declares resource ownership in the source config. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
 
 Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent.
 
@@ -401,7 +404,7 @@ Keep extension-specific placement and parameter semantics in the extension's own
 Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
-Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json` and the selected CIS security/observability pairs. Complete scope also emits `iam.json` and `governance.json`. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs in either scope.
+Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json` and the selected CIS security files (pre only when different) and complete observability file. Complete scope also emits `iam.json` and `governance.json`. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the corresponding CIS1 files instead. Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs in either scope.
 
 Regional DR uses ordinary config mode twice. The complete home source defines the X-RPC acceptor and `dr_region` for the DR Object Storage key-use grant. The regional DR source defines the requester and uses `stack_scope: 'regional'`. Generate each source independently into a different output directory and deploy it with a separate stack or state. Regional scope supports platforms and registered extensions and retains their extra outputs and regional security contributions. CIS2 security pre/final files create DR-local Vaults and keys; Vault grant blocks are removed because their downstream module creates home-region IAM policies. The complete home stack owns all matching compartment, governance, and extension IAM prerequisites. IAM, governance, Cloud Guard, Security Zones, home-region events, and cross-tenancy RPCs remain excluded from regional output.
 
@@ -417,7 +420,7 @@ Config mode validates required fields during normalization. `config.environments
 
 - **Final network artifact** (`network` -> `network.json`): canonical deployable network configuration for every hub. Managed NFW/NLB route targets use naming-derived resource keys.
 - **Internal composition**: OKE, OCVS, and networked ExaCS extensions contribute resources through `contributions.network`. These contributions and hub `pre`/`post` fragments are merged into final `network`.
-- **Security and observability**: pre/final outputs retain their existing contracts.
+- **Security**: pre/final outputs retain their existing contracts. **Observability**: config mode emits only the complete file, with explicit `service_logs` targeting declared VCN/subnet keys. Internal legacy pre fields remain for publication adapters that still consume them.
 - **Published ExaCS multi-stack exception**: its publication adapter still emits separate spoke-network pre/final files because the extension stack creates the VCN and the base stack creates its DRG attachment. See the [ExaCS multi-stack guide](../workload-extensions/exacs/multi-stack/readme.md).
 
 ## 11. Platform Topology Rules
@@ -443,3 +446,31 @@ Hybrid connectivity is a top-level add-on, not a platform or workload extension.
 - **Optional parameters**: Use `null` as default, not empty array/object. Test with `!= null`.
 - **Named parameters**: Always use named parameters when calling functions with optional args.
 - **Comments**: Use `//` style. Include function signature and parameter docs in header comment.
+
+### Custom Hub Subnet Contract
+
+MGMT, MON and DNS are optional canonical subnets for all four hubs when an explicit `hub.network.subnets` map is supplied. Omitted maps retain the full historical automatic allocation. Keep LB/firewall subnet requirements and reserved names unchanged. Enabled Bastion requires MGMT at the config boundary and in Studio. Missing MGMT suppresses the example Bastion endpoint SSH rule and management-sourced project NSG SSH rules; retain shared MGMT RT/SL objects for the remaining private/custom subnets. Studio keeps canonical names fixed while allowing removal/restoration of the optional entries; source import/export and saved designs must preserve omissions without changing other CIDRs.
+
+`hub.network.custom_subnets` is a separate optional CIDR map. Canonical `subnets` remain exact and required when supplied. Normalize and validate the combined allocation, reject all hub-reserved names and invalid custom names, and keep custom ranges inside the hub VCN. Common hub rendering associates custom private subnets with MGMT RT/SL. A/B NAT return routes must include every custom CIDR. Studio must split and reunite canonical/custom maps on export/import and show the shared routing/security behavior. Omitted custom maps must preserve published output.
+
+`security_zone_recipe1_cis_level` optionally overrides Recipe 01 and its root target in both pre/final outputs. Absent/null preserves each CIS variant's baseline. Other recipes, encryption and extension outputs remain driven by `cis_level`.
+
+### Separate tenancy Home and Primary stacks
+
+`home` and `primary` scopes split one complete Primary topology into independent states without changing `regional` DR behavior. Home source sets `region`/`region_short_name` to the tenancy Home and requires `primary_region`/`primary_region_short_name` together. It renders IAM and governance in the Primary topology context, then retains only IAM, governance (including pre when present), Cloud Guard with Home reporting region, Home events and their topics. Primary source uses its own region and keeps regional networks, Security Zones, Vaults with key-specific IAM grants, Service Connector Hub and workloads; it omits Home-owned resources. Keep key grants in Primary because they depend on Primary key OCIDs, even when their provider alias is `oci.home`.
+
+Deploy Home first with `save_output = true`; Primary imports Home's `compartments_output.json`. If DR is selected, complete Primary with `save_output = true` and pass compartments from Home plus `network_output.json` from Primary to the separate regional stack. External RPC dependencies still apply. These scopes support new installations; they do not migrate existing Terraform state. `tenancy_home_region` is optional Studio round-trip metadata; it does not change a source's ownership unless an explicit scope is chosen.
+
+### Optional shared-network Security Zone
+
+`enable_shared_network_security_zone` is an optional boolean, defaulting to `true` when omitted for compatibility with published profiles and existing sources. When false, the security builder omits Recipe 02 and its `cmp-lz-network` target from all CIS variants. Recipe 01 and its `CMP-LANDINGZONE-KEY` target remain. `security_targets` independently selects environment recipes and zones. New Studio sources explicitly set the new flag false and have empty environment targets; existing saved/imported configurations retain their prior selection. Expanding the Advanced UI is a disclosure action and must not change deployment ownership or selected resources.
+
+### Optional landing-zone Security Zone
+
+`enable_landing_zone_security_zone` is an optional boolean, defaulting to `true`. False omits Recipe 01 and its `CMP-LANDINGZONE-KEY` target from every pre/final CIS variant while preserving Advanced zones, Cloud Guard, Vaults and keys. Studio always inherits Recipe 01's level from `cis_level`; it no longer emits an independent `security_zone_recipe1_cis_level` override. Direct Blueprint Factory sources retain that override contract. New Studio designs enable Recipe 01, with additional zones disabled.
+
+`security_zone_environment_recipe_number` accepts `2` or `3`. New Studio sources explicitly select `2` for optional environment recipes. Omitted sources and older saved Studio models retain Recipe 03 identities; never silently renumber deployed keys. Config-mode output emits `security_cisX_pre.json` only when its projected document differs from the final document. Recipe 01 alone and regional DR projections omit redundant pre files. Review and downloaded guides must present the additional Security Zone association as two applies in the same stack/state and exclude simultaneous pre/final selection.
+
+### Optional Vulnerability Scanning
+
+`enable_vulnerability_scanning` is a boolean, enabled when omitted. False omits the `scanning_configuration` root from every CIS pre/final variant without changing IAM, other security controls or output phase selection. New and older Studio designs default to enabled. The regional selection must survive source import/export and model persistence, appear in Review, and drive diagrams through the actual generated inventory. Linked Studio DR inherits the Primary VSS selection; updating Primary must invalidate any linked cached outputs whose serialized source changes. Standalone regional inputs retain their own selection. It does not manage scanning owned by other stacks.

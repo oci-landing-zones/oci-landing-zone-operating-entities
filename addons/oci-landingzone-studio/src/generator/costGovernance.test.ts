@@ -1,0 +1,366 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { beforeAll, expect, it } from 'vitest';
+import { emptyLzModel } from '../model/defaults';
+import { defaultCostGovernance, setFinOpsTagsEnabled, syncCostCenterBudgets, parseTagValues, businessUnitAssignments } from '../services/costGovernance';
+import { hubKindDefaults } from '../services/hubKinds';
+import { generateOutputs, generateFromConfigCode } from './generate';
+import { buildConfig, serializeConfig } from '../services/lzConfig';
+import { importConfig, resolveImportedFinOps } from '../services/importConfig';
+import { generatePreview } from './preview';
+import { setAssetLoader } from './jsonnetVm';
+import { syncDrEnvironments } from '../services/linkedDr';
+
+beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) })));
+
+function ready(model: ReturnType<typeof emptyLzModel>) {
+  const cfg = model.foundation.costGovernance ?? defaultCostGovernance();
+  cfg.tagsEnabled = true;
+  cfg.ownerEmail ??= 'owner@customer.test';
+  if (!cfg.recipients) cfg.recipients = 'finops@example.com';
+  if (!cfg.useSingleRecipient) for (const budget of [...Object.values(cfg.budgets), ...Object.values(cfg.additionalBudgets ?? {})]) {
+    if (!budget.recipients) budget.recipients = 'finops@example.com';
+  }
+  if (!Object.keys(businessUnitAssignments(cfg)).length) {
+    const center = parseTagValues(cfg.tagValueLists?.['tag-lz-cost-center'] ?? 'CC12345').find((value) => value !== 'tobedefined')!;
+    cfg.tagValueLists = { ...cfg.tagValueLists, 'tag-lz-business-unit': 'IT' };
+    cfg.costCenterBusinessUnits = { [center]: 'IT' };
+  }
+  model.foundation.costGovernance = cfg;
+  return model;
+}
+
+it('keeps topology ownership when project names overlap network roles and environments', async () => {
+  const files = await generateFromConfigCode(JSON.stringify({
+    hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+    bastion: { client_cidr_block_allow_list: ['192.0.2.0/24'] },
+    environments: {
+      prod: { projects: {} },
+      dev: {
+        projects: { network: {}, prod: {} },
+        project_network: { network: { vcn: '10.1.0.0/21' } },
+        platforms: { prod: {
+          network: { vcn: '10.1.64.0/20' },
+          extension: { type: 'oke_simple', params: {
+            kubernetes_version: 'v1.35.2', services_cidr: '172.22.0.0/16',
+            api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+          } },
+        } },
+      },
+    },
+    cost_governance: { enable_tags: true },
+  }));
+  const prefix = 'tagns-lz-cost-governance.tag-lz-';
+  const iam = JSON.parse(files['iam.json']);
+  const children = iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].children;
+  expect(children['CMP-LZ-NETWORK-KEY'].defined_tags[prefix + 'project']).toBe('notapplicable');
+  const project = children['CMP-LZ-DEV-KEY'].children['CMP-LZ-DEV-PROJECTS-KEY'].children['CMP-LZ-DEV-PROD-KEY'];
+  expect(project.defined_tags).toMatchObject({ [prefix + 'environment']: 'dev', [prefix + 'project']: 'prod', [prefix + 'platform']: 'iam' });
+  for (const role of ['ADMINS', 'RBAC-ROLE', 'BASTION-ACCESS']) {
+    const policy = iam.policies_configuration.supplied_policies[`PCY-LZ-DEV-PLATFORM-PROD-${role}-KEY`];
+    expect(policy.defined_tags[prefix + 'environment']).toBe('dev');
+  }
+  const network = JSON.parse(files['network.json']);
+  const hub = network.network_configuration.network_configuration_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
+  expect(hub.defined_tags[prefix + 'project']).toBe('notapplicable');
+  const oke = JSON.parse(files['oke.json']).oke_configuration;
+  const deployment = oke[Object.keys(oke)[0]];
+  expect(deployment.cluster_configuration.defined_tags[prefix + 'environment']).toBe('dev');
+  expect(deployment.cluster_configuration.options.service_lb_config.defined_tags[prefix + 'environment']).toBe('dev');
+  expect(deployment.cluster_configuration.options.persistent_volume_config.defined_tags[prefix + 'environment']).toBe('dev');
+  const pools = deployment.workers_configuration.worker_pools;
+  expect(pools[Object.keys(pools)[0]].node_defined_tags[prefix + 'environment']).toBe('dev');
+  for (const text of Object.values(files)) {
+    expect(text).not.toContain('_cost_scope');
+    expect(text).not.toContain('_cost_platform');
+  }
+}, 60_000);
+
+it('generates user-required tags and edited inherited budgets from Studio with one shared email', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = setFinOpsTagsEnabled(model.foundation.costGovernance!, true);
+  model.foundation.costGovernance.recipients = 'finops@example.com';
+  Object.assign(model.foundation.costGovernance.budgets['BUDGET-LANDINGZONE-KEY'], { name: 'budget-team', amount: 12500, thresholdValue: 90 });
+  const output = await generateOutputs(ready(model));
+  const gov = JSON.parse(output.files['governance.json']);
+  const tags = Object.values(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags) as Array<{ tag_defaults: Record<string, { is_user_required: boolean }> }>;
+  expect(tags).toHaveLength(6);
+  expect(tags.every((tag) => Object.values(tag.tag_defaults).every((entry) => entry.is_user_required))).toBe(true);
+  const platformField = 'tagns-lz-cost-governance.tag-lz-platform';
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags['TAG-LZ-PLATFORM-KEY'].valid_values).toEqual(expect.arrayContaining(['iam', 'governance']));
+  expect(Object.values(gov.budgets_configuration.budgets).every((budget) => (budget as { defined_tags: Record<string, string> }).defined_tags[platformField] === 'governance')).toBe(true);
+  const iam = JSON.parse(output.files['iam.json']);
+  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags[platformField]).toBe('iam');
+  const budgets = gov.budgets_configuration.budgets;
+  expect(Object.keys(budgets)).toHaveLength(6);
+  expect(budgets['BUDGET-BUSINESS-UNIT-FINANCE-KEY']).toBeUndefined();
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags['TAG-LZ-BUSINESS-UNIT-KEY'].tag_defaults['TAG-LZ-BUSINESS-UNIT-KEY-REQUIRED'].default_value).toBe('tobedefined');
+  expect(budgets['BUDGET-LANDINGZONE-KEY']).toMatchObject({ name: 'budget-team', amount: 12500, alert_rule: { threshold_value: 90, recipients: 'finops@example.com' } });
+  expect(Object.values(budgets).every((budget) => (budget as { alert_rule: { recipients: string } }).alert_rule.recipients === 'finops@example.com')).toBe(true);
+}, 60_000);
+
+it('generates and restores tag-based custom budgets and edited LOV from Studio exports', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  const cfg = defaultCostGovernance(); model.foundation.costGovernance = cfg;
+  cfg.tagValueLists = { 'tag-lz-cost-center': 'tobedefined\nCC900' };
+  cfg.removedBudgets = ['BUDGET-COST-CENTER-CC12345-KEY'];
+  cfg.additionalBudgets = { 'BUDGET-CUSTOM-TEAM-KEY': { name: 'budget-team', amount: 900, thresholdValue: 95, recipients: 'team@example.com', tagName: 'tag-lz-cost-center', tagValue: 'CC900' } };
+  cfg.useSingleRecipient = false;
+  const result = await generateOutputs(ready(model));
+  const gov = JSON.parse(result.files['governance.json']);
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags['TAG-LZ-COST-CENTER-KEY'].valid_values).toEqual(['CC900', 'tobedefined']);
+  expect(gov.budgets_configuration.budgets['BUDGET-COST-CENTER-CC12345-KEY']).toBeUndefined();
+  expect(gov.budgets_configuration.budgets['BUDGET-CUSTOM-TEAM-KEY']).toMatchObject({ name: 'budget-team', amount: 900, target: { type: 'TAG', values: ['tagns-lz-cost-governance.tag-lz-cost-center.CC900'] }, alert_rule: { threshold_value: 95, recipients: 'team@example.com' } });
+}, 60_000);
+
+it('generates a renamed cost-center budget with the new target and original alert settings', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  const cfg = defaultCostGovernance(); cfg.useSingleRecipient = false;
+  Object.assign(cfg.budgets['BUDGET-COST-CENTER-CC12345-KEY'], { amount: 7777, thresholdValue: 95, recipients: 'team@example.com' });
+  cfg.tagValueLists = { 'tag-lz-cost-center': 'CC2345' };
+  model.foundation.costGovernance = syncCostCenterBudgets(cfg, 'CC12345');
+  const result = await generateOutputs(ready(model));
+  const gov = JSON.parse(result.files['governance.json']);
+  const key = model.foundation.costGovernance.costCenterBudgetKeys!.CC2345;
+  expect(gov.budgets_configuration.budgets['BUDGET-COST-CENTER-CC12345-KEY']).toBeUndefined();
+  expect(gov.budgets_configuration.budgets[key]).toMatchObject({ name: 'budget-cost-center-cc2345', amount: 7777,
+    target: { type: 'TAG', values: ['tagns-lz-cost-governance.tag-lz-cost-center.CC2345'] },
+    alert_rule: { threshold_value: 95, recipients: 'team@example.com' } });
+}, 60_000);
+
+it('uses the configured owner email on every generated resource tag map and Owner Tag Default', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = { ...defaultCostGovernance(), ownerEmail: 'owner@example.com' };
+  const output = await generateOutputs(ready(model));
+  let checked = 0;
+  const walk = (value: unknown) => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (['defined_tags', 'default_defined_tags', 'node_defined_tags'].includes(key) && child && typeof child === 'object') {
+        expect((child as Record<string, string>)['tagns-lz-cost-governance.tag-lz-owner']).toBe('owner@example.com'); checked++;
+      } else walk(child);
+    }
+  };
+  Object.values(output.files).forEach((file) => walk(JSON.parse(file)));
+  expect(checked).toBeGreaterThan(20);
+  const gov = JSON.parse(output.files['governance.json']);
+  const owner = gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags['TAG-LZ-OWNER-KEY'];
+  expect(owner.valid_values).toContain('owner@example.com');
+  expect(Object.values(owner.tag_defaults)).toEqual([expect.objectContaining({ default_value: 'owner@example.com' })]);
+}, 60_000);
+
+it('applies Studio cost center filters to generated resources and leaves unmatched resources unchanged', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = {
+    ...defaultCostGovernance(),
+    costCenterFilters: { CC12345: { platform: ['network'], environment: ['shared'], project: ['notapplicable'] } },
+  };
+  const output = { files: await generateFromConfigCode(serializeConfig(ready(model))) };
+  const field = 'tagns-lz-cost-governance.tag-lz-cost-center';
+  let matching = 0, unmatched = 0;
+  const walk = (value: unknown) => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === 'defined_tags' && child && typeof child === 'object') {
+        const tags = child as Record<string, string>;
+        if (tags['tagns-lz-cost-governance.tag-lz-platform'] === 'network') {
+          expect(tags[field]).toBe('CC12345'); matching++;
+        } else {
+          expect(tags[field]).toBe('tobedefined'); unmatched++;
+        }
+      } else walk(child);
+    }
+  };
+  walk(JSON.parse(output.files['network.json']));
+  walk(JSON.parse(output.files['iam.json']));
+  expect(matching).toBeGreaterThan(5);
+  expect(unmatched).toBeGreaterThan(5);
+}, 60_000);
+
+it('intersects Platform, Environment and Project on actual generated project resources', async () => {
+  const model = emptyLzModel(); model.environments = [model.environments[0]];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = {
+    ...defaultCostGovernance(),
+    costCenterFilters: { CC12345: { platform: ['network'], environment: [`environment:${model.environments[0].id}`], project: [`project:${model.projects[0].id}`] } },
+  };
+  const output = { files: await generateFromConfigCode(serializeConfig(ready(model))) };
+  const network = JSON.parse(output.files['network.json']);
+  const vcn = network.network_configuration.network_configuration_categories['1-prod'].vcns['VCN-FRA-LZ-PROD-PROJECTS-KEY'];
+  const field = 'tagns-lz-cost-governance.tag-lz-cost-center';
+  expect(vcn.network_security_groups['NSG-FRA-LZ-PROD-PROJ1-APP-KEY'].defined_tags[field]).toBe('CC12345');
+  expect(vcn.defined_tags[field]).toBe('tobedefined');
+  const iam = JSON.parse(output.files['iam.json']);
+  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags[field]).toBe('tobedefined');
+}, 60_000);
+
+it('does not reintroduce Retail through inherited budgets when Studio only defines IT', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = { ...defaultCostGovernance(), tagValueLists: { 'tag-lz-business-unit': 'IT' } };
+  const output = await generateOutputs(ready(model));
+  const governance = JSON.parse(output.files['governance.json']);
+  expect(governance.budgets_configuration.budgets['BUDGET-BUSINESS-UNIT-RETAIL-KEY']).toBeUndefined();
+  expect(governance.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags['TAG-LZ-BUSINESS-UNIT-KEY'].valid_values).toEqual(['IT', 'tobedefined']);
+  expect(output.files['governance.json']).not.toContain('Retail');
+}, 60_000);
+
+
+it('creates governance once without self-tagging while retaining FinOps on other resources', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = { ...defaultCostGovernance(), requireTagValues: true,
+    tagValueLists: { 'tag-lz-business-unit': 'IT' }, costCenterBusinessUnits: { CC12345: 'IT' },
+  };
+  const output = await generateOutputs(ready(model));
+  const governance = JSON.parse(output.files['governance.json']);
+  expect(output.files['governance_pre.json']).toBeUndefined();
+  for (const namespace of Object.values(governance.tags_configuration.namespaces) as { defined_tags?: unknown; tags: Record<string, { defined_tags?: unknown }> }[]) {
+    expect(namespace.defined_tags).toBeUndefined();
+    expect(Object.values(namespace.tags).every((tag) => tag.defined_tags === undefined)).toBe(true);
+  }
+  const costTags = governance.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY'].tags;
+  expect(Object.keys(costTags)).toHaveLength(6);
+  expect(Object.values(costTags).every((tag) => Object.values((tag as { tag_defaults: Record<string, { is_user_required: boolean }> }).tag_defaults).every((value) => value.is_user_required))).toBe(true);
+  expect(Object.values(costTags).some((tag) => Object.keys((tag as { tag_defaults?: object }).tag_defaults ?? {}).length > 0)).toBe(true);
+  expect(Object.keys(governance.budgets_configuration.budgets).length).toBeGreaterThan(1);
+  const iam = JSON.parse(output.files['iam.json']);
+  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags['tagns-lz-cost-governance.tag-lz-business-unit']).toBe('IT');
+}, 60_000);
+
+
+it('reports uncovered IAM resources in the preview and blocks downloading until all environments are covered', async () => {
+  const model = emptyLzModel();
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.foundation.costGovernance = { ...defaultCostGovernance(),
+    tagValueLists: { 'tag-lz-cost-center': 'CC12345, CC12346', 'tag-lz-business-unit': 'IT, GOV' },
+    costCenterBusinessUnits: { CC12345: 'IT', CC12346: 'GOV' },
+    costCenterFilters: {
+      CC12345: { platform: ['network', 'security', 'observability'], environment: null, project: null },
+      CC12346: { platform: ['iam', 'governance'], environment: ['shared'], project: null },
+    },
+  };
+  model.foundation.costGovernance.recipients = 'finops@example.com';
+  model.foundation.costGovernance.ownerEmail = 'owner@customer.test';
+  const preview = await generatePreview(model);
+  expect(preview.uncoveredCostResources).toHaveLength(14);
+  expect(preview.uncoveredCostResources.every((resource) => resource.platform === 'iam' && ['prod', 'preprod'].includes(resource.environment))).toBe(true);
+  await expect(generateOutputs(model)).rejects.toThrow('14 resources have no cost center');
+  model.foundation.costGovernance.costCenterFilters!.CC12346.environment = [];
+  await expect(generateOutputs(model)).resolves.toHaveProperty('files');
+}, 120_000);
+
+
+it('uses the default IT cost center association and blocks an explicitly removed association', async () => {
+  const model = emptyLzModel(); model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  const output = await generateOutputs(ready(model));
+  const iam = JSON.parse(output.files['iam.json']);
+  expect(iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].defined_tags).toMatchObject({
+    'tagns-lz-cost-governance.tag-lz-cost-center': 'CC12345',
+    'tagns-lz-cost-governance.tag-lz-business-unit': 'IT',
+  });
+  model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterBusinessUnits: {} };
+  await expect(generateOutputs(model)).rejects.toThrow('Cost center CC12345: Assign a business unit before downloading.');
+}, 60_000);
+
+
+it('blocks JSON generation when notification emails are missing or still contain the sample address', async () => {
+  const model = emptyLzModel();
+  await expect(generateOutputs(model)).rejects.toThrow('Budget alerts: Enter at least one notification email address.');
+  model.foundation.costGovernance = { ...defaultCostGovernance(), recipients: 'email.address@example.com' };
+  await expect(generateOutputs(model)).rejects.toThrow('Budget alerts: Enter at least one notification email address.');
+  model.foundation.costGovernance.useSingleRecipient = false;
+  await expect(generateOutputs(model)).rejects.toThrow('budget-landingzone (recipients): Enter at least one notification email address.');
+});
+
+it('omits FinOps tags and tag budgets by default while retaining role tags', async () => {
+  const model = emptyLzModel();
+  model.foundation.costGovernance!.recipients = 'finops@example.com'; model.environments = []; model.projects = [];
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  const output = await generateOutputs(model);
+  const gov = JSON.parse(output.files['governance.json']);
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-COST-GOVERNANCE-KEY']).toBeUndefined();
+  expect(gov.tags_configuration.namespaces['TAGNS-LZ-ROLE-KEY']).toBeDefined();
+  expect(Object.keys(gov.budgets_configuration.budgets)).toEqual(['BUDGET-LANDINGZONE-KEY']);
+  expect(output.files['governance_pre.json']).toBeUndefined();
+  for (const text of Object.values(output.files)) expect(text).not.toContain('tagns-lz-cost-governance');
+  expect(output.files['iam.json']).toContain('tagns-lz-role.tag-lz-role');
+}, 60_000);
+
+it('omits FinOps tags from regional JSON when Home tagging is disabled', async () => {
+  const model = ready(emptyLzModel());
+  model.foundation.stackScope = 'regional'; model.foundation.region = 'eu-amsterdam-1'; model.foundation.regionShortName = 'ams'; model.foundation.homeRegion = 'eu-frankfurt-1';
+  Object.assign(model.foundation.costGovernance!, { tagsEnabled: false });
+  const output = await generateOutputs(model);
+  expect(output.files['governance.json']).toBeUndefined();
+  for (const text of Object.values(output.files)) expect(text).not.toContain('tagns-lz-cost-governance');
+}, 60_000);
+
+it('labels linked DR resources with Home business mappings without deploying regional governance', async () => {
+  const home = ready(emptyLzModel());
+  home.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  home.environments = []; home.projects = [];
+  Object.assign(home.foundation.costGovernance!, {
+    ownerEmail: 'home.owner@example.test',
+    tagValueLists: { 'tag-lz-cost-center': 'CC_HOME', 'tag-lz-business-unit': 'Operations' },
+    costCenterBusinessUnits: { CC_HOME: 'Operations' },
+    costCenterFilters: { CC_HOME: { platform: null, environment: null, project: null } },
+  });
+  const regional = structuredClone(home);
+  Object.assign(regional.foundation, { stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
+  regional.foundation.costGovernance!.ownerEmail = 'stale@example.test';
+  const output = await generateOutputs(syncDrEnvironments(regional, home));
+  const network = JSON.parse(output.files['network.json']);
+  const hub = network.network_configuration.network_configuration_categories['0-shared'].vcns['VCN-AMS-LZ-HUB-KEY'];
+  expect(hub.defined_tags).toMatchObject({
+    'tagns-lz-cost-governance.tag-lz-owner': 'home.owner@example.test',
+    'tagns-lz-cost-governance.tag-lz-cost-center': 'CC_HOME',
+    'tagns-lz-cost-governance.tag-lz-business-unit': 'Operations',
+  });
+  expect(output.files['iam.json']).toBeUndefined();
+  expect(output.files['governance.json']).toBeUndefined();
+  expect(output.files['governance_pre.json']).toBeUndefined();
+}, 60_000);
+
+
+it('keeps FinOps disabled in real generated outputs after importing a config without settings', async () => {
+  const original = emptyLzModel();
+  original.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  original.environments = []; original.projects = [];
+  const config = buildConfig(original);
+  delete config.cost_governance;
+  const imported = importConfig(config);
+  const model = resolveImportedFinOps(imported, null);
+  model.foundation.costGovernance!.useSingleRecipient = true;
+  model.foundation.costGovernance!.recipients = 'budgets@customer.test';
+  const output = await generateOutputs(model);
+  const governance = JSON.parse(output.files['governance.json']);
+  expect(governance.tags_configuration?.namespaces?.['TAGNS-LZ-COST-GOVERNANCE-KEY']).toBeUndefined();
+  expect(Object.keys(governance.budgets_configuration.budgets)).toEqual(['BUDGET-LANDINGZONE-KEY']);
+  expect(output.files['network.json']).not.toContain('tagns-lz-cost-governance');
+  expect(output.files['iam.json']).toContain('tagns-lz-role.tag-lz-role');
+}, 60_000);
+
+
+it.each(['', 'email.address@example.com'])('blocks a download with incomplete Owner %j before rendering files', async (ownerEmail) => {
+  const model = ready(emptyLzModel());
+  model.foundation.notifications!.default = 'alarms@customer.test';
+  model.foundation.costGovernance!.ownerEmail = ownerEmail;
+  await expect(generateOutputs(model)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
+});
+
+
+it('keeps the preview available while the required Owner is still empty', async () => {
+  const model = ready(emptyLzModel());
+  model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+  model.environments = []; model.projects = [];
+  model.foundation.costGovernance!.ownerEmail = '';
+  expect((await generatePreview(model)).network).toBeDefined();
+  await expect(generateOutputs(model)).rejects.toThrow('tag-lz-owner: Enter one valid owner email address.');
+}, 60_000);

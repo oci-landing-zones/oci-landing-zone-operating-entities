@@ -18,6 +18,9 @@
 &nbsp;
 
 ## **Overview**
+
+The published JSON configuration includes FinOps tags and requires the landing zone's `tagns-lz-cost-governance` namespace and all six key definitions to exist before deployment. For a Studio design without FinOps tags, prepare a separate adapted copy following [FinOps tags and Studio compatibility](../readme.md#finops-tags-and-studio-compatibility). Removing only `default_defined_tags` is insufficient because individual resources also carry tags. Published assets retain their tags; published Tag Defaults use `is_user_required: false`.
+
 This configuration enables centralized management of private DNS zones within a Hub VCN, controlled by a central network team. All DNS configurations, including zone creation and record updates, are streamlined through a single management plane. This ensures consistency, simplifies administration and eliminates the complexity of managing DNS across multiple environments and OCI regions.
 
 This document provides configuration views for the following use cases:

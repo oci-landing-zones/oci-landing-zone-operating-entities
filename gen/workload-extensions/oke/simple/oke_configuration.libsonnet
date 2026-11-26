@@ -1,3 +1,4 @@
+local cost_scope = import '../../../lib/cost_scope.libsonnet';
 local peering = import './oke_peering.libsonnet';
 // One CIS OKE 0.3.0 deployment per generated cluster identity.
 local public_lb = import './oke_public_load_balancer.libsonnet';
@@ -5,6 +6,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 function(ctx) {
   oke_configuration+: {
     [ctx.cluster_key]: {
+      _cost_scope:: cost_scope.value(ctx.scope.scope_name),
       cluster_configuration: {
         name: ctx.cluster_name,
         cis_level: '%d' % ctx.cis_level,

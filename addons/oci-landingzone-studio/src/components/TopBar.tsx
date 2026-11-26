@@ -7,6 +7,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { oracle } from '../theme';
 import { CURRENT_VERSION } from '../changelog';
+import oracleSymbol from '../assets/oracle-symbol.svg';
 
 const css = {
   bar: { position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', gap: 14, height: 52, padding: '0 24px', background: oracle.nav, color: '#fff', boxShadow: '0 1px 4px rgba(32,31,28,0.18)' } as React.CSSProperties,
@@ -43,7 +44,7 @@ export default function TopBar({ center, right, onEmptySpaceClick }: {
       }}
     >
       <Link to="/" style={css.link} className="studio-topbar-brand" aria-label="Go to home" title="Home">
-        <span style={css.mark} />
+        <img src={oracleSymbol} alt="" style={css.mark} />
         <span style={css.word}>OCI</span>
       </Link>
       <span style={css.divider} />

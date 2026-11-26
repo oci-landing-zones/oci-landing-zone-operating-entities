@@ -122,6 +122,8 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
 
 &nbsp;
 
+The complete observability file is used from the initial deployment. ExaCC does not manage VCNs or subnets, so these files do not create Flow Logs; network logging remains owned by the underlying landing zone.
+
 # License <!-- omit from toc -->
 
 Copyright (c) 2026 Oracle and/or its affiliates.

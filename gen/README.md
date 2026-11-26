@@ -23,7 +23,7 @@ Regular clones, submodules, and linked Git worktrees are supported. Hook paths a
 
 Config-mode network artifacts use one canonical final file: `network.json`. Managed NFW/NLB route targets use resource keys.
 Generate a regional DR design as two independent configs. The complete home config owns the RPC acceptor and sets `dr_region` for the DR Object Storage key-use grant; the regional DR config owns the RPC requester. Run `--config` once for each source and use separate output directories. Regional scope supports platforms and registered workload extensions and emits their workload, network, security, and observability contributions. CIS2 creates regional Vaults and keys. Shared IAM and governance prerequisites must already exist in the complete home stack; cross-tenancy RPCs remain rejected in regional scope.
-Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
+Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 files instead. Security has pre/final files only when additional Security Zone associations require a second apply; Recipe 01 alone emits only the final security file. Observability is complete from the initial apply, with explicit VCN/subnet Flow Logs.
 Config-mode extension outputs are emitted as additional files from `result.extra`; for example, OKE emits one `oke.json` with an `oke_configuration` map keyed by cluster. Each entry contains `cluster_configuration` and `workers_configuration.worker_pools`. Only Orchestrator v2.4.1 with CIS OKE v0.3.0 is supported. Existing deployments require state and input migration; do not simply apply the new generated files to existing state.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
 For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to contribute an internal `network` fragment to the final network.
@@ -285,3 +285,7 @@ base + {
 - [Jsonnet Official Documentation](https://jsonnet.org/)
 - [Language Reference](https://jsonnet.org/ref/language.html)
 - [Standard Library](https://jsonnet.org/ref/stdlib.html)
+
+## Separate Home and Primary deployments
+
+Config mode supports `stack_scope: 'home'` and `'primary'` alongside the existing `complete` and `regional` scopes. Use these when tenancy Home controls and Primary regional resources need separate stacks. Home requires paired `primary_region` and `primary_region_short_name` in addition to its own Home region fields. See [region and stack settings](../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#1-region-stack-scope-and-security-settings) for ownership and dependency requirements. Generate each source independently; do not mix their outputs in one Terraform state.

@@ -1,24 +1,30 @@
+import { extractFoundationResources, type FoundationResourceInventory } from '../services/foundationInventory';
 import type { LzModel } from '../model/types';
 import { serializeConfig } from '../services/lzConfig';
-import { extractGeneratedResources, GENERATED_RESOURCE_COLLECTIONS, type GeneratedResourceInventory } from '../services/generatedResources';
+import { extractGeneratedResources, type GeneratedResourceInventory } from '../services/generatedResources';
+import { costCenterCoverage, type UncoveredCostResource } from '../services/costCenterCoverage';
 import { evaluate } from './jsonnetVm';
 import { buildVirtualFs } from './virtualFs';
+import { costCenterReferenceErrors } from '../services/costGovernance';
 
 export interface GeneratedPreview {
   network: unknown;
+  foundationResources: FoundationResourceInventory;
   inventory: GeneratedResourceInventory;
   files: string[];
+  uncoveredCostResources: UncoveredCostResource[];
 }
 
 /** One canonical evaluation keeps the diagram's routes and resource inventory in the same snapshot. */
 export async function generatePreview(model: LzModel): Promise<GeneratedPreview> {
+  const referenceErrors = costCenterReferenceErrors(model);
+  if (referenceErrors.length) throw new Error(referenceErrors.join('\n'));
   const { files } = buildVirtualFs();
   const entry = 'studio_preview.jsonnet';
   const result = await evaluate(entry, {
     ...files,
     [entry]: `function(config)
       local outputs = (import 'landing_zone_multi.jsonnet')(config);
-      local configurations = ${JSON.stringify([...new Set(GENERATED_RESOURCE_COLLECTIONS.map((entry) => entry.configuration))])};
       {
         files: std.objectFields(outputs),
         network: outputs['network.json'],
@@ -26,10 +32,10 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
           [filename]: {
             [configuration]: outputs[filename][configuration]
             for configuration in std.objectFields(outputs[filename])
-            if std.member(configurations, configuration)
+            if std.endsWith(configuration, '_configuration')
           }
           for filename in std.objectFields(outputs)
-          if !std.endsWith(filename, '_pre.json') && !std.member(['network.json', 'network_backends.json', 'iam.json', 'governance.json'], filename)
+          if !std.endsWith(filename, '_pre.json') && filename != 'network.json'
         },
         compartments: if std.objectHas(outputs, 'iam.json') then outputs['iam.json'].compartments_configuration
           else (import 'landing_zone.libsonnet')(config).iam.compartments_configuration,
@@ -41,5 +47,7 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
     || !Array.isArray(preview.files) || !preview.files.every((file) => typeof file === 'string')) {
     throw new Error('The generated diagram preview is incomplete.');
   }
-  return { network: preview.network, inventory: extractGeneratedResources(preview.artifacts as Record<string, unknown>, preview.compartments), files: preview.files };
+  const artifacts = preview.artifacts as Record<string, unknown>;
+  return { network: preview.network, foundationResources: extractFoundationResources({ ...artifacts, 'network.json': preview.network }), inventory: extractGeneratedResources(artifacts, preview.compartments), files: preview.files,
+    uncoveredCostResources: costCenterCoverage({ ...artifacts, 'network.json': preview.network }) };
 }

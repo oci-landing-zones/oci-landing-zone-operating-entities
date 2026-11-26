@@ -1,3 +1,4 @@
+import { validateCloudGuard } from '../services/cloudGuard';
 /**
  * generate — run the real OCI landing-zone jsonnet generator over the wizard's
  * canonical config and hand back the deployable JSON artifacts.
@@ -23,6 +24,8 @@ import { validateRemotePeering } from '../services/remotePeering';
 import { validateRegionalDeployment } from '../services/regionalDeployment';
 import { regionShortNameError } from '../services/regions';
 import { validateHybridConnectivity } from '../services/hybridConnectivity';
+import { validateCostGovernance } from '../services/costGovernance';
+import { costCenterCoverage, costCenterCoverageError } from '../services/costCenterCoverage';
 import { validateBastion } from '../services/bastion';
 
 export interface GeneratedOutputs {
@@ -93,12 +96,15 @@ export function generateFromUpstreamDefaults(profile: string): Promise<Record<st
 
 /** Run the generator over a wizard model. */
 export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs> {
-  const issues = [...validateBastion(model), ...validateHybridConnectivity(model), ...validatePlatformContracts(model), ...validateOkeModel(model), ...validateExadataModel(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model)];
+  const issues = [...validateBastion(model), ...validateCostGovernance(model), ...validateHybridConnectivity(model), ...validatePlatformContracts(model), ...validateOkeModel(model), ...validateExadataModel(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model)];
+  issues.push(...validateCloudGuard(model));
   const shortNameError = regionShortNameError(model.foundation.regionShortName);
   if (shortNameError) issues.push(shortNameError);
   if (issues.length) throw new GeneratorError(issues.join('\n'));
   const config = serializeConfig(model);
   const files = await generateFromConfigCode(config);
+  const coverageError = costCenterCoverageError(costCenterCoverage(files), model);
+  if (coverageError) throw new GeneratorError(coverageError);
   const primary = PRIMARY_OUTPUTS.filter((name) => name in files);
   const secondary = Object.keys(files).filter((name) => !primary.includes(name as never)).sort();
   return { config, files, primary, secondary };

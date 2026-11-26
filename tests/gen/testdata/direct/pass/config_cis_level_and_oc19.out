@@ -4,7 +4,6 @@
     "iam.json",
     "network.json",
     "observability_cis2.json",
-    "observability_cis2_pre.json",
     "security_cis2.json",
     "security_cis2_pre.json"
   ],
@@ -26,7 +25,6 @@
     "iam.json",
     "network.json",
     "observability_cis1.json",
-    "observability_cis1_pre.json",
     "security_cis1.json",
     "security_cis1_pre.json"
   ],

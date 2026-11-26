@@ -59,13 +59,13 @@ describe('toDrawioXml', () => {
     const drModel = emptyLzModel();
     drModel.foundation = { ...drModel.foundation, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams' };
     const dr = buildGraph(drModel, 5, { showEndpoints: true });
-    const xml = toDrawioPagesXml([{ name: 'DR', diagram: dr }, { name: 'Home Region & source', diagram: home }]);
+    const xml = toDrawioPagesXml([{ name: 'DR', diagram: dr }, { name: 'Primary deployment & source', diagram: home }]);
     const pages = [...xml.matchAll(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/g)].map((match) => match[0]);
     expect(xml.match(/<mxfile\b/g)).toHaveLength(1);
     expect(pages).toHaveLength(2);
     expect(pages[0]).toBe(toDrawioXml(dr, 'DR').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0]);
-    expect(pages[1]).toBe(toDrawioXml(home, 'Home Region & source').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0].replace('id="lz"', 'id="lz-2"'));
-    expect(pages[1]).toContain('name="Home Region &amp; source"');
+    expect(pages[1]).toBe(toDrawioXml(home, 'Primary deployment & source').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0].replace('id="lz"', 'id="lz-2"'));
+    expect(pages[1]).toContain('name="Primary deployment &amp; source"');
     expect(pages[0]).toContain('eu-amsterdam-1');
     expect(pages[0]).not.toContain('eu-frankfurt-1');
     expect(pages[1]).toContain('eu-frankfurt-1');
@@ -120,8 +120,9 @@ describe('toDrawioXml', () => {
   });
 
   it('adds a Security Zone shield image to secure compartments only', () => {
-    // default model: prod is a Security Zone, preprod is not
-    const xml = toDrawioXml(buildGraph(emptyLzModel()));
+    const model = emptyLzModel();
+    model.environments[0].securityZone = true;
+    const xml = toDrawioXml(buildGraph(model));
     expect(xml).toContain('id="cmp-env-0-shield"');   // prod
     expect(xml).toContain('shape=image;');
     expect(xml).not.toContain('id="cmp-env-1-shield"'); // preprod

@@ -21,12 +21,13 @@ describe('generator-supported realms', () => {
     expect(getRegionsForRealm('oc2')).toEqual([]);
   });
 
-  it('does not rewrite a current-version record', () => {
+  it('preserves current-version region settings while normalizing missing FinOps settings', () => {
     const stored = {
       ...emptyLzModel(),
       foundation: { realm: 'oc19', region: 'eu-frankfurt-2', regionShortName: 'fr2', cisLevel: 2 },
     };
-    expect(normalizeModel(stored).foundation).toEqual(stored.foundation);
+    expect(normalizeModel(stored).foundation).toEqual({ ...stored.foundation, costGovernance: emptyLzModel().foundation.costGovernance });
+    expect(stored.foundation).not.toHaveProperty('costGovernance');
   });
 
   it('resets a record from any older version', () => {

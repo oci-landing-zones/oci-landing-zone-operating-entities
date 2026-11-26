@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { emptyLzModel } from '../model/defaults';
-import { createLZ, saveDisasterRecoveryLZ, saveOutputs } from '../services/lzStore';
+import { createDrLZ, createLZ, deleteLZ, saveDisasterRecoveryLZ, saveOutputs, saveLZ, getLZ } from '../services/lzStore';
 import { createDrDraft } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint } from '../services/disasterRecoverySavedDesign';
 import SavedLzList from './SavedLzList';
+import { defaultCostGovernance } from '../services/costGovernance';
+import { serializeConfig } from '../services/lzConfig';
 
 beforeEach(() => {
   const data = new Map<string, string>();
@@ -17,6 +19,32 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
+  it.each([undefined, 'complete', 'regional'] as const)('shows the deployment badge beside the name without duplicate type metadata: %s', (scope) => {
+    const model = emptyLzModel();
+    model.foundation.stackScope = scope;
+    createLZ('Saved configuration', model);
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    const type = `>${scope === 'regional' ? 'DR' : 'Primary'}</span>`;
+    expect(html).toContain(type);
+    expect(html.indexOf(type)).toBeGreaterThan(html.indexOf('Saved configuration'));
+    expect(html.indexOf(type)).toBeLessThan(html.indexOf('2 envs'));
+    expect(html).toContain('fra');
+    expect(html).not.toContain('Deployment type:');
+  });
+
+  it('renders a saved design with cached outputs and a deleted cost-center reference', () => {
+    const model = emptyLzModel();
+    model.foundation.costGovernance = { ...defaultCostGovernance(), costCenterFilters: {
+      CC12345: { platform: null, environment: [`environment:${model.environments[0].id}`], project: null },
+    } };
+    const previous = serializeConfig(model);
+    model.environments = model.environments.slice(1);
+    const record = createLZ('Needs filter review', model).record!;
+    saveOutputs(record.id, { config: previous, files: { 'network.json': '{}' } });
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toContain('Needs filter review');
+    expect(html).toContain('>Open</button>');
+  });
   it('offers Create DR only for complete designs and removes Duplicate from all cards', () => {
     createLZ('Home', emptyLzModel());
     const regional = emptyLzModel();
@@ -30,6 +58,25 @@ describe('saved combined Landing Zone cards', () => {
     expect(html).not.toContain('Duplicate');
     expect(html.match(/>Open<\/button>/g)).toHaveLength(3);
     expect(html.match(/>Delete<\/button>/g)).toHaveLength(3);
+  });
+
+  it('links Edit DR to the existing Secondary configuration of its Primary', () => {
+    const primary = createLZ('Primary with DR', emptyLzModel()).record!;
+    const secondary = createDrLZ(primary.id).record!;
+    createLZ('Another Primary', emptyLzModel());
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toMatch(new RegExp(`<a[^>]*href="/lz/${secondary.id}"[^>]*>Edit DR</a>`));
+    expect(html.match(/>Edit DR<\/a>/g)).toHaveLength(1);
+    expect(html.match(/>Create DR<\/button>/g)).toHaveLength(1);
+  });
+
+  it('offers Create DR again when the linked Secondary configuration is deleted', () => {
+    const primary = createLZ('Primary', emptyLzModel()).record!;
+    const secondary = createDrLZ(primary.id).record!;
+    deleteLZ(secondary.id);
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toContain('>Create DR</button>');
+    expect(html).not.toContain('Edit DR');
   });
 
   it('keeps Create DR available on the current complete design without reopening it', () => {
@@ -58,7 +105,7 @@ describe('saved combined Landing Zone cards', () => {
     } });
     const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
     expect(html).not.toContain('>Home + DR + RPC<');
-    expect(html).toContain('Home: fra');
+    expect(html).toContain('Primary: fra');
     expect(html).toContain('DR: ams');
     expect(html).toContain('Download LZ config');
     expect(html).toContain('Download LZ DR config');
@@ -77,4 +124,34 @@ describe('saved combined Landing Zone cards', () => {
     expect(html).toContain('Download LZ DR config');
     expect(html).toContain('2 saved');
   });
+});
+
+it('asks to regenerate and reapply both linked designs after a Primary VSS change', () => {
+  const primary = createLZ('Primary', emptyLzModel()).record!;
+  const dr = createDrLZ(primary.id).record!;
+  for (const id of [primary.id, dr.id]) saveOutputs(id, { config: serializeConfig(getLZ(id)!.model), files: { 'network.json': '{}' } });
+  const changed = getLZ(primary.id)!.model; changed.foundation.vulnerabilityScanningEnabled = false;
+  saveLZ(primary.id, changed);
+  const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html.match(/>Files out of date<\/span>/g)).toHaveLength(2);
+  expect(html).toContain('reapply');
+  expect(html).toContain('Why are these files out of date?');
+  expect(html).toContain('Security settings changed.');
+  expect(html).toContain('Last generated');
+  expect(html).toContain('Studio does not check live OCI deployment status.');
+  expect(html).toContain(`/lz/${primary.id}?step=review`);
+});
+
+
+it('keeps the change explanation hidden by default and omits it for current outputs', () => {
+  const record = createLZ('Current', emptyLzModel()).record!;
+  saveOutputs(record.id, { config: serializeConfig(record.model), files: { 'network.json': '{}' } });
+  let html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html).not.toContain('Why are these files out of date?');
+  const changed = record.model; changed.foundation.vulnerabilityScanningEnabled = false;
+  saveLZ(record.id, changed);
+  html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+  expect(html).toContain('<details');
+  expect(html).not.toMatch(/<details[^>]*\sopen/);
+  expect(html).toContain('Open Review');
 });

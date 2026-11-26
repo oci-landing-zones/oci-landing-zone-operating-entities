@@ -1,3 +1,4 @@
+local identity_domain = import '../lib/identity_domain.libsonnet';
 // gen/builders/security.libsonnet
 // Security builder: cloud guard, scanning, security zones, and vaults.
 //
@@ -8,23 +9,31 @@
 //   blueprints/one-oe/runtime/one-stack/oneoe_security_cis2.json
 //
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
+local cost_scope = import '../lib/cost_scope.libsonnet';
 
 function(config, n, realm_constants, topo)
+  local landing_zone_enabled = !std.objectHas(config, 'enable_landing_zone_security_zone') || config.enable_landing_zone_security_zone;
+  local shared_network_zone_enabled = !std.objectHas(config, 'enable_shared_network_security_zone') || config.enable_shared_network_security_zone;
   local security_target_env_names = topo.security_target_env_names();
   local szp = realm_constants.security_zone_policy_ocids;
   local cis_label(cis_level) = 'L%s' % cis_level;
   local cis_recipe_key(cis_level) = n.key_global('SZ-RCP', ['01', 'CIS', cis_label(cis_level)]);
   local shared_network_recipe_key = n.key_global('SZ-RCP', ['02', 'SHARED', 'NETWORK']);
-  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', ['03', env_name, 'ENVIRONMENT']);
+  // Preserve existing Recipe 03 identities unless the source explicitly selects the new numbering.
+  local environment_recipe_segment = if std.objectHas(config, 'security_zone_environment_recipe_number') && config.security_zone_environment_recipe_number == 2 then '02' else '03';
+  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', [environment_recipe_segment, env_name, 'ENVIRONMENT']);
+  local recipe1_level(cis_level) =
+    if std.objectHas(config, 'security_zone_recipe1_cis_level') && config.security_zone_recipe1_cis_level != null then
+      config.security_zone_recipe1_cis_level else cis_level;
   local recipe_set(cis_level) = {
-    [cis_recipe_key(cis_level)]: {
-      name: n.display_global('sz-rcp', ['01', 'cis', cis_label(cis_level)]),
-      description: 'Recipe 01 CIS Level %s' % cis_level,
+    [if landing_zone_enabled then cis_recipe_key(recipe1_level(cis_level))]: {
+      name: n.display_global('sz-rcp', ['01', 'cis', cis_label(recipe1_level(cis_level))]),
+      description: 'Recipe 01 CIS Level %s' % recipe1_level(cis_level),
       compartment_id: n.key_global('CMP', ['SECURITY']),
-      cis_level: '%s' % cis_level,
+      cis_level: '%s' % recipe1_level(cis_level),
     },
 
-    [shared_network_recipe_key]: {
+    [if shared_network_zone_enabled then shared_network_recipe_key]: {
       name: n.display_global('sz-rcp', ['02', 'shared', 'network']),
       description: 'Recipe 02 Shared Network',
       compartment_id: n.key_global('CMP', ['SECURITY']),
@@ -33,8 +42,9 @@ function(config, n, realm_constants, topo)
     },
   } + {
     [environment_recipe_key(env_name)]: {
-      name: n.display_global('sz-rcp', ['03', env_name, 'environment']),
-      description: 'Recipe 03 %s Environment' % topo.env_display(env_name),
+      _cost_scope:: cost_scope.value(env_name),
+      name: n.display_global('sz-rcp', [environment_recipe_segment, env_name, 'environment']),
+      description: 'Recipe %s %s Environment' % [environment_recipe_segment, topo.env_display(env_name)],
       compartment_id: n.key_global('CMP', ['SECURITY']),
       cis_level: '%s' % cis_level,
       security_policies_ocids: szp.environment,
@@ -44,7 +54,7 @@ function(config, n, realm_constants, topo)
 
   // --- Base security (shared across all CIS levels) ---
   local base(cis_level) = {
-    cloud_guard_configuration: {
+    [if config.enable_cloud_guard then 'cloud_guard_configuration']: {
       compartment_id: 'TENANCY-ROOT',
       reporting_region: config.region,
       self_manage_resources: false,
@@ -60,7 +70,7 @@ function(config, n, realm_constants, topo)
       },
     },
 
-    scanning_configuration: {
+    [if !std.objectHas(config, 'enable_vulnerability_scanning') || config.enable_vulnerability_scanning then 'scanning_configuration']: {
       default_compartment_id: n.key_global('CMP', ['SECURITY']),
 
       host_recipes: {
@@ -122,10 +132,10 @@ function(config, n, realm_constants, topo)
   local cis1_pre = base(1) {
     security_zones_configuration+: {
       security_zones: {
-        [n.key_global('SZ-TGT', ['CIS', 'L1'])]: {
-          name: n.display_global('sz-tgt', ['cis', 'l1']),
+        [if landing_zone_enabled then n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(1))])]: {
+          name: n.display_global('sz-tgt', ['cis', std.asciiLower(cis_label(recipe1_level(1)))]),
           compartment_id: 'CMP-LANDINGZONE-KEY',
-          recipe_key: cis_recipe_key(1),
+          recipe_key: cis_recipe_key(recipe1_level(1)),
         },
       },
     },
@@ -135,7 +145,7 @@ function(config, n, realm_constants, topo)
   // The topology helper decides which environments are security targets.
   // Config mode defaults this to all environments; published profiles can pin a narrower list.
   local env_zone_targets = {
-    [n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
+    [if shared_network_zone_enabled then n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
       name: n.display_global('sz-tgt', ['shared', 'network']),
       compartment_id: n.key_global('CMP', ['NETWORK']),
       recipe_key: shared_network_recipe_key,
@@ -160,10 +170,10 @@ function(config, n, realm_constants, topo)
   local cis2_pre = base(2) {
     security_zones_configuration+: {
       security_zones: {
-        [n.key_global('SZ-TGT', ['CIS', 'L2'])]: {
-          name: n.display_global('sz-tgt', ['cis', 'l2']),
+        [if landing_zone_enabled then n.key_global('SZ-TGT', ['CIS', cis_label(recipe1_level(2))])]: {
+          name: n.display_global('sz-tgt', ['cis', std.asciiLower(cis_label(recipe1_level(2)))]),
           compartment_id: 'CMP-LANDINGZONE-KEY',
-          recipe_key: cis_recipe_key(2),
+          recipe_key: cis_recipe_key(recipe1_level(2)),
         },
       },
     },
@@ -183,7 +193,11 @@ function(config, n, realm_constants, topo)
           protection_mode: 'SOFTWARE',
           vault_key: n.key_global('VLT', ['SHARED', 'SECURITY']),
           service_grantees: [realm_constants.service_identifiers.objectstorage(config.region)],
-          group_grantees: [n.display_global('grp', ['security', 'admin'])],
+          group_grantees: [
+            local group = n.display_global('grp', ['security', 'admin']);
+            if identity_domain.name(config) == identity_domain.default_name then group
+            else identity_domain.group(identity_domain.name(config), group)
+          ],
           versions: ['1', '2'],
         },
       },

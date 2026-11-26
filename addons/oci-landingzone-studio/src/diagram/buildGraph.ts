@@ -118,6 +118,7 @@ interface SubnetSpec {
   backendGapAfter?: number;
   icon?: DiagramNode['icon'];
   caption?: string;
+  routingNote?: string;
   captionTone?: 'green' | 'orange';
   ipNote?: string;
   /** A VM endpoint to draw inside the subnet (only icon-less subnets get one). */
@@ -128,9 +129,9 @@ interface SubnetSpec {
 
 const SUB_H_ICON_IP = SUB_H_ICON + 16; // icon + caption + an IP line
 const SUB_H_ENDPOINT = 110;            // plain subnet grown to hold a VM (name + icon + IP)
-const subnetHeight = (sn: SubnetSpec) =>
+const subnetHeight = (sn: SubnetSpec) => (sn.routingNote ? 18 : 0) + (
   sn.resourceGroup ? SUB_H + resourceGroupLayout(sn.resourceGroup.kind, sn.resourceGroup.items, SUB_W - 2 * PAD).height + PAD
-    : sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H;
+    : sn.icon ? (sn.ipNote ? SUB_H_ICON_IP : SUB_H_ICON) : sn.endpoint ? SUB_H_ENDPOINT : SUB_H);
 
 /**
  * Give an icon-less subnet a VM endpoint and a host `.10` inside its range.
@@ -209,22 +210,45 @@ function pushGeneratedResources(nodes: DiagramNode[], inventory: GeneratedResour
     const owner = ensureOwner(key);
     owner.container = true;
     const available = owner.width - 2 * PAD;
-    const columns = Math.min(DIAGRAM_LAYOUT.maxResourceColumns, unordered.length, Math.max(1, Math.floor((available + COMP_GAP) / (DIAGRAM_LAYOUT.resourceMinWidth + COMP_GAP))));
-    const width = Math.min(280, (available - (columns - 1) * COMP_GAP) / columns);
-    const groups = unordered.map((group) => ({ group, layout: resourceGroupLayout(group.kind, group.items, width) }))
-      .sort((a, b) => b.layout.height - a.layout.height || a.group.id.localeCompare(b.group.id));
-    const top = Math.max(TITLE + PAD, owner.height - PAD, ...children(owner.id).map((child) => child.y + child.height + COMP_GAP));
-    const bottoms = Array<number>(columns).fill(top);
-    for (const { group, layout } of groups) {
-      const column = bottoms.indexOf(Math.min(...bottoms));
+    const regular = unordered.filter((group) => !['identitydomain', 'budgets', 'requiredtags'].includes(group.kind));
+    if (regular.length) {
+      const columns = Math.min(DIAGRAM_LAYOUT.maxResourceColumns, regular.length, Math.max(1, Math.floor((available + COMP_GAP) / (DIAGRAM_LAYOUT.resourceMinWidth + COMP_GAP))));
+      const width = Math.min(280, (available - (columns - 1) * COMP_GAP) / columns);
+      const groups = regular.map((group) => ({ group, layout: resourceGroupLayout(group.kind, group.items, width) }))
+        .sort((a, b) => b.layout.height - a.layout.height || a.group.id.localeCompare(b.group.id));
+      const top = Math.max(TITLE + PAD, owner.height - PAD, ...children(owner.id).map((child) => child.y + child.height + COMP_GAP));
+      const bottoms = Array<number>(columns).fill(top);
+      for (const { group, layout } of groups) {
+        const column = bottoms.indexOf(Math.min(...bottoms));
+        nodes.push({
+          id: `resource-${group.id}`, kind: 'resourcegroup', label: layout.label, resourceKind: group.kind,
+          resourceItems: group.items.map((item) => ({ ...item })), parentId: owner.id,
+          x: PAD + column * (width + COMP_GAP), y: bottoms[column], width, height: layout.height,
+        });
+        bottoms[column] += layout.height + COMP_GAP;
+      }
+      grow(owner, Math.max(...bottoms) - COMP_GAP + PAD);
+    }
+    let domainTop = TITLE + PAD;
+    for (const group of unordered.filter((group) => ['identitydomain', 'budgets', 'requiredtags'].includes(group.kind)).sort((a, b) => ['identitydomain', 'budgets', 'requiredtags'].indexOf(a.kind) - ['identitydomain', 'budgets', 'requiredtags'].indexOf(b.kind))) {
+      const panelWidth = group.kind === 'requiredtags' ? Math.min(280, available) : available;
+      const layout = resourceGroupLayout(group.kind, group.items, panelWidth);
+      const growth = layout.height + COMP_GAP;
+      for (const child of children(owner.id)) {
+        if (child.y >= domainTop) child.y += growth;
+      }
+      // Keep the floating hybrid endpoints aligned when the tenancy content moves down.
+      if (owner.kind === 'tenancy') {
+        for (const node of nodes.filter((node) => !node.parentId && node.kind !== 'region')) node.y += growth;
+      }
       nodes.push({
         id: `resource-${group.id}`, kind: 'resourcegroup', label: layout.label, resourceKind: group.kind,
         resourceItems: group.items.map((item) => ({ ...item })), parentId: owner.id,
-        x: PAD + column * (width + COMP_GAP), y: bottoms[column], width, height: layout.height,
+        x: PAD, y: domainTop, width: panelWidth, height: layout.height,
       });
-      bottoms[column] += layout.height + COMP_GAP;
+      grow(owner, owner.height + growth);
+      domainTop += growth;
     }
-    grow(owner, Math.max(...bottoms) - COMP_GAP + PAD);
   }
 }
 
@@ -265,7 +289,7 @@ function pushVcn(
     nodes.push({
       id: `${id}-sn-${i}`, kind: 'subnet', label: `${sn.name}\n${sn.cidr}`, parentId: id,
       container: sn.resourceGroup ? true : undefined,
-      icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
+      routingNote: sn.routingNote, icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
       endpointName: sn.endpoint?.name, endpointIp: sn.endpoint?.ip, publicSubnet: sn.isPublic,
       x: SUB_X, y: sy, width: SUB_W, height,
     });
@@ -325,6 +349,9 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   projectEnvironmentIds?: string[];
   environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
 }, routeTables: RouteTable[] = [], inventory?: GeneratedResourceInventory): DiagramModel {
+  const showSecurityZones = opts.showSecurityZones !== false;
+  if (inventory && !showSecurityZones) inventory = { ...inventory, groups: inventory.groups.filter((group) => group.kind !== 'securityrecipes') };
+  if (inventory && upToStep < 5) inventory = { ...inventory, groups: inventory.groups.filter((group) => !['budgets', 'requiredtags'].includes(group.kind)) };
   const hybrid = upToStep >= 2 ? hybridRoutes(model) : [];
   const vpns = hybrid.filter((connection) => connection.type === 'VPN');
   const circuits = hybrid.filter((connection) => connection.type === 'FastConnect');
@@ -415,7 +442,10 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
 
   // ---- hub network (left column), driven by the step 2 fields
   const hubSubnets = model.network.subnets.map((sn, j) => {
-    const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
+    const required = getHubKind(model.network.hubKind)!.defaultSubnets.some((subnet) => subnet.name === sn.name);
+    const spec: SubnetSpec = required
+      ? decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok)
+      : { name: generatorNames.hubSubnet(regionTok, sn.name), cidr: sn.cidr, routingNote: 'Private · RT: mgmt' };
     if (bastion?.subnetNode === `hub-vcn-sn-${j}`) {
       spec.resourceGroup = inventory?.groups.find((group) => `resource-${group.id}` === bastion.serviceNode);
     }
@@ -516,7 +546,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
       sourceId: e.id,
       name,
       label: generatorNames.environmentCompartment(name),
-      secure: model.foundation.stackScope !== 'regional' && e.securityZone,
+      secure: showSecurityZones && model.foundation.stackScope !== 'regional' && e.securityZone,
       netLabel: generatorNames.environmentChildCompartment(name, 'network'),
       vcnLabel: `${generatorNames.environmentVcn(regionTok, name)}\n${net.vcnCidr}`,
       subnets,
@@ -641,7 +671,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   const nodes: DiagramNode[] = [
     { id: 'region', kind: 'region', label: region ? `OCI Region · ${region}` : 'OCI Region', x: 0, y: 0, width: regWidth, height: regHeight },
     { id: 'tenancy', kind: 'tenancy', label: 'OCI Tenancy', parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
-    { id: 'landingzone', kind: 'landingzone', secure: f.stackScope !== 'regional', container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
+    { id: 'landingzone', kind: 'landingzone', secure: showSecurityZones && f.stackScope !== 'regional' && f.landingZoneSecurityZone !== false, container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
   const pushExadataChildren = (parentId: string, parentLabel: string, parentWidth: number, children: Array<'db' | 'infra'>) => {
@@ -654,7 +684,7 @@ export function buildGraphLayout(model: LzModel, upToStep = Infinity, opts: Diag
   };
 
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
-  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: f.stackScope !== 'regional', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
+  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: showSecurityZones && f.stackScope !== 'regional' && f.sharedNetworkSecurityZone !== false, container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
     const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets, centeredVcnX);
     // Gateways straddle the left boundary: IGW by the first subnet,

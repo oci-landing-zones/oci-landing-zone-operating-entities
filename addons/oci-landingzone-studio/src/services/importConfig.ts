@@ -1,12 +1,21 @@
+import { identityDomainNameError } from './identityDomains';
 /** Reconstruct only configurations that Studio can edit without losing values. */
 import { emptyLzModel } from '../model/defaults';
 import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
 import { buildConfig } from './lzConfig';
+import { activeProjectNames, budgetDefinitions, importCostGovernance } from './costGovernance';
 import { exadataNotificationSource } from './exadata';
 import { validateBastion } from './bastion';
 
 type ObjectValue = Record<string, unknown>;
-export interface ImportedConfig { model: LzModel; warnings: string[] }
+export interface ImportedConfig { model: LzModel; warnings: string[]; requiresFinOpsChoice?: boolean }
+
+export function resolveImportedFinOps(imported: ImportedConfig, choice: boolean | null): LzModel {
+  if (imported.requiresFinOpsChoice && choice === null) throw new Error('Choose whether to keep FinOps tags before importing this design.');
+  const model = structuredClone(imported.model);
+  if (imported.requiresFinOpsChoice) model.foundation.costGovernance!.tagsEnabled = choice!;
+  return model;
+}
 
 function invalid(path: string): never {
   throw new Error(`Cannot import ${path}: invalid or unsupported configuration. Use a config.jsonnet exported by Studio.`);
@@ -184,17 +193,24 @@ function restoreExadata(model: LzModel, type: 'exacc' | 'exacs', shared: ObjectV
 }
 
 export function importConfig(value: unknown): ImportedConfig {
+  const warnings: string[] = [];
   const config = object(value, 'config');
   const model = emptyLzModel();
+  if (config.enable_vulnerability_scanning !== undefined && typeof config.enable_vulnerability_scanning !== 'boolean') invalid('enable_vulnerability_scanning');
+  if (config.enable_cloud_guard !== undefined && typeof config.enable_cloud_guard !== 'boolean') invalid('enable_cloud_guard');
   const cisLevel = number(config.cis_level ?? 2, 'cis_level');
   if (cisLevel !== 1 && cisLevel !== 2) invalid('cis_level');
   model.foundation = {
     ...model.foundation,
+    cloudGuardEnabled: config.enable_cloud_guard !== false,
+    vulnerabilityScanningEnabled: config.enable_vulnerability_scanning !== false,
     realm: text(config.realm, 'realm'), region: text(config.region, 'region'),
     regionShortName: text(config.region_short_name, 'region_short_name'), cisLevel,
   };
   if (config.stack_scope !== undefined) model.foundation.stackScope = choice(config.stack_scope, ['complete', 'regional'] as const, 'stack_scope');
   if (config.dr_region !== undefined) model.foundation.drRegion = text(config.dr_region, 'dr_region');
+  if (model.foundation.stackScope === 'regional' && config.primary_region !== undefined) model.foundation.homeRegion = text(config.primary_region, 'primary_region');
+  if (config.tenancy_home_region !== undefined) model.foundation.tenancyHomeRegion = text(config.tenancy_home_region, 'tenancy_home_region');
   const bastion = config.bastion == null ? undefined : object(config.bastion, 'bastion');
   if (bastion) {
     model.bastion = { enabled: true,
@@ -223,10 +239,27 @@ export function importConfig(value: unknown): ImportedConfig {
       cloudguard: recipients('cloudguard'), iam: recipients('iam'), network: recipients('network'), security: recipients('security'),
     };
   }
+  if (config.identity_domain_name !== undefined) {
+    const name = text(config.identity_domain_name, 'identity_domain_name');
+    if (identityDomainNameError(name)) invalid('identity_domain_name');
+    model.foundation.identityDomainName = name;
+  }
+  if (config.enable_landing_zone_security_zone !== undefined && typeof config.enable_landing_zone_security_zone !== 'boolean') invalid('enable_landing_zone_security_zone');
+  model.foundation.landingZoneSecurityZone = config.enable_landing_zone_security_zone !== false;
+  if (config.security_zone_environment_recipe_number !== undefined && config.security_zone_environment_recipe_number !== 2 && config.security_zone_environment_recipe_number !== 3) invalid('security_zone_environment_recipe_number');
+  model.foundation.environmentSecurityZoneRecipeNumber = config.security_zone_environment_recipe_number === 2 ? 2 : 3;
+  if (config.enable_shared_network_security_zone !== undefined && typeof config.enable_shared_network_security_zone !== 'boolean') invalid('enable_shared_network_security_zone');
+  model.foundation.sharedNetworkSecurityZone = config.enable_shared_network_security_zone !== false;
+  if (model.foundation.sharedNetworkSecurityZone && model.foundation.stackScope !== 'regional') warnings.push('This configuration retains a legacy shared-network Security Zone. Studio no longer offers this option; review the owning stack and its Terraform plan before removing it outside Studio.');
+  if (config.security_zone_recipe1_cis_level !== undefined && config.security_zone_recipe1_cis_level !== null) {
+    const level = number(config.security_zone_recipe1_cis_level, 'security_zone_recipe1_cis_level');
+    if (level !== 1 && level !== 2) invalid('security_zone_recipe1_cis_level');
+    if (level !== model.foundation.cisLevel) warnings.push('Recipe 01 now follows the Security baseline CIS level in Studio. Its independent CIS override was removed.');
+  }
   const hub = object(config.hub, 'hub');
   const hubKind = choice<HubKind>(hub.kind, ['hub_a', 'hub_b', 'hub_c', 'hub_e'], 'hub.kind');
   const hubNetwork = network(hub.network, 'hub.network');
-  model.network = { hubKind, hubVcnCidr: hubNetwork.vcnCidr, subnets: hubNetwork.subnets };
+  model.network = { hubKind, hubVcnCidr: hubNetwork.vcnCidr, subnets: [...hubNetwork.subnets, ...subnets(object(hub.network, 'hub.network').custom_subnets ?? {}, 'hub.network.custom_subnets')] };
   const envs = object(config.environments === undefined ? {} : config.environments, 'environments');
   const securityTargets = strings(config.security_targets ?? Object.keys(envs), 'security_targets');
   model.environments = Object.entries(envs).map(([name, value], index) => {
@@ -271,11 +304,19 @@ export function importConfig(value: unknown): ImportedConfig {
     if (restored.type === 'oke_simple') invalid(`${path}.extension.type`);
     model.sharedPlatforms.push({ ...restored, type: restored.type });
   }
-  const warnings: string[] = [];
-  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Foundation before generating a new package.');
-  if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
+  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Observability before generating a new package.');
+  if (model.foundation.stackScope === 'regional') warnings.push('Choose the primary region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
+  const costSettings = config.cost_governance === undefined ? {} : object(config.cost_governance, 'cost_governance');
+  model.foundation.costGovernance = importCostGovernance(costSettings, activeProjectNames(model), model);
+  const definitions = budgetDefinitions(activeProjectNames(model));
+  // Legacy Studio exports omitted enable_tags even when they contained FinOps settings.
+  const requiresFinOpsChoice = costSettings.enable_tags === undefined && (
+    ['require_tag_values', 'tag_resource_labels', 'owner_email', 'tag_value_lists', 'cost_center_assignments', 'cost_center_business_units'].some((key) => Object.hasOwn(costSettings, key))
+    || Object.keys((costSettings.budgets ?? {}) as ObjectValue).some((key) => definitions[key]?.target.type === 'TAG')
+    || Object.keys((costSettings.additional_budgets ?? {}) as ObjectValue).length > 0
+  );
   const expected: ObjectValue = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
     const env = object(value, `environments.${name}`);
     const platforms = Object.fromEntries(Object.entries(object(env.platforms ?? {}, `environments.${name}.platforms`)).map(([key, value]) => {
@@ -292,9 +333,26 @@ export function importConfig(value: unknown): ImportedConfig {
     }));
     return [name, { ...env, projects: env.projects ?? {}, platforms }];
   })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
+  if (config.enable_vulnerability_scanning === true) delete expected.enable_vulnerability_scanning;
+  if (config.enable_cloud_guard === true) delete expected.enable_cloud_guard;
+  if (config.security_zone_environment_recipe_number === 3) delete expected.security_zone_environment_recipe_number;
+  if (config.enable_shared_network_security_zone === true) delete expected.enable_shared_network_security_zone;
+  if ((model.foundation.cloudGuardEnabled === false || model.foundation.stackScope === 'regional') && expected.notification_emails) {
+    expected.notification_emails = { ...object(expected.notification_emails, 'notification_emails') };
+    delete (expected.notification_emails as ObjectValue).cloudguard;
+    if (!Object.keys(expected.notification_emails as ObjectValue).length) delete expected.notification_emails;
+  }
   if (config.bastion === null) delete expected.bastion;
+  delete expected.security_zone_recipe1_cis_level;
+  if (config.enable_landing_zone_security_zone === true) delete expected.enable_landing_zone_security_zone;
+  const expectedHubNetwork = { ...object(hub.network, 'hub.network') };
+  if (expectedHubNetwork.custom_subnets && Object.keys(object(expectedHubNetwork.custom_subnets, 'hub.network.custom_subnets')).length === 0) {
+    delete expectedHubNetwork.custom_subnets;
+    expected.hub = { ...hub, network: expectedHubNetwork };
+  }
   if (bastion) expected.bastion = { ...bastion, max_session_ttl_in_seconds: bastion.max_session_ttl_in_seconds ?? 3600 };
-  const diff = difference(expected, buildConfig(model));
+  const canonical = buildConfig(model);
+  const diff = difference({ ...expected, ...(canonical.cost_governance ? { cost_governance: canonical.cost_governance } : {}) }, canonical);
   if (diff) invalid(diff);
-  return { model, warnings };
+  return { model, warnings, ...(requiresFinOpsChoice ? { requiresFinOpsChoice: true } : {}) };
 }

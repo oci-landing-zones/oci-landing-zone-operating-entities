@@ -1,6 +1,8 @@
 // gen/builders/iam/compartments.libsonnet
 // Compartment tree construction for the IAM output.
 
+local cost_scope = import '../../lib/cost_scope.libsonnet';
+
 function(ctx)
   local config = ctx.config;
   local n = ctx.n;
@@ -16,6 +18,7 @@ function(ctx)
     local env = entry.env;
     if std.objectHas(env, 'platforms') then {
       [scope.compartment_key]: {
+        _cost_platform:: cost_scope.platform_kind(env.platforms[platform_name]),
         name: scope.compartment_name,
         description: scope.compartment_description,
       }
@@ -26,6 +29,7 @@ function(ctx)
   local shared_platform_children =
     if std.objectHas(config, 'shared_platforms') then {
       [scope.compartment_key]: {
+        _cost_platform:: cost_scope.platform_kind(config.shared_platforms[platform_name]),
         name: scope.compartment_name,
         description: scope.compartment_description,
       }
@@ -43,6 +47,8 @@ function(ctx)
 
     local proj_children = {
       [topo.env_project_compartment_key(entry, proj_name)]: {
+        _cost_scope:: cost_scope.value(entry.env_name, proj_name),
+        _cost_platform:: 'iam',
         name: topo.env_project_compartment_name(entry, proj_name),
         description: '%s environment, %s compartment' % [ctx.env_desc(env_name), ctx.proj_display(proj_name)],
       }
@@ -51,6 +57,7 @@ function(ctx)
 
     {
       [topo.env_child_compartment_key(entry, 'NETWORK')]: {
+        _cost_platform:: 'network',
         name: topo.env_child_compartment_name(entry, 'network'),
         // 'prod' is abbreviated to "Prod" for the NETWORK compartment (matches hand-written JSON).
         description: '%s Workload Environment, Common Network Compartment' % topo.env_display_network(env_name),
@@ -60,6 +67,7 @@ function(ctx)
       },
 
       [topo.env_child_compartment_key(entry, 'PLATFORM')]: {
+        _cost_platform:: 'iam',
         name: topo.env_child_compartment_name(entry, 'platform'),
         description: '%s Workload Environment, Common Platform Compartment' % ctx.env_desc(env_name),
       } + (
@@ -69,12 +77,14 @@ function(ctx)
       ),
 
       [topo.env_child_compartment_key(entry, 'PROJECTS')]: {
+        _cost_platform:: 'iam',
         name: topo.env_child_compartment_name(entry, 'projects'),
         description: '%s Workload Environment, Common Projects Compartment' % ctx.env_desc(env_name),
         children: proj_children,
       },
 
       [topo.env_child_compartment_key(entry, 'SECURITY')]: {
+        _cost_platform:: 'security',
         name: topo.env_child_compartment_name(entry, 'security'),
         description: '%s Workload Environment, Common Security Compartment' % ctx.env_desc(env_name),
         defined_tags: {
@@ -88,6 +98,7 @@ function(ctx)
     function(acc, entry)
       acc + {
         [topo.env_compartment_key(entry)]: {
+          _cost_scope:: cost_scope.value(entry.env_name),
           name: topo.env_compartment_name(entry),
           description: '%s Environment Compartment' % ctx.env_desc(entry.env_name),
           children: env_compartment_children(entry),

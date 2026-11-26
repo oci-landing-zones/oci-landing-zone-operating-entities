@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ChangeEvent } from 'react';
+import * as context from '../wizardContext';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { emptyLzModel } from '../../model/defaults';
 import { WizardProvider } from '../wizardContext';
 import FoundationStep from './FoundationStep';
 import type { LzModel } from '../../model/types';
-import { MemoryRouter } from 'react-router-dom';
 
 function render(model: LzModel) {
   return renderToStaticMarkup(<WizardProvider initialModel={model}>
@@ -12,160 +13,182 @@ function render(model: LzModel) {
   </WizardProvider>);
 }
 
-describe('observability fields', () => {
-  it('offers Bastion below Notifications in Foundations, disabled by default', () => {
+const fields = vi.hoisted(() => new Map<string, Record<string, unknown>>());
+vi.mock('react/jsx-dev-runtime', async (original) => {
+  const actual = await original<typeof import('react/jsx-dev-runtime')>();
+  return { ...actual, jsxDEV: (...args: Parameters<typeof actual.jsxDEV>) => {
+    const props = args[1] as Record<string, unknown>;
+    if (typeof props.id === 'string') fields.set(props.id, props);
+    return actual.jsxDEV(...args);
+  } };
+});
+vi.mock('react/jsx-runtime', async (original) => {
+  const actual = await original<typeof import('react/jsx-runtime')>();
+  const capture = (render: typeof actual.jsx) => (...args: Parameters<typeof actual.jsx>) => {
+    const props = args[1] as Record<string, unknown>;
+    if (typeof props.id === 'string') fields.set(props.id, props);
+    return render(...args);
+  };
+  return { ...actual, jsx: capture(actual.jsx), jsxs: capture(actual.jsxs) };
+});
+afterEach(() => { vi.restoreAllMocks(); fields.clear(); });
+
+describe('foundation fields', () => {
+  it.each([
+    ['eu-frankfurt-1', undefined, 1, 1],
+    ['eu-madrid-1', undefined, 1, 2],
+    ['eu-frankfurt-1', 'eu-amsterdam-1', 2, 2],
+    ['eu-madrid-1', 'eu-amsterdam-1', 2, 3],
+  ] as const)('summarizes Home=%s and Secondary=%s as %i configurations and %i stacks', (home, secondary, configurations, stacks) => {
+    const model = emptyLzModel();
+    Object.assign(model.foundation, { tenancyHomeRegion: home, drRegion: secondary,
+      deploymentMode: secondary ? 'primary-secondary' : 'primary-only' });
+    const html = render(model);
+    expect(html).toContain(`${configurations} Studio configuration${configurations === 1 ? '' : 's'} · ${stacks} deployment stack${stacks === 1 ? '' : 's'}`);
+    expect(html.indexOf('aria-label="Deployment summary"')).toBeGreaterThan(html.indexOf('id="lz-region"'));
+    expect(html.indexOf('aria-label="Deployment summary"')).toBeLessThan(html.indexOf('id="lz-region-help"'));
+  });
+
+  it('waits for all required regions before showing deployment counts', () => {
+    const model = emptyLzModel();
+    model.foundation.tenancyHomeRegion = 'eu-frankfurt-1';
+    model.foundation.deploymentMode = 'primary-secondary';
+    expect(render(model)).not.toContain('aria-label="Deployment summary"');
+    model.foundation.drRegion = model.foundation.region;
+    expect(render(model)).not.toContain('aria-label="Deployment summary"');
+  });
+
+  it('marks Secondary region as required and invalid until a different valid region is selected', () => {
+    const model = emptyLzModel();
+    model.foundation.deploymentMode = 'primary-secondary';
+    const html = render(model);
+    expect(fields.get('lz-dr-region')).toMatchObject({ required: true, 'aria-invalid': true });
+    expect(html).toContain('<option value="" selected="">Select secondary region</option>');
+    expect(html).toContain('Select a secondary region.');
+    model.foundation.drRegion = model.foundation.region;
+    render(model);
+    expect(fields.get('lz-dr-region')?.['aria-invalid']).toBe(true);
+    model.foundation.drRegion = 'eu-amsterdam-1';
+    render(model);
+    expect(fields.get('lz-dr-region')?.['aria-invalid']).toBeUndefined();
+  });
+
+  it('marks missing Home and Primary regions as required and invalid', () => {
+    const model = emptyLzModel();
+    model.foundation.tenancyHomeRegion = undefined;
+    model.foundation.region = '';
+    const html = render(model);
+    for (const id of ['lz-tenancy-home-region', 'lz-region']) {
+      expect(fields.get(id)).toMatchObject({ required: true, 'aria-invalid': true });
+    }
+    expect(html).toContain('<option value="" selected="">Select tenancy home region</option>');
+    expect(html).toContain('<option value="" selected="">Select primary region</option>');
+    expect(html).toContain('Select a tenancy home region.');
+    expect(html).toContain('Select a primary region.');
+  });
+
+  it('clears region errors when valid Home and Primary regions are selected', () => {
+    const model = emptyLzModel();
+    model.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    model.foundation.region = 'eu-frankfurt-1';
+    render(model);
+    for (const id of ['lz-tenancy-home-region', 'lz-region']) {
+      expect(fields.get(id)?.['aria-invalid']).toBeUndefined();
+    }
+  });
+
+  it('links the region reference from Home and Primary labels and retains shared help', () => {
+    const model = emptyLzModel();
+    model.foundation.tenancyHomeRegion = 'eu-madrid-1';
+    model.foundation.region = 'eu-frankfurt-1';
+    model.foundation.drRegion = 'eu-amsterdam-1';
+    model.foundation.deploymentMode = 'primary-secondary';
+    const html = render(model);
+    const referenceLinks = [...html.matchAll(/<a\b[^>]*aria-label="View region reference for [^"]*"[^>]*>[\s\S]*?<\/a>/g)].map((match) => match[0]);
+    expect(referenceLinks).toHaveLength(2);
+    for (const [index, link] of referenceLinks.entries()) {
+      expect(link).toContain(`aria-label="View region reference for ${index === 0 ? 'Home' : 'Primary'} region (opens in a new tab)"`);
+      expect(link).toContain('href="/reference/regions"');
+      expect(link).toContain('target="_blank"');
+      expect(link).toContain('rel="noopener noreferrer"');
+      expect(link).toContain('<svg');
+    }
+    expect(html).not.toContain('Reference guide');
+    expect(html).not.toContain('<img');
+    expect(html).toMatch(/<select[^>]*id="lz-tenancy-home-region"[\s\S]*?<option value="eu-madrid-1" selected="">/);
+    expect(html).toContain('Home region (input 1)');
+    expect(html).toContain('Primary region (input 2)');
+    expect(html).toContain('Secondary region (input 3)');
+    expect(html).toContain('<strong>Secondary region:</strong> The region where disaster recovery resources are deployed. It must be different from the Primary region.');
+    expect(html).toContain("<strong>Primary region:</strong> The region where this landing zone&#x27;s regional resources are deployed. Home and Primary may be the same region.");
+    expect(html.indexOf('Home and Primary may be the same region.')).toBeLessThan(html.indexOf('<strong>Secondary region:</strong>'));
+    expect(html.indexOf('id="lz-region-help"')).toBeGreaterThan(html.indexOf('id="lz-dr-region"'));
+    expect(html.indexOf('aria-label="View region reference for Home')).toBeLessThan(html.indexOf('id="lz-tenancy-home-region"'));
+    expect(html.indexOf('aria-label="View region reference for Primary')).toBeLessThan(html.indexOf('id="lz-region"'));
+    expect(html.indexOf('id="lz-tenancy-home-region"')).toBeLessThan(html.indexOf('id="lz-region"'));
+    expect(html.indexOf('id="lz-region"')).toBeLessThan(html.indexOf('id="lz-dr-region"'));
+  });
+
+  it('offers only Primary and Primary + Secondary flows and hides Secondary region for Only Primary', () => {
     const html = render(emptyLzModel());
-    expect(html).toContain('aria-label="Enable OCI Bastion"');
-    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('foundation-observability-title'));
-    expect(html.indexOf('Enable OCI Bastion')).toBeGreaterThan(html.indexOf('lz-observability-default'));
-    expect(html).not.toContain('id="lz-bastion-client-cidrs"');
+    expect(html).toMatch(/<select[^>]*id="lz-deployment-type"/);
+    expect(html).toContain('Only Primary</option>');
+    expect(html).toContain('Primary + Secondary</option>');
+    expect(html).not.toContain('Secondary from an existing primary');
+    expect(html).not.toContain('value="secondary-existing"');
+    expect(html).not.toContain('id="lz-dr-region"');
+    expect(html).not.toContain('Secondary region (input 3)');
   });
 
-  it('shows enabled Bastion settings with accessible errors and the access guide', () => {
+  it('automatically updates the short name when selecting a Primary region', () => {
     const model = emptyLzModel();
-    Object.assign(model, { bastion: { enabled: true, clientCidrs: '0.0.0.0/0', maxSessionTtlInSeconds: 3600 } });
-    const html = render(model);
-    expect(html).toContain('id="lz-bastion-client-cidrs"');
-    expect(html).toContain('id="lz-bastion-session-duration"');
-    expect(html).toContain('lz-bastion-client-cidrs-error');
-    expect(html).toContain('hub management subnet');
-    expect(html).toContain('aria-label="About OCI Bastion"');
-    expect(html).toContain('popover="auto"');
-    expect(html).toContain('Oracle documents access within the Bastion&#x27;s VCN.');
-    expect(html).toContain('The service remains deployed until you remove it.');
-    expect(html).toContain('approved public IPv4 address OCI sees from your workstation or corporate internet gateway');
-    expect(html).toContain('Limit how long each access session can stay open.');
-    const intro = html.match(/<p id="foundation-bastion-intro"[^>]*>(.*?)<\/p>/)?.[1];
-    expect(intro).toContain('Access private databases and virtual machines');
-    expect(intro).toContain('Studio includes the service in your deployment files.');
-    expect(intro).not.toContain('SOCKS5');
-    expect(html).toContain('/addons/oci-bastion/README.md');
+    const setField = vi.fn();
+    vi.spyOn(context, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+    render(model);
+    const select = fields.get('lz-region');
+    (select!.onChange as (event: ChangeEvent<HTMLSelectElement>) => void)({ target: { value: 'eu-amsterdam-1' } } as ChangeEvent<HTMLSelectElement>);
+    expect(setField).toHaveBeenCalledWith('foundation', expect.objectContaining({ region: 'eu-amsterdam-1', regionShortName: 'ams' }));
   });
 
-  it('keeps a custom region short name editable', () => {
+  it('stores Primary + Secondary intent while retaining complete generator scope', () => {
     const model = emptyLzModel();
-    model.foundation.regionShortName = 'fr2';
-    const input = render(model).match(/<input\b[^>]*id="lz-region-short-name"[^>]*>/)?.[0];
-    expect(input).toContain('value="fr2"');
-    expect(input).toContain('maxLength="3"');
-    expect(input).not.toContain('required');
-    expect(input).not.toMatch(/readOnly|disabled|aria-invalid="true"/i);
+    const setField = vi.fn();
+    vi.spyOn(context, 'useWizard').mockReturnValue({ model, setField, reset: vi.fn(), vcnErrors: {} });
+    render(model);
+    const select = fields.get('lz-deployment-type');
+    (select!.onChange as (event: ChangeEvent<HTMLSelectElement>) => void)({ target: { value: 'primary-secondary' } } as ChangeEvent<HTMLSelectElement>);
+    expect(setField).toHaveBeenCalledWith('foundation', expect.objectContaining({ stackScope: 'complete', deploymentMode: 'primary-secondary' }));
   });
 
-  it('associates an invalid short name with its inline error', () => {
-    const model = emptyLzModel();
-    model.foundation.regionShortName = ' fr2';
-    const html = render(model);
-    expect(html).toMatch(/id="lz-region-short-name"[^>]*aria-invalid="true"/);
-    expect(html).toMatch(/id="lz-region-short-name"[^>]*aria-describedby="lz-region-short-name-error"/);
-    expect(html).toContain('id="lz-region-short-name-error"');
-    expect(html).toContain('Use 3 characters or fewer for the region short name.');
+  it('leaves CIS, Bastion and Security Zone controls to Security', () => {
+    const html = render(emptyLzModel());
+    expect(html).not.toContain('id="lz-cis-level"');
+    expect(html).not.toContain('Observability Notifications');
+    expect(html).not.toContain('aria-label="Enable OCI Bastion"');
+    expect(html).not.toContain('aria-label="Security zone for');
   });
 
-  it.each(['', 'a-b', ' a '])('adds no required or format rule to region short names: %j', (value) => {
-    const model = emptyLzModel();
-    model.foundation.regionShortName = value;
-    const input = render(model).match(/<input\b[^>]*id="lz-region-short-name"[^>]*>/)?.[0];
-    expect(input).not.toMatch(/required|pattern=|aria-invalid="true"/);
+  it('does not expose a manual region short name setting', () => {
+    const html = render(emptyLzModel());
+    expect(html).not.toContain('id="lz-region-short-name"');
+    expect(html).not.toContain('Region short name');
   });
 
-  it('locks linked DR environments and opens their Home Region design in a new tab', () => {
-    const home = emptyLzModel();
-    const dr = structuredClone(home);
-    dr.foundation.stackScope = 'regional';
-    const html = renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={dr} homeSource={{ id: 'saved-home', name: 'Primary design', model: home }}>
-      <FoundationStep name="Recovery" onNameChange={() => {}} onNameBlur={() => {}} />
-    </WizardProvider></MemoryRouter>);
-    expect(html).toContain('Environments sync automatically from');
-    expect(html).toContain('Home Region environments');
-    expect(html).toContain('These environments are expected to be deployed in the Home Region.');
-    expect(html).toContain('Primary design');
-    expect(html).toContain('Environments synced from Home Region');
-    expect(html).not.toContain('New environment name');
-    expect(html).not.toContain('Remove prod from DR');
-    expect(html).not.toContain('Environment 1 name');
-    const homeLink = html.match(/<a\b[^>]*>Open Home Region<\/a>/)?.[0];
-    expect(homeLink).toContain('href="/lz/saved-home"');
-    expect(homeLink).toContain('target="_blank"');
-    expect(homeLink).toContain('rel="noopener noreferrer"');
-    expect(html).toMatch(/id="lz-deployment-type"[^>]+disabled/);
-    expect(html).toMatch(/id="lz-realm"[^>]+disabled/);
-    expect(html).toMatch(/id="lz-home-region"[^>]+disabled/);
-    expect(html).not.toMatch(/id="lz-region"[^>]+disabled/);
-  });
-
-  it('preserves the locked environment snapshot when the Home Region design is unavailable', () => {
-    const dr = emptyLzModel();
-    dr.foundation.stackScope = 'regional';
-    const html = renderToStaticMarkup(<WizardProvider initialModel={dr} homeSource={{ id: 'missing-home' }}>
-      <FoundationStep name="Recovery" onNameChange={() => {}} onNameBlur={() => {}} />
-    </WizardProvider>);
-    expect(html).toContain('Home Region design is unavailable');
-    expect(html).toContain('prod');
-    expect(html).not.toContain('href="/lz/missing-home"');
-    expect(html).not.toContain('New environment name');
-  });
-  it('offers deployment type without a description or DR starting-point field', () => {
+  it('shows deployment type without a description or DR starting-point field', () => {
     const complete = render(emptyLzModel());
     expect(complete).toContain('id="lz-deployment-type"');
-    expect(complete).toMatch(/<option value="complete"[^>]*>Home Region<\/option>/);
-    expect(complete).toMatch(/<option value="regional"[^>]*>DR<\/option>/);
-    expect(complete).toContain('Home Region creates compartments, IAM and governance');
+    expect(complete).toContain('Only Primary</option>');
+    expect(complete).toMatch(/<select[^>]*id="lz-deployment-type"/);
+    expect(complete).toContain('Configure Home and Primary in this Studio configuration.');
     expect(complete).not.toContain('id="lz-dr-source"');
     expect(complete).not.toContain('Description');
     const model = emptyLzModel();
     model.foundation.stackScope = 'regional';
     const regional = render(model);
-    expect(regional).toContain('Home Region');
+    expect(regional).toContain('Home and Primary Studio configuration');
     expect(regional).not.toContain('id="lz-dr-source"');
     expect(regional).not.toContain('Apply starting point');
     expect(regional).not.toContain('Description');
   });
-  it('explains DR environment matching and leaves deployment prerequisites to Review', () => {
-    const model = emptyLzModel();
-    model.foundation.stackScope = 'regional';
-    model.foundation.notifications!.useSingleRecipient = false;
-    const html = render(model);
-    expect(html).toContain('Home Region environments');
-    expect(html).toContain('aria-label="About Home Region environments"');
-    expect(html).toContain('These environments are expected to be deployed in the Home Region.');
-    expect(html).toContain('Use the same environment names as your Home Region deployment.');
-    expect(html).toMatch(/<details[^>]*><summary[^>]*>How DR uses these environments<\/summary>/);
-    expect(html).not.toMatch(/<details[^>]*\bopen/);
-    expect(html).toContain('compartments from your Home Region.');
-    expect(html).toContain('Changes here affect only this DR design.');
-    expect(html).not.toContain('Home-owned');
-    expect(html).not.toContain('Home controls');
-    expect(html).not.toContain('aria-label="Security zone for');
-    expect(render(emptyLzModel())).toContain('role="switch"');
-    expect(html).toContain('Home Region');
-    expect(html).not.toContain('Home stack owns matching compartments');
-    model.environments = [];
-    expect(render(model)).toContain('No Home Region environments. Hub and shared services only.');
-    expect(html).not.toContain('id="lz-observability-cloudguard"');
-    expect(html).not.toContain('id="lz-observability-iam"');
-    expect(html).toContain('id="lz-observability-network"');
-  });
-  it('starts with the shared recipient checked and a required email field', () => {
-    const html = render(emptyLzModel());
-    expect(html).toMatch(/type="checkbox"[^>]*checked/);
-    expect(html).toMatch(/id="lz-observability-default"[^>]*required/);
-    expect(html).toContain('Enter at least one notification email address.');
-    expect(html).not.toContain('id="lz-observability-cloudguard"');
-  });
-  it('keeps the switch above topic inputs when separate recipients are selected', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.useSingleRecipient = false;
-    const html = render(model);
-    const recipientChoice = html.indexOf('Use the same recipients for all topics');
-    expect(recipientChoice).toBeGreaterThan(-1);
-    expect(recipientChoice).toBeLessThan(html.indexOf('id="lz-observability-cloudguard"'));
-    expect(html).not.toContain('id="lz-observability-default"');
-    expect(html).not.toMatch(/type="checkbox"[^>]*checked/);
-  });
-  it('clears the field error for a valid shared recipient', () => {
-    const model = emptyLzModel();
-    model.foundation.notifications!.default = 'ops@example.com';
-    expect(render(model)).not.toContain('role="alert"');
-  });
+
 });

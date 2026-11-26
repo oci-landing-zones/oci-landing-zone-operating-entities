@@ -5,6 +5,7 @@ import { findRegion } from './regions';
 import type { DrDesignDraft } from './disasterRecoveryDesign';
 import { drPlatformProjection } from './disasterRecoveryPlatformProjection';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
+import { inheritRegionalCostGovernance } from './regionalCostGovernance';
 
 export function createRegionalModel(): LzModel {
   const model = { ...emptyLzModel(), environments: [], projects: [] };
@@ -13,12 +14,14 @@ export function createRegionalModel(): LzModel {
   return model;
 }
 
-export function validateRegionalDeployment(model: LzModel): string[] {
+export function validateRegionalDeployment(model: LzModel, primary?: LzModel | null): string[] {
   if (model.foundation.stackScope !== 'regional') return [];
   const { realm, region, homeRegion } = model.foundation;
   return [
     ...(!findRegion(realm, region) ? ['Choose a DR region.'] : []),
-    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different Home Region in the same realm.'] : []),
+    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different primary region in the same realm.'] : []),
+    ...(primary && model.foundation.cisLevel === 2 && primary.foundation.drRegion !== region
+      ? ['Select this secondary region in the primary design before generating CIS Level 2 files. Review and apply the updated primary deployment first.'] : []),
   ];
 }
 
@@ -135,5 +138,7 @@ export function legacyRegionalModel(home: LzModel, draft: DrDesignDraft): LzMode
   }
   model.remotePeeringConnections = draft.rpcEnabled ? [{ id: 'rpc-home', name: 'home', role: 'requester',
     remoteCidrs: configuredVcnCidrs(home), peerRegionName: home.foundation.region, peerId: '' }] : [];
+  const projectOrigins = Object.fromEntries(home.projects.flatMap((project) => model.environments.map((env) => [`${project.id}:${env.id}`, project.id])));
+  model.foundation.costGovernance = inheritRegionalCostGovernance(home, model, projectOrigins);
   return structuredClone(model);
 }

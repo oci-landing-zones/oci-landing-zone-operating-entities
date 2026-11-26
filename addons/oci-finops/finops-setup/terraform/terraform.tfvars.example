@@ -12,3 +12,6 @@ private_subnet_id = ""
 
 #To create dynamic group and policy or not. Default is false
 create_policy = false
+
+# Keep automatic FinOps tags for published deployments. Set false for Studio without FinOps tags.
+enable_cost_governance_tags = true

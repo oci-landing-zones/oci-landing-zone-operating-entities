@@ -16,7 +16,7 @@ export const s: Record<string, CSSProperties> = {
   accent:  { height: 3, background: oracle.red, borderRadius: '8px 8px 0 0' },
   body:    { padding: 20 },
   title:   { fontSize: 18, lineHeight: 1.35, fontWeight: 700, margin: '0 0 8px', color: oracle.ink },
-  intro:   { fontSize: 14, lineHeight: 1.55, color: oracle.textMuted, margin: '0 0 20px', maxWidth: '65ch' },
+  intro:   { fontSize: 14, lineHeight: 1.55, color: oracle.textMuted, margin: '0 0 20px' },
   label:   { display: 'block', fontSize: 13, lineHeight: 1.4, color: oracle.text, fontWeight: 600, marginBottom: 6 },
   input:   { width: '100%', boxSizing: 'border-box', minHeight: 44, padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
 

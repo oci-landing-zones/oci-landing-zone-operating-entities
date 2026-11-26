@@ -133,14 +133,79 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 |---|---|---:|---|---|
 | `region` | string | No* | `eu-frankfurt-1` | OCI region used by generated configuration. |
 | `region_short_name` | string | No* | `fra` | Short region label used by resource naming. |
+| `tenancy_home_region` | string | No | Omitted | Studio metadata preserving the tenancy Home selection on import. Ownership follows `stack_scope`. |
+| `primary_region`, `primary_region_short_name` | strings | For `home` scope | Omitted | Paired Primary deployment region and naming code, used to derive Home-owned IAM and governance for that topology. |
 | `dr_region` | string | No | Omitted | DR region whose Object Storage service must be authorized by complete home IAM. Must differ from `region`. |
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
+| `identity_domain_name` | string | No | `id_lz_common` | Display name of the landing-zone identity domain: 1–100 letters, numbers, hyphens, periods or underscores. Domain-qualified IAM policies and key grants follow this name; logical key `COMMON-DOMAIN` remains stable. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
-| `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
+| `security_zone_recipe1_cis_level` | number | No | `cis_level` | Optional CIS `1` or `2` override for Security Zone Recipe 01 and its root target only. |
+| `enable_cloud_guard` | boolean | No | `true` | Include Cloud Guard configuration and its dedicated event rule and topic. Set `false` only when Cloud Guard is already enabled and managed externally; the baseline Security Zones require it. Regional output always excludes Cloud Guard. |
+| `stack_scope` | `complete`, `regional`, `home` or `primary` | No | `complete` | Declares which resource domains this source config owns. |
+| `enable_landing_zone_security_zone` | boolean | No | `true` | Include Recipe 01 and its `cmp-landingzone` Security Zone in pre/final files. Independent of shared-network and environment zones, Cloud Guard and encryption. |
+| `enable_shared_network_security_zone` | boolean | No | `true` | Include Recipe 02 and its separate `cmp-lz-network` Security Zone. New Studio configurations explicitly set `false`. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
 | `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |
+| `cost_governance` | object | No | Omitted | Opts the complete Home stack into One-OE cost Tag Defaults and its eight inherited budgets, with optional overrides. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
+
+### Separate Home and Primary stacks
+
+For different Home and Primary regions, generate two sources independently:
+
+- Home uses `stack_scope: 'home'`, its own `region`/`region_short_name`, and paired `primary_region`/`primary_region_short_name`. It owns IAM, governance, Cloud Guard, Home events and their notification topics.
+- Primary uses `stack_scope: 'primary'` and its own region pair. It owns networks, Security Zones, regional keys and key-specific IAM grants, observability including Service Connector Hub, and workloads. Keep its key grants even when they use the `oci.home` provider alias.
+
+Deploy Home first with `save_output = true`. Import its runtime `compartments_output.json` into the separate Primary stack. These files support a new installation and do not migrate existing state. Keep the same topology in both sources; configure and generate the same `dr_region` in both when using DR. Complete Primary before the separate regional DR stack; DR imports compartments from Home and network output from Primary. External RPC requesters can additionally require the acceptor's network output. Use separate private sources and Terraform states for each deployment.
+
+### Cost tags and inherited budgets
+
+Studio's **Governance** uses the same `cost_governance` contract as Blueprint Factory:
+
+```jsonnet
+cost_governance: {
+  require_tag_values: true,
+  enable_tags: true,
+  tag_resource_labels: true,
+  owner_email: 'owner@example.com',
+  cost_center_assignments: {
+    CC12345: { platform: ['network', 'security'], environment: ['prod'], project: null },
+  },
+  budget_recipients: 'finops@example.com',
+  budgets: {
+    'BUDGET-LANDINGZONE-KEY': {
+      name: 'budget-platform',
+      amount: 12000,
+      alert_rule: { threshold_value: 90 },
+    },
+  },
+},
+```
+
+Providing this object inherits the eight [One-OE budget defaults](../../gen/lib/cost_budgets.libsonnet) and all six cost Tag Defaults. Omit `cost_governance` to preserve the existing factory behavior without these additional resources. Studio includes the object for Home designs; DR reuses Home governance and does not emit `governance.json`. Regional inputs include `enable_tags: false` when Home disables FinOps tags.
+
+- `enable_tags` defaults to `true`. Set it to `false` to omit the six FinOps tag definitions, defaults, resource assignments and tag-based budgets. IAM role tags and compartment-based budgets are retained. New Studio designs start with FinOps tags disabled. **Enable FinOps tags** in Governance enables them with `require_tag_values: true`; linked DR designs inherit the Home selection.
+- `enable_vulnerability_scanning` is an optional boolean, enabled by default. Set it to `false` to omit `scanning_configuration` (host scanning recipes and targets) from security outputs in the selected deployment. Cloud Guard, CIS level, Security Zones and encryption resources are unchanged. Standalone regional inputs may use their own selection; linked Studio Secondary configurations inherit Primary. Existing scanning managed by other stacks is outside this switch's scope.
+- `security_zone_environment_recipe_number` accepts `2` or `3`. New Studio designs use `2` for optional environment recipes; omitted inputs preserve the existing Recipe 03 resource keys. This setting does not move resource ownership between stacks. Do not renumber deployed recipes without a reviewed migration.
+- Security output includes `security_cisX_pre.json` only when its configuration differs from `security_cisX.json`. Recipe 01 alone needs only the final file. Additional environment zone associations require applying the pre file first, then replacing it with the final file in the same stack and state; never load both variants together. Regional DR outputs omit redundant pre files.
+- `tag_resource_labels` defaults to `false` in Factory inputs and is enabled by Studio. It applies FinOps labels to generated resources, excluding tag namespaces and tag definitions. Home exports only `governance.json`, containing namespaces, definitions, defaults and budgets; governance requires no bootstrap file or second phase. DR emits no governance file.
+- `cost_center_business_units` maps each cost-center value to one Business Unit. Matching generated resources receive the unit associated with their assigned cost center. Each configured Business Unit must have at least one cost center; several centers may belong to the same unit. Omit the map to preserve previous Factory assignments. Studio exports the selected associations and validates missing assignments.
+- `require_tag_values` defaults to `false`. Set it to `true` to set `is_user_required` on all six cost Tag Defaults, retaining their `default_value`. Explicit placeholder values still satisfy this requirement; it does not enforce business-specific values. Access-control tags are unchanged.
+- Budget resources use `tag-lz-platform=governance` and `tag-lz-environment=shared`, independently of their spend target. IAM groups also use `environment=shared` while retaining project values and policy scopes. General IAM resources and structural compartments use `iam`; network, security and workload compartments retain their specific platform classifications. Both values are included in the generated Platform LOV.
+- `owner_email` is one email address used for `tag-lz-owner` on every emitted resource tag map and on the landing-zone Owner Tag Default. When provided, it overrides existing Owner assignments and is included in the Owner LOV. Studio exposes one global Owner email; per-resource Owner customization is outside its current scope. Omitting this field preserves existing Factory Owner behavior.
+- `budget_recipients` applies its email string to all active budget alerts and takes precedence over individual recipients. Studio's shared-email control accepts one address; configuration files can also supply a comma-separated list. An empty string keeps the alert rules without email notifications in Factory configuration files. Studio requires a valid notification email for active budgets.
+- `budgets` contains overrides keyed by the original budget keys. Keys and target filters remain stable. Each override accepts `name`, `amount`, and `alert_rule.threshold_value` or `alert_rule.recipients`. Omitted fields inherit One-OE values. Changing a budget name does not change its compartment or tag target.
+- Inherited Business Unit budgets are omitted when their target is absent from an explicit `tag_value_lists['tag-lz-business-unit']` list. Removing Retail in Studio therefore removes its inherited budget and prevents that budget from adding Retail back to the generated LOV. Existing budget edits remain saved for reuse if the value is added again.
+- `tag_value_lists` maps one of the six cost tag names to an array of allowed strings. Studio's editable **LOV (List of values)** accepts comma-separated values; Owner uses a single email input instead. Generated lists retain values used by the landing zone, active budgets and Tag Defaults. The **Configuration** column shows the landing-zone scope inherited by child compartments.
+- Studio creates an additional tag-based budget when a cost center is added. Factory input must include the corresponding `additional_budgets` entry; adding a value to `tag_value_lists` alone does not create a budget. Business Unit associations are exported through `cost_center_business_units` and applied to generated resources.
+- `cost_center_assignments` maps cost-center values to `platform`, `environment` and `project` filters using their inherited names. All active filters must match the resource's generated tags; multiple values within one filter are alternatives. Omitted, `null` or empty filters are inactive (**Not apply**). Studio exports these rules, including an unfiltered `CC12345` rule for its default **All LZ** scope. Matching generated resource tag maps receive the cost center instead of `tobedefined`; existing explicit cost-center tags, including budget targets, are preserved. A resource matching multiple cost centers fails generation rather than receiving an arbitrary value. Assigned cost centers are retained in the generated LOV. These rules do not create compartment Tag Defaults for future resources; existing Tag Defaults and tag definitions remain unchanged. Omit the field to preserve previous Factory assignments.
+- Each additional project assigned to an environment gets one monthly tag-based budget (default amount `500`, threshold `80`), shared across its environments. Its key is `BUDGET-PROJECT-<PROJECT>-KEY` (uppercase, unsupported characters replaced with hyphens).
+- `exclude_budgets` lists inherited, project or custom keys to omit from generated governance. Studio retains inherited overrides in source config so restoring a removed budget after import keeps its settings.
+- `additional_budgets` defines new budgets for the six FinOps/Governance tags. Keys use `BUDGET-CUSTOM-<ID>-KEY`; each entry requires `name`, `amount`, `tag_name` (for example `tag-lz-cost-center`) and `tag_value`, with optional `alert_rule.threshold_value` and `alert_rule.recipients`. Targets use the `tagns-lz-cost-governance` namespace. Studio exposes **Add tag-based budget**; custom budgets can be deleted, while inherited budgets can be restored. Shared recipients apply to custom budgets too.
+- Amounts must be integers from `1` through `999999999999`. Percentage thresholds must be greater than `0` and at most `10000`, with up to two decimals. Names use letters, numbers, hyphens or underscores and cannot start with a number. Recipients are strings, not arrays. Alert names and messages follow the configured budget name and threshold.
+
+The [cost governance guide](../../blueprints/one-oe/runtime/one-stack/cost-governance.md) describes the defaults and the effects of requiring tag values.
 
 `security_targets` can contain only names defined under `environments`. Omit it to apply the default targeting to every configured environment.
 
@@ -155,16 +220,22 @@ notification_emails: {
 },
 ```
 
+### Security Zone Recipe 01 CIS level
+
+Optional `security_zone_recipe1_cis_level: 1` or `2` overrides only Recipe 01 and its landing-zone target. When omitted or null, Recipe 01 follows `cis_level`. Shared-network and environment recipes, CMEKs, Vaults and workload security continue to use `cis_level`. A different Recipe 01 level therefore does not establish compliance with that CIS level for the complete landing zone. Review compatibility between the selected restrictions and the resources you deploy.
+
+Studio always uses the Security baseline CIS level for Recipe 01. **Security → Security Zones** shows the inherited level and an On/Off switch, enabled by default. Turning it off exports `enable_landing_zone_security_zone: false` and omits Recipe 01 and its target; baseline encryption and Advanced zones are unchanged. Independent recipe-level overrides remain supported by Blueprint Factory sources, but Studio normalizes imported overrides to the baseline and warns when the level changes. New Studio configurations generate only Recipe 01 and its `cmp-landingzone` zone: they export `enable_shared_network_security_zone: false` and `security_targets: []`. **Advanced** reveals independent controls for Recipe 02 / shared network and environment zones. Enabling an additional zone includes its recipe and target; opening or closing Advanced preserves selections. Older saved/imported configurations retain the factory default shared-network zone unless explicitly disabled. Omission of the new field preserves the factory default of `true`; published blueprints are unchanged.
+
 ## 2. Hub
 
 The hub is the landing zone's central network. Its `kind` selects the supported routing and firewall pattern.
 
 | Hub kind | Description | Required subnet keys when explicitly supplied |
 |---|---|---|
-| `hub_a` | Dual-firewall hub. | `fw-dmz`, `lb`, `fw-int`, `mgmt`, `mon`, `dns` |
-| `hub_b` | Single OCI Network Firewall hub. | `lb`, `fw`, `mgmt`, `mon`, `dns` |
-| `hub_c` | Third-party firewall hub. | `untrust`, `trust`, `lb`, `mgmt`, `mon`, `dns` |
-| `hub_e` | No-firewall, DRG-based hub. | `lb`, `mgmt`, `mon`, `dns` |
+| `hub_a` | Dual-firewall hub. | `fw-dmz`, `lb`, `fw-int` |
+| `hub_b` | Single OCI Network Firewall hub. | `lb`, `fw` |
+| `hub_c` | Third-party firewall hub. | `untrust`, `trust`, `lb` |
+| `hub_e` | No-firewall, DRG-based hub. | `lb` |
 
 ```jsonnet
 hub: {
@@ -176,7 +247,27 @@ hub: {
 },
 ```
 
-`network.vcn` is always required and must be a valid CIDR. When `hub.network.subnets` is omitted, the factory allocates the canonical `/24` subnet layout. If it is supplied, it must contain the complete key set for the selected hub, use valid non-overlapping CIDRs, and remain inside the hub VCN.
+`network.vcn` is always required and must be a valid CIDR. When `hub.network.subnets` is omitted, the factory allocates the full canonical `/24` subnet layout, including `mgmt`, `mon` and `dns`. If it is supplied, it must contain the required keys above and may additionally contain any of `mgmt`, `mon` and `dns`. All CIDRs must be valid, non-overlapping and inside the hub VCN. Omitted optional entries are not generated; existing explicit maps retain their current resources and CIDRs.
+
+Studio enables these three optional subnets by default. In Hub Network, remove an unused subnet with its delete button or restore it with **Add mgmt/mon/dns subnet**. Restoring allocates an available range without moving existing subnets. OCI Bastion requires `mgmt`: disable Bastion before removing that subnet, and restore it before enabling Bastion again. Direct factory sources with Bastion enabled and no `mgmt` are rejected.
+
+When `mgmt` is absent, the factory omits the example Bastion-endpoint SSH ingress and the project NSG SSH rules sourced from that subnet. The shared MGMT route table and security list remain available to other private hub subnets. Removing `mon` or `dns` removes their subnet definitions and any generated subnet-specific routes or flow-log references. These changes do not provide an alternative management or DNS endpoint. For an already deployed landing zone, review the Terraform plan and migrate any dependent resources before applying subnet removal.
+
+### Custom private hub subnets
+
+Use the separate optional `hub.network.custom_subnets` map for additional private subnets. Keep `subnets` limited to the required and optional canonical names above. Custom names cannot reuse any hub's reserved subnet name, including an omitted optional subnet, and must use lowercase letters, digits or hyphens, starting and ending with a letter or digit. At most 99 custom subnets are supported. DNS labels use a stable hash of each custom name to remain within OCI limits; adding another subnet does not change existing labels.
+
+```jsonnet
+hub: {
+  kind: 'hub_e',
+  network: {
+    vcn: '10.0.0.0/21',
+    custom_subnets: { tools: '10.0.6.0/24' },
+  },
+},
+```
+
+All custom CIDRs must fit inside the hub VCN and must not overlap canonical or other custom subnets. They prohibit public IPs and internet ingress and reference the **same MGMT route table and security list**, as MON and DNS do. This includes MGMT's current outbound, ICMP and Bastion SSH rules; it does not add application-specific ingress or NSGs. Review those shared rules for the intended workload. Hubs A and B also include every custom CIDR in NAT gateway return routes through their firewall. Hub C reuses its MGMT Trust-NLB path; Hub E reuses its MGMT NAT/service-gateway and generated peer routes. This option does not enable inspection of same-subnet traffic or add subnet-specific IAM boundaries.
 
 ## 3. Environments
 

@@ -59,9 +59,9 @@ The ExaDB-D stack creates its VCN, and the base One-OE stack owns its DRG attach
     </tr>
     <tr>
       <td>Files</td>
-      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc1.json">exacs_identity_uc1.json</a>, observability pre <a href="./exacs_observability_uc1_pre.json">exacs_observability_uc1_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc1_a_pre.json">exacs_network_uc1_a_pre.json</a> or <a href="./exacs_network_uc1_e_pre.json">exacs_network_uc1_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_post.json">oneoe_network_hub_a_post.json</a> or <a href="./oneoe_network_hub_e_post.json">oneoe_network_hub_e_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc1.json">exacs_observability_uc1.json</a> and the selected hub network final file: <a href="./exacs_network_uc1_a.json">exacs_network_uc1_a.json</a> or <a href="./exacs_network_uc1_e.json">exacs_network_uc1_e.json</a>.</td>
-      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc2.json">exacs_identity_uc2.json</a>, observability pre <a href="./exacs_observability_uc2_pre.json">exacs_observability_uc2_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc2_a_pre.json">exacs_network_uc2_a_pre.json</a> or <a href="./exacs_network_uc2_e_pre.json">exacs_network_uc2_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc2_post.json">oneoe_network_hub_a_uc2_post.json</a> or <a href="./oneoe_network_hub_e_uc2_post.json">oneoe_network_hub_e_uc2_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc2.json">exacs_observability_uc2.json</a> and the selected hub network final file: <a href="./exacs_network_uc2_a.json">exacs_network_uc2_a.json</a> or <a href="./exacs_network_uc2_e.json">exacs_network_uc2_e.json</a>.</td>
-      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc3.json">exacs_identity_uc3.json</a>, observability pre <a href="./exacs_observability_uc3_pre.json">exacs_observability_uc3_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc3_a_pre.json">exacs_network_uc3_a_pre.json</a> or <a href="./exacs_network_uc3_e_pre.json">exacs_network_uc3_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc3_post.json">oneoe_network_hub_a_uc3_post.json</a> or <a href="./oneoe_network_hub_e_uc3_post.json">oneoe_network_hub_e_uc3_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc3.json">exacs_observability_uc3.json</a> and the selected hub network final file: <a href="./exacs_network_uc3_a.json">exacs_network_uc3_a.json</a> or <a href="./exacs_network_uc3_e.json">exacs_network_uc3_e.json</a>.</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc1.json">exacs_identity_uc1.json</a>, observability <a href="./exacs_observability_uc1.json">exacs_observability_uc1.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc1_a_pre.json">exacs_network_uc1_a_pre.json</a> or <a href="./exacs_network_uc1_e_pre.json">exacs_network_uc1_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_post.json">oneoe_network_hub_a_post.json</a> or <a href="./oneoe_network_hub_e_post.json">oneoe_network_hub_e_post.json</a>. Finally re-apply the EXACS extension stack with the same observability file and the selected hub network final file: <a href="./exacs_network_uc1_a.json">exacs_network_uc1_a.json</a> or <a href="./exacs_network_uc1_e.json">exacs_network_uc1_e.json</a>.</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc2.json">exacs_identity_uc2.json</a>, observability <a href="./exacs_observability_uc2.json">exacs_observability_uc2.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc2_a_pre.json">exacs_network_uc2_a_pre.json</a> or <a href="./exacs_network_uc2_e_pre.json">exacs_network_uc2_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc2_post.json">oneoe_network_hub_a_uc2_post.json</a> or <a href="./oneoe_network_hub_e_uc2_post.json">oneoe_network_hub_e_uc2_post.json</a>. Finally re-apply the EXACS extension stack with the same observability file and the selected hub network final file: <a href="./exacs_network_uc2_a.json">exacs_network_uc2_a.json</a> or <a href="./exacs_network_uc2_e.json">exacs_network_uc2_e.json</a>.</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc3.json">exacs_identity_uc3.json</a>, observability <a href="./exacs_observability_uc3.json">exacs_observability_uc3.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc3_a_pre.json">exacs_network_uc3_a_pre.json</a> or <a href="./exacs_network_uc3_e_pre.json">exacs_network_uc3_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc3_post.json">oneoe_network_hub_a_uc3_post.json</a> or <a href="./oneoe_network_hub_e_uc3_post.json">oneoe_network_hub_e_uc3_post.json</a>. Finally re-apply the EXACS extension stack with the same observability file and the selected hub network final file: <a href="./exacs_network_uc3_a.json">exacs_network_uc3_a.json</a> or <a href="./exacs_network_uc3_e.json">exacs_network_uc3_e.json</a>.</td>
     </tr>
     <tr>
       <td>Deployment</td>
@@ -70,7 +70,7 @@ The ExaDB-D stack creates its VCN, and the base One-OE stack owns its DRG attach
   </tbody>
 </table>
 
-On every re-apply, retain all configuration documents whose top-level family is not being replaced. For the One-OE re-apply, keep its IAM, governance, security, and observability documents and replace only the One-OE network document with the matching `oneoe_network_*_post.json` file. For the ExaDB-D extension re-apply, keep the matching `exacs_identity_uc*.json` document and replace the pre network and observability documents with their final counterparts. Do not provide both the pre and final document for the same top-level family in one operation.
+On every re-apply, retain all configuration documents whose top-level family is not being replaced. For the One-OE re-apply, keep its IAM, governance, security, and observability documents and replace only the One-OE network document with the matching `oneoe_network_*_post.json` file. For the ExaDB-D extension re-apply, keep the matching `exacs_identity_uc*.json` document and retain its observability document and replace only the pre network document with its final counterpart. Do not provide both the pre and final document for the same top-level family in one operation.
 
 &nbsp;
 
@@ -103,9 +103,9 @@ On every re-apply, retain all configuration documents whose top-level family is 
       <td>Hub and spoke routes required to connect the existing One-OE network to the shared ExaDB-D platform network.</td>
     </tr>
     <tr>
-      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc1_pre.json">exacs_observability_uc1_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc1.json">exacs_observability_uc1.json</a></td>
+      <td><strong>Observability configuration</strong><br><a href="exacs_observability_uc1.json">exacs_observability_uc1.json</a></td>
       <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
-      <td>ExaDB-D infrastructure and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+      <td>ExaDB-D infrastructure and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The complete observability file includes explicit Flow Logs for the extension-owned VCNs and subnets from the initial apply.</td>
     </tr>
     <tr>
       <td rowspan="4"><strong>Use Case 2 (UC2)</strong></td>
@@ -124,9 +124,9 @@ On every re-apply, retain all configuration documents whose top-level family is 
       <td>Hub and spoke routes required to connect the existing One-OE network to the prod and preprod ExaDB-D platform networks.</td>
     </tr>
     <tr>
-      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc2_pre.json">exacs_observability_uc2_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc2.json">exacs_observability_uc2.json</a></td>
+      <td><strong>Observability configuration</strong><br><a href="exacs_observability_uc2.json">exacs_observability_uc2.json</a></td>
       <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
-      <td>Shared ExaDB-D infrastructure, environment ExaDB-D platform, and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+      <td>Shared ExaDB-D infrastructure, environment ExaDB-D platform, and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The complete observability file includes explicit Flow Logs for the extension-owned VCNs and subnets from the initial apply.</td>
     </tr>
     <tr>
       <td rowspan="4"><strong>Use Case 3 (UC3)</strong></td>
@@ -145,9 +145,9 @@ On every re-apply, retain all configuration documents whose top-level family is 
       <td>Hub and spoke routes required to connect the existing One-OE network to the prod and preprod ExaDB-D platform networks.</td>
     </tr>
     <tr>
-      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc3_pre.json">exacs_observability_uc3_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc3.json">exacs_observability_uc3.json</a></td>
+      <td><strong>Observability configuration</strong><br><a href="exacs_observability_uc3.json">exacs_observability_uc3.json</a></td>
       <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
-      <td>Environment ExaDB-D platform and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+      <td>Environment ExaDB-D platform and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The complete observability file includes explicit Flow Logs for the extension-owned VCNs and subnets from the initial apply.</td>
     </tr>
   </tbody>
 </table>

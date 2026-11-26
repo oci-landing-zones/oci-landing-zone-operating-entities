@@ -9,6 +9,7 @@ export function complexHybridModel(hubKind: HubKind = 'hub_b') {
   const model = emptyLzModel();
   model.network = { hubKind, ...hubKindDefaults(hubKind) };
   model.foundation.notifications!.default = 'ops@example.com';
+  model.foundation.costGovernance!.recipients = 'finops@example.com';
   model.environments = ['prod', 'preprod', 'dev'].map((name, index) => ({
     id: `environment-${index + 1}`, name, securityZone: index === 0, network: envNetworkDefaults(index, name),
   }));

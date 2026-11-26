@@ -9,6 +9,8 @@ import { setAssetLoader } from './jsonnetVm';
 beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-jsonnet/libjsonnet.wasm') })));
 it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s creates spoke NAT only for Hub E', async (hubKind) => {
   const model = emptyLzModel();
+  model.foundation.costGovernance!.recipients = 'finops@example.com';
+  model.foundation.notifications!.default = 'ops@example.com';
   model.network = { hubKind, ...hubKindDefaults(hubKind) };
   model.platforms = [newPlatform('oke_simple', [], model.environments), newPlatform('custom', [], model.environments)];
   model.sharedPlatforms = [newSharedPlatform('custom', [])];

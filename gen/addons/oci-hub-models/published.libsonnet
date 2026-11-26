@@ -1,3 +1,4 @@
+local cost_tags = import '../../lib/cost_tags.libsonnet';
 local governance_builder = import '../../builders/governance.libsonnet';
 local iam_builder = import '../../builders/iam.libsonnet';
 local render_context = import '../../render_context.libsonnet';
@@ -22,19 +23,19 @@ local hub_builders = {
       lb_backends: ctx.lb_backends,
       lb_env_name: ctx.lb_env_name,
     });
-    {
+    cost_tags.apply({
       network:
         if hub.post != null then hub.pre + hub.post
         else hub.pre,
 
       [if std.objectHas(hub, 'backends') then 'network_backends']:
         self.network + hub.backends.build_placeholders(),
-    },
+    }, ctx.config),
 
   render_iam(config)::
     local ctx = render_context.from_raw_config(config);
     local shared_only_topo = topology(ctx.shared_only_config, ctx.n);
-    iam_builder(ctx.shared_only_config, ctx.n, ctx.realm_constants, shared_only_topo),
+    cost_tags.apply(iam_builder(ctx.shared_only_config, ctx.n, ctx.realm_constants, shared_only_topo), ctx.config),
 
   render_governance(config)::
     local ctx = render_context.from_raw_config(config);

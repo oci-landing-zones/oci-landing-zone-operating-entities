@@ -11,6 +11,31 @@ export interface RemotePeeringIssue {
   detail: string;
 }
 
+export function defaultRemotePeeringName(connections: readonly Pick<RemotePeeringConnection, 'name'>[]): string {
+  const names = new Set(connections.map((connection) => connection.name.trim().toLowerCase().replaceAll('_', '-')));
+  let index = connections.length + 1;
+  while (names.has(`rpc-${index}`)) index++;
+  return `rpc-${index}`;
+}
+
+export function remotePeeringPeerRegion(model: LzModel, connection?: Pick<RemotePeeringConnection, 'peerRegionName'>): string {
+  return connection?.peerRegionName || (model.foundation.stackScope === 'regional'
+    ? model.foundation.homeRegion : model.foundation.drRegion) || '';
+}
+
+export function autofillRemotePeeringCidrs(model: LzModel, peer?: LzModel): LzModel {
+  if (!peer || peer.foundation.realm !== model.foundation.realm) return model;
+  const connections = model.remotePeeringConnections ?? [];
+  const matches = connections.filter((connection) => !connection.peerTenancyOcid?.trim()
+    && remotePeeringPeerRegion(model, connection) === peer.foundation.region);
+  // Multiple RPCs to one region may represent different peers or routing scopes.
+  if (matches.length !== 1 || matches[0].remoteCidrs.some((cidr) => cidr.trim())) return model;
+  const remoteCidrs = [...new Set(configuredVcnCidrs(peer))];
+  if (!remoteCidrs.length || remoteCidrs.some((cidr) => !parseCidr(cidr) || normalizeCidr(cidr) !== cidr)) return model;
+  return { ...model, remotePeeringConnections: connections.map((connection) => connection === matches[0]
+    ? { ...connection, remoteCidrs } : connection) };
+}
+
 export function remotePeeringIssues(model: LzModel): RemotePeeringIssue[] {
   const errors: RemotePeeringIssue[] = [];
   const names = new Set<string>();
@@ -26,10 +51,10 @@ export function remotePeeringIssues(model: LzModel): RemotePeeringIssue[] {
     const segment = name.replaceAll('_', '-');
     if (!/^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/.test(name) || names.has(segment)) add('name', 'use a unique lowercase connection name (hyphens and underscores are allowed).');
     names.add(segment);
-    if (!findRegion(model.foundation.realm, connection.peerRegionName)) add('peerRegionName', 'choose a peer region in the same realm.');
+    if (!findRegion(model.foundation.realm, remotePeeringPeerRegion(model, connection))) add('peerRegionName', 'choose a peer region in the same realm.');
     if (connection.role === 'requester' && !connection.peerId?.trim()) add('peerId', 'enter the acceptor RPC OCID or dependency key.');
     if (connection.role === 'requester' && connection.peerId?.startsWith('ocid1.') && !connection.peerId.startsWith('ocid1.remotepeeringconnection.')) add('peerId', 'the peer OCID must identify a remote peering connection.');
-    if (model.foundation.stackScope === 'regional' && connection.peerTenancyOcid?.trim()) add('peerTenancyOcid', 'DR supports same-tenancy peering only. Cross-tenancy IAM must be managed in a Home Region deployment.');
+    if (model.foundation.stackScope === 'regional' && connection.peerTenancyOcid?.trim()) add('peerTenancyOcid', 'DR supports same-tenancy peering only. Cross-tenancy IAM must be managed in a primary deployment.');
     if (connection.peerTenancyOcid?.trim() && !connection.peerTenancyOcid.startsWith('ocid1.tenancy.')) add('peerTenancyOcid', 'enter a valid peer tenancy OCID.');
     if (connection.peerTenancyOcid?.trim() && connection.role === 'acceptor' && !connection.requestorGroupOcid?.startsWith('ocid1.group.')) add('requestorGroupOcid', 'enter the foreign requester group OCID.');
     if (connection.requestorGroupOcid?.trim() && (!connection.peerTenancyOcid?.trim() || connection.role !== 'acceptor')) add('requestorGroupOcid', 'a foreign requester group applies only to a cross-tenancy acceptor.');

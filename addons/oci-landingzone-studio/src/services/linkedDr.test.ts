@@ -115,3 +115,25 @@ describe('linked environment synchronization', () => {
     expect(syncDrEnvironments(dr, emptyLzModel())).toBe(dr);
   });
 });
+
+it('inherits disabled FinOps tagging from Home without sharing mutable settings', () => {
+  const home = emptyLzModel(); const dr = emptyLzModel(); dr.foundation.stackScope = 'regional';
+  home.foundation.costGovernance = { requireTagValues: false, useSingleRecipient: true, recipients: '', budgets: {}, tagsEnabled: false };
+  const synced = syncDrEnvironments(dr, home);
+  expect(synced.foundation.costGovernance?.tagsEnabled).toBe(false);
+  expect(synced.foundation.costGovernance).not.toBe(home.foundation.costGovernance);
+  home.foundation.costGovernance.tagsEnabled = true;
+  expect(syncDrEnvironments(synced, home).foundation.costGovernance?.tagsEnabled).toBe(true);
+});
+
+it('inherits VSS from Primary without changing regional networks and supports re-enabling it', () => {
+  const home = emptyLzModel(); const dr = emptyLzModel();
+  dr.foundation.region = 'eu-amsterdam-1'; dr.foundation.regionShortName = 'ams';
+  home.foundation.vulnerabilityScanningEnabled = false;
+  const synced = syncDrEnvironments(dr, home);
+  expect(synced.foundation.vulnerabilityScanningEnabled).toBe(false);
+  expect(synced.network).toEqual(dr.network);
+  expect(synced.foundation.region).toBe('eu-amsterdam-1');
+  home.foundation.vulnerabilityScanningEnabled = true;
+  expect(syncDrEnvironments(synced, home).foundation.vulnerabilityScanningEnabled).toBe(true);
+});
