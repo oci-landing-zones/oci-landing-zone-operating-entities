@@ -1,4 +1,4 @@
-# Security Zone recipes — CIS Level 1
+## **[Security Zone Recipes for CIS Level 1](#)**
 ### Overview
 
 The published One-OE blueprint deploys Recipe 01 only. This reference describes that baseline and the optional Recipe 02 for selected environments available through the [OCI Security Zones add-on](./README.md).
@@ -11,6 +11,8 @@ The base [oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/on
 
 &nbsp;
 
+#### [Security Zone](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm) and [Recipe](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/managing-recipes.htm) assignment across the [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) Landing Zone compartment hierarchy
+<img src="./images/security-zones.png" width="980" height="value">
 
 &nbsp;
 
@@ -21,7 +23,7 @@ The base [oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/on
 
 &nbsp;
 
-### Recipe 01 — CIS Level 1
+### **[<img src="../../blueprints/one-oe/design/images/logo1.png"  height="50" align="center">](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/sz_recipes_cis1.md#----cis-level-1)  - CIS Level 1**
 
 | Category           | DENY policy and description                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
@@ -30,10 +32,10 @@ The base [oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/on
 
 &nbsp;
 
-### Recipe 02 — Environment
-| Category              | DENY policy and description                                                                                                                                                             |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Includes              | **RECIPE 01**                                                                                                                                                                           |
+### **[<img src="../../blueprints/one-oe/design/images/logo2.png"  height="50" align="center">](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/sz_recipes_cis1.md#)**
+| Category              | DENY policy and description                                                                                                                    |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Includes              | **RECIPE 01**                                                                                                                                  |
 | Restrict modification | **delete_VCN**<br>You can't delete a VCN in the security zone.                                                                                 |
 | Restrict movement     | **subnet_in_security_zone_move_to_compartment_not_in_security_zone**<br>You can't move a subnet in a security zone to a compartment that is not in the same security zone. |
 | Restrict modification | **delete_vcn_security_list**<br>You can't delete a VCN security list in the security zone.                                                     |
@@ -61,7 +63,7 @@ The base [oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/on
 | Restrict association  | **block_volume_in_security_zone_attach_to_instance_not_in_security_zone**<br>You can't attach a block storage volume in the security zone to a Compute instance that isn't in the same security zone. |
 | Restrict association  | **block_volume_not_in_security_zone_attach_to_instance_in_security_zone**<br>You can't attach a block storage volume to a Compute instance in the security zone if the volume isn't in the same security zone. |
 > [!NOTE]
-> **RECIPE 02** includes the 2 policies from **RECIPE 01** and adds 26 environment restrictions. In total, **RECIPE 02** contains 28 policies.
+> **RECIPE 02** includes all policies from  **RECIPE 01** and adds 26 additional policies.<br>In total, **RECIPE 02** contains 28 policies.
 
 &nbsp;
 &nbsp;
@@ -75,7 +77,7 @@ The base [oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/on
 
 Earlier final security files also managed additional recipes and zones. Updating an existing stack to this reduced file can plan to destroy them. Preserve the existing configuration or prepare an explicitly reviewed state migration before upgrading. Do not let both stacks manage the same recipe or zone. See [upgrade guidance](../../blueprints/one-oe/runtime/one-stack/readme.md#existing-deployments).
 
-# License
+# License 
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 
