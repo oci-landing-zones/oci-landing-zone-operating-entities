@@ -156,6 +156,7 @@ Update this diagram when any of these change:
   - `gen/addons/oci-hub-models/profiles.libsonnet`
   - `gen/addons/oci-hybrid-connectivity/profiles.libsonnet`
   - `gen/addons/oci-x-rpc/profiles.libsonnet`
+  - `gen/addons/oci-security-zones/profiles.libsonnet` (standalone security-only publication; see its local guide)
   - `gen/addons/oci-lz-dr/one-oe/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
@@ -396,6 +397,8 @@ Keep `gen/defaults.libsonnet` limited to generic reusable hub defaults. If an ex
 Keep extension-specific placement and parameter semantics in the extension's own local guide; for example, ExaDB-C@C lives under `gen/workload-extensions/exacc/` and ExaDB-D / ExaCS lives under `gen/workload-extensions/exacs/`.
 
 ## 9. Generation Modes
+
+The published One-OE one-stack security entrypoints use a local `output_builder.libsonnet` to publish only Recipe 01 and its landing-zone target, while preserving Cloud Guard, scanning and CIS2 Vault resources. There are no published `oneoe_security_cis*_pre.json` files. The generic builder's security pre/final variants remain available to Blueprint Factory and workload-extension consumers; do not remove them as a side effect of changing this publication family. Additional published zones are owned by `gen/addons/oci-security-zones/`. Observability publication and staging are unchanged by this security boundary.
 
 **Default mode** (`bash gen/generate.sh`):
 Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.

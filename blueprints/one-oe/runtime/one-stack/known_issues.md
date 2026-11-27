@@ -13,10 +13,11 @@ Suggestion: Please update the parameter(s) in the Terraform config as per error 
 
 ```
 
-If you see it, you would need to disable Cloud Guard manually from the console:
-Main Menu -> Identity and Security -> Cloud Guard -> Configuration -> Disable Cloud Guard
+Review which Security Zone is still associated with the compartment and which Terraform state owns it. The base One-OE stack manages Recipe 01 on `cmp-landingzone`; optional Recipe 02 environment zones belong to their separate add-on stacks.
 
-Then, apply remove the conflicting compartment manually and proceed with the Stack destroy operation.
+For an approved decommission, review the destruction plans for the owning stacks and remove any optional environment zones before their compartments. Ensure the base stack removes its landing-zone zone before deleting `cmp-landingzone`. Keep each resource under a single owning state; do not remove compartments manually to bypass a failed plan.
+
+Deleting a zone changes policy enforcement and Cloud Guard targets. Verify the resulting associations and targets before retrying compartment deletion. Disabling tenancy-wide Cloud Guard is not the default remedy. See [add-on maintenance](../../../../addons/oci-security-zones/README.md#5-maintenance) and Oracle's [Deleting a Security Zone](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/delete-security-zone.htm) guidance.
 
 &nbsp; 
 

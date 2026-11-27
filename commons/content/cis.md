@@ -21,16 +21,18 @@ In this repository, `CIS v2` should be read as the `CIS v1` baseline plus additi
 | Observability - Audit Logs | Object Storage bucket plus Service Connector for audit log export and retention | - | Adds KMS-protected bucket encryption using Vault key |
 | Security - Security Posture | Cloud Guard and Vulnerability Scanning | - | - |
 | Security - Vault | - | - | Vault and Software Key |
-| Security - Security Zones | - | Security Zones with Recipe 01 CIS Level 1 | Security Zones with Recipe 02 CIS Level 2 |
+| Security - Security Zones | - | Security Zones with Recipe 01 CIS Level 1 | Security Zones with Recipe 01 CIS Level 2 |
 
 ### Security Zone Recipes
+
+The published One-OE blueprint applies only Recipe 01 to the landing-zone compartment. Optional Recipe 02 for selected environments is deployed separately through the [OCI Security Zones add-on](../../addons/oci-security-zones/README.md). Recipe numbers identify scope; they do not identify the CIS level.
 
 **Recipe 01 CIS Level 1**
 
 - Object Storage buckets in a security zone cannot be public.
 - Databases in a security zone must use private subnets, not public subnets.
 
-**Recipe 02 CIS Level 2**
+**Recipe 01 CIS Level 2**
 
 - Object Storage buckets in a security zone cannot be public.
 - Databases in a security zone must use private subnets, not public subnets.
