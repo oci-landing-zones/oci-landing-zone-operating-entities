@@ -31,11 +31,11 @@ The example illustrates Recipe 02 applied to production. Select the environments
 
 ## 2. Security Zone Configuration
 
-Choose the production example matching the landing zone's CIS level. Each example creates one Recipe 02 in the security compartment (`CMP-LZ-SECURITY-KEY`) and one Security Zone protecting production (`CMP-LZ-PROD-KEY`).
+Choose the production example matching the landing zone's CIS level. Each example creates one Recipe 02 in the security compartment (`cmp_lz_security`) and one Security Zone protecting production (`cmp_lz_prod`).
 
-| Scope | CIS Level 1 | CIS Level 2 | Target compartment reference |
+| Scope | CIS Level 1 | CIS Level 2 | Existing target compartment |
 |---|---|---|---|
-| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `CMP-LZ-PROD-KEY` |
+| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `cmp_lz_prod` |
 
 Use **one configuration file per add-on stack**, containing all selected environments under one `security_zones_configuration` root. Do not load both CIS alternatives into the same stack. The files use the [OCI Landing Zone Orchestrator v2.2.0](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0).
 
