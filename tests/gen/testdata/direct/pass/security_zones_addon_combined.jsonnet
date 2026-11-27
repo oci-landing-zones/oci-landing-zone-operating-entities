@@ -1,4 +1,4 @@
-// Combined examples deploy one independent Recipe 02 and zone per environment in one stack.
+// Custom environment profiles deploy one independent Recipe 02 and zone per environment in one stack.
 // contains: "passed": true
 local combine = import 'gen/addons/oci-security-zones/combined.libsonnet';
 local render = import 'gen/addons/oci-security-zones/published.libsonnet';
@@ -16,7 +16,7 @@ local verify(inputs, cis_level) =
   assert std.set([z.compartment_id for z in std.objectValues(config.security_zones)]) == ['CMP-LZ-PREPROD-KEY', 'CMP-LZ-PROD-KEY'];
   assert std.foldl(function(ok, recipe) ok && recipe.cis_level == std.toString(cis_level), std.objectValues(config.recipes), true);
   true;
-assert verify(profiles.prod_preprod_cis1, 1);
-assert verify(profiles.prod_preprod_cis2, 2);
+assert verify([profiles.environment_cis1, profiles.environment_cis1 + { environment_name: 'preprod', target_compartment_id: 'CMP-LZ-PREPROD-KEY' }], 1);
+assert verify([profiles.environment_cis2, profiles.environment_cis2 + { environment_name: 'preprod', target_compartment_id: 'CMP-LZ-PREPROD-KEY' }], 2);
 assert combine([profiles.environment_cis1]) == render(profiles.environment_cis1);
 { passed: true }

@@ -24,8 +24,8 @@ local verify(profile) =
   assert config.reporting_region == profile.reporting_region;
   assert !std.objectHas(config, 'tenancy_ocid');
   true;
-assert std.objectFields(profiles) == ['environment_cis1', 'environment_cis2', 'prod_preprod_cis1', 'prod_preprod_cis2'] :
-       'The add-on must expose only single and combined environment presets';
+assert std.objectFields(profiles) == ['environment_cis1', 'environment_cis2'] :
+       'The add-on must expose only the two production CIS examples';
 assert verify(profiles.environment_cis1) && verify(profiles.environment_cis2);
 assert profiles.environment_cis1.cis_level == 1 && profiles.environment_cis2.cis_level == 2;
 assert std.objectFields(render(profiles.environment_cis1).security_zones_configuration.recipes)

@@ -18,6 +18,10 @@ The deployment menu includes several Hub architectures, each with distinct netwo
 
 The published blueprint creates only **Security Zone Recipe 01**, applied to `cmp-landingzone` with the selected CIS level. Use `oneoe_security_cis1.json` or `oneoe_security_cis2.json` from the initial deployment onwards; retain it during subsequent updates. Cloud Guard, Vulnerability Scanning and CIS2 Vault resources remain part of that file.
 
+<p align="center">
+  <img src="../../design/images/szblueprint.png" width="882" alt="One-OE blueprint: Security Zone Recipe 01 applied to cmp-landingzone and inherited by its environment and shared compartments">
+</p>
+
 For optional Recipe 02 per selected environment, use the [OCI Security Zones add-on](../../../../addons/oci-security-zones/README.md) in a separate stack. The base stack continues managing Recipe 01. Observability retains its existing pre/final deployment stages.
 
 ### Existing deployments

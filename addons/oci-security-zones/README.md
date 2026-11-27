@@ -35,12 +35,19 @@ Choose **one** configuration per independent add-on stack, with the same CIS lev
 
 | Scope | CIS Level 1 | CIS Level 2 | Existing target compartment |
 |---|---|---|---|
-| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `cmp_lz_prod` |
-| Production and preproduction — one stack | [Configuration](./security_zones_prod_preprod_cis1.json) | [Configuration](./security_zones_prod_preprod_cis2.json) | `cmp_lz_prod` and `cmp_lz_preprod` |
+| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `cmp_lz_prod` (reference key: `CMP-LZ-PROD-KEY`) |
 
-Recipes are created in `cmp_lz_security`, while each zone protects its selected environment. The production example creates one recipe and zone; the combined example creates two recipes and two zones in a single configuration. Both environments must exist in the compartment dependency before deploying the combined example.
+Recipes are created in the security compartment (`cmp_lz_security`, referenced by `CMP-LZ-SECURITY-KEY`), while each zone protects its selected environment. The published production example creates one Recipe 02 and one Security Zone, targeting `CMP-LZ-PROD-KEY`.
 
-Use the combined file for a new stack protecting both environments, or update an existing production-only add-on stack to add an unmanaged `preprod`. Production resource keys are preserved: with the same CIS level and region settings, review that the plan retains the existing production recipe and zone and creates only the preproduction pair. Do not deploy overlapping examples in different states; consolidating existing independent stacks requires a separately reviewed state migration.
+The production example can be extended to any other existing environment, such as preproduction, test or development. For each additional environment:
+
+1. Copy the production recipe entry inside the same `recipes` map. Give it a unique key and `name`, replacing the production environment token with the new environment. Keep the same `cis_level`, policy list and recipe placement compartment.
+2. Copy the production zone entry inside the same `security_zones` map. Give it a unique key and `name`, set `compartment_id` to the new environment's key from `compartments_output.json`, and set `recipe_key` to the new recipe's key.
+3. Confirm that the target environment already exists in the compartment dependency. Keep all selected environments under one `security_zones_configuration` root, using the same reporting region and CIS level.
+
+For example, adding preproduction uses recipe key `SZ-RCP-LZ-02-PREPROD-ENVIRONMENT-KEY`, recipe name `sz-rcp-lz-02-preprod-environment`, zone key `SZ-TGT-LZ-PREPROD-ENVIRONMENT-KEY`, zone name `sz-tgt-lz-preprod-environment`, and target compartment `CMP-LZ-PREPROD-KEY`. The new zone's `recipe_key` references that new recipe. This produces two independent recipe/zone pairs managed by one stack.
+
+When extending an existing production-only add-on stack, preserve its production keys, names, CIS level and region settings. Review that the plan retains the existing production recipe and zone and creates only the additional environment pairs. Each recipe and zone must have exactly one owning state. Do not add a zone already managed by another stack; consolidating existing independent stacks requires a separately reviewed state migration.
 
 Apply each Security Zone to the intended environment compartment, such as cmp_lz_prod or cmp_lz_preprod. Do not target the landing-zone parent compartment or the shared network, platform or security compartments.
 
@@ -56,10 +63,30 @@ The deployable files use the [OCI Landing Zone Orchestrator](https://github.com/
 
 The difference is the CIS baseline included in Recipe 02:
 
-| Variant | CIS baseline | Additional environment restrictions | Total policies |
-|---|---|---|---|
-| CIS Level 1 | 2 policies preventing public buckets and public database instances | 26 | **28** |
-| CIS Level 2 | The Level 1 policies plus 4 policies requiring customer-managed Vault keys | 26 | **32** |
+<table>
+  <thead>
+    <tr>
+      <th width="150">Variant</th>
+      <th>CIS baseline</th>
+      <th>Additional environment restrictions</th>
+      <th>Total policies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CIS&nbsp;Level&nbsp;1</td>
+      <td>2 policies preventing public buckets and public database instances</td>
+      <td>26</td>
+      <td><strong>28</strong></td>
+    </tr>
+    <tr>
+      <td>CIS&nbsp;Level&nbsp;2</td>
+      <td>The Level 1 policies plus 4 policies requiring customer-managed Vault keys</td>
+      <td>26</td>
+      <td><strong>32</strong></td>
+    </tr>
+  </tbody>
+</table>
 
 For Level 2, provision customer-managed keys and the required IAM permissions for applicable block volumes, boot volumes, buckets and file systems before creating or updating protected resources.
 
@@ -84,9 +111,10 @@ Before updating an existing deployment, confirm which stack manages each recipe 
 
 
 > [!IMPORTANT]
+> **Creating a Security Zone does not automatically remediate existing resources that violate its policies.** Subsequent create and update operations are validated against the zone's recipe, while Cloud Guard detects policy violations in existing resources. Review those findings and plan any required remediation separately; a successful add-on deployment does not mean that all existing resources are compliant. See [Oracle's Security Zones overview](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm).
+
+> [!IMPORTANT]
 > Security Zone policies are enforced based on the recipe assigned to the Security Zone associated with a compartment. When a child compartment is assigned a different Security Zone, only the policies defined in that Security Zone's recipe are enforced for resources within the child compartment.
-
-
 
 ### 3.1. Region Settings
 
@@ -113,7 +141,7 @@ Set the tenancy, deployment region and authorized execution identity for that st
 | `oci_configuration_objects` | For example `["security-zones/security_zones_environment_cis2.json"]`; select the intended recipe and CIS level |
 | `oci_dependency_objects` | `["landing-zone/compartments_output.json"]` |
 
-Replace the example object paths with the actual uploaded objects. For a new production-and-preproduction stack, select `security_zones_prod_preprod_cis1.json` or `security_zones_prod_preprod_cis2.json` instead. The facade reads the dependency's top-level `compartments` block. Keep dependency files separate from configuration files, and do not load the base stack's full security file into this stack.
+Replace the example object paths with the actual uploaded objects. If extending protection to other environments, upload the single configuration containing all selected recipe/zone pairs as described in Section 2. The facade reads the dependency's top-level `compartments` block. Keep dependency files separate from configuration files, and do not load the base stack's full security file into this stack.
 
 Review validation, plan and apply as separate steps:
 
