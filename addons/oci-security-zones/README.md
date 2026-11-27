@@ -31,31 +31,25 @@ The example illustrates Recipe 02 applied to production. Select the environments
 
 ## 2. Security Zone Configuration
 
-Choose **one** configuration per independent add-on stack, with the same CIS level as the landing-zone baseline. These files are alternatives, not deployment phases. Each selected environment receives its own Recipe 02 and Security Zone. Do not load several files with the same `security_zones_configuration` root into one operation.
+Choose the production example matching the landing zone's CIS level. Each example creates one Recipe 02 in the security compartment (`CMP-LZ-SECURITY-KEY`) and one Security Zone protecting production (`CMP-LZ-PROD-KEY`).
 
-| Scope | CIS Level 1 | CIS Level 2 | Existing target compartment |
+| Scope | CIS Level 1 | CIS Level 2 | Target compartment reference |
 |---|---|---|---|
-| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `cmp_lz_prod` (reference key: `CMP-LZ-PROD-KEY`) |
+| Production | [Configuration](./security_zones_environment_cis1.json) | [Configuration](./security_zones_environment_cis2.json) | `CMP-LZ-PROD-KEY` |
 
-Recipes are created in the security compartment (`cmp_lz_security`, referenced by `CMP-LZ-SECURITY-KEY`), while each zone protects its selected environment. The published production example creates one Recipe 02 and one Security Zone, targeting `CMP-LZ-PROD-KEY`.
+Use **one configuration file per add-on stack**, containing all selected environments under one `security_zones_configuration` root. Do not load both CIS alternatives into the same stack. The files use the [OCI Landing Zone Orchestrator v2.2.0](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0).
 
-The production example can be extended to any other existing environment, such as preproduction, test or development. For each additional environment:
+**To add another environment**, such as preproduction, test or development:
 
-1. Copy the production recipe entry inside the same `recipes` map. Give it a unique key and `name`, replacing the production environment token with the new environment. Keep the same `cis_level`, policy list and recipe placement compartment.
-2. Copy the production zone entry inside the same `security_zones` map. Give it a unique key and `name`, set `compartment_id` to the new environment's key from `compartments_output.json`, and set `recipe_key` to the new recipe's key.
-3. Confirm that the target environment already exists in the compartment dependency. Keep all selected environments under one `security_zones_configuration` root, using the same reporting region and CIS level.
+1. Duplicate the production entry in `recipes`, assigning a unique key and `name`. Keep its CIS level, policy list and security compartment reference.
+2. Duplicate the production entry in `security_zones`, assigning a unique key and `name`. Set `compartment_id` to the new environment's reference and `recipe_key` to the new recipe's key.
+3. Keep the existing production entries and region settings. Review that the plan retains them and adds only the new recipe/zone pair.
 
-For example, adding preproduction uses recipe key `SZ-RCP-LZ-02-PREPROD-ENVIRONMENT-KEY`, recipe name `sz-rcp-lz-02-preprod-environment`, zone key `SZ-TGT-LZ-PREPROD-ENVIRONMENT-KEY`, zone name `sz-tgt-lz-preprod-environment`, and target compartment `CMP-LZ-PREPROD-KEY`. The new zone's `recipe_key` references that new recipe. This produces two independent recipe/zone pairs managed by one stack.
+For preproduction, replace `PROD` with `PREPROD` in the copied keys and `prod` with `preprod` in the copied names; use `CMP-LZ-PREPROD-KEY` as the target compartment reference. Repeat for each additional environment.
 
-When extending an existing production-only add-on stack, preserve its production keys, names, CIS level and region settings. Review that the plan retains the existing production recipe and zone and creates only the additional environment pairs. Each recipe and zone must have exactly one owning state. Do not add a zone already managed by another stack; consolidating existing independent stacks requires a separately reviewed state migration.
+Before deployment, confirm that every compartment reference resolves to the intended OCID in `compartments_output.json`. For literal OCIDs, verify the compartment directly in OCI. Review its subcompartments too: target only the intended environment, never the landing-zone parent or shared network, platform or security compartments.
 
-Apply each Security Zone to the intended environment compartment, such as cmp_lz_prod or cmp_lz_preprod. Do not target the landing-zone parent compartment or the shared network, platform or security compartments.
-
-Before deployment, verify the target compartment in OCI and review its subcompartments to confirm the intended scope of protection. If the configuration references a compartment using a JSON object key, check that the key maps to the correct compartment OCID in compartments_output.json. If it uses an OCID directly, confirm that the OCID identifies the intended environment compartment.
-
-The add-on uses existing compartments; it does not create IAM policies, networks, workloads, Vaults, keys or a separate Cloud Guard configuration block.
-
-The deployable files use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0) and its `security_zones_configuration` input.
+The add-on creates only recipes and zones in existing compartments. It does not create IAM policies, networks, workloads, Vaults, keys or a separate Cloud Guard configuration block. Each recipe and zone must belong to one Terraform state; see [Prerequisites](#3-prerequisites) before adding protection to an existing deployment.
 
 ### 2.1. CIS Benchmark Level
 
