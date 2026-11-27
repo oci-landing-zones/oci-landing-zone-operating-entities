@@ -1,13 +1,13 @@
 ## **[Security Zone Recipes for CIS Level 2](#)**
 ### Overview
 
-The published One-OE blueprint deploys Recipe 01 only. This reference describes that baseline and the optional Recipe 02 for selected environments available through the [OCI Security Zones add-on](./README.md).
+The published One-OE blueprint deploys Recipe 01 only. This reference describes that baseline and the optional Recipe 02 for selected environments available through the [OCI Security Zones add-on](../../../../addons/oci-security-zones/README.md).
 
 Recipe 01 remains owned by the base landing-zone stack. Deploy selected additional zones in a separate stack after the landing zone is complete. Choose the same CIS level as the baseline.
 
-For deployable files, ownership requirements and plan/apply steps, see the [add-on deployment guide](./README.md).
+For deployable files, ownership requirements and plan/apply steps, see the [add-on deployment guide](../../../../addons/oci-security-zones/README.md).
 
-The base [oneoe_security_cis2.json](../../blueprints/one-oe/runtime/one-stack/oneoe_security_cis2.json) file configures Recipe 01, Cloud Guard, Vulnerability Scanning and the CIS2 Vault and key from the initial deployment onwards. Keep that same security file for subsequent base-stack updates; additional recipes are owned by the add-on stack.
+The base [oneoe_security_cis2.json](./oneoe_security_cis2.json) file configures Recipe 01, Cloud Guard, Vulnerability Scanning and the CIS2 Vault and key from the initial deployment onwards. Keep that same security file for subsequent base-stack updates; additional recipes are owned by the add-on stack.
 
 &nbsp;
 #### [Security Zone](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm) and [Recipe](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/managing-recipes.htm) assignment across the [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) Landing Zone compartment hierarchy
